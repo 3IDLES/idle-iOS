@@ -1,0 +1,8 @@
+# Ignore all xcodeproj files in all directories
+**/*.xcodeproj
+
+# Ignore all xcworkspace files in all directories
+**/*.xcworkspace
+
+# Ignore all xcconfig files in all directories
+**/*.xcconfig
