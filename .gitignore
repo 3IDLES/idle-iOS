@@ -6,3 +6,6 @@
 
 # Ignore all xcconfig files in all directories
 **/*.xcconfig
+
+# Ignore Derived
+**/Derived/
