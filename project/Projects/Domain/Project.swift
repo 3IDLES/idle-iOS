@@ -19,14 +19,14 @@ let project = Project(
         
         /// UseCaseConcrete type
         .target(
-            name: "UseCaseConcrete",
+            name: "ConcreteUseCase",
             destinations: DeploymentSettings.platform,
             product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["UseCaseConcrete/Sources/**"],
+            sources: ["ConcreteUseCase/**"],
             dependencies: [
-                D.Domain.DomainInterface,
+                D.Domain.UseCaseInterface,
                 D.Domain.RepositoryInterface,
             ],
             settings: .settings(
@@ -36,14 +36,14 @@ let project = Project(
         
         /// Concrete type Test
         .target(
-            name: "UseCaseConcreteTests",
+            name: "ConcreteUseCaseTests",
             destinations: DeploymentSettings.platform,
             product: .unitTests,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["UseCaseConcreteTests/**"],
+            sources: ["ConcreteUseCaseTests/**"],
             dependencies: [
-                D.Domain.UseCaseConcrete,
+                D.Domain.ConcreteUseCase,
                 D.Domain.RepositoryInterface,
             ],
             settings: .settings(
@@ -53,12 +53,12 @@ let project = Project(
         
         /// Domain interface
         .target(
-            name: "DomainInterface",
+            name: "UseCaseInterface",
             destinations: DeploymentSettings.platform,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["DomainInterface/Sources/**"],
+            sources: ["UseCaseInterface/**"],
             dependencies: [
                 D.Domain.Entity,
             ],
@@ -74,7 +74,7 @@ let project = Project(
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["RepositoryInterface/Sources/**"],
+            sources: ["RepositoryInterface/**"],
             dependencies: [
                 D.Domain.Entity,
             ],
@@ -100,15 +100,15 @@ let project = Project(
     ],
     schemes: [
         Scheme.makeTestableSchemes(
-            .target("Concrete"),
-            testableTarget: .target("ConcreteTests"),
+            .target("ConcreteUseCase"),
+            testableTarget: .target("ConcreteUseCaseTests"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
             ]
         ),
         Scheme.makeInterfaceSchemes(
-            .target("DomainInterface"),
+            .target("UseCaseInterface"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName

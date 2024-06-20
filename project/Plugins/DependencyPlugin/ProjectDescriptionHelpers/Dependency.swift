@@ -13,8 +13,8 @@ public typealias D = ModuleDependency
 public enum ModuleDependency {
     
     public enum Domain {
-        public static let UseCaseConcrete: TargetDependency = .project(target: "UseCaseConcrete", path: .relativeToRoot("Projects/Domain"))
-        public static let DomainInterface: TargetDependency = .project(target: "DomainInterface", path: .relativeToRoot("Projects/Domain"))
+        public static let ConcreteUseCase: TargetDependency = .project(target: "ConcreteUseCase", path: .relativeToRoot("Projects/Domain"))
+        public static let UseCaseInterface: TargetDependency = .project(target: "UseCaseInterface", path: .relativeToRoot("Projects/Domain"))
         public static let RepositoryInterface: TargetDependency = .project(target: "RepositoryInterface", path: .relativeToRoot("Projects/Domain"))
         public static let Entity: TargetDependency = .project(target: "Entity", path: .relativeToRoot("Projects/Domain"))
     }

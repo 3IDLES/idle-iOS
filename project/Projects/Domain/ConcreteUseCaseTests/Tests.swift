@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import Concrete
+@testable import ConcreteUseCase
 
 final class ConcreteTests: XCTestCase {
     
