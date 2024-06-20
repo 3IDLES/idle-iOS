@@ -16,7 +16,7 @@ let project = Project(
     targets: [
         /// Application
         .target(
-            name: "IdleApp",
+            name: "Idle-iOS",
             destinations: DeploymentSettings.platform,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -39,15 +39,15 @@ let project = Project(
             product: .unitTests,
             bundleId: "com.idle-application.test",
             sources: ["Tests/**"],
-            dependencies: [.target(name: "IdleApp")]
+            dependencies: [.target(name: "Idle-iOS")]
         )
     ],
     schemes: [
         .scheme(
-            name: "IdleApp_Debug",
+            name: "Idle-iOS_Debug",
             buildAction: .buildAction(
                 targets: [
-                    .target("IdleApp")
+                    .target("Idle-iOS")
                 ]
             ),
             testAction: .targets(
@@ -60,10 +60,10 @@ let project = Project(
             archiveAction: .archiveAction(configuration: IdleConfiguration.debugConfigName)
         ),
         .scheme(
-            name: "IdleApp_Release",
+            name: "Idle-iOS_Release",
             buildAction: .buildAction(
                 targets: [
-                    .target("IdleApp")
+                    .target("Idle-iOS")
                 ]
             ),
             testAction: .targets(
