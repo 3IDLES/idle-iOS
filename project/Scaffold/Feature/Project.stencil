@@ -2,7 +2,7 @@
 //  Project.swift
 //  ProjectDescriptionHelpers
 //
-//  Created by 최준영 on 6/21/24.
+//  Created by {{ author }} on {{ currentDate }}
 //
 
 import ProjectDescription
@@ -11,7 +11,7 @@ import ConfigurationPlugin
 import DependencyPlugin
 
 let project = Project(
-    name: "SampleFeature",
+    name: "{{ projectName }}",
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
@@ -19,7 +19,7 @@ let project = Project(
         
         /// FeatureConcrete
         .target(
-            name: "SampleFeature",
+            name: "{{ projectName }}",
             destinations: DeploymentSettings.platform,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -39,7 +39,7 @@ let project = Project(
         
         /// FeatureConcrete ExampleApp
         .target(
-            name: "SampleFeature_ExampleApp",
+            name: "{{ projectName }}_ExampleApp",
             destinations: DeploymentSettings.platform,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -48,7 +48,7 @@ let project = Project(
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
-                .target(name: "SampleFeature")
+                .target(name: "{{ projectName }}")
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -57,14 +57,14 @@ let project = Project(
     ],
     schemes: [
         Scheme.makeSchemes(
-            .target("SampleFeature"),
+            .target("{{ projectName }}"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
             ]
         ),
         Scheme.makeSchemes(
-            .target("SampleFeature_ExampleApp"),
+            .target("{{ projectName }}_ExampleApp"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
