@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import Entity
 
 public protocol RepositoryInterface {
     
-    func getHelloMessage() -> String
+    func getHelloMessage() -> TestEntity
 }

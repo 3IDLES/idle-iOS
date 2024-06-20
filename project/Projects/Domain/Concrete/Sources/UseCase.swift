@@ -20,6 +20,6 @@ public class DefaultUseCase: UseCaseInterface {
     public func sayHello() {
         let message = repository.getHelloMessage()
         
-        print(message)
+        print(message.text)
     }
 }
