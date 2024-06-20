@@ -17,6 +17,8 @@ public enum IdleConfiguration {
     private enum XcconfigFile {
         static let appDebug: Path = .relativeToRoot("XcodeConfiguration/appDebug.xcconfig")
         static let appRelease: Path = .relativeToRoot("XcodeConfiguration/appRelease.xcconfig")
+        static let domainDebug: Path = .relativeToRoot("XcodeConfiguration/Domain/domainDebug.xcconfig")
+        static let domainRelease: Path = .relativeToRoot("XcodeConfiguration/Domain/domainRelease.xcconfig")
     }
     
     private static let appDebug: Configuration = .debug(name: Name.debug, xcconfig: XcconfigFile.appDebug)
@@ -24,6 +26,9 @@ public enum IdleConfiguration {
     
     public static let appDebugConfigName = Name.debug
     public static let appReleaseConfigName = Name.release
+    private static let domainDebug: Configuration = .debug(name: debugConfigName, xcconfig: XcconfigFile.domainDebug)
+    private static let domainRelease: Configuration = .release(name: releaseConfigName, xcconfig: XcconfigFile.domainRelease)
     
     public static let appConfigurations: [Configuration] = [appDebug, appRelease]
+    public static let domainConfigurations: [Configuration] = [domainDebug, domainRelease]
 }

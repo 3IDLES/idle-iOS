@@ -11,7 +11,7 @@ import ConfigurationPlugin
 let project = Project(
     name: "App",
     settings: .settings(
-        configurations: IdleConfiguration.appConfigurations
+        configurations: IdleConfiguration.emptyConfigurations
     ),
     targets: [
         /// Application
@@ -20,7 +20,7 @@ let project = Project(
             destinations: DeploymentSettings.platform,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: .iOS("13.0"),
+            deploymentTargets: DeploymentSettings.deployment_version,
             infoPlist: IdleInfoPlist.appDefault,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
@@ -54,10 +54,10 @@ let project = Project(
                 [
                     .testableTarget(target: .target("IdleAppTests")) 
                 ],
-                configuration: IdleConfiguration.appDebugConfigName
+                configuration: IdleConfiguration.debugConfigName
             ),
-            runAction: .runAction(configuration: IdleConfiguration.appDebugConfigName),
-            archiveAction: .archiveAction(configuration: IdleConfiguration.appDebugConfigName)
+            runAction: .runAction(configuration: IdleConfiguration.debugConfigName),
+            archiveAction: .archiveAction(configuration: IdleConfiguration.debugConfigName)
         ),
         .scheme(
             name: "IdleApp_Release",
@@ -70,10 +70,10 @@ let project = Project(
                 [
                     .testableTarget(target: .target("IdleAppTests"))
                 ],
-                configuration: IdleConfiguration.appReleaseConfigName
+                configuration: IdleConfiguration.releaseConfigName
             ),
-            runAction: .runAction(configuration: IdleConfiguration.appReleaseConfigName),
-            archiveAction: .archiveAction(configuration: IdleConfiguration.appReleaseConfigName)
+            runAction: .runAction(configuration: IdleConfiguration.releaseConfigName),
+            archiveAction: .archiveAction(configuration: IdleConfiguration.releaseConfigName)
         )
     ]
 )
