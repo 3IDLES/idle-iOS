@@ -107,14 +107,14 @@ let project = Project(
                 IdleConfiguration.releaseConfigName
             ]
         ),
-        Scheme.makeInterfaceSchemes(
+        Scheme.makeSchemes(
             .target("UseCaseInterface"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
             ]
         ),
-        Scheme.makeInterfaceSchemes(
+        Scheme.makeSchemes(
             .target("RepositoryInterface"),
             configNames: [
                 IdleConfiguration.debugConfigName,

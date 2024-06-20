@@ -9,18 +9,18 @@ import ProjectDescription
 
 public extension Scheme {
     
-    static func makeInterfaceSchemes(_ targetReference: TargetReference, configNames: [ConfigurationName]) -> [Scheme] {
+    static func makeSchemes(_ targetReference: TargetReference, configNames: [ConfigurationName]) -> [Scheme] {
         
         return configNames.map { configName in
             
-            .makeInterfaceScheme(
+            .makeScheme(
                 targetReference,
                 configName: configName
             )
         }
     }
     
-    static func makeInterfaceScheme(_ targetReference: TargetReference, configName: ConfigurationName) -> Scheme {
+    static func makeScheme(_ targetReference: TargetReference, configName: ConfigurationName) -> Scheme {
         
         return .scheme(
             name: "\(targetReference.targetName)-\(configName.rawValue)",

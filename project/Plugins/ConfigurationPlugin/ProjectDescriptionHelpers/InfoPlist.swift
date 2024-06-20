@@ -24,6 +24,22 @@ public enum IdleInfoPlist {
             ]
         ]
     ])
+    
+    public static let exampleAppDefault: InfoPlist = .extendingDefault(with: [
+        "UILaunchStoryboardName": "LaunchScreen.storyboard",
+        "CFBundleDisplayName" : "$(BUNDLE_DISPLAY_NAME)",
+        "UIApplicationSceneManifest": [
+            "UIApplicationSupportsMultipleScenes": false,
+            "UISceneConfigurations": [
+                "UIWindowSceneSessionRoleApplication": [
+                    [
+                        "UISceneConfigurationName": "Default Configuration",
+                        "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
+                    ]
+                ]
+            ]
+        ]
+    ])
 }
 
 
