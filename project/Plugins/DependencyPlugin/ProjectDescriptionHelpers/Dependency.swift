@@ -24,5 +24,11 @@ public enum ModuleDependency {
         public static let NetworkConcrete: TargetDependency = .project(target: "ConcreteNetwork", path: .relativeToRoot("Projects/Data"))
         public static let NetworkInterface: TargetDependency = .project(target: "NetworkInterface", path: .relativeToRoot("Projects/Data"))
     }
+    
+    public enum Presentation {
+        public static let DSKit: TargetDependency = .project(target: "DSKit", path: .relativeToRoot("Projects/Feature/DSKit"))
+        public static let PresentationCore: TargetDependency = .project(target: "PresentationCore", path: .relativeToRoot("Projects/Feature/PresentationCore"))
+        public static let SampleFeature: TargetDependency = .project(target: "SampleFeature", path: .relativeToRoot("Projects/Feature/SampleFeature"))
+    }
 }
 
