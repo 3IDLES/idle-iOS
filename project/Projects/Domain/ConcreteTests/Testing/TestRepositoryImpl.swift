@@ -7,10 +7,11 @@
 
 import Foundation
 import RepositoryInterface
+import Entity
 
 class RepositoryImpl: RepositoryInterface {
     
-    func getHelloMessage() -> String {
-        return "Hello, World!"
+    func getHelloMessage() -> TestEntity {
+        return .init(text: "Hello, World!")
     }
 }

@@ -60,6 +60,7 @@ let project = Project(
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["DomainInterface/Sources/**"],
             dependencies: [
+                D.Domain.Entity,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.domainConfigurations
@@ -74,12 +75,28 @@ let project = Project(
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["RepositoryInterface/Sources/**"],
+            dependencies: [
+                D.Domain.Entity,
+            ],
+            settings: .settings(
+                base: ["ENABLE_TESTABILITY": "YES"],
+                configurations: IdleConfiguration.domainConfigurations
+            )
+        ),
+        
+        /// Entity
+        .target(
+            name: "Entity",
+            destinations: DeploymentSettings.platform,
+            product: .framework,
+            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
+            deploymentTargets: DeploymentSettings.deployment_version,
+            sources: ["Entity/**"],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"],
                 configurations: IdleConfiguration.domainConfigurations
             )
         )
-        
     ],
     schemes: [
         Scheme.makeTestableSchemes(
