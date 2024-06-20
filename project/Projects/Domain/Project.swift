@@ -17,14 +17,14 @@ let project = Project(
     ),
     targets: [
         
-        /// Concrete type
+        /// UseCaseConcrete type
         .target(
-            name: "Concrete",
+            name: "UseCaseConcrete",
             destinations: DeploymentSettings.platform,
             product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["Concrete/Sources/**"],
+            sources: ["UseCaseConcrete/Sources/**"],
             dependencies: [
                 D.Domain.DomainInterface,
                 D.Domain.RepositoryInterface,
@@ -36,14 +36,14 @@ let project = Project(
         
         /// Concrete type Test
         .target(
-            name: "ConcreteTests",
+            name: "UseCaseConcreteTests",
             destinations: DeploymentSettings.platform,
             product: .unitTests,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["ConcreteTests/**"],
+            sources: ["UseCaseConcreteTests/**"],
             dependencies: [
-                D.Domain.Concrete,
+                D.Domain.UseCaseConcrete,
                 D.Domain.RepositoryInterface,
             ],
             settings: .settings(
