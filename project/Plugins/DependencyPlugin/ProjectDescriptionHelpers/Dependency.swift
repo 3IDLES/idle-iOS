@@ -18,5 +18,11 @@ public enum ModuleDependency {
         public static let RepositoryInterface: TargetDependency = .project(target: "RepositoryInterface", path: .relativeToRoot("Projects/Domain"))
         public static let Entity: TargetDependency = .project(target: "Entity", path: .relativeToRoot("Projects/Domain"))
     }
+    
+    public enum Data {
+        public static let ConcreteRepository: TargetDependency = .project(target: "ConcreteRepository", path: .relativeToRoot("Projects/Data"))
+        public static let NetworkConcrete: TargetDependency = .project(target: "ConcreteNetwork", path: .relativeToRoot("Projects/Data"))
+        public static let NetworkInterface: TargetDependency = .project(target: "NetworkInterface", path: .relativeToRoot("Projects/Data"))
+    }
 }
 
