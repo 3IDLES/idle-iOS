@@ -28,7 +28,13 @@ public enum ModuleDependency {
     public enum Presentation {
         public static let DSKit: TargetDependency = .project(target: "DSKit", path: .relativeToRoot("Projects/Presentation/DSKit"))
         public static let PresentationCore: TargetDependency = .project(target: "PresentationCore", path: .relativeToRoot("Projects/Presentation/PresentationCore"))
-        public static let SampleFeature: TargetDependency = .project(target: "SampleFeature", path: .relativeToRoot("Projects/Presentation/SampleFeature"))
     }
 }
-	
+
+// External dependencies
+public extension TargetDependency {
+    
+    static let rxswift: TargetDependency = .external(name: "RxSwift")
+    static let rxCocoa: TargetDependency = .external(name: "RxCocoa")
+}
+

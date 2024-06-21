@@ -9,3 +9,6 @@
 
 # Ignore Derived
 **/Derived/
+
+**/.package.resolved
+**/Package.resolved
