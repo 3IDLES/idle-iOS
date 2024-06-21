@@ -12,9 +12,6 @@ import DependencyPlugin
 
 let project = Project(
     name: "Data",
-    packages: [
-        .remote(url: "https://github.com/Alamofire/Alamofire.git", requirement: .exact("5.9.1")),
-    ],
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
@@ -64,7 +61,8 @@ let project = Project(
             sources: ["ConcreteNetwork/**"],
             dependencies: [
                 D.Data.NetworkInterface,
-                .package(product: "Alamofire")
+                // ThirdParty
+                D.ThirdParty.Alamofire
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"]

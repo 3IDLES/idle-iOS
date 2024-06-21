@@ -32,9 +32,13 @@ public enum ModuleDependency {
 }
 
 // External dependencies
-public extension TargetDependency {
+public extension ModuleDependency {
     
-    static let rxSwift: TargetDependency = .external(name: "RxSwift")
-    static let rxCocoa: TargetDependency = .external(name: "RxCocoa")
+    enum ThirdParty {
+        public static let RxSwift: TargetDependency = .external(name: "RxSwift")
+        public static let RxCocoa: TargetDependency = .external(name: "RxCocoa")
+        public static let Swinject: TargetDependency = .external(name: "Swinject")
+        public static let Alamofire: TargetDependency = .external(name: "Alamofire")
+    }
 }
 

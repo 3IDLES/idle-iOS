@@ -12,9 +12,6 @@ import Foundation
 
 let project = Project(
     name: "App",
-    packages: [
-        .remote(url: "https://github.com/Swinject/Swinject.git", requirement: .exact("2.9.1")),
-    ],
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
@@ -37,8 +34,8 @@ let project = Project(
                 D.Data.ConcreteRepository,
                 D.Data.NetworkConcrete,
                 
-                // external
-                .package(product: "Swinject")
+                // ThirdParty
+                D.ThirdParty.Swinject
             ],
             settings: .settings(
                 configurations: IdleConfiguration.appConfigurations
