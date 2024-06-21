@@ -12,7 +12,7 @@ private let projectName: Template.Attribute = .required("projectName")
 private let author: Template.Attribute = .required("author")
 private let currentDate: Template.Attribute = .required("currentDate")
 
-let projectPath = "Projects/Presentation/\(projectName)"
+let projectPath = "Projects/Presentation/Feature/\(projectName)"
 
 let featureTemplate = Template(
     description: "A template for a new feature module",
@@ -37,6 +37,12 @@ let featureTemplate = Template(
         .file(
             path: "\(projectPath)/Project.swift",
             templatePath: .relativeToRoot("Scaffold/Feature/Project.stencil")
+        ),
+        
+        /// Dependency plugin생성
+        .file(
+            path: "Plugins/DependencyPlugin/ProjectDescriptionHelpers/\(projectName)FeatureDependency.swift",
+            templatePath: .relativeToRoot("Scaffold/Feature/FeatureDependency.stencil")
         )
     ]
 )
