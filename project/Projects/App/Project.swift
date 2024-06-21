@@ -12,6 +12,10 @@ import DependencyPlugin
 let project = Project(
     name: "App",
     settings: .settings(
+        base: [
+            "CLANG_ENABLE_MODULE_VERIFIER": "YES",
+            "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
+        ],
         configurations: IdleConfiguration.emptyConfigurations
     ),
     targets: [
