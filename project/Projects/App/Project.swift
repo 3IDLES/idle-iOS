@@ -8,14 +8,11 @@
 import ProjectDescription
 import ConfigurationPlugin
 import DependencyPlugin
+import Foundation
 
 let project = Project(
     name: "App",
     settings: .settings(
-        base: [
-            "CLANG_ENABLE_MODULE_VERIFIER": "YES",
-            "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
-        ],
         configurations: IdleConfiguration.emptyConfigurations
     ),
     targets: [
@@ -32,13 +29,9 @@ let project = Project(
             dependencies: [
                 // Domain
                 D.Domain.ConcreteUseCase,
-                D.Domain.RepositoryInterface,
-                D.Domain.UseCaseInterface,
                 
                 // Data
-                D.Data.ConcreteRepository,
                 D.Data.NetworkConcrete,
-                D.Data.NetworkInterface,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.appConfigurations
