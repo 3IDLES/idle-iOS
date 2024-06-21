@@ -16,10 +16,6 @@ let project = Project(
         .remote(url: "https://github.com/Alamofire/Alamofire.git", requirement: .exact("5.9.1")),
     ],
     settings: .settings(
-        base: [
-            "CLANG_ENABLE_MODULE_VERIFIER": "YES",
-            "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
-        ],
         configurations: IdleConfiguration.emptyConfigurations
     ),
     targets: [

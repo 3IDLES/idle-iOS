@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import DomainInterface
+import UseCaseInterface
 import RepositoryInterface
 
 public class DefaultUseCase: UseCaseInterface {
