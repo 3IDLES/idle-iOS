@@ -19,7 +19,7 @@ let project = Project(
         
         /// FeatureConcrete
         .target(
-            name: "{{ projectName }}",
+            name: "{{ projectName }}Feature",
             destinations: DeploymentSettings.platform,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -48,7 +48,7 @@ let project = Project(
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
-                .target(name: "{{ projectName }}")
+                .target(name: "{{ projectName }}Feature")
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -57,7 +57,7 @@ let project = Project(
     ],
     schemes: [
         Scheme.makeSchemes(
-            .target("{{ projectName }}"),
+            .target("{{ projectName }}Feature"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
