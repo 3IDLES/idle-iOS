@@ -7,6 +7,7 @@
 
 import ProjectDescription
 import ConfigurationPlugin
+import DependencyPlugin
 
 let project = Project(
     name: "App",
