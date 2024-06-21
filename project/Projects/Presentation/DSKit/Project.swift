@@ -13,6 +13,10 @@ import DependencyPlugin
 let proejct = Project(
     name: "DSKit",
     settings: .settings(
+        base: [
+            "CLANG_ENABLE_MODULE_VERIFIER": "YES",
+            "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
+        ],
         configurations: IdleConfiguration.emptyConfigurations
     ),
     targets: [
