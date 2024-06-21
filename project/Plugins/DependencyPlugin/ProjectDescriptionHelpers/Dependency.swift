@@ -34,7 +34,7 @@ public enum ModuleDependency {
 // External dependencies
 public extension TargetDependency {
     
-    static let rxswift: TargetDependency = .external(name: "RxSwift")
+    static let rxSwift: TargetDependency = .external(name: "RxSwift")
     static let rxCocoa: TargetDependency = .external(name: "RxCocoa")
 }
 

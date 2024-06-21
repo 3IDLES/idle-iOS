@@ -30,7 +30,15 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
+                // Domain
+                D.Domain.ConcreteUseCase,
+                D.Domain.RepositoryInterface,
+                D.Domain.UseCaseInterface,
                 
+                // Data
+                D.Data.ConcreteRepository,
+                D.Data.NetworkConcrete,
+                D.Data.NetworkInterface,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.appConfigurations
