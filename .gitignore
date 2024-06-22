@@ -12,3 +12,6 @@
 
 **/.package.resolved
 **/Package.resolved
+
+# Ignore build cache
+**/.build
