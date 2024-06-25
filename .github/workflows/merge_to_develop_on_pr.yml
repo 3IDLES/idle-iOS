@@ -56,11 +56,11 @@ jobs:
         with:
           repository: ${{ secrets.XCCONFIG_REPO }}
           token: ${{ secrets.XCCONFIG_REPO_TOKEN }}
-          path: '$GITHUB_WORKSPACE/project/XcodeConfiguration'
+          path: '${{ github.workspace }}/project/XcodeConfiguration'
       
       - run: |
           echo "Checking configurations are loaded..."
-          tree $GITHUB_WORKSPACE/project/XcodeConfiguration
+          tree ${{ github.workspace }}/project/XcodeConfiguration
       
       #6. test tuist project
       - name: Test project
