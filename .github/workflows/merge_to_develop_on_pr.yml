@@ -65,6 +65,7 @@ jobs:
       #6. test tuist project
       - name: Test project
         run: 
+          cd project
           tuist test
 
   
