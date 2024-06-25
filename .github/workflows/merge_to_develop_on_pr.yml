@@ -46,11 +46,14 @@ jobs:
         if: steps.cache-tree.outputs.cache-hit != 'true'
         run: brew install tree
 
+      - name: add brew to PATH
+        run: |
+          echo "/opt/homebrew/bin" >> ${{ github.path }}
+
       - name: check paths
         run: |
-          which tuist
-          which tree
-        
+          echo "tuist in installed in $(which tuist)"
+          echo "tree in installed in $(which tree)"
       
       #4. checkout tuist project repository
       - name: checkout project
