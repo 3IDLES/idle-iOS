@@ -60,7 +60,7 @@ jobs:
       
       - run: |
           echo "Checking configurations are loaded..."
-          tree project/XcodeConfiguration
+          tree $GITHUB_WORKSPACE/project/XcodeConfiguration
       
       #6. test tuist project
       - name: Test project
