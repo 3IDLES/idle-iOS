@@ -33,6 +33,7 @@ jobs:
         if: steps.cache-tuist.outputs.cache-hit != 'true'
         run: |
           mise install tuist@${{ env.TUIST_VERSION }}
+          mise use -g tuist@${{ env.TUIST_VERSION }}
       
       #4. checkout tuist project repository
       - name: checkout project
@@ -45,6 +46,10 @@ jobs:
           repository: ${{ secrets.XCCONFIG_REPO }}
           token: ${{ secrets.XCCONFIG_REPO_TOKEN }}
           path: '$GITHUB_WORKSPACE/project/XcodeConfiguration'
+      
+      - run: |
+          echo "Checking configurations are loaded..."
+          tree project/XcodeConfiguration
       
       #6. test tuist project
       - name: Test project
