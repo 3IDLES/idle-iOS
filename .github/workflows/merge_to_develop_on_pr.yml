@@ -35,16 +35,22 @@ jobs:
           mise install tuist@${{ env.TUIST_VERSION }}
           mise use -g tuist@${{ env.TUIST_VERSION }}
 
-      - name: cache tree
-        id: cache-tree
-        uses: actions/cache@v4
-        with:
-          path: /opt/homebrew/bin/tree
-          key: ${{ runner.os }}-tree
+      # - name: cache tree
+      #   id: cache-tree
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: /opt/homebrew/bin/tree
+      #     key: ${{ runner.os }}-tree
           
       - name: install tree
-        if: steps.cache-tree.outputs.cache-hit != 'true'
+        # if: steps.cache-tree.outputs.cache-hit != 'true'
         run: brew install tree
+
+      - name: check paths
+        run: |
+          which tuist
+          which tree
+        
       
       #4. checkout tuist project repository
       - name: checkout project
