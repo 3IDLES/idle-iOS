@@ -34,21 +34,9 @@ jobs:
         run: |
           mise install tuist@${{ env.TUIST_VERSION }}
           mise use -g tuist@${{ env.TUIST_VERSION }}
-
-      - name: cache tree
-        id: cache-tree
-        uses: actions/cache@v4
-        with:
-          path: /opt/homebrew/bin/tree
-          key: ${{ runner.os }}-tree
           
       - name: install tree
-        if: steps.cache-tree.outputs.cache-hit != 'true'
         run: brew install tree
-
-      - name: add brew to PATH
-        run: |
-          echo "/opt/homebrew/bin" >> $GITHUB_PATH
 
       - name: check paths
         run: |
@@ -66,8 +54,9 @@ jobs:
           repository: ${{ secrets.XCCONFIG_REPO }}
           token: ${{ secrets.XCCONFIG_REPO_TOKEN }}
           path: '${{ github.workspace }}/project/XcodeConfiguration'
-      
-      - run: |
+
+      - name: check xcconfig files
+        run: |
           echo "Checking configurations are loaded..."
           tree ${{ github.workspace }}/project/XcodeConfiguration
       
