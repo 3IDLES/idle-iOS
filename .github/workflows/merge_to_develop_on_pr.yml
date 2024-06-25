@@ -1,0 +1,56 @@
+name: PR to [develop]
+on: 
+  pull_request:
+    branches: [ develop ]
+
+#1. load mise
+#2. cache tuist
+#3. install tuist
+#4. checkout tuist project repository
+#5. fetch XCConfig from repository
+#6. test tuist project
+
+jobs:
+  test:
+    runs-on: macos-latest
+    env: 
+      TUIST_VERSION: 4.12.1
+    steps:
+
+      #1. load mise
+      - uses: jdx/mise-action@v2
+
+      #2. cache tuist
+      - name: cache tuist
+        id: cache-tuist
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/tuist
+          key: ${{ runner.os }}-tuist@${{ env.TUIST_VERSION }}
+
+      #3. install tuist
+      - name: install tuist
+        if: steps.cache-tuist.outputs.cache-hit != 'true'
+        run: |
+          mise install tuist@${{ env.TUIST_VERSION }}
+      
+      #4. checkout tuist project repository
+      - name: checkout project
+        uses: actions/checkout@v4
+      
+      #5. fetch XCConfig from repository
+      - name: fetch xcconfig
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.XCCONFIG_REPO }}
+          token: ${{ secrets.XCCONFIG_REPO_TOKEN }}
+          path: '$GITHUB_WORKSPACE/project/XcodeConfiguration'
+      
+      #6. test tuist project
+      - name: Test project
+        run: 
+          tuist test
+
+  
+
+
