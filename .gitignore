@@ -6,6 +6,7 @@
 
 # Ignore all xcconfig files in all directories
 **/*.xcconfig
+XcodeConfiguration/
 
 # Ignore Derived
 **/Derived/
