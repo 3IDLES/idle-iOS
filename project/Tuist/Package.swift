@@ -32,5 +32,7 @@ let package = Package(
         .package(url: "https://github.com/ReactiveX/RxSwift.git", from: "6.7.1"),
         // Swinject
         .package(url: "https://github.com/Swinject/Swinject.git", from: "2.9.1"),
+        // KeyChainAccess
+        .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: "4.2.2")
     ]
 )

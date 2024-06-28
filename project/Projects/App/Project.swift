@@ -32,7 +32,7 @@ let project = Project(
                 
                 // Data
                 D.Data.ConcreteRepository,
-                D.Data.NetworkConcrete,
+                D.Data.NetworkDataSource,
                 
                 // ThirdParty
                 D.ThirdParty.Swinject

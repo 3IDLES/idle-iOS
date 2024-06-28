@@ -7,16 +7,32 @@
 
 import XCTest
 @testable import ConcreteRepository
-@testable import ConcreteNetwork
+@testable import NetworkDataSource
 
 final class ConcretesTests: XCTestCase {
     
     func testFunction() {
         
-        let repository = DefaultRepository(
-            networkDataSource: DefaultNetworkDataSource()
-        )
+        let expectation = expectation(description: "Test function")
         
-        print(repository.getHelloMessage())
+        let testStore = TestKeyValueStore()
+        
+        let testService = DefaultTestService(keyValueStore: testStore)
+        
+        let single = testService.testRequest()
+        
+        let _ = single.subscribe { people in
+            
+            XCTAssertGreaterThanOrEqual(people.count, 1)
+            
+            expectation.fulfill()
+        } onFailure: { error in
+            
+            XCTFail(error.localizedDescription)
+            
+            expectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: 10, handler: nil)
     }
 }

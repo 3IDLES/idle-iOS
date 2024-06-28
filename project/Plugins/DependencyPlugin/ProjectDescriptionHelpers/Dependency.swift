@@ -21,8 +21,7 @@ public enum ModuleDependency {
     
     public enum Data {
         public static let ConcreteRepository: TargetDependency = .project(target: "ConcreteRepository", path: .relativeToRoot("Projects/Data"))
-        public static let NetworkConcrete: TargetDependency = .project(target: "ConcreteNetwork", path: .relativeToRoot("Projects/Data"))
-        public static let NetworkInterface: TargetDependency = .project(target: "NetworkInterface", path: .relativeToRoot("Projects/Data"))
+        public static let NetworkDataSource: TargetDependency = .project(target: "NetworkDataSource", path: .relativeToRoot("Projects/Data"))
     }
     
     public enum Presentation {
@@ -39,6 +38,7 @@ public extension ModuleDependency {
         public static let RxCocoa: TargetDependency = .external(name: "RxCocoa")
         public static let Swinject: TargetDependency = .external(name: "Swinject")
         public static let Alamofire: TargetDependency = .external(name: "Alamofire")
+        public static let KeyChainAccess: TargetDependency = .external(name: "KeychainAccess")
     }
 }
 
