@@ -16,3 +16,6 @@ XcodeConfiguration/
 
 # Ignore build cache
 **/.build
+
+# Ignore DS STore
+**/.DS_Store
