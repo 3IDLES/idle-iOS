@@ -27,7 +27,7 @@ let project = Project(
             sources: ["ConcreteRepository/**"],
             dependencies: [
                 D.Domain.RepositoryInterface,
-                D.Data.NetworkInterface,
+                D.Data.NetworkDataSource,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"]
@@ -44,39 +44,31 @@ let project = Project(
             sources: ["ConcretesTests/**"],
             dependencies: [
                 D.Data.ConcreteRepository,
-                D.Data.NetworkConcrete,
+                D.Data.NetworkDataSource,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.dataConfigurations
             )
         ),
         
-        /// NetworkConcrete
+        /// NetworkDataSource
         .target(
-            name: "ConcreteNetwork",
+            name: "NetworkDataSource",
             destinations: DeploymentSettings.platform,
             product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["ConcreteNetwork/**"],
+            sources: ["NetworkDataSource/**"],
             dependencies: [
-                D.Data.NetworkInterface,
+                
                 // ThirdParty
-                D.ThirdParty.Alamofire
+                D.ThirdParty.Alamofire,
+                D.ThirdParty.RxSwift,
+                D.ThirdParty.KeyChainAccess,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"]
             )
-        ),
-        
-        /// NetworkInterface
-        .target(
-            name: "NetworkInterface",
-            destinations: DeploymentSettings.platform,
-            product: .staticLibrary,
-            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["NetworkInterface/**"]
         ),
     ],
     schemes: [
