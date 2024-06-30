@@ -27,6 +27,10 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
+                
+                // Presentation
+                D.Presentation.PresentationCore,
+                
                 // Domain
                 D.Domain.ConcreteUseCase,
                 
