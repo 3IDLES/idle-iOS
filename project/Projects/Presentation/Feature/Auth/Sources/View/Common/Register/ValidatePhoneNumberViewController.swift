@@ -10,7 +10,7 @@ import PresentationCore
 
 class ValidatePhoneNumberViewController: DisposableViewController {
     
-    var coordinater: AgentRegisterCoordinator?
+    var coordinater: Coordinator?
     
     override func viewDidLoad() {
         

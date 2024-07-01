@@ -1,23 +1,23 @@
 //
-//  EnterNameViewController.swift
+//  SetIdPasswordViewController.swift
 //  AuthFeature
 //
-//  Created by choijunios on 6/30/24.
+//  Created by choijunios on 7/1/24.
 //
 
 import UIKit
 import PresentationCore
 
-class EnterNameViewController: DisposableViewController {
+class SetIdPasswordViewController: DisposableViewController {
     
-    var coordinater: Coordinator?
+    var coordinater: AgencyRegisterCoordinator?
     
     override func viewDidLoad() {
         
         view.backgroundColor = .white
         
         let label = UILabel()
-        label.text = "이름 입력"
+        label.text = "아이디 패스워드 최초 설정화면"
         
         view.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
