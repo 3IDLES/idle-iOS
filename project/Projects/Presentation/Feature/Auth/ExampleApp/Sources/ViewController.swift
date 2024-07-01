@@ -13,7 +13,7 @@ class ViewController: UIViewController {
         
         let initialLabel = UILabel()
         
-        initialLabel.text = "Hello world"
+        initialLabel.text = "Example app"
         
         view.backgroundColor = .white
         

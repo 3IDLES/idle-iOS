@@ -6,10 +6,16 @@
 //
 
 import Foundation
+import AuthFeature
 
 extension RootCoordinator {
     
     func auth() {
         
+        let authCoordinator = AuthCoordinator(
+            navigationController: navigationController
+        )
+        
+        authCoordinator.start()
     }
 }
