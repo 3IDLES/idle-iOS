@@ -76,7 +76,15 @@ extension AgencyAuthCoorinator: AgencyAuthCoordinatable {
     
     func register() {
         
+        let coordinator = AgencyRegisterCoordinator(
+            navigationController: navigationController
+        )
         
+        coordinator.parent = self
+        
+        addChildCoordinator(coordinator)
+        
+        coordinator.start()
     }
     
     func authFinished() {

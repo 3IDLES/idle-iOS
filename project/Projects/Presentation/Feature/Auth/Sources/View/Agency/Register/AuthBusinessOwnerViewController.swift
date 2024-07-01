@@ -1,23 +1,23 @@
 //
-//  EnterNameViewController.swift
+//  AuthBusinessOwnerViewController.swift
 //  AuthFeature
 //
-//  Created by choijunios on 6/30/24.
+//  Created by choijunios on 7/1/24.
 //
 
 import UIKit
 import PresentationCore
 
-class EnterNameViewController: DisposableViewController {
+class AuthBusinessOwnerViewController: DisposableViewController {
     
-    var coordinater: Coordinator?
+    var coordinater: AgencyRegisterCoordinator?
     
     override func viewDidLoad() {
         
         view.backgroundColor = .white
         
         let label = UILabel()
-        label.text = "이름 입력"
+        label.text = "사업자 인증 화면"
         
         view.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
