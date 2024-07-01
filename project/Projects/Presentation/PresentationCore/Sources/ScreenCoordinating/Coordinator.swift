@@ -47,6 +47,8 @@ public extension ParentCoordinator {
     
     func clearChildren() {
         
+        print(self, childCoordinators, navigationController.viewControllers)
+        
         let lastCoordinator = childCoordinators.popLast()
         
         var middleViewControllers: [UIViewController?] = []
@@ -89,6 +91,8 @@ public extension ParentCoordinator {
                 lastCoordinator.popViewController()
             }
         }
+        
+        print("종료", self, childCoordinators, navigationController.viewControllers)
     }
 }
 
