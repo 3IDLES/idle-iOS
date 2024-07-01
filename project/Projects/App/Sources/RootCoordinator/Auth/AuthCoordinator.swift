@@ -33,7 +33,7 @@ public class AuthCoordinator: ParentCoordinator {
         coordinator.parent = self
         
         addChildCoordinator(coordinator)
-        `
+        
         coordinator.start()
     }
     
