@@ -5,8 +5,7 @@
 **/*.xcworkspace
 
 # Ignore all xcconfig files in all directories
-**/*.xcconfig
-XcodeConfiguration/
+project/Secrets/
 
 # Ignore Derived
 **/Derived/

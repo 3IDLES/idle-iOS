@@ -28,6 +28,9 @@ let project = Project(
             dependencies: [
                 D.Domain.UseCaseInterface,
                 D.Domain.RepositoryInterface,
+                
+                // ThirdParty
+                D.ThirdParty.RxSwift,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"]
@@ -61,6 +64,9 @@ let project = Project(
             sources: ["UseCaseInterface/**"],
             dependencies: [
                 D.Domain.Entity,
+                
+                // ThirdParty
+                D.ThirdParty.RxSwift,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.domainConfigurations
@@ -77,6 +83,9 @@ let project = Project(
             sources: ["RepositoryInterface/**"],
             dependencies: [
                 D.Domain.Entity,
+                
+                // ThirdParty
+                D.ThirdParty.RxSwift,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"],
