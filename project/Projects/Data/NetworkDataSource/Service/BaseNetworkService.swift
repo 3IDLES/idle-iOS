@@ -8,54 +8,62 @@
 import Foundation
 import RxSwift
 import Alamofire
+import Moya
+import RxMoya
 
-class BaseNetworkService<T: BaseAPI> {
+class BaseNetworkService<TagetAPI: BaseAPI> {
     
-    let keyValueStore: KeyValueStore
+    private let keyValueStore: KeyValueStore
     
     init(keyValueStore: KeyValueStore = KeyChainList.shared) {
         self.keyValueStore = keyValueStore
     }
     
-    lazy var tokenSession: Session = {
+    private lazy var provider = self.defaultProvider
+        
+    private lazy var defaultProvider: MoyaProvider<TagetAPI> = {
+        
+        let provider = MoyaProvider<TagetAPI>(session: sessionWithToken)
+        
+        return provider
+    }()
+    
+    lazy var sessionWithToken: Session = {
         
         let configuration = URLSessionConfiguration.default
         
+        // 단일 요청이 완료되는데 걸리는 최대 시간, 초과시 타임아웃
         configuration.timeoutIntervalForRequest = 10
+        
+        // 하나의 리소스를 로드하는데 걸리는 시간, 재시도를 포함한다 초과시 타임아웃
+        configuration.timeoutIntervalForResource = 10
+        
+        // Cache policy: 로컬캐시를 무시하고 항상 새로운 데이터를 가져온다.
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         
         let tokenIntercepter = Interceptor.interceptor(
             adapter: tokenAdpater,
             retrier: tokenRetrier
         )
         
-        let serverTrustPolicies: [String: ServerTrustEvaluating] = [
-            "667c2cf33c30891b865ba28e.mockapi.io": DisabledTrustEvaluator()
-        ]
-
-        let serverTrustManager = ServerTrustManager(evaluators: serverTrustPolicies)
-        
-        let tokenSession = Session(
+        return Session(
             configuration: configuration,
-            interceptor: tokenIntercepter,
-            serverTrustManager: serverTrustManager
+            interceptor: tokenIntercepter
         )
-        
-        return tokenSession
     }()
     
+    
+    // MARK: Alamofire Interceptor
     lazy var tokenAdpater = Adapter { [weak self] request, session, completion in
-        
-        guard let token = self?.keyValueStore.getAuthToken() else {
-            
-            // TODO: 에러처리 규칙 정해지면 수정예정
-            precondition(false, "Token not found")
-        }
         
         var adaptedRequest = request
         
-        let bearerToken = "Bearer \(token.accessToken)"
-        
-        adaptedRequest.setValue(bearerToken, forHTTPHeaderField: ReqeustConponents.Header.authorization.key)
+        if let token = self?.keyValueStore.getAuthToken() {
+            
+            let bearerToken = "Bearer \(token.accessToken)"
+            
+            adaptedRequest.setValue(bearerToken, forHTTPHeaderField: "Authorization")
+        }
           
         completion(.success(adaptedRequest))
     }
@@ -67,7 +75,6 @@ class BaseNetworkService<T: BaseAPI> {
             if httpResponse.statusCode == 401 {
                 
                 // TODO: 토큰 재발급후 요청 재시도
-            
             }
         }
         
@@ -76,33 +83,49 @@ class BaseNetworkService<T: BaseAPI> {
     
 }
 
+// MARK: DataRequest
 extension BaseNetworkService {
     
-    func request<R: Decodable>(api: T) -> Single<R> {
+    func requestDecodable<T: Decodable>(api: TagetAPI) -> Single<T> {
         
-        return Single<R>.create { [weak self] single in
+        self.provider.rx.request(api)
+            .map(T.self)
+    }
+    
+    // MARK: Request with Progress
+    struct ProgressResponse<T: Decodable> {
+        
+        let progress: Double
+        let data: T?
+    }
+    
+    func requestDecodableWithProgress<T: Decodable>(api: TagetAPI) -> Single<ProgressResponse<T>> {
+        
+        Single<ProgressResponse<T>>.create { single in
             
-            let urlRequest = URLRequest(url: api.baseUrl)
-            
-            print(urlRequest.url!.absoluteString)
-            
-            let requestSession = api.headers.keys.contains("Authorization") ? self?.tokenSession : AF
-            
-            let dataRequest = requestSession?
-                .request(urlRequest)
-                .validate(statusCode: 200..<300)
-                .responseDecodable(of: R.self) { response in
-                    switch response.result {
-                    case .success(let decoded):
-                        single(.success(decoded))
-                    case .failure(let error):
-                        single(.failure(error))
+            self.provider.rx
+                .requestWithProgress(api)
+                .subscribe(onNext: { response in
+                    
+                    if let result = response.response {
+                        
+                        do {
+                            
+                            let decoded = try result.map(T.self)
+                            
+                            let item = ProgressResponse<T>(
+                                progress: response.progress,
+                                data: decoded
+                            )
+                            
+                            single(.success(item))
+                            
+                        } catch {
+                            
+                            single(.failure(error))
+                        }
                     }
-                }
-            
-            return Disposables.create {
-                dataRequest?.cancel()
-            }
+                })
         }
     }
 }

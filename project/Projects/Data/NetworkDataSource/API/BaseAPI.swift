@@ -6,49 +6,41 @@
 //
 
 import Foundation
+import Moya
 
-protocol BaseAPI {
+enum APIType {
     
-    static var apiType: APIType { get }
-    var headers: [String: String] { get }
-    var method: ReqeustConponents.HTTPMethod { get }
-    var queryItems: [URLQueryItem]? { get }
-    var endPoint: String { get }
+    case test
+}
+
+// MARK: BaseAPI
+protocol BaseAPI: TargetType {
+    
+    var apiType: APIType { get }
 }
 
 extension BaseAPI {
     
-    var baseUrl: URL {
+    var baseURL: URL {
         
-        var baseUrlString = Config.baseUrlString
+        let base = URL(string: NetworkConfig.baseUrl)!
         
-        [
-            Self.apiType.additionalPath,
-            endPoint
-        ].forEach { path in
-            if !path.isEmpty {
-                baseUrlString.append("/\(path)")
-            }
+        return base.appendingPathComponent(self.path)
+    }
+    
+    var path: String {
+        
+        switch apiType {
+        case .test:
+            "test"
+        default:
+            preconditionFailure("APIType is not defined")
         }
-        
-        return URL(string: baseUrlString)!
     }
     
-    
-    var headers: [String: String] {
+    /// Default header
+    var headers: [String : String]? {
         
-        return defaultHeaders
-    }
-    
-    var defaultHeaders: [String: String] {
-        
-        return [
-            ReqeustConponents.Header.contentType.key: ReqeustConponents.Header.contentType.defaultValue
-        ]
-    }
-    
-    var queryItems: [URLQueryItem]? {
-        
-        return nil
+        return ["Content-Type": "application/json"]
     }
 }

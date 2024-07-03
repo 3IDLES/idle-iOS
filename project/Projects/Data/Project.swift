@@ -28,6 +28,9 @@ let project = Project(
             dependencies: [
                 D.Domain.RepositoryInterface,
                 D.Data.NetworkDataSource,
+                
+                // ThirdParty
+                D.ThirdParty.RxSwift
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"]
@@ -58,13 +61,18 @@ let project = Project(
             product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["NetworkDataSource/**"],
+            sources: [
+                "NetworkDataSource/**",
+                SecretSource.networkDataSource,
+            ],
             dependencies: [
                 
                 // ThirdParty
                 D.ThirdParty.Alamofire,
                 D.ThirdParty.RxSwift,
                 D.ThirdParty.KeyChainAccess,
+                D.ThirdParty.Moya,
+                D.ThirdParty.RxMoya,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"]

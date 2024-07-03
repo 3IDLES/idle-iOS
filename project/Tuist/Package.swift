@@ -33,6 +33,8 @@ let package = Package(
         // Swinject
         .package(url: "https://github.com/Swinject/Swinject.git", from: "2.9.1"),
         // KeyChainAccess
-        .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: "4.2.2")
+        .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: "4.2.2"),
+        // Moya
+        .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3"),
     ]
 )

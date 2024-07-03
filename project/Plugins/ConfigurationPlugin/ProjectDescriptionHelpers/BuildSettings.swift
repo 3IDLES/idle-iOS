@@ -15,17 +15,17 @@ public enum IdleConfiguration {
     }
     
     private enum XcconfigFile {
-        static let appDebug: Path = .relativeToRoot("XcodeConfiguration/App/appDebug.xcconfig")
-        static let appRelease: Path = .relativeToRoot("XcodeConfiguration/App/appRelease.xcconfig")
+        static let appDebug: Path = .relativeToRoot("Secrets/XcodeConfiguration/App/appDebug.xcconfig")
+        static let appRelease: Path = .relativeToRoot("Secrets/XcodeConfiguration/App/appRelease.xcconfig")
         
-        static let domainDebug: Path = .relativeToRoot("XcodeConfiguration/Domain/domainDebug.xcconfig")
-        static let domainRelease: Path = .relativeToRoot("XcodeConfiguration/Domain/domainRelease.xcconfig")
+        static let domainDebug: Path = .relativeToRoot("Secrets/XcodeConfiguration/Domain/domainDebug.xcconfig")
+        static let domainRelease: Path = .relativeToRoot("Secrets/XcodeConfiguration/Domain/domainRelease.xcconfig")
         
-        static let dataDebug: Path = .relativeToRoot("XcodeConfiguration/Data/dataDebug.xcconfig")
-        static let dataRelease: Path = .relativeToRoot("XcodeConfiguration/Data/dataRelease.xcconfig")
+        static let dataDebug: Path = .relativeToRoot("Secrets/XcodeConfiguration/Data/dataDebug.xcconfig")
+        static let dataRelease: Path = .relativeToRoot("Secrets/XcodeConfiguration/Data/dataRelease.xcconfig")
         
-        static let presentationDebug: Path = .relativeToRoot("XcodeConfiguration/Presentation/presentationDebug.xcconfig")
-        static let presentationRelease: Path = .relativeToRoot("XcodeConfiguration/Presentation/presentationRelease.xcconfig")
+        static let presentationDebug: Path = .relativeToRoot("Secrets/XcodeConfiguration/Presentation/presentationDebug.xcconfig")
+        static let presentationRelease: Path = .relativeToRoot("Secrets/XcodeConfiguration/Presentation/presentationRelease.xcconfig")
     }
     
     public static let debugConfigName = Name.debug
