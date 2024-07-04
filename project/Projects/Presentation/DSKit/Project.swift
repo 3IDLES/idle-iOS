@@ -27,6 +27,24 @@ let proejct = Project(
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
             )
-        )
+        ),
+        
+        // Component를 테스트하는 Example타겟
+        .target(
+            name: "DSKit_ExampleApp",
+            destinations: DeploymentSettings.platform,
+            product: .app,
+            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
+            deploymentTargets: DeploymentSettings.deployment_version,
+            infoPlist: IdleInfoPlist.exampleAppDefault,
+            sources: ["ExampleApp/Sources/**"],
+            resources: ["ExampleApp/Resources/**"],
+            dependencies: [
+                D.Presentation.DSKit
+            ],
+            settings: .settings(
+                configurations: IdleConfiguration.presentationConfigurations
+            )
+        ),
     ]
 )
