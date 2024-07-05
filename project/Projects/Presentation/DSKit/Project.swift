@@ -23,7 +23,12 @@ let proejct = Project(
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Sources/**"],
-            resources: ["Resources/**"],
+            resources: ["Resources/**",],
+            dependencies: [
+                // ThirdParty
+                D.ThirdParty.RxSwift,
+                D.ThirdParty.RxCocoa,
+            ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
             )
@@ -40,11 +45,12 @@ let proejct = Project(
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
-                D.Presentation.DSKit
+                D.Presentation.DSKit,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
             )
         ),
-    ]
+    ],
+    resourceSynthesizers: .default
 )
