@@ -1,15 +1,15 @@
 //
-//  TextButtonType1.swift
+//  CTAButtonType1.swift
 //  DSKit
 //
-//  Created by choijunios on 7/5/24.
+//  Created by choijunios on 7/6/24.
 //
 
 import UIKit
 import RxSwift
 import RxCocoa
 
-public class TextButtonType1: UIView {
+public class CTAButtonType1: UIView {
     
     public private(set) var isEnabled: Bool = true
     
@@ -33,6 +33,10 @@ public class TextButtonType1: UIView {
     
     public var eventPublisher: Signal<UITapGestureRecognizer> { tapGesture.rx.event.asSignal() }
     
+    public override var intrinsicContentSize: CGSize {
+        .init(width: 0, height: 58)
+    }
+    
     public init(
         labelText: String,
         textOriginColor: UIColor = DSKitAsset.Colors.orange500.color
@@ -55,7 +59,7 @@ public class TextButtonType1: UIView {
     func setApearance() {
         
         self.backgroundColor = DSKitAsset.Colors.orange500.color
-        self.layer.cornerRadius = 6
+        self.layer.cornerRadius = 8
     }
     
     func setAutoLayout() {
@@ -87,7 +91,7 @@ public class TextButtonType1: UIView {
 }
 
 // MARK: 활성상태
-extension TextButtonType1: DisablableComponent {
+extension CTAButtonType1: DisablableComponent {
     
     public func setEnabled(_ isEnabled: Bool) {
         self.isEnabled = isEnabled

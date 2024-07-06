@@ -45,10 +45,13 @@ class ViewController: UIViewController {
             }
         )
         
+        let ctaButton = CTAButtonType1(labelText: "다음")
+        
         [
             iFType1,
             btn1,
             btn2,
+            ctaButton,
         ]
             .forEach {
                 $0.translatesAutoresizingMaskIntoConstraints = false
@@ -63,7 +66,11 @@ class ViewController: UIViewController {
             iFType1.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             iFType1.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            btn1.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            ctaButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            btn1.bottomAnchor.constraint(equalTo: ctaButton.topAnchor, constant: -20),
             btn1.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             btn1.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
