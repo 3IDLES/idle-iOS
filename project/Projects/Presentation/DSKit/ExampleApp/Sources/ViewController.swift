@@ -27,17 +27,26 @@ class ViewController: UIViewController {
             submitButtonText: "인증"
         )
         
-        let btn = ButtonPrototype(
-            text: "테스트",
+        let btn1 = ButtonPrototype(
+            text: "테스트1",
             onTouch: {
                 
                 iFType1.resignFirstResponder()
             }
         )
         
+        let btn2 = ButtonPrototype(
+            text: "테스트2",
+            onTouch: {
+                
+                iFType1.button.setEnabled(!iFType1.button.isEnabled)
+            }
+        )
+        
         [
             iFType1,
-            btn
+            btn1,
+            btn2,
         ]
             .forEach {
                 $0.translatesAutoresizingMaskIntoConstraints = false
@@ -52,9 +61,13 @@ class ViewController: UIViewController {
             iFType1.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             iFType1.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            btn.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            btn.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            btn.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            btn1.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            btn1.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            btn1.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            btn2.bottomAnchor.constraint(equalTo: btn1.topAnchor, constant: -20),
+            btn2.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            btn2.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
 }

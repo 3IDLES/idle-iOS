@@ -1,5 +1,5 @@
 //
-//  TextButton.swift
+//  TextButtonType1.swift
 //  DSKit
 //
 //  Created by choijunios on 7/5/24.
@@ -10,6 +10,8 @@ import RxSwift
 import RxCocoa
 
 public class TextButtonType1: UIView {
+    
+    public private(set) var isEnabled: Bool = true
     
     lazy var label: UILabel = {
        
@@ -79,11 +81,12 @@ public class TextButtonType1: UIView {
     }
 }
 
-extension TextButtonType1 {
+// MARK: 활성상태
+extension TextButtonType1: DisablableComponent {
     
-    enum State {
-        
-        case active
-        case inactive
+    public func setEnabled(_ isEnabled: Bool) {
+        self.isEnabled = isEnabled
+        self.isUserInteractionEnabled = isEnabled
+        self.alpha = isEnabled ? 1 : 0.5
     }
 }
