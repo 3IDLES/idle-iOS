@@ -26,6 +26,7 @@ public class IdleOneLineInputField: UIView {
     
     var eventPublisher: Observable<String> { textField.rx.text.compactMap { $0 } }
     
+    // MARK: TextField
     public private(set) lazy var textField: UITextField = {
         
         let view = UITextField()
@@ -35,6 +36,7 @@ public class IdleOneLineInputField: UIView {
         return view
     }()
     
+    // MARK: Clear button
     private lazy var clearButton: UIButton = {
        
         let button = UIButton()
@@ -49,7 +51,14 @@ public class IdleOneLineInputField: UIView {
         
         return button
     }()
+    @objc
+    private func onClear(sender: UIButton) {
+        
+        textField.text = ""
+        clearButton.isHidden = true
+    }
     
+    // MARK: Complete image
     private let isCompleteImageAvailable: Bool
     
     private let completeImage: UIImageView = {
@@ -62,6 +71,10 @@ public class IdleOneLineInputField: UIView {
         return view
     }()
     
+    // MARK: Timer label
+    private var timerLabel: TimerLabel?
+    private var timer: Timer?
+    
     private let stack: UIStackView = {
         
         let stack = UIStackView()
@@ -72,13 +85,6 @@ public class IdleOneLineInputField: UIView {
         
         return stack
     }()
-    
-    @objc
-    private func onClear(sender: UIButton) {
-        
-        textField.text = ""
-        clearButton.isHidden = true
-    }
     
     private let disposeBag = DisposeBag()
     
@@ -274,10 +280,112 @@ extension IdleOneLineInputField: DisablableComponent {
         textField.textColor = isEnabled ? .black : DSKitAsset.Colors.gray300.color
         self.backgroundColor = isEnabled ? .white : DSKitAsset.Colors.gray050.color
         
+        if let timerLabel {
+            
+            timerLabel.textColor = isEnabled ? timerLabel.originTextColor : timerLabel.disabledTextColor
+        }
+        
         if !isEnabled {
             
             onResignFocused()
         }
     }
+}
+
+// MARK: Timer
+public extension IdleOneLineInputField {
     
+    class TimerLabel: UILabel { 
+        
+        let originTextColor = DSKitAsset.Colors.gray500.color
+        let disabledTextColor = DSKitAsset.Colors.gray200.color
+        
+        func setTime(seconds: Int) {
+            
+            let minute = seconds / 60
+            let second = seconds % 60
+            
+            let minuteText = minute < 10 ? "0\(minute)" : "\(minute)"
+            let secondText = second < 10 ? "0\(second)" : "\(second)"
+            
+            self.text = "\(minuteText):\(secondText)"
+        }
+    }
+    
+    // Creation
+    func createTimer() {
+        
+        // 중복생성 방지
+        if timerLabel != nil { return }
+        
+        let timerLabel = TimerLabel()
+        timerLabel.setTime(seconds: 0)
+        timerLabel.font = .systemFont(ofSize: textField.font?.pointSize ?? 14)
+        timerLabel.textColor = DSKitAsset.Colors.gray500.color
+        timerLabel.textAlignment = .center
+        
+        stack.addArrangedSubview(timerLabel)
+        timerLabel.setContentHuggingPriority(.init(751), for: .horizontal)
+        timerLabel.setContentCompressionResistancePriority(.init(751), for: .horizontal)
+        timerLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            timerLabel.heightAnchor.constraint(equalTo: textField.heightAnchor),
+        ])
+        
+        self.timerLabel = timerLabel
+    }
+    
+    func removeTimer() {
+        
+        if let timerLabel = stack.arrangedSubviews.first(where: { ($0 as? TimerLabel) != nil }) {
+            // timer라벨이 존재하는 경우 삭제
+            stopTimer()
+            
+            stack.removeArrangedSubview(timerLabel)
+            self.layoutSubviews()
+        }
+    }
+    
+    // Management
+    func startTimer(minute: Int, seconds: Int) {
+        
+        if let timerLabel {
+            
+            var startSeconds = minute * 60 + seconds
+            
+            timerLabel.setTime(seconds: startSeconds)
+            
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
+                
+                startSeconds -= 1
+                
+                if startSeconds == 0 {
+                    
+                    self?.stopTimer()
+                    
+                    return
+                }
+                
+                self?.timerLabel?.setTime(seconds: startSeconds)
+            }
+        }
+    }
+    
+    func stopTimer() {
+                
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    // Visibility
+    func showTimer() {
+        
+        timerLabel?.isHidden = false
+    }
+    
+    func dismissTimer() {
+        
+        timerLabel?.isHidden = true
+    }
 }
