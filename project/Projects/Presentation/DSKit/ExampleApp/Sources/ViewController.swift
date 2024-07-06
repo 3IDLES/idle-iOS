@@ -40,6 +40,7 @@ class ViewController: UIViewController {
             onTouch: {
                 
                 iFType1.button.setEnabled(!iFType1.button.isEnabled)
+                iFType1.textField.setEnabled(!iFType1.textField.isEnabled)
             }
         )
         
