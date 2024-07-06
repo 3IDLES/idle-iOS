@@ -37,7 +37,7 @@ public class NavigationBarType1: UIStackView {
         
         label.textAlignment = .left
         label.text = navigationTitle
-        label.font = .systemFont(ofSize: 20)
+        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 20)
         
         return label
     }()

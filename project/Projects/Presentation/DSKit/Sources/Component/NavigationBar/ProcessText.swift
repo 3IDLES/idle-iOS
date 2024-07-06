@@ -23,7 +23,7 @@ public class ProcessText: UIStackView {
             
         let label = ResizableUILabel()
         
-        label.font = .systemFont(ofSize: 16)
+        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 16)
         label.textColor = DSKitAsset.Colors.orange500.color
         label.textAlignment = .right
         
@@ -33,7 +33,7 @@ public class ProcessText: UIStackView {
             
         let label = ResizableUILabel()
         
-        label.font = .systemFont(ofSize: 14)
+        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
         label.textColor = DSKitAsset.Colors.gray300.color
         
         return label
@@ -81,6 +81,10 @@ public class ProcessText: UIStackView {
         
         currentProcessLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
         processCountLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
+        NSLayoutConstraint.activate([
+            currentProcessLabel.widthAnchor.constraint(equalToConstant: 14),
+        ])
     }
     
     func setObservable() {

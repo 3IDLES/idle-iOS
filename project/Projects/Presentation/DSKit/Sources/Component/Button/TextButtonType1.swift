@@ -21,7 +21,7 @@ public class TextButtonType1: UIView {
         
         view.text = labelText
         view.textColor = .white
-        view.font = .systemFont(ofSize: 16, weight: UIFont.Weight(700))
+        view.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
         view.textAlignment = .center
         
         return view
