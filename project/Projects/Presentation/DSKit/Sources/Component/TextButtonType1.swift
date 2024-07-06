@@ -15,9 +15,9 @@ public class TextButtonType1: UIView {
     
     private let textOriginColor: UIColor
     
-    lazy var label: UILabel = {
+    lazy var label: ResizableUILabel = {
        
-        let view = UILabel()
+        let view = ResizableUILabel()
         
         view.text = labelText
         view.textColor = .white
