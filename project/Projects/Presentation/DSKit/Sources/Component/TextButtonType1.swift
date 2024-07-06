@@ -13,6 +13,8 @@ public class TextButtonType1: UIView {
     
     public private(set) var isEnabled: Bool = true
     
+    private let textOriginColor: UIColor
+    
     lazy var label: UILabel = {
        
         let view = UILabel()
@@ -31,9 +33,13 @@ public class TextButtonType1: UIView {
     
     public var eventPublisher: Signal<UITapGestureRecognizer> { tapGesture.rx.event.asSignal() }
     
-    init(labelText: String) {
+    init(
+        labelText: String,
+        textOriginColor: UIColor = DSKitAsset.Colors.orange500.color
+    ) {
         
         self.labelText = labelText
+        self.textOriginColor = textOriginColor
         
         super.init(frame: .zero)
         
@@ -70,12 +76,11 @@ public class TextButtonType1: UIView {
     @objc
     func onTouchAction(_ tapGesture: UITapGestureRecognizer) {
         
-        let orginColor: UIColor = DSKitAsset.Colors.orange500.color
         self.backgroundColor = DSKitAsset.Colors.orange300.color
         
-        UIView.animate(withDuration: 0.2) {
+        UIView.animate(withDuration: 0.3) {
             
-            self.backgroundColor = orginColor
+            self.backgroundColor = self.textOriginColor
             self.layer.displayIfNeeded()
         }
     }
@@ -87,6 +92,6 @@ extension TextButtonType1: DisablableComponent {
     public func setEnabled(_ isEnabled: Bool) {
         self.isEnabled = isEnabled
         self.isUserInteractionEnabled = isEnabled
-        self.alpha = isEnabled ? 1 : 0.5
+        self.backgroundColor = isEnabled ? textOriginColor : DSKitAsset.Colors.gray200.color
     }
 }
