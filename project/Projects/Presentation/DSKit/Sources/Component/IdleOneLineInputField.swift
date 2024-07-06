@@ -295,7 +295,7 @@ extension IdleOneLineInputField: DisablableComponent {
 // MARK: Timer
 public extension IdleOneLineInputField {
     
-    class TimerLabel: UILabel { 
+    class TimerLabel: ResizableUILabel {
         
         let originTextColor = DSKitAsset.Colors.gray500.color
         let disabledTextColor = DSKitAsset.Colors.gray200.color
