@@ -23,6 +23,11 @@ let proejct = Project(
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Sources/**"],
+            dependencies: [
+                // ThirdParty
+                D.ThirdParty.RxSwift,
+                D.ThirdParty.RxCocoa,
+            ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
             )

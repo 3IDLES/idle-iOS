@@ -33,7 +33,7 @@ enum CenterRegisterStage: Int {
     }
 }
 
-public class CenterRegisterCoordinator: ChildCoordinator {
+public class CenterRegisterCoordinator: Coordinator {
     
     public var parent: CenterAuthCoordinatable?
     
@@ -47,7 +47,14 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
     private var currentStage: CenterRegisterStage?
     
-    public init(navigationController: UINavigationController) {
+    // ViewModel
+    private let viewModel: CenterRegisterViewModel
+    
+    public init(
+        viewModel: CenterRegisterViewModel,
+        navigationController: UINavigationController
+    ) {
+        self.viewModel = viewModel
         self.navigationController = navigationController
     }
     
@@ -55,10 +62,10 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
     public func start() {
         stageViewControllers = [
-            EnterNameViewController(),
-            ValidatePhoneNumberViewController(),
-            AuthBusinessOwnerViewController(),
-            SetIdPasswordViewController(),
+            EnterNameViewController(coordinator: self, viewModel: viewModel),
+            ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
+            AuthBusinessOwnerViewController(coordinator: self),
+            SetIdPasswordViewController(coordinator: self),
         ]
         
         let pageViewController = UIPageViewController(
@@ -86,13 +93,15 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
         viewControllerRef?.cleanUp()
         
+        stageViewControllers = []
+        
         parent?.removeChildCoordinator(self)
     }
 }
 
 extension CenterRegisterCoordinator {
     
-    func next() {
+    public func next() {
         
         if let nextStage = currentStage?.nextStage {
             
@@ -117,11 +126,7 @@ extension CenterRegisterCoordinator {
         
         let viewController = stageViewControllers[CenterRegisterStage.phoneNumber.rawValue]
         
-        let phoneStage = viewController as! ValidatePhoneNumberViewController
-        
-        phoneStage.coordinater = self
-        
-        showStage(viewController: phoneStage)
+        showStage(viewController: viewController)
         
         currentStage = .phoneNumber
     }
@@ -130,11 +135,7 @@ extension CenterRegisterCoordinator {
         
         let viewController = stageViewControllers[CenterRegisterStage.name.rawValue]
         
-        let nameStage = viewController as! EnterNameViewController
-        
-        nameStage.coordinater = self
-        
-        showStage(viewController: nameStage)
+        showStage(viewController: viewController)
         
         currentStage = .name
     }
@@ -143,11 +144,7 @@ extension CenterRegisterCoordinator {
         
         let viewController = stageViewControllers[CenterRegisterStage.businessOwner.rawValue]
         
-        let nameStage = viewController as! AuthBusinessOwnerViewController
-        
-        nameStage.coordinater = self
-        
-        showStage(viewController: nameStage)
+        showStage(viewController: viewController)
         
         currentStage = .businessOwner
     }
@@ -156,11 +153,7 @@ extension CenterRegisterCoordinator {
         
         let viewController = stageViewControllers[CenterRegisterStage.idPassword.rawValue]
         
-        let nameStage = viewController as! SetIdPasswordViewController
-        
-        nameStage.coordinater = self
-        
-        showStage(viewController: nameStage)
+        showStage(viewController: viewController)
         
         currentStage = .idPassword
     }

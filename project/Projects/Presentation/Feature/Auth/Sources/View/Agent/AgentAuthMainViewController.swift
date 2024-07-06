@@ -48,6 +48,6 @@ public class AgentAuthMainViewController: DisposableViewController {
     }
     
     public func cleanUp() {
-        coordinator?.coordinatorDidFinish()
+        
     }
 }

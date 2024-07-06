@@ -43,7 +43,6 @@ class CenterRegisterViewController: DisposableViewController {
         [
             statusView,
             pageViewController.view,
-            nextButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -58,17 +57,12 @@ class CenterRegisterViewController: DisposableViewController {
             pageViewController.view.topAnchor.constraint(equalTo: statusView.bottomAnchor),
             pageViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             pageViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            pageViewController.view.bottomAnchor.constraint(equalTo: nextButton.topAnchor),
-            
-            nextButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            nextButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor, constant: 20),
-            nextButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor, constant: -20)
+            pageViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
     }
     
     func cleanUp() {
         
-        coordinator?.stageViewControllers = []
     }
 }
 
