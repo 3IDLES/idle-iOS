@@ -24,11 +24,11 @@ public class IFType1: UIStackView {
     public let eventPublisher: PublishSubject<String> = .init()
     
     // View
-    private lazy var textField = IdleOneLineInputField(
+    public private(set) lazy var textField = IdleOneLineInputField(
         placeHolderText: placeHolderText,
         keyboardType: .numberPad
     )
-    private lazy var button: TextButtonType1 = {
+    public private(set) lazy var button: TextButtonType1 = {
        
         let btn = TextButtonType1(labelText: submitButtonText)
         return btn
