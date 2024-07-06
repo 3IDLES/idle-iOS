@@ -18,6 +18,8 @@ import RxCocoa
 
 public class IdleOneLineInputField: UIView {
     
+    public var isEnabled: Bool = true
+    
     // Init parameters
     var state: BehaviorSubject<State> = .init(value: .editing)
     let initialText: String
@@ -260,4 +262,22 @@ extension IdleOneLineInputField: UITextFieldDelegate {
         
         return true
     }
+}
+
+// MARK: 활성상태
+extension IdleOneLineInputField: DisablableComponent {
+    
+    public func setEnabled(_ isEnabled: Bool) {
+        self.isEnabled = isEnabled
+        self.isUserInteractionEnabled = isEnabled
+        
+        textField.textColor = isEnabled ? .black : DSKitAsset.Colors.gray300.color
+        self.backgroundColor = isEnabled ? .white : DSKitAsset.Colors.gray050.color
+        
+        if !isEnabled {
+            
+            onResignFocused()
+        }
+    }
+    
 }
