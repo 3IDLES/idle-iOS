@@ -25,7 +25,7 @@ extension AuthCoordinator: AuthCoordinatable {
             
         case .agency:
             
-            let coordinator = AgencyAuthCoorinator(navigationController: navigationController)
+            let coordinator = CenterAuthCoorinator(navigationController: navigationController)
             
             addChildCoordinator(coordinator)
             

@@ -1,5 +1,5 @@
 //
-//  AgencyRegisterCoordinator.swift
+//  CenterRegisterCoordinator.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/1/24.
@@ -8,7 +8,7 @@
 import UIKit
 import PresentationCore
 
-enum AgencyRegisterStage: Int {
+enum CenterRegisterStage: Int {
     
     case phoneNumber=0
     case name=1
@@ -33,9 +33,9 @@ enum AgencyRegisterStage: Int {
     }
 }
 
-public class AgencyRegisterCoordinator: ChildCoordinator {
+public class CenterRegisterCoordinator: ChildCoordinator {
     
-    public var parent: AgencyAuthCoordinatable?
+    public var parent: CenterAuthCoordinatable?
     
     public weak var viewControllerRef: (any PresentationCore.DisposableViewController)?
     
@@ -45,7 +45,7 @@ public class AgencyRegisterCoordinator: ChildCoordinator {
     
     var stageViewControllers: [DisposableViewController] = []
     
-    private var currentStage: AgencyRegisterStage?
+    private var currentStage: CenterRegisterStage?
     
     public init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -69,7 +69,7 @@ public class AgencyRegisterCoordinator: ChildCoordinator {
         
         self.pageViewController = pageViewController
         
-        let viewController = AgencyRegisterViewController(
+        let viewController = CenterRegisterViewController(
             pageViewController: pageViewController
         )
         
@@ -90,7 +90,7 @@ public class AgencyRegisterCoordinator: ChildCoordinator {
     }
 }
 
-extension AgencyRegisterCoordinator {
+extension CenterRegisterCoordinator {
     
     func next() {
         
@@ -115,7 +115,7 @@ extension AgencyRegisterCoordinator {
     
     func authPhoneNumber() {
         
-        let viewController = stageViewControllers[AgencyRegisterStage.phoneNumber.rawValue]
+        let viewController = stageViewControllers[CenterRegisterStage.phoneNumber.rawValue]
         
         let phoneStage = viewController as! ValidatePhoneNumberViewController
         
@@ -128,7 +128,7 @@ extension AgencyRegisterCoordinator {
     
     func enterName() {
         
-        let viewController = stageViewControllers[AgencyRegisterStage.name.rawValue]
+        let viewController = stageViewControllers[CenterRegisterStage.name.rawValue]
         
         let nameStage = viewController as! EnterNameViewController
         
@@ -141,7 +141,7 @@ extension AgencyRegisterCoordinator {
     
     func authBusinessOwner() {
         
-        let viewController = stageViewControllers[AgencyRegisterStage.businessOwner.rawValue]
+        let viewController = stageViewControllers[CenterRegisterStage.businessOwner.rawValue]
         
         let nameStage = viewController as! AuthBusinessOwnerViewController
         
@@ -154,7 +154,7 @@ extension AgencyRegisterCoordinator {
     
     func setIdPassword() {
         
-        let viewController = stageViewControllers[AgencyRegisterStage.idPassword.rawValue]
+        let viewController = stageViewControllers[CenterRegisterStage.idPassword.rawValue]
         
         let nameStage = viewController as! SetIdPasswordViewController
         

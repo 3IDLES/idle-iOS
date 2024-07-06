@@ -1,5 +1,5 @@
 //
-//  AgencyFindPasswordCoordinator.swift
+//  CenterFindPasswordCoordinator.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/1/24.
@@ -8,13 +8,13 @@
 import UIKit
 import PresentationCore
 
-public class AgencyFindPasswordCoordinator: ChildCoordinator {
+public class CenterFindPasswordCoordinator: ChildCoordinator {
     
     public weak var viewControllerRef: (any PresentationCore.DisposableViewController)?
     
     public var navigationController: UINavigationController
     
-    public var parent: AgencyAuthCoordinatable?
+    public var parent: CenterAuthCoordinatable?
     
     public init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -24,7 +24,7 @@ public class AgencyFindPasswordCoordinator: ChildCoordinator {
     
     public func start() {
         
-        let viewController = AgencyFindPasswordController()
+        let viewController = CenterFindPasswordController()
         viewController.coordinator = self
         
         viewControllerRef = viewController
