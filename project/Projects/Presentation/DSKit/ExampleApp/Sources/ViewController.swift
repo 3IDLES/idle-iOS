@@ -39,7 +39,6 @@ class ViewController: UIViewController {
             .disposed(by: disposeBag)
         
         let iFType1 = IFType1(
-            titleText: "테스트",
             placeHolderText: "전화번호를 입력해 주세요",
             submitButtonText: "인증"
         )

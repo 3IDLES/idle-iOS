@@ -13,6 +13,7 @@ public protocol Coordinator: AnyObject {
     var navigationController: UINavigationController { get }
     
     func start()
+    func next()
     func popViewController(animated: Bool)
 }
 
@@ -22,6 +23,8 @@ public extension Coordinator {
         
         navigationController.popViewController(animated: animated)
     }
+    
+    func next() { }
 }
 
 // MARK: ParentCoordinator

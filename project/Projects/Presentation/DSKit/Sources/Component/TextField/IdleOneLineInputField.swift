@@ -24,7 +24,7 @@ public class IdleOneLineInputField: UIView {
     var state: BehaviorSubject<State> = .init(value: .editing)
     let initialText: String
     
-    var eventPublisher: Observable<String> { textField.rx.text.compactMap { $0 } }
+    public var eventPublisher: Observable<String> { textField.rx.text.compactMap { $0 } }
     
     // MARK: TextField
     public private(set) lazy var textField: UITextField = {
@@ -60,7 +60,7 @@ public class IdleOneLineInputField: UIView {
     }
     
     // MARK: Complete image
-    private let isCompleteImageAvailable: Bool
+    public var isCompleteImageAvailable: Bool
     
     private let completeImage: UIImageView = {
        
@@ -194,8 +194,8 @@ public class IdleOneLineInputField: UIView {
             .disposed(by: disposeBag)
         
         state
-            .map {
-                !($0 == .complete)
+            .map { [weak self] in
+                !($0 == .complete && self?.isCompleteImageAvailable ?? false)
             }
             .bind(to: completeImage.rx.isHidden)
             .disposed(by: disposeBag)
@@ -209,20 +209,6 @@ public extension IdleOneLineInputField {
         
         case editing
         case complete
-    }
-    
-    private func onEditingState() {
-        
-        completeImage.isHidden = true
-    }
-    
-    private func onCompleteState() {
-        
-        if isCompleteImageAvailable {
-            
-            clearButton.isHidden = true
-            completeImage.isHidden = false
-        }
     }
     
     private func onFocused() {
@@ -343,9 +329,9 @@ public extension IdleOneLineInputField {
         if let timerLabel = stack.arrangedSubviews.first(where: { ($0 as? TimerLabel) != nil }) {
             // timer라벨이 존재하는 경우 삭제
             stopTimer()
-            
+            // Consraints비활성화 후 삭제해야한다.
+            timerLabel.constraints.forEach { $0.isActive = false }
             stack.removeArrangedSubview(timerLabel)
-            self.layoutSubviews()
         }
     }
     

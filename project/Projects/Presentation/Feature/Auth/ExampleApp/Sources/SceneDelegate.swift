@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AuthFeature
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -17,7 +18,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = ViewController()
+        
+        let viewModel = CenterRegisterViewModel()
+        
+        window?.rootViewController = EnterNameViewController(
+            viewModel: viewModel
+        )
         window?.makeKeyAndVisible()
     }
 }

@@ -10,7 +10,15 @@ import PresentationCore
 
 class SelectGenderViewController: DisposableViewController {
     
-    var coordinater: AgentRegisterCoordinator?
+    var coordinator: AgentRegisterCoordinator?
+    
+    public init(coordinator: AgentRegisterCoordinator? = nil) {
+        self.coordinator = coordinator
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
     
     override func viewDidLoad() {
         
@@ -29,6 +37,6 @@ class SelectGenderViewController: DisposableViewController {
     }
     
     func cleanUp() {
-        coordinater?.coordinatorDidFinish()
+        coordinator?.coordinatorDidFinish()
     }
 }

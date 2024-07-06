@@ -12,6 +12,14 @@ class SetIdPasswordViewController: DisposableViewController {
     
     var coordinater: CenterRegisterCoordinator?
     
+    public init(coordinator: Coordinator? = nil) {
+        
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
+    
     override func viewDidLoad() {
         
         view.backgroundColor = .white

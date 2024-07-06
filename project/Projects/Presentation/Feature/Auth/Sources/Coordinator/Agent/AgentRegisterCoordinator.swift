@@ -56,9 +56,9 @@ public class AgentRegisterCoordinator: ChildCoordinator {
     public func start() {
         
         stageViewControllers = [
-            ValidatePhoneNumberViewController(),
-            EnterNameViewController(),
-            SelectGenderViewController(),
+            ValidatePhoneNumberViewController(coordinator: self, viewModel: CenterRegisterViewModel()),
+            EnterNameViewController(coordinator: self, viewModel: CenterRegisterViewModel()),
+            SelectGenderViewController(coordinator: self),
         ]
         
         let pageViewController = UIPageViewController(
@@ -92,7 +92,7 @@ public class AgentRegisterCoordinator: ChildCoordinator {
 
 extension AgentRegisterCoordinator {
     
-    func next() {
+    public func next() {
         
         if let nextStage = currentStage?.nextStage {
             
@@ -113,26 +113,22 @@ extension AgentRegisterCoordinator {
         
         let viewController = stageViewControllers[AgentRegisterStage.phoneNumber.rawValue]
         
-        let phoneStage = viewController as! ValidatePhoneNumberViewController
-        
-        phoneStage.coordinater = self
-        
-        showStage(viewController: phoneStage)
+        showStage(viewController: viewController)
         
         currentStage = .phoneNumber
     }
     
     func nameStage() {
         
-        let viewController = stageViewControllers[AgentRegisterStage.name.rawValue]
-        
-        let nameStage = viewController as! EnterNameViewController
-        
-        nameStage.coordinater = self
-        
-        showStage(viewController: nameStage)
-        
-        currentStage = .name
+//        let viewController = stageViewControllers[AgentRegisterStage.name.rawValue]
+//        
+//        let nameStage = viewController as! EnterNameViewController
+//        
+//        nameStage.coordinator = self
+//
+//        showStage(viewController: nameStage)
+//        
+//        currentStage = .name
     }
     
     func genderStage() {
@@ -141,7 +137,7 @@ extension AgentRegisterCoordinator {
         
         let genderStage = viewController as! SelectGenderViewController
         
-        genderStage.coordinater = self
+        genderStage.coordinator = self
         
         showStage(viewController: genderStage)
         

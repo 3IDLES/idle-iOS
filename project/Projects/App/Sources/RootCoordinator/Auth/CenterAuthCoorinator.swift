@@ -77,6 +77,7 @@ extension CenterAuthCoorinator: CenterAuthCoordinatable {
     func register() {
         
         let coordinator = CenterRegisterCoordinator(
+            viewModel: CenterRegisterViewModel(),
             navigationController: navigationController
         )
         

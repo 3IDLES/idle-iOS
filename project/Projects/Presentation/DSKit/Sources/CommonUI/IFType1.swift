@@ -13,7 +13,6 @@ public class IFType1: UIStackView {
     private var state: State
     
     // Init parameters
-    public private(set) var titleText: String
     public private(set) var placeHolderText: String
     public private(set) var submitButtonText: String
     
@@ -38,12 +37,10 @@ public class IFType1: UIStackView {
     
     public init(
         state: State = .waitForInput,
-        titleText: String,
         placeHolderText: String,
         submitButtonText: String
     ) {
         self.state = .waitForInput
-        self.titleText = titleText
         self.placeHolderText = placeHolderText
         self.submitButtonText = submitButtonText
         super.init(frame: .zero)
