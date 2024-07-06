@@ -31,7 +31,8 @@ class ViewController: UIViewController {
             text: "테스트1",
             onTouch: {
                 
-                iFType1.resignFirstResponder()
+                iFType1.textField.createTimer()
+                iFType1.textField.startTimer(minute: 5, seconds: 0)
             }
         )
         
