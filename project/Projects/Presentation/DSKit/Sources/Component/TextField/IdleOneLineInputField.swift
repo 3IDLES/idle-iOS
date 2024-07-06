@@ -30,8 +30,9 @@ public class IdleOneLineInputField: UIView {
     public private(set) lazy var textField: UITextField = {
         
         let view = UITextField()
-        view.font = .systemFont(ofSize: 14)
+        
         view.delegate = self
+        view.font = DSKitFontFamily.Pretendard.medium.font(size: 14)
         
         return view
     }()
@@ -110,6 +111,7 @@ public class IdleOneLineInputField: UIView {
         // Initial setting
         textField.placeholder = placeHolderText
         textField.keyboardType = keyboardType
+        textField.contentVerticalAlignment = .center
         
         completeImage.isHidden = true
         
@@ -320,7 +322,7 @@ public extension IdleOneLineInputField {
         
         let timerLabel = TimerLabel()
         timerLabel.setTime(seconds: 0)
-        timerLabel.font = .systemFont(ofSize: textField.font?.pointSize ?? 14)
+        timerLabel.font = DSKitFontFamily.Pretendard.medium.font(size: 14)
         timerLabel.textColor = DSKitAsset.Colors.gray500.color
         timerLabel.textAlignment = .center
         

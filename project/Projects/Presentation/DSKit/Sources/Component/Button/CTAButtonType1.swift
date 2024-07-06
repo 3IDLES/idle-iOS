@@ -21,7 +21,7 @@ public class CTAButtonType1: UIView {
         
         view.text = labelText
         view.textColor = .white
-        view.font = .systemFont(ofSize: 16, weight: UIFont.Weight(700))
+        view.font = DSKitFontFamily.Pretendard.bold.font(size: 16)
         view.textAlignment = .center
         
         return view
