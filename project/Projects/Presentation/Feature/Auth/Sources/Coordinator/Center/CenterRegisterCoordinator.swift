@@ -10,8 +10,8 @@ import PresentationCore
 
 enum CenterRegisterStage: Int {
     
-    case phoneNumber=0
-    case name=1
+    case name=0
+    case phoneNumber=1
     case businessOwner=2
     case idPassword=3
     case finish=4
@@ -19,9 +19,9 @@ enum CenterRegisterStage: Int {
     var nextStage: Self? {
         
         switch self {
-        case .phoneNumber:
-            return .name
         case .name:
+            return .phoneNumber
+        case .phoneNumber:
             return .businessOwner
         case .businessOwner:
             return .idPassword
@@ -55,8 +55,8 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
     public func start() {
         stageViewControllers = [
-            ValidatePhoneNumberViewController(),
             EnterNameViewController(),
+            ValidatePhoneNumberViewController(),
             AuthBusinessOwnerViewController(),
             SetIdPasswordViewController(),
         ]
@@ -79,7 +79,7 @@ public class CenterRegisterCoordinator: ChildCoordinator {
         
         navigationController.pushViewController(viewController, animated: true)
         
-        authPhoneNumber()
+        enterName()
     }
     
     public func coordinatorDidFinish() {
@@ -97,10 +97,10 @@ extension CenterRegisterCoordinator {
         if let nextStage = currentStage?.nextStage {
             
             switch nextStage {
-            case .phoneNumber:
-                authPhoneNumber()
             case .name:
                 enterName()
+            case .phoneNumber:
+                authPhoneNumber()
             case .businessOwner:
                 authBusinessOwner()
             case .idPassword:
