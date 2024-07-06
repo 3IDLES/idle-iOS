@@ -1,5 +1,5 @@
 //
-//  AuthBusinessOwnerViewController.swift
+//  SetIdPasswordViewController.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/1/24.
@@ -8,16 +8,16 @@
 import UIKit
 import PresentationCore
 
-class AuthBusinessOwnerViewController: DisposableViewController {
+class SetIdPasswordViewController: DisposableViewController {
     
-    var coordinater: AgencyRegisterCoordinator?
+    var coordinater: CenterRegisterCoordinator?
     
     override func viewDidLoad() {
         
         view.backgroundColor = .white
         
         let label = UILabel()
-        label.text = "사업자 인증 화면"
+        label.text = "아이디 패스워드 최초 설정화면"
         
         view.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false

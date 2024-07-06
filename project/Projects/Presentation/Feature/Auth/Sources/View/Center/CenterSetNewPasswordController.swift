@@ -1,5 +1,5 @@
 //
-//  AgencySetNewPasswordController.swift
+//  CenterSetNewPasswordController.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/1/24.
@@ -11,14 +11,14 @@ import PresentationCore
 
 
 
-class AgencySetNewPasswordController: DisposableViewController {
+class CenterSetNewPasswordController: DisposableViewController {
     
     private lazy var setNewPasswordButton = ButtonPrototype(text: "새로운 비밀번호 설정완료") { [weak self] in
         
         self?.coordinator?.parent?.authFinished()
     }
     
-    var coordinator: AgencySetNewPasswordCoordinator?
+    var coordinator: CenterSetNewPasswordCoordinator?
     
     override func viewDidLoad() {
         super.viewDidLoad()

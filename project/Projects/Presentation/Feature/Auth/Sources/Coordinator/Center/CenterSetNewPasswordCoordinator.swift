@@ -1,5 +1,5 @@
 //
-//  AgencyAuthMainCoordinator.swift
+//  CenterSetNewPasswordCoordinator.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/1/24.
@@ -8,13 +8,14 @@
 import PresentationCore
 import UIKit
 
-public class AgencyAuthMainCoordinator: ChildCoordinator {
+
+public class CenterSetNewPasswordCoordinator: ChildCoordinator {
     
     public var navigationController: UINavigationController
     
     public weak var viewControllerRef: DisposableViewController?
     
-    public var parent: AgencyAuthCoordinatable?
+    public var parent: CenterAuthCoordinatable?
     
     public init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -23,15 +24,13 @@ public class AgencyAuthMainCoordinator: ChildCoordinator {
     deinit { printIfDebug("deinit \(Self.self)") }
     
     public func coordinatorDidFinish() {
-        
-        viewControllerRef?.cleanUp()
-        
+        popViewController()
         parent?.removeChildCoordinator(self)
     }
     
     public func start() {
         
-        let viewController = AgencyAuthMainViewController()
+        let viewController = CenterSetNewPasswordController()
         viewController.coordinator = self
         
         viewControllerRef = viewController

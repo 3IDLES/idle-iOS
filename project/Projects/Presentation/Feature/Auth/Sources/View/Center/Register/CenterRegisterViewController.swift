@@ -1,5 +1,5 @@
 //
-//  AgencyRegisterViewController.swift
+//  CenterRegisterViewController.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/1/24.
@@ -9,9 +9,9 @@ import UIKit
 import DSKit
 import PresentationCore
 
-class AgencyRegisterViewController: DisposableViewController {
+class CenterRegisterViewController: DisposableViewController {
     
-    var coordinator: AgencyRegisterCoordinator?
+    var coordinator: CenterRegisterCoordinator?
     
     var pageViewController: UIPageViewController
     

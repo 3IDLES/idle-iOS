@@ -1,5 +1,5 @@
 //
-//  AgencyFindPasswordController.swift
+//  CenterFindPasswordController.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/1/24.
@@ -9,14 +9,14 @@ import UIKit
 import DSKit
 import PresentationCore
 
-class AgencyFindPasswordController: DisposableViewController {
+class CenterFindPasswordController: DisposableViewController {
     
     private lazy var setNewPasswordButton = ButtonPrototype(text: "새로운 비밀번호 설정(임시)") { [weak self] in
         
         self?.coordinator?.parent?.setNewPassword()
     }
     
-    var coordinator: AgencyFindPasswordCoordinator?
+    var coordinator: CenterFindPasswordCoordinator?
     
     override func viewDidLoad() {
         super.viewDidLoad()

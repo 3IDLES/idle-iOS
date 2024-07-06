@@ -1,5 +1,5 @@
 //
-//  AgencyAuthMainViewController.swift
+//  CenterAuthMainViewController.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/1/24.
@@ -9,7 +9,7 @@ import UIKit
 import DSKit
 import PresentationCore
 
-public class AgencyAuthMainViewController: DisposableViewController {
+public class CenterAuthMainViewController: DisposableViewController {
 
     private lazy var loginButton = ButtonPrototype(text: "로그인") { [weak self] in
         
@@ -21,7 +21,7 @@ public class AgencyAuthMainViewController: DisposableViewController {
         self?.coordinator?.parent?.register()
     }
     
-    var coordinator: AgencyAuthMainCoordinator?
+    var coordinator: CenterAuthMainCoordinator?
     
     public override func viewDidLoad() {
         super.viewDidLoad()

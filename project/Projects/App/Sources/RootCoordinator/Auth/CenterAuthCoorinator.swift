@@ -1,5 +1,5 @@
 //
-//  AgencyAuthCoorinator.swift
+//  CenterAuthCoorinator.swift
 //  Idle-iOS
 //
 //  Created by choijunios on 7/1/24.
@@ -9,7 +9,7 @@ import UIKit
 import PresentationCore
 import AuthFeature
 
-class AgencyAuthCoorinator: ParentCoordinator {
+class CenterAuthCoorinator: ParentCoordinator {
     
     var childCoordinators: [Coordinator] = []
     
@@ -25,7 +25,7 @@ class AgencyAuthCoorinator: ParentCoordinator {
     
     func start() {
         
-        let coordinator = AgencyAuthMainCoordinator(
+        let coordinator = CenterAuthMainCoordinator(
             navigationController: navigationController
         )
         
@@ -36,11 +36,11 @@ class AgencyAuthCoorinator: ParentCoordinator {
     }
 }
 
-extension AgencyAuthCoorinator: AgencyAuthCoordinatable {
+extension CenterAuthCoorinator: CenterAuthCoordinatable {
     
     func login() {
         
-        let coordinator = AgencyLoginCoordinator(
+        let coordinator = CenterLoginCoordinator(
             navigationController: navigationController
         )
         
@@ -52,7 +52,7 @@ extension AgencyAuthCoorinator: AgencyAuthCoordinatable {
     
     func findPassword() {
         
-        let coordinator = AgencyFindPasswordCoordinator(
+        let coordinator = CenterFindPasswordCoordinator(
             navigationController: navigationController
         )
         
@@ -64,7 +64,7 @@ extension AgencyAuthCoorinator: AgencyAuthCoordinatable {
     
     func setNewPassword() {
         
-        let coordinator = AgencySetNewPasswordCoordinator(
+        let coordinator = CenterSetNewPasswordCoordinator(
             navigationController: navigationController
         )
         
@@ -76,7 +76,7 @@ extension AgencyAuthCoorinator: AgencyAuthCoordinatable {
     
     func register() {
         
-        let coordinator = AgencyRegisterCoordinator(
+        let coordinator = CenterRegisterCoordinator(
             navigationController: navigationController
         )
         
