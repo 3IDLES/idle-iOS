@@ -350,13 +350,13 @@ public extension IdleOneLineInputField {
     // Management
     func startTimer(minute: Int, seconds: Int) {
         
-        if let timerLabel {
+        if let timerLabel, timer == nil {
             
             var startSeconds = minute * 60 + seconds
             
             timerLabel.setTime(seconds: startSeconds)
             
-            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
+            self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
                 
                 startSeconds -= 1
                 
