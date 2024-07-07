@@ -9,7 +9,6 @@ import UIKit
 import Entity
 import DSKit
 import RxSwift
-import RxCocoa
 import PresentationCore
 
 public protocol AuthBusinessOwnerInputable {
@@ -46,7 +45,8 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
         
        let textField = IFType1(
         placeHolderText: "사업자 등록번호를 입력해주세요.",
-        submitButtonText: "검색"
+        submitButtonText: "검색",
+        keyboardType: .numberPad
        )
         
         textField.textField.isCompleteImageAvailable = false
@@ -150,6 +150,9 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
         // Initial setting
         dismissCenterInfo()
         
+        // 검색 버튼 비활성화
+        businessNumberField.button.setEnabled(false)
+        
         // - CTA버튼 비활성화
         ctaButton.setEnabled(false)
     }
@@ -160,7 +163,6 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
         var input = viewModel.input
         
         // 현재 입력중인 정보 전송
-        businessNumberField.button.setEnabled(false)
         input.editingBusinessNumber = businessNumberField.textField.eventPublisher.asObservable()
         
         // 인증, 확인 버튼이 눌린 경우

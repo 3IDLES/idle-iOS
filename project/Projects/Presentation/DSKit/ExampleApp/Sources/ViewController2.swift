@@ -44,8 +44,19 @@ class ViewController2: UIViewController {
             ])
         }
         
+        
+        let textField = IdleOneLineInputField(
+            placeHolderText: "placeHolderText"
+        )
+        textField.backgroundColor = .brown
+        
+        let rawTextField = UITextField()
+        rawTextField.backgroundColor = .red
+        
         [
-            box
+            box,
+            textField,
+            rawTextField,
         ].forEach {
             
             view.addSubview($0)
@@ -56,6 +67,14 @@ class ViewController2: UIViewController {
             box.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             box.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             box.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            textField.topAnchor.constraint(equalTo: box.bottomAnchor, constant: 30),
+            textField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            textField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            rawTextField.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 30),
+            rawTextField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            rawTextField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
     
