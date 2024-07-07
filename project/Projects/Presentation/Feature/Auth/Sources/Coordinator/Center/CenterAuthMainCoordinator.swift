@@ -24,8 +24,7 @@ public class CenterAuthMainCoordinator: ChildCoordinator {
     
     public func coordinatorDidFinish() {
         
-        viewControllerRef?.cleanUp()
-        
+        popViewController()
         parent?.removeChildCoordinator(self)
     }
     
