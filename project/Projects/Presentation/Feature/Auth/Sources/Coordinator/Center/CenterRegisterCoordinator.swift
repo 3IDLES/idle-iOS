@@ -65,7 +65,7 @@ public class CenterRegisterCoordinator: Coordinator {
             EnterNameViewController(coordinator: self, viewModel: viewModel),
             ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
             AuthBusinessOwnerViewController(coordinator: self, viewModel: viewModel),
-            SetIdPasswordViewController(coordinator: self),
+            SetIdPasswordViewController(coordinator: self, viewModel: viewModel),
         ]
         
         let pageViewController = UIPageViewController(

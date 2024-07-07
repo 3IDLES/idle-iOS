@@ -15,6 +15,7 @@ public class IFType1: UIStackView {
     // Init parameters
     public private(set) var placeHolderText: String
     public private(set) var submitButtonText: String
+    public private(set) var keyboardType: UIKeyboardType
     
     // TextInput
     public private(set) var currentTextInout = ""
@@ -26,7 +27,7 @@ public class IFType1: UIStackView {
     // View
     public private(set) lazy var textField = IdleOneLineInputField(
         placeHolderText: placeHolderText,
-        keyboardType: .numberPad
+        keyboardType: keyboardType
     )
     public private(set) lazy var button: TextButtonType1 = {
        
@@ -39,11 +40,13 @@ public class IFType1: UIStackView {
     public init(
         state: State = .waitForInput,
         placeHolderText: String,
-        submitButtonText: String
+        submitButtonText: String,
+        keyboardType: UIKeyboardType = .default
     ) {
         self.state = .waitForInput
         self.placeHolderText = placeHolderText
         self.submitButtonText = submitButtonText
+        self.keyboardType = keyboardType
         super.init(frame: .zero)
         
         setStack()

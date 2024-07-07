@@ -61,7 +61,8 @@ where
         
        let textField = IFType1(
         placeHolderText: "전화번호를 입력해주세요.",
-        submitButtonText: "인증"
+        submitButtonText: "인증",
+        keyboardType: .numberPad
        )
         
         textField.textField.isCompleteImageAvailable = false
@@ -83,7 +84,8 @@ where
         
        let textField = IFType1(
         placeHolderText: "",
-        submitButtonText: "확인"
+        submitButtonText: "확인",
+        keyboardType: .numberPad
        )
         
         textField.textField.isCompleteImageAvailable = false

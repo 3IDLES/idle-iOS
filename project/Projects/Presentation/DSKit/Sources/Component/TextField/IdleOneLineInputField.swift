@@ -24,7 +24,7 @@ public class IdleOneLineInputField: UIView {
     var state: BehaviorSubject<State> = .init(value: .editing)
     let initialText: String
     
-    public var eventPublisher: Observable<String> { textField.rx.text.compactMap { $0 } }
+    public var eventPublisher: Observable<String> { textField.rx.text.compactMap { $0 }}
     
     // MARK: TextField
     public private(set) lazy var textField: UITextField = {
@@ -48,16 +48,8 @@ public class IdleOneLineInputField: UIView {
         button.imageView?.contentMode = .scaleAspectFit
         button.imageView?.clipsToBounds = true
         
-        button.addTarget(self, action: #selector(onClear(sender: )), for: .touchUpInside)
-        
         return button
     }()
-    @objc
-    private func onClear(sender: UIButton) {
-        
-        textField.text = ""
-        clearButton.isHidden = true
-    }
     
     // MARK: Complete image
     public var isCompleteImageAvailable: Bool
@@ -82,7 +74,6 @@ public class IdleOneLineInputField: UIView {
         
         stack.axis = .horizontal
         stack.alignment = .fill
-        stack.distribution = .fill
         
         return stack
     }()
@@ -163,10 +154,10 @@ public class IdleOneLineInputField: UIView {
             stack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             stack.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
             
-            clearButton.widthAnchor.constraint(equalTo: textField.heightAnchor),
+            clearButton.widthAnchor.constraint(equalToConstant: textField.intrinsicContentSize.height),
             clearButton.heightAnchor.constraint(equalTo: clearButton.widthAnchor),
             
-            completeImage.widthAnchor.constraint(equalTo: textField.heightAnchor),
+            completeImage.widthAnchor.constraint(equalToConstant: textField.intrinsicContentSize.height),
             completeImage.heightAnchor.constraint(equalTo: completeImage.widthAnchor),
         ])
     }
@@ -199,6 +190,15 @@ public class IdleOneLineInputField: UIView {
             }
             .bind(to: completeImage.rx.isHidden)
             .disposed(by: disposeBag)
+        
+        clearButton
+            .rx.tap.subscribe { [weak self] _ in
+                
+                self?.textField.text = ""
+                self?.textField.sendActions(for: .editingChanged)
+                self?.clearButton.isHidden = true
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -210,6 +210,8 @@ public extension IdleOneLineInputField {
         case editing
         case complete
     }
+    
+    func setState(state: State) { self.state.onNext(state) }
     
     private func onFocused() {
         
@@ -228,14 +230,6 @@ extension IdleOneLineInputField: UITextFieldDelegate {
         
         // FirstResponder해제
         onResignFocused()
-        
-        if let text = textField.text {
-            
-            if !text.isEmpty {
-                // 종료시 텍스트가 비지 않았다면 완료 이미지 표출
-                state.onNext(.complete)
-            }
-        }
     }
     
     // 텍스트필드가 FirstReponder가 된 경우 호출

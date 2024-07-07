@@ -106,6 +106,60 @@ public class CenterRegisterViewModel: ViewModelType {
                 self?.output.businessNumberValidation?.onNext((true, .mock))
             })
             .disposed(by: disposeBag)
+        
+        // MARK: Id & Password
+        input
+            .editingId?
+            .subscribe(onNext: { [weak self] id in
+                
+                printIfDebug("[CenterRegisterViewModel] 입력중인 id: \(id)")
+                
+                // TODO: Id 유효성 검사
+                let isValid = !id.isEmpty
+                
+                self?.output.canCheckIdDuplication?.onNext(isValid)
+            })
+            .disposed(by: disposeBag)
+        
+        // 중복성 검사
+        input
+            .requestIdDuplicationValidation?
+            .subscribe(onNext: { [weak self] id in
+                
+                printIfDebug("[CenterRegisterViewModel] 중복성 검사 대상 id: \(id)")
+                
+                // TODO: id 중복검사 API 호출
+                let isValid = !id.isEmpty
+                
+                self?.output.idValidation?.onNext((isValid, id))
+            })
+            .disposed(by: disposeBag)
+        
+        Observable
+            .combineLatest(
+                input.editingPassword ?? .empty(),
+                input.editingCheckPassword ?? .empty()
+            )
+            .subscribe(onNext: { [weak self] (pwd, cpwd) in
+                
+                printIfDebug("[CenterRegisterViewModel] \n 입력중인 비밀번호: \(pwd) \n 확인 비밀번호: \(cpwd)")
+                
+                // TODO: 패스워드 유효성 로직
+                let isValid = pwd.count >= 10
+                
+                if !isValid {
+                    
+                    self?.output.passwordValidation?.onNext((.invalidPassword, pwd))
+                } else if pwd != cpwd {
+                    
+                    self?.output.passwordValidation?.onNext((.unMatch, pwd))
+                } else {
+                    
+                    self?.output.passwordValidation?.onNext((.match, pwd))
+                }
+                
+            })
+            .disposed(by: disposeBag)
                 
         return output
     }
@@ -132,10 +186,11 @@ extension CenterRegisterViewModel {
         public var editingBusinessNumber: Observable<String>?
         public var requestBusinessNumberValidation: Observable<String>?
         
-//        var businessNumber: Observable<String>
-//        var idString: Observable<String>
-//        var passwordString: Observable<String>
-//        var passwordCheckString: Observable<String>
+        // Id & password
+        public var editingId: Observable<String>?
+        public var editingPassword: Observable<String>?
+        public var editingCheckPassword: Observable<String>?
+        public var requestIdDuplicationValidation: Observable<String>?
     }
     
     public struct Output {
@@ -153,6 +208,10 @@ extension CenterRegisterViewModel {
         public var canSubmitBusinessNumber: PublishSubject<Bool>? = .init()
         public var businessNumberValidation: PublishSubject<(isValid: Bool, info: CenterInformation?)>? = .init()
         
+        // Id & password
+        public var canCheckIdDuplication: PublishSubject<Bool>? = .init()
+        public var idValidation: PublishSubject<(isValid: Bool, id: String)>? = .init()
+        public var passwordValidation: PublishSubject<(state: PasswordValidationState, password: String)>? = .init()
     }
 }
 
@@ -172,3 +231,7 @@ extension CenterRegisterViewModel.Output: AuthPhoneNumberOutputable { }
 // Auth Business owner
 extension CenterRegisterViewModel.Input: AuthBusinessOwnerInputable { }
 extension CenterRegisterViewModel.Output: AuthBusinessOwnerOutputable { }
+
+// Id & Password
+extension CenterRegisterViewModel.Input: SetIdPasswordInputable { }
+extension CenterRegisterViewModel.Output: SetIdPasswordOutputable { }

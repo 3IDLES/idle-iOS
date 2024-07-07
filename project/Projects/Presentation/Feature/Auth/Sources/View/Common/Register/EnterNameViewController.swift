@@ -104,7 +104,6 @@ where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNam
             textField.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
             textField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            textField.heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
             
             ctaButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
