@@ -33,7 +33,7 @@ enum CenterRegisterStage: Int {
     }
 }
 
-public class CenterRegisterCoordinator: Coordinator {
+public class CenterRegisterCoordinator: ChildCoordinator {
     
     public var parent: CenterAuthCoordinatable?
     
@@ -47,26 +47,24 @@ public class CenterRegisterCoordinator: Coordinator {
     
     private var currentStage: CenterRegisterStage?
     
-    // ViewModel
-    private let viewModel: CenterRegisterViewModel
-    
     public init(
         viewModel: CenterRegisterViewModel,
         navigationController: UINavigationController
     ) {
-        self.viewModel = viewModel
         self.navigationController = navigationController
-    }
-    
-    deinit { printIfDebug("deinit \(Self.self)") }
-    
-    public func start() {
-        stageViewControllers = [
+        
+        // stageViewControllerss에 자기자신과 ViewModel할당
+        self.stageViewControllers = [
             EnterNameViewController(coordinator: self, viewModel: viewModel),
             ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
             AuthBusinessOwnerViewController(coordinator: self, viewModel: viewModel),
             SetIdPasswordViewController(coordinator: self, viewModel: viewModel),
         ]
+    }
+    
+    deinit { printIfDebug("deinit \(Self.self)") }
+    
+    public func start() {
         
         let pageViewController = UIPageViewController(
             transitionStyle: .scroll,
@@ -90,10 +88,12 @@ public class CenterRegisterCoordinator: Coordinator {
     }
     
     public func coordinatorDidFinish() {
-    
+        
         viewControllerRef?.cleanUp()
         
         stageViewControllers = []
+        
+        popViewController()
         
         parent?.removeChildCoordinator(self)
     }
@@ -164,6 +164,8 @@ extension CenterRegisterCoordinator {
     }
     
     func authFinished() {
+        
+        stageViewControllers = []
         
         parent?.authFinished()
     }
