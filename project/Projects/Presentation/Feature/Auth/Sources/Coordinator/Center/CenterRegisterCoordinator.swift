@@ -64,7 +64,7 @@ public class CenterRegisterCoordinator: Coordinator {
         stageViewControllers = [
             EnterNameViewController(coordinator: self, viewModel: viewModel),
             ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
-            AuthBusinessOwnerViewController(coordinator: self),
+            AuthBusinessOwnerViewController(coordinator: self, viewModel: viewModel),
             SetIdPasswordViewController(coordinator: self),
         ]
         

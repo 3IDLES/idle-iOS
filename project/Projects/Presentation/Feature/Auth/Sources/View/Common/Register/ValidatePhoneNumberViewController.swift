@@ -123,6 +123,7 @@ where
         
         setAppearance()
         setAutoLayout()
+        initialUISettuing()
         setObservable()
     }
     
@@ -184,8 +185,8 @@ where
             ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
-    
-    private func setObservable() {
+        
+    private func initialUISettuing() {
         
         // Initial setting
         // - 휴대번호 '인증 요청' 버튼 비활성화
@@ -197,6 +198,9 @@ where
         
         // - CTA버튼 비활성화
         ctaButton.setEnabled(false)
+    }
+    
+    private func setObservable() {
         
         // MARK: Input
         var input = viewModel.input

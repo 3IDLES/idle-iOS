@@ -62,6 +62,12 @@ where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNam
         self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
+        
+        setAppearance()
+        setAutoLayout()
+        setRecognizer()
+        initialUISettuing()
+        setObservable()
     }
     
     public required init?(coder: NSCoder) {
@@ -70,12 +76,7 @@ where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNam
     
     public override func viewDidLoad() {
         
-        view.backgroundColor = .white
-        
-        setAppearance()
-        setAutoLayout()
-        setRecognizer()
-        setObservable()
+        view.backgroundColor = .clear
     }
     
     private func setAppearance() {
@@ -115,6 +116,12 @@ where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNam
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapGestureHandler))
         view.addGestureRecognizer(tapGesture)
+    }
+    
+    private func initialUISettuing() {
+        
+        // - CTA버튼 비활성화
+        ctaButton.setEnabled(false)
     }
     
     private func setObservable() {
