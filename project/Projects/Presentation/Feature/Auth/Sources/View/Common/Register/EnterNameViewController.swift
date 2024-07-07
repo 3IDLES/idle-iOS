@@ -12,11 +12,15 @@ import RxCocoa
 import PresentationCore
 
 public protocol EnterNameInputable {
-    var name: Observable<String>? { get set }
+    var editingName: Observable<String>? { get set }
+}
+
+public protocol EnterNameOutputable {
+    var nameValidation: PublishSubject<(isValid: Bool, name: String)>? { get set }
 }
 
 public class EnterNameViewController<T: ViewModelType>: DisposableViewController
-where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: CTAButtonEnableOutPutable {
+where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNameOutputable {
     
     public var coordinator: Coordinator?
     
@@ -118,25 +122,27 @@ where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: CTAButto
         // - CTA버튼 비활성화
         ctaButton.setEnabled(false)
         
+        // MARK: Input
         var input = viewModel.input
+        input.editingName = textField.eventPublisher.asObservable()
         
-        input.name = textField.eventPublisher.asObservable()
-        input.ctaButtonClicked = ctaButton.eventPublisher.asObservable()
-        
-        viewModel.transform(input: input)
-            .ctaButtonEnabled?
-            .asDriver(onErrorJustReturn: false)
-            .drive(onNext: { [weak self] in
-                self?.ctaButton.setEnabled($0)
+        // MARK: Output
+        let output = viewModel.transform(input: input)
+        output
+            .nameValidation?
+            .subscribe(onNext: { [weak self] (isValid, name) in
+                
+                printIfDebug("성함 입력: \(name), 유효성: \(isValid)")
+                
+                self?.ctaButton.setEnabled(isValid)
             })
             .disposed(by: disposeBag)
         
+        // MARK: ViewController한정 로직
+        // CTA버튼 클릭시 화면전환
         ctaButton
             .eventPublisher
-            .emit { [weak self] _ in
-                
-                self?.coordinator?.next()
-            }
+            .emit { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
     }
     

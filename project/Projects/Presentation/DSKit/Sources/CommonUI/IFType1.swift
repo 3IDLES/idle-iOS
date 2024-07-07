@@ -20,6 +20,7 @@ public class IFType1: UIStackView {
     public private(set) var currentTextInout = ""
     
     // Observable
+    /// 버튼을 누를시 텍스트를 반환하는 event publisher입니다.
     public let eventPublisher: PublishSubject<String> = .init()
     
     // View

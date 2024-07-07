@@ -12,19 +12,24 @@ import PresentationCore
 
 public protocol AuthPhoneNumberInputable {
     
-    var phoneNumber: Observable<String>? { get set }
-    var phoneNumberAuthNumber: Observable<String>? { get set }
+    var editingPhoneNumber: Observable<String>? { get set }
+    var editingAuthNumber: Observable<String>? { get set }
+    var requestAuthForPhoneNumber: Observable<String>? { get set }
+    var requestValidationForAuthNumber: Observable<String>? { get set }
 }
 
 public protocol AuthPhoneNumberOutputable {
     
-    var startAuth: PublishSubject<String>? { get set }
+    var canSubmitPhoneNumber: PublishSubject<Bool>? { get set }
+    var canSubmitAuthNumber: PublishSubject<Bool>? { get set }
+    var phoneNumberValidation: PublishSubject<(isValid: Bool, phoneNumber: String)>? { get set }
+    var authNumberValidation: PublishSubject<(isValid: Bool, authNumber: String)>? { get set }
 }
 
 class ValidatePhoneNumberViewController<T: ViewModelType>: DisposableViewController
 where 
     T.Input: AuthPhoneNumberInputable & CTAButtonEnableInputable,
-    T.Output: AuthPhoneNumberOutputable & CTAButtonEnableOutPutable {
+    T.Output: AuthPhoneNumberOutputable {
     
     var coordinator: Coordinator?
     
@@ -193,62 +198,63 @@ where
         // - CTA버튼 비활성화
         ctaButton.setEnabled(false)
         
+        // MARK: Input
         var input = viewModel.input
         
-        // '인증'버튼 클릭시 입력중이된 텍스트 필드값 전송
-        input.phoneNumber = phoneNumberField.button.eventPublisher.map({ [weak self] _ in
-            self?.phoneNumberField.textField.textField.text ?? ""
-        }).asObservable()
+        // 현재 입력중인 정보 전송
+        input.editingPhoneNumber = phoneNumberField.textField.eventPublisher.asObservable()
+        input.editingAuthNumber = authNumberField.textField.eventPublisher.asObservable()
         
-        // '확인'버튼 클릭시 입력중이된 텍스트 필드값 전송
-        input.phoneNumberAuthNumber = authNumberField.button.eventPublisher.map({ [weak self] _ in
-            self?.authNumberField.textField.textField.text ?? ""
-        }).asObservable()
+        // 인증, 확인 버튼이 눌린 경우
+        input.requestAuthForPhoneNumber = phoneNumberField.eventPublisher.asObservable()
+        input.requestValidationForAuthNumber = authNumberField.eventPublisher.asObservable()
         
+        // 화면전환 버튼이 눌렸음을 전송
+        input.ctaButtonClicked = ctaButton.eventPublisher.asObservable()
+        
+        // MARK: Output
         let output = viewModel.transform(input: input)
         
-        // 휴대번호 인증시작
+        // 입력중인 전화번호가 특정 조건(ex: 입력길이)을 만족한 경우 '인증'버튼 활성화
         output
-            .startAuth?
-            .subscribe(onNext: { [weak self] authingNumber in
-                
-                printIfDebug("☑️ \(authingNumber)의 인증을 시작합니다.")
-                
-                // 인증 텍스트 필드 활성화
-                self?.authNumberField.textField.setEnabled(true)
-                self?.authNumberField.textField.createTimer()
-                self?.authNumberField.textField.startTimer(minute: 5, seconds: 0)
-            })
-            .disposed(by: disposeBag)
-        
-        // 휴대번호가 입력창에 입력이 있을 경우 '인증'버튼을 활성화
-        phoneNumberField.textField
-            .eventPublisher
-            .subscribe(onNext: { [weak self] phoneNumber in
-                
-                self?.phoneNumberField.button.setEnabled(phoneNumber.count >= 10)
-            })
-            .disposed(by: disposeBag)
-        
-        // 인증번호 입력창에 입력이 있을 경우 '확인'버튼을 활성화
-        authNumberField.textField
-            .eventPublisher
-            .subscribe(onNext: { [weak self] phoneNumber in
-                
-                self?.authNumberField.button.setEnabled(!phoneNumber.isEmpty)
-            })
-            .disposed(by: disposeBag)
-        
-        // 인증 성공여부 획득
-        output
-            .ctaButtonEnabled?
+            .canSubmitPhoneNumber?
             .asDriver(onErrorJustReturn: false)
-            .drive(onNext: { [weak self] in
+            .drive(onNext: { [weak self] in self?.phoneNumberField.button.setEnabled($0) })
+            .disposed(by: disposeBag)
+        
+        // 입력중인 인증번호가 특정 조건(ex: 입력길이)을 만족한 경우 '확인'버튼 활성화
+        output
+            .canSubmitAuthNumber?
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] in self?.authNumberField.button.setEnabled($0) })
+            .disposed(by: disposeBag)
+        
+        // 휴대전화 인증의 시작
+        output
+            .phoneNumberValidation?
+            .subscribe(onNext: { [weak self] (isValid, phoneNumber) in
                 
-                if $0 {
-                    // 인증번호 인증성공
+                if isValid {
+                    // 인증이 사작된 경우
+                    printIfDebug("☑️ \(phoneNumber)의 인증을 시작합니다.")
                     
-                    // 인증 성공으로 모든 버튼 비활성화
+                    // 인증 텍스트 필드 활성화
+                    self?.authNumberField.textField.setEnabled(true)
+                    self?.authNumberField.textField.createTimer()
+                    self?.authNumberField.textField.startTimer(minute: 5, seconds: 0)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        // 인증번호 인증 성공여부
+        output
+            .authNumberValidation?
+            .subscribe(onNext: { [weak self] (isValid, authNumber) in
+                
+                if isValid {
+                    // 인증번호 인증성공한 경우
+                    
+                    // 입력과 관려된 필드와 버튼 비활성화
                     self?.phoneNumberField.textField.setEnabled(false)
                     self?.phoneNumberField.button.setEnabled(false)
                     self?.authNumberField.textField.setEnabled(false)
@@ -259,21 +265,19 @@ where
                     
                     // 인증 완료 텍스트
                     self?.authSuccessText.isHidden = false
+                    
+                    // CTA버튼 활성화
+                    self?.ctaButton.setEnabled(true)
                 }
-                
-                self?.ctaButton.setEnabled($0)
             })
             .disposed(by: disposeBag)
         
         
-        
-        // CTA버튼 클릭시
+        // MARK: ViewController한정 로직
+        // CTA버튼 클릭시 화면전환
         ctaButton
             .eventPublisher
-            .emit { [weak self] _ in
-                
-                self?.coordinator?.next()
-            }
+            .emit { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
     }
     
