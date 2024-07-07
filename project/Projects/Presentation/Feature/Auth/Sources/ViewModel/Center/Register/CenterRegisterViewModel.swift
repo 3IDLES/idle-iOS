@@ -8,6 +8,8 @@
 import UIKit
 import RxSwift
 import PresentationCore
+import UseCaseInterface
+import Entity
 
 public class CenterRegisterViewModel: ViewModelType {
     
@@ -80,6 +82,30 @@ public class CenterRegisterViewModel: ViewModelType {
                 self?.output.authNumberValidation?.onNext((true, authNumber))
             })
             .disposed(by: disposeBag)
+        
+        // MARK: 사업자 번호 입력
+        input
+            .editingBusinessNumber?
+            .subscribe(onNext: { [weak self] businessNumber in
+                
+                printIfDebug("[CenterRegisterViewModel] 전달받은 사업자 번호: \(businessNumber)")
+                
+                // 특정 조건 만족시
+                self?.output.canSubmitBusinessNumber?.onNext(businessNumber.count == 10)
+            })
+            .disposed(by: disposeBag)
+        
+        input
+            .requestBusinessNumberValidation?
+            .subscribe(onNext: { [weak self] businessNumber in
+                
+                printIfDebug("[CenterRegisterViewModel] 사업자 번호 인증 요청: \(businessNumber)")
+                
+                // TODO: 사업자 번호조회 API 성공시
+                
+                self?.output.businessNumberValidation?.onNext((true, .mock))
+            })
+            .disposed(by: disposeBag)
                 
         return output
     }
@@ -102,6 +128,9 @@ extension CenterRegisterViewModel {
         public var requestAuthForPhoneNumber: Observable<String>?
         public var requestValidationForAuthNumber: Observable<String>?
         
+        // 사업자 번호 입력
+        public var editingBusinessNumber: Observable<String>?
+        public var requestBusinessNumberValidation: Observable<String>?
         
 //        var businessNumber: Observable<String>
 //        var idString: Observable<String>
@@ -119,6 +148,11 @@ extension CenterRegisterViewModel {
         public var canSubmitAuthNumber: PublishSubject<Bool>? = .init()
         public var phoneNumberValidation: PublishSubject<(isValid: Bool, phoneNumber: String)>? = .init()
         public var authNumberValidation: PublishSubject<(isValid: Bool, authNumber: String)>? = .init()
+        
+        // 사업자 번호 입력
+        public var canSubmitBusinessNumber: PublishSubject<Bool>? = .init()
+        public var businessNumberValidation: PublishSubject<(isValid: Bool, info: CenterInformation?)>? = .init()
+        
     }
 }
 
@@ -134,3 +168,7 @@ extension CenterRegisterViewModel.Output: EnterNameOutputable { }
 // Auth phoneNumber
 extension CenterRegisterViewModel.Input: AuthPhoneNumberInputable { }
 extension CenterRegisterViewModel.Output: AuthPhoneNumberOutputable { }
+
+// Auth Business owner
+extension CenterRegisterViewModel.Input: AuthBusinessOwnerInputable { }
+extension CenterRegisterViewModel.Output: AuthBusinessOwnerOutputable { }
