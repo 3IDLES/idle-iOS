@@ -8,6 +8,8 @@
 import UIKit
 import PresentationCore
 import AuthFeature
+import ConcreteUseCase
+import ConcreteRepository
 
 class CenterAuthCoorinator: ParentCoordinator {
     
@@ -77,7 +79,11 @@ extension CenterAuthCoorinator: CenterAuthCoordinatable {
     func register() {
         
         let coordinator = CenterRegisterCoordinator(
-            viewModel: CenterRegisterViewModel(),
+            viewModel: CenterRegisterViewModel(
+                useCase: DefaultCenterRegisterUseCase(
+                    repository: DefaultCenterRegisterRepository()
+                )
+            ),
             navigationController: navigationController
         )
         

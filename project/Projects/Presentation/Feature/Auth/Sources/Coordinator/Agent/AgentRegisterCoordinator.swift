@@ -47,6 +47,12 @@ public class AgentRegisterCoordinator: ChildCoordinator {
     public init(navigationController: UINavigationController) {
     
         self.navigationController = navigationController
+        
+        self.stageViewControllers = [
+//            ValidatePhoneNumberViewController(coordinator: self, viewModel: CenterRegisterViewModel()),
+//            EnterNameViewController(coordinator: self, viewModel: CenterRegisterViewModel()),
+//            SelectGenderViewController(coordinator: self),
+        ]
     }
     
     deinit {
@@ -54,12 +60,6 @@ public class AgentRegisterCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        
-        stageViewControllers = [
-            ValidatePhoneNumberViewController(coordinator: self, viewModel: CenterRegisterViewModel()),
-            EnterNameViewController(coordinator: self, viewModel: CenterRegisterViewModel()),
-            SelectGenderViewController(coordinator: self),
-        ]
         
         let pageViewController = UIPageViewController(
             transitionStyle: .scroll,
@@ -150,6 +150,8 @@ extension AgentRegisterCoordinator {
     }
     
     func authFinished() {
+        
+        stageViewControllers = []
         
         parent?.authFinished()
     }

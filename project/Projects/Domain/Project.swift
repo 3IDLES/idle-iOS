@@ -48,6 +48,10 @@ let project = Project(
             dependencies: [
                 D.Domain.ConcreteUseCase,
                 D.Domain.RepositoryInterface,
+                
+                // for test
+                D.Data.ConcreteRepository,
+                D.Data.NetworkDataSource
             ],
             settings: .settings(
                 configurations: IdleConfiguration.domainConfigurations

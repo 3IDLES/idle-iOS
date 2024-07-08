@@ -83,7 +83,6 @@ public class IFType1: UIStackView {
         
         NSLayoutConstraint.activate([
         
-            textField.heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
             button.heightAnchor.constraint(equalToConstant: 44),
             button.widthAnchor.constraint(equalToConstant: 78),
         ])

@@ -10,6 +10,9 @@ import ProjectDescription
 public enum IdleInfoPlist {
     
     public static let appDefault: InfoPlist = .extendingDefault(with: [
+        "NSAppTransportSecurity" : [
+            "NSAllowsArbitraryLoads" : true
+        ],
         "UILaunchStoryboardName": "LaunchScreen.storyboard",
         "CFBundleDisplayName" : "$(BUNDLE_DISPLAY_NAME)",
         "UIApplicationSceneManifest": [
