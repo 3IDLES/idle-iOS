@@ -20,9 +20,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         
         let rootNavigationController = UINavigationController()
+        let injector = DependencyInjector()
+        
+        injector
+            .assemble([
+                DataAssembly(),
+                DomainAssembly(),
+                AuthAssembly(),
+            ])
         
         rootCoordinator = RootCoordinator(
-            navigationController: rootNavigationController
+            dependency: .init(
+                navigationController: rootNavigationController,
+                injector: injector
+            )
         )
         
         rootCoordinator?.start()

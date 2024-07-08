@@ -8,14 +8,21 @@
 import UIKit
 import PresentationCore
 
+struct Dependency {
+    let navigationController: UINavigationController
+    let injector: Injector
+}
+
 class RootCoordinator: ParentCoordinator {
     
     var childCoordinators: [Coordinator] = []
     
-    var navigationController: UINavigationController
+    let navigationController: UINavigationController
+    let injector: Injector
     
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
+    init(dependency: Dependency) {
+        self.navigationController = dependency.navigationController
+        self.injector = dependency.injector
     }
     
     func start() {

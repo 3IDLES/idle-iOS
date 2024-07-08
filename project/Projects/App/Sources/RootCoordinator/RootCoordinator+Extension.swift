@@ -13,7 +13,10 @@ extension RootCoordinator {
     func auth() {
         
         let authCoordinator = AuthCoordinator(
-            navigationController: navigationController
+            dependency: .init(
+                navigationController: navigationController,
+                injector: injector
+            )
         )
         
         authCoordinator.start()
