@@ -33,6 +33,34 @@ public class IdleOneLineInputField: UIView {
         
         view.delegate = self
         view.font = DSKitFontFamily.Pretendard.medium.font(size: 14)
+        // 자동완성 끄기
+        view.autocorrectionType = .no
+        // 첫 글자 자동 대문자화 끄기
+        view.autocapitalizationType = .none
+        
+        // TextField toolbar
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        
+        // flexibleSpace 추가
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        
+        let closeButton = UIBarButtonItem()
+        closeButton.title = "완료"
+        closeButton.style = .done
+        toolbar.setItems([
+            flexibleSpace,
+            closeButton
+        ], animated: false)
+        toolbar.isUserInteractionEnabled = true
+        
+        view.inputAccessoryView = toolbar
+        
+        closeButton.rx.tap.subscribe { [weak self] _ in
+            
+            self?.textField.resignFirstResponder()
+        }
+        .disposed(by: disposeBag)
         
         return view
     }()
