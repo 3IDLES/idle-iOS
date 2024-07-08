@@ -13,11 +13,16 @@ import Entity
 
 public class CenterRegisterViewModel: ViewModelType {
     
+    // UseCase
+    public let useCase: CenterRegisterUseCase
+    
     // Input은 모든 ViewController에서 공유한다. (다만, 각가의 ViewController의 Input프로토콜에 의해 제한된다.)
     public let input = Input()
     public let output = Output()
     
-    public init() { }
+    public init(useCase: CenterRegisterUseCase) {
+        self.useCase = useCase
+    }
     
     let disposeBag = DisposeBag()
     
@@ -44,8 +49,12 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 printIfDebug("[CenterRegisterViewModel] 전달받은 전화번호: \(phoneNumber)")
                 
+                guard let self else { return }
+                
                 // 특정 조건 만족시
-                self?.output.canSubmitPhoneNumber?.onNext((10...11).contains(phoneNumber.count))
+                self.output.canSubmitPhoneNumber?.onNext(
+                    self.useCase.checkPhoneNumberIsValid(phoneNumber: phoneNumber)
+                )
             })
             .disposed(by: disposeBag)
         
@@ -55,31 +64,84 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 printIfDebug("[CenterRegisterViewModel] 전달받은 인증번호: \(authNumber)")
                 
-                self?.output.canSubmitAuthNumber?.onNext(authNumber.count >= 3)
+                self?.output.canSubmitAuthNumber?.onNext(authNumber.count >= 6)
             })
             .disposed(by: disposeBag)
+        
+        // 인증중인 전화번호를 캐치
+        let currentAuthenticatingNumber = PublishSubject<String>()
         
         input
             .requestAuthForPhoneNumber?
             .subscribe(onNext: { [weak self] phoneNumber in
                 
-                printIfDebug("[CenterRegisterViewModel] 전화번호 인증 요청: \(phoneNumber)")
+                let s1 = phoneNumber.startIndex
+                let e1 = phoneNumber.index(s1, offsetBy: 3)
+                let s2 = e1
+                let e2 = phoneNumber.index(s2, offsetBy: 4)
+                let s3 = e2
+                let e3 = phoneNumber.index(s3, offsetBy: 4)
+               
+                let formattedString = [
+                    phoneNumber[s1..<e1],
+                    phoneNumber[s2..<e2],
+                    phoneNumber[s3..<e3]
+                ].joined(separator: "-")
                 
-                // TODO: 인증요청API 성공시
+                printIfDebug("[CenterRegisterViewModel] 전화번호 인증 요청: \(formattedString)")
                 
-                self?.output.phoneNumberValidation?.onNext((true, phoneNumber))
+                guard let self else { return }
+                
+                self.useCase
+                    .requestPhoneNumberAuthentication(phoneNumber: formattedString)
+                    .subscribe { [weak self] result in
+                        switch result {
+                        case .success(_):
+                            printIfDebug("✅ \(formattedString)번호로 인증을 시작합니다.")
+                            currentAuthenticatingNumber.onNext(formattedString)
+                            
+                            self?.output.phoneNumberValidation?.onNext((true, formattedString))
+                        case .failure(let error):
+                            printIfDebug("❌ \(formattedString)번호로 인증을 시작할 수 없습니다. \n 에러내용: \(error.message)")
+                            
+                            // TODO: 에러처리 요망
+                            
+                            self?.output.phoneNumberValidation?.onNext((false, formattedString))
+                            return
+                        }
+                    }
+                    .disposed(by: self.disposeBag)
             })
             .disposed(by: disposeBag)
         
-        input
-            .requestValidationForAuthNumber?
-            .subscribe(onNext: { [weak self] authNumber in
+        Observable
+            .combineLatest(
+                currentAuthenticatingNumber,
+                input.requestValidationForAuthNumber ?? .empty()
+            )
+            .subscribe(onNext: { [weak self] (phoneNumber, authNumber) in
                 
-                printIfDebug("[CenterRegisterViewModel] 인증번호 검증 요청: \(authNumber)")
+                printIfDebug("[CenterRegisterViewModel] 인증번호 검증 요청: \n 유저입력 인증번호: \(authNumber) \n 전화번호: \(phoneNumber)")
                 
-                // TODO: 인증번호 확인 성공시
+                guard let self else { return }
                 
-                self?.output.authNumberValidation?.onNext((true, authNumber))
+                self.useCase
+                    .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
+                    .subscribe { result in
+                        switch result {
+                        case .success(_):
+                            printIfDebug("✅ \(phoneNumber)번호 인증성공")
+                            self.output.authNumberValidation?.onNext((true, authNumber))
+                        case .failure(let error):
+                            printIfDebug("❌ \(phoneNumber)번호 인증실패 \n 에러내용: \(error.message)")
+                            
+                            // TODO: 에러처리
+                            
+                            self.output.authNumberValidation?.onNext((false, authNumber))
+                            return
+                        }
+                    }
+                    .disposed(by: self.disposeBag)
             })
             .disposed(by: disposeBag)
         

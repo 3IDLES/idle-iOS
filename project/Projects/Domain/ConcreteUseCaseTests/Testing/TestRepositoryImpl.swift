@@ -9,9 +9,9 @@ import Foundation
 import RepositoryInterface
 import Entity
 
-class RepositoryImpl: RepositoryInterface {
-    
-    func getHelloMessage() -> TestEntity {
-        return .init(text: "Hello, World!")
-    }
-}
+//class RepositoryImpl: RepositoryInterface {
+//    
+//    func getHelloMessage() -> TestEntity {
+//        return .init(text: "Hello, World!")
+//    }
+//}

@@ -11,7 +11,7 @@ import Alamofire
 import Moya
 import RxMoya
 
-class BaseNetworkService<TagetAPI: BaseAPI> {
+public class BaseNetworkService<TagetAPI: BaseAPI> {
     
     private let keyValueStore: KeyValueStore
     
@@ -84,12 +84,17 @@ class BaseNetworkService<TagetAPI: BaseAPI> {
 }
 
 // MARK: DataRequest
-extension BaseNetworkService {
+public extension BaseNetworkService {
     
     func requestDecodable<T: Decodable>(api: TagetAPI) -> Single<T> {
         
         self.provider.rx.request(api)
             .map(T.self)
+    }
+    
+    func request(api: TagetAPI) -> Single<Response> {
+        
+        self.provider.rx.request(api)
     }
     
     // MARK: Request with Progress

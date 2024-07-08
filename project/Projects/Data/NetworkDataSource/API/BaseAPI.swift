@@ -8,34 +8,33 @@
 import Foundation
 import Moya
 
-enum APIType {
+public enum APIType {
     
-    case test
+    case auth
 }
 
 // MARK: BaseAPI
-protocol BaseAPI: TargetType {
+public protocol BaseAPI: TargetType {
     
     var apiType: APIType { get }
 }
 
-extension BaseAPI {
+public extension BaseAPI {
     
     var baseURL: URL {
         
-        let base = URL(string: NetworkConfig.baseUrl)!
+        var baseStr = NetworkConfig.baseUrl
         
-        return base.appendingPathComponent(self.path)
-    }
-    
-    var path: String {
+        let apiVersion = "v1"
+        
+        baseStr += "/api/\(apiVersion)"
         
         switch apiType {
-        case .test:
-            "test"
-        default:
-            preconditionFailure("APIType is not defined")
+        case .auth:
+            baseStr += "/auth"
         }
+        
+        return URL(string: baseStr)!
     }
     
     /// Default header
