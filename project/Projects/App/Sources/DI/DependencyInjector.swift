@@ -23,7 +23,7 @@ public typealias Injector = DependencyAssemblable & DependencyResolvable
 public final class DependencyInjector: Injector {
     private let container: Container
     
-    public init(container: Container) {
+    public init(container: Container = Container()) {
         self.container = container
     }
     

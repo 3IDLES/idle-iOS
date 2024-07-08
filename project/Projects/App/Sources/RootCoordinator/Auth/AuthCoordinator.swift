@@ -9,16 +9,18 @@ import UIKit
 import PresentationCore
 import AuthFeature
 
-public class AuthCoordinator: ParentCoordinator {
+class AuthCoordinator: ParentCoordinator {
     
-    public var childCoordinators: [Coordinator] = []
+    var childCoordinators: [Coordinator] = []
     
-    public var parent: ParentCoordinator?
+    var parent: ParentCoordinator?
     
-    public var navigationController: UINavigationController
+    let navigationController: UINavigationController
+    let injector: Injector
     
-    public init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
+    init(dependency: Dependency) {
+        self.navigationController = dependency.navigationController
+        self.injector = dependency.injector
     }
     
     deinit {

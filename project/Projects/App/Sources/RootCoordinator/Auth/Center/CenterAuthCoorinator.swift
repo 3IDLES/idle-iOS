@@ -15,12 +15,14 @@ class CenterAuthCoorinator: ParentCoordinator {
     
     var childCoordinators: [Coordinator] = []
     
-    var navigationController: UINavigationController
-    
     var parent: AuthCoordinatable?
     
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
+    let navigationController: UINavigationController
+    let injector: Injector
+    
+    init(dependency: Dependency) {
+        self.navigationController = dependency.navigationController
+        self.injector = dependency.injector
     }
     
     deinit { printIfDebug("deinit \(Self.self)") }
@@ -78,14 +80,9 @@ extension CenterAuthCoorinator: CenterAuthCoordinatable {
     
     func register() {
         
-        let coordinator = CenterRegisterCoordinator(
-            viewModel: CenterRegisterViewModel(
-                useCase: DefaultCenterRegisterUseCase(
-                    repository: DefaultCenterRegisterRepository()
-                )
-            ),
-            navigationController: navigationController
-        )
+        let viewModel = injector.resolve(CenterRegisterViewModel.self)
+        
+        let coordinator = CenterRegisterCoordinator(viewModel: viewModel, navigationController: navigationController)
         
         coordinator.parent = self
         
