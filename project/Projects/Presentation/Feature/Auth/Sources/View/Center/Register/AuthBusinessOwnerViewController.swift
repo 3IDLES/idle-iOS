@@ -168,9 +168,6 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
         // 인증, 확인 버튼이 눌린 경우
         input.requestBusinessNumberValidation = businessNumberField.eventPublisher.asObservable()
         
-        // 화면전환 버튼이 눌렸음을 전송
-        input.ctaButtonClicked = ctaButton.eventPublisher.asObservable()
-        
         // MARK: Output
         let output = viewModel.transform(input: input)
         
