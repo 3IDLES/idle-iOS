@@ -11,8 +11,10 @@ import Entity
 
 public protocol CenterRegisterRepository: RepositoryBase {
     
-    func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<PhoneNumberAuthResult>
-    func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<PhoneNumberAuthResult>
+    func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<BoolResult>
+    func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<BoolResult>
     
     func requestBusinessNumberAuthentication(businessNumber: String) -> Single<BusinessNumberAuthResult>
+    
+    func requestCheckingIdDuplication(id: String) -> Single<BoolResult>
 }

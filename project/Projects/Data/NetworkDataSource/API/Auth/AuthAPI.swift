@@ -17,6 +17,7 @@ public enum AuthAPI {
     
     // Center
     case authenticateBusinessNumber(businessNumber: String)
+    case checkIdDuplication(id: String)
 }
 
 extension AuthAPI: BaseAPI {
@@ -32,6 +33,8 @@ extension AuthAPI: BaseAPI {
             return .post
         case .authenticateBusinessNumber:
             return .get
+        case .checkIdDuplication:
+            return .get
         }
     }
     
@@ -43,6 +46,8 @@ extension AuthAPI: BaseAPI {
             "core/confirm"
         case .authenticateBusinessNumber(let businessNumber):
             "center/authentication/\(businessNumber)"
+        case .checkIdDuplication(id: let id):
+            "center/validation/\(id)"
         }
     }
     

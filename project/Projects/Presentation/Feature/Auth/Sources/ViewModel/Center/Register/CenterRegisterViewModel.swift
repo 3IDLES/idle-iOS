@@ -110,8 +110,7 @@ public class CenterRegisterViewModel: ViewModelType {
                             
                             self?.output.phoneNumberValidation?.onNext((true, formattedString))
                         case .failure(let error):
-                            guard let idleError = error as? IdleError else { return }
-                            printIfDebug("❌ \(formattedString)번호로 인증을 시작할 수 없습니다. \n 에러내용: \(idleError.message)")
+                            printIfDebug("❌ \(formattedString)번호로 인증을 시작할 수 없습니다. \n 에러내용: \(error.message)")
                             
                             // TODO: 에러처리 요망
                             
@@ -149,8 +148,7 @@ public class CenterRegisterViewModel: ViewModelType {
                             printIfDebug("✅ \(phoneNumber)번호 인증성공")
                             self?.output.authNumberValidation?.onNext((true, authNumber))
                         case .failure(let error):
-                            guard let idleError = error as? IdleError else { return }
-                            printIfDebug("❌ \(phoneNumber)번호 인증실패 \n 에러내용: \(idleError.message)")
+                            printIfDebug("❌ \(phoneNumber)번호 인증실패 \n 에러내용: \(error.message)")
                             
                             // TODO: 에러처리
                             
@@ -227,10 +225,11 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 printIfDebug("[CenterRegisterViewModel] 입력중인 id: \(id)")
                 
-                // TODO: Id 유효성 검사
-                let isValid = !id.isEmpty
+                guard let self else { return }
                 
-                self?.output.canCheckIdDuplication?.onNext(isValid)
+                let isValid = self.useCase.checkIdIsValid(id: id)
+                
+                self.output.canCheckIdDuplication?.onNext(isValid)
             })
             .disposed(by: disposeBag)
         
@@ -241,10 +240,29 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 printIfDebug("[CenterRegisterViewModel] 중복성 검사 대상 id: \(id)")
                 
-                // TODO: id 중복검사 API 호출
-                let isValid = !id.isEmpty
+                #if DEBUG
+                // 디버그시 아이디 중복체크 미실시
+                print("✅ 디버그모드에서 아이디 중복검사 미실시")
+                self?.output.idValidation?.onNext((true, id))
+                return
+                #endif
                 
-                self?.output.idValidation?.onNext((isValid, id))
+                guard let self else { return }
+                
+                self.useCase
+                    .requestCheckingIdDuplication(id: id)
+                    .subscribe(onNext: { [weak self] result in
+                        
+                        switch result {
+                        case .success(let isValid):
+                            printIfDebug("[CenterRegisterViewModel] \(id) 중복체크 결과: \(isValid ? "✅ 성공" : "❌ 실패")")
+                            self?.output
+                                .idValidation?.onNext((isValid, id))
+                        case .failure(let error):
+                            printIfDebug("❌ \(id) 아이디중복검사 실패 \n 에러내용: \(error.message)")
+                        }
+                    })
+                    .disposed(by: self.disposeBag)
             })
             .disposed(by: disposeBag)
         
@@ -257,18 +275,19 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 printIfDebug("[CenterRegisterViewModel] \n 입력중인 비밀번호: \(pwd) \n 확인 비밀번호: \(cpwd)")
                 
-                // TODO: 패스워드 유효성 로직
-                let isValid = pwd.count >= 10
+                guard let self else { return }
+                
+                let isValid = self.useCase.checkPasswordIsValid(password: pwd)
                 
                 if !isValid {
                     
-                    self?.output.passwordValidation?.onNext((.invalidPassword, pwd))
+                    self.output.passwordValidation?.onNext((.invalidPassword, pwd))
                 } else if pwd != cpwd {
                     
-                    self?.output.passwordValidation?.onNext((.unMatch, pwd))
+                    self.output.passwordValidation?.onNext((.unMatch, pwd))
                 } else {
                     
-                    self?.output.passwordValidation?.onNext((.match, pwd))
+                    self.output.passwordValidation?.onNext((.match, pwd))
                 }
                 
             })

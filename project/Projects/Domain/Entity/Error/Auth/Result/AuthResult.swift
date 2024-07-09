@@ -7,5 +7,5 @@
 
 import Foundation
 
-public typealias PhoneNumberAuthResult = Result<Bool, IdleError>
+public typealias BoolResult = Result<Bool, IdleError>
 public typealias BusinessNumberAuthResult = Result<BusinessInfoVO, IdleError>
