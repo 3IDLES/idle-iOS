@@ -143,18 +143,18 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 self.useCase
                     .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
-                    .subscribe { result in
+                    .subscribe { [weak self] result in
                         switch result {
                         case .success(_):
                             printIfDebug("✅ \(phoneNumber)번호 인증성공")
-                            self.output.authNumberValidation?.onNext((true, authNumber))
+                            self?.output.authNumberValidation?.onNext((true, authNumber))
                         case .failure(let error):
                             guard let idleError = error as? IdleError else { return }
                             printIfDebug("❌ \(phoneNumber)번호 인증실패 \n 에러내용: \(idleError.message)")
                             
                             // TODO: 에러처리
                             
-                            self.output.authNumberValidation?.onNext((false, authNumber))
+                            self?.output.authNumberValidation?.onNext((false, authNumber))
                             return
                         }
                     }
@@ -169,8 +169,10 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 printIfDebug("[CenterRegisterViewModel] 전달받은 사업자 번호: \(businessNumber)")
                 
-                // 특정 조건 만족시
-                self?.output.canSubmitBusinessNumber?.onNext(businessNumber.count == 10)
+                guard let self else { return }
+                
+                let isValid = self.useCase.checkBusinessNumberIsValid(businessNumber: businessNumber)
+                self.output.canSubmitBusinessNumber?.onNext(isValid)
             })
             .disposed(by: disposeBag)
         
@@ -180,9 +182,41 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 printIfDebug("[CenterRegisterViewModel] 사업자 번호 인증 요청: \(businessNumber)")
                 
-                // TODO: 사업자 번호조회 API 성공시
+                let s1 = businessNumber.startIndex
+                let e1 = businessNumber.index(s1, offsetBy: 3)
+                let s2 = e1
+                let e2 = businessNumber.index(s2, offsetBy: 2)
+                let s3 = e2
+                let e3 = businessNumber.index(s3, offsetBy: 5)
+               
+                let formattedString = [
+                    businessNumber[s1..<e1],
+                    businessNumber[s2..<e2],
+                    businessNumber[s3..<e3]
+                ].joined(separator: "-")
                 
-                self?.output.businessNumberValidation?.onNext((true, .mock))
+                guard let self else { return }
+                
+                self.useCase
+                    .requestBusinessNumberAuthentication(businessNumber: formattedString)
+                    .subscribe(onNext: { [weak self] result in
+                        
+                        switch result {
+                        case .success(let vo):
+                            printIfDebug("✅ \(formattedString)번호 검색 성공")
+                            
+                            self?.output.businessNumberValidation?.onNext(vo)
+                        case .failure(let error):
+                            
+                            printIfDebug("❌ \(formattedString)번호 검색실패 \n 에러내용: \(error.message)")
+                            
+                            // TODO: 에러처리
+                            
+                            self?.output.businessNumberValidation?.onNext(nil)
+                        }
+                    })
+                    .disposed(by: self.disposeBag)
+                
             })
             .disposed(by: disposeBag)
         
@@ -285,7 +319,7 @@ extension CenterRegisterViewModel {
         
         // 사업자 번호 입력
         public var canSubmitBusinessNumber: PublishSubject<Bool>? = .init()
-        public var businessNumberValidation: PublishSubject<(isValid: Bool, info: CenterInformation?)>? = .init()
+        public var businessNumberValidation: PublishSubject<BusinessInfoVO?>? = .init()
         
         // Id & password
         public var canCheckIdDuplication: PublishSubject<Bool>? = .init()

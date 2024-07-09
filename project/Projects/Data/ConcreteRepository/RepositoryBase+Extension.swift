@@ -9,7 +9,7 @@ import Foundation
 import Entity
 import RepositoryInterface
 
-public extension RepositoryBase {
+extension RepositoryBase {
     
     func decodeError<TargetError: CustomError>(of: TargetError.Type, data: Data) -> IdleError {
         
@@ -25,4 +25,10 @@ public extension RepositoryBase {
         
         return .decodingError(message: "\(String(data: data, encoding: .utf8) ?? "(❌❌ciritical❌❌)") 에러데이터 디코딩 실패")
     }
+    
+    func decodeData<DTO: Decodable>(data: Data) -> DTO {
+        
+        return try! JSONDecoder().decode(DTO.self, from: data)
+    }
+    
 }

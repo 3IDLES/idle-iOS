@@ -26,23 +26,33 @@ public class IdleError: Error {
         self.errorType = errorType
     }
     
+    // MARK: static Local Error
     public static func decodingError(message: String) -> IdleError {
         IdleError(
-            code: "Err-001",
+            code: "Local-001",
             message: message,
             timestamp: ISO8601DateFormatter().string(from: Date())
         )
     }
     
-    public static func unknownError() -> IdleError {
+    public static var unknownError: IdleError {
         IdleError(
-            code: "Err-002",
+            code: "Local-002",
             message: "처리되지 않은 에러입니다. 관리자에게 문의하세요.",
             timestamp: ISO8601DateFormatter().string(from: Date())
         )
     }
     
-    public static func systemError() -> IdleError {
+    public static var networkError: IdleError {
+        IdleError(
+            code: "Local-003",
+            message: "네트워크 에러입니다. 네트워크 연결을 확인해주세요.",
+            timestamp: ISO8601DateFormatter().string(from: Date())
+        )
+    }
+    
+    // MARK: static ServerError
+    public static var systemError: IdleError {
         IdleError(
             code: "SYSTEM-001",
             message: "서버에러 입니다.",

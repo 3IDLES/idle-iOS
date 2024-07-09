@@ -18,7 +18,7 @@ public protocol AuthBusinessOwnerInputable {
 
 public protocol AuthBusinessOwnerOutputable {
     var canSubmitBusinessNumber: PublishSubject<Bool>? { get set }
-    var businessNumberValidation: PublishSubject<(isValid: Bool, info: CenterInformation?)>? { get set }
+    var businessNumberValidation: PublishSubject<BusinessInfoVO?>? { get set }
 }
 
 public class AuthBusinessOwnerViewController<T: ViewModelType>: DisposableViewController
@@ -184,17 +184,19 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
         // 사업자 번호 조회 결과
         output
             .businessNumberValidation?
-            .subscribe(onNext: { [weak self] (isValid, info) in
+            .subscribe(onNext: { [weak self] (info) in
                 
-                if isValid {
+                if let centerInfo = info {
                     
-                    if let centerInfo = info {
-                        
-                        printIfDebug("✅ \(centerInfo.name) 조회결과")
-                        
-                        self?.displayCenterInfo(vo: centerInfo)
-                        self?.ctaButton.setEnabled(true)
-                    }
+                    printIfDebug("✅ \(centerInfo.name) 조회결과")
+                    
+                    self?.displayCenterInfo(vo: centerInfo)
+                    self?.ctaButton.setEnabled(true)
+                } else {
+                    
+                    // 정보가 없는 경우
+                    self?.dismissCenterInfo()
+                    self?.ctaButton.setEnabled(false)
                 }
             })
             .disposed(by: disposeBag)
@@ -207,7 +209,7 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
             .disposed(by: disposeBag)
     }
     
-    private func displayCenterInfo(vo: CenterInformation) {
+    private func displayCenterInfo(vo: BusinessInfoVO) {
         
         centerInfoBox.update(
             titleText: vo.name,
