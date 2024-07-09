@@ -78,6 +78,8 @@ public class IdleOneLineInputField: UIView {
         
         return button
     }()
+    // 사라질 수 있는 뷰의 오토 레이아웃을 관리
+    private var clearButtonHeightConstraint: NSLayoutConstraint!
     
     // MARK: Complete image
     public var isCompleteImageAvailable: Bool
@@ -91,6 +93,8 @@ public class IdleOneLineInputField: UIView {
         
         return view
     }()
+    // 사라질 수 있는 뷰의 오토 레이아웃을 관리
+    private var completeImageHeightConstraint: NSLayoutConstraint!
     
     // MARK: Timer label
     private var timerLabel: TimerLabel?
@@ -162,7 +166,6 @@ public class IdleOneLineInputField: UIView {
             clearButton,
             completeImage,
         ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
             stack.addArrangedSubview($0)
         }
         
@@ -174,19 +177,12 @@ public class IdleOneLineInputField: UIView {
         clearButton.setContentCompressionResistancePriority(.init(751), for: .horizontal)
         completeImage.setContentCompressionResistancePriority(.init(751), for: .horizontal)
         
-        
         NSLayoutConstraint.activate([
         
             stack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
             stack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             stack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             stack.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
-            
-            clearButton.widthAnchor.constraint(equalToConstant: textField.intrinsicContentSize.height),
-            clearButton.heightAnchor.constraint(equalTo: clearButton.widthAnchor),
-            
-            completeImage.widthAnchor.constraint(equalToConstant: textField.intrinsicContentSize.height),
-            completeImage.heightAnchor.constraint(equalTo: completeImage.widthAnchor),
         ])
     }
     
@@ -203,19 +199,23 @@ public class IdleOneLineInputField: UIView {
             .orEmpty
             .map { $0.isEmpty }
         
-        Observable
+        let clearButtonEnable = Observable
             .combineLatest(isEmpty, state)
             .map({ (lhs, rhs) in
                 // 문자열이 비지 않음 && editing모드인 경우
-                !(!lhs && (rhs == .editing))
+                !lhs && (rhs == .editing)
             })
+        
+        clearButtonEnable
+            .map({ !$0 })
             .bind(to: clearButton.rx.isHidden)
             .disposed(by: disposeBag)
         
-        state
-            .map { [weak self] in
-                !($0 == .complete && self?.isCompleteImageAvailable ?? false)
-            }
+        let completeImageEnable = state
+            .map { [weak self] in $0 == .complete && self?.isCompleteImageAvailable ?? false }
+        
+        completeImageEnable
+            .map({ !$0 })
             .bind(to: completeImage.rx.isHidden)
             .disposed(by: disposeBag)
         
