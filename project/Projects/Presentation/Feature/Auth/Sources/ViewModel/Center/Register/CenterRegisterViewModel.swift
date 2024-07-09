@@ -335,6 +335,9 @@ public class CenterRegisterViewModel: ViewModelType {
                         case .failure(let error):
                             printIfDebug("❌ 회원가입 실패: \(error.message)")
                         }
+                        
+                        // 현재까지 입력정보를 모두 삭제
+                        self.stateObject.clear()
                     })
                     .disposed(by: self.disposeBag)
             }
