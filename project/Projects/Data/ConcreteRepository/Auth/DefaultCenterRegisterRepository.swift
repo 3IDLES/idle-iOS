@@ -22,6 +22,7 @@ public class DefaultCenterRegisterRepository: CenterRegisterRepository {
     public func requestPhoneNumberAuthentication(phoneNumber: String) -> RxSwift.Single<PhoneNumberAuthResult> {
         
         networkService.request(api: .startPhoneNumberAuth(phoneNumber: phoneNumber))
+            .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
                 guard let self = self else { return PhoneNumberAuthResult.failure(.unknownError) }
@@ -38,6 +39,7 @@ public class DefaultCenterRegisterRepository: CenterRegisterRepository {
     public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> RxSwift.Single<PhoneNumberAuthResult> {
         
         networkService.request(api: .checkAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber))
+            .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
                 guard let self = self else { return PhoneNumberAuthResult.failure(.unknownError) }
@@ -54,6 +56,7 @@ public class DefaultCenterRegisterRepository: CenterRegisterRepository {
     public func requestBusinessNumberAuthentication(businessNumber: String) -> RxSwift.Single<BusinessNumberAuthResult> {
         
         networkService.request(api: .authenticateBusinessNumber(businessNumber: businessNumber))
+            .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
                 guard let self = self else { return BusinessNumberAuthResult.failure(.unknownError) }
@@ -69,3 +72,4 @@ public class DefaultCenterRegisterRepository: CenterRegisterRepository {
             }
     }
 }
+

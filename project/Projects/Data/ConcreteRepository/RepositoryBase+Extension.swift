@@ -8,6 +8,7 @@
 import Foundation
 import Entity
 import RepositoryInterface
+import Moya
 
 extension RepositoryBase {
     
@@ -29,6 +30,16 @@ extension RepositoryBase {
     func decodeData<DTO: Decodable>(data: Data) -> DTO {
         
         return try! JSONDecoder().decode(DTO.self, from: data)
+    }
+    
+    func filterNetworkConnection(_ error: Error) -> URLError? {
+        
+        guard let moyaError = error as? MoyaError, case .underlying(let err, _) = moyaError, let afError = err.asAFError, afError.isSessionTaskError else {
+            return nil
+        }
+        
+        // 네트워크 미연결 에러
+        return URLError.init(.notConnectedToInternet)
     }
     
 }

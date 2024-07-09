@@ -20,9 +20,10 @@ public class DefaultCenterRegisterUseCase: CenterRegisterUseCase {
     }
     
     // MARK: 전화번호 인증
-    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<PhoneNumberAuthResult> {
-        
-        return repository.requestPhoneNumberAuthentication(phoneNumber: phoneNumber)
+    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Observable<PhoneNumberAuthResult> {
+        filteringDataLayer(
+            domainTask: repository.requestPhoneNumberAuthentication(phoneNumber: phoneNumber).asObservable()
+        )
     }
     
     public func checkPhoneNumberIsValid(phoneNumber: String) -> Bool {
@@ -32,31 +33,17 @@ public class DefaultCenterRegisterUseCase: CenterRegisterUseCase {
         return predicate.evaluate(with: phoneNumber)
     }
     
-    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<PhoneNumberAuthResult> {
-        
-        return repository.authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
+    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Observable<PhoneNumberAuthResult> {
+        filteringDataLayer(
+            domainTask: repository.authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber).asObservable()
+        )
     }
     
     // MARK: 사업자 번호 인증
     public func requestBusinessNumberAuthentication(businessNumber: String) -> Observable<BusinessNumberAuthResult> {
-        return Observable.create { [weak self] observer in
-            let task = self?.repository.requestBusinessNumberAuthentication(businessNumber: businessNumber)
-                .subscribe { result in observer.onNext(result) } onFailure: { error in
-                    
-                    // UseCase영역에서 네트워크 오류가 발생하였음을 확인합니다.
-                    
-                    if let urlError = error as? URLError, urlError.code == .networkConnectionLost {
-                        // 네트워크 비연결 에러
-                        observer.onNext(.failure(.networkError))
-                    } else {
-                        // 알수 없는 에러
-                        observer.onNext(.failure(.unknownError))
-                    }
-                }
-            return Disposables.create {
-                task?.dispose()
-            }
-        }
+        filteringDataLayer(
+            domainTask: repository.requestBusinessNumberAuthentication(businessNumber: businessNumber).asObservable()
+        )
     }
     
     public func checkBusinessNumberIsValid(businessNumber: String) -> Bool {
