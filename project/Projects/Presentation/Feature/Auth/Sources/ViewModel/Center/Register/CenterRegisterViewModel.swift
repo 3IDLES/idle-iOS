@@ -102,7 +102,8 @@ public class CenterRegisterViewModel: ViewModelType {
                             
                             self?.output.phoneNumberValidation?.onNext((true, formattedString))
                         case .failure(let error):
-                            printIfDebug("❌ \(formattedString)번호로 인증을 시작할 수 없습니다. \n 에러내용: \(error.message)")
+                            guard let idleError = error as? IdleError else { return }
+                            printIfDebug("❌ \(formattedString)번호로 인증을 시작할 수 없습니다. \n 에러내용: \(idleError.message)")
                             
                             // TODO: 에러처리 요망
                             
@@ -133,7 +134,8 @@ public class CenterRegisterViewModel: ViewModelType {
                             printIfDebug("✅ \(phoneNumber)번호 인증성공")
                             self.output.authNumberValidation?.onNext((true, authNumber))
                         case .failure(let error):
-                            printIfDebug("❌ \(phoneNumber)번호 인증실패 \n 에러내용: \(error.message)")
+                            guard let idleError = error as? IdleError else { return }
+                            printIfDebug("❌ \(phoneNumber)번호 인증실패 \n 에러내용: \(idleError.message)")
                             
                             // TODO: 에러처리
                             
