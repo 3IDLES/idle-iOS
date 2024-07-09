@@ -7,6 +7,8 @@
 
 import UIKit
 import AuthFeature
+import ConcreteUseCase
+import ConcreteRepository
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -19,7 +21,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-        let viewModel = CenterRegisterViewModel()
+        let viewModel = CenterRegisterViewModel(
+            useCase: DefaultCenterRegisterUseCase(
+                repository: DefaultCenterRegisterRepository()
+            )
+        )
         
         window?.rootViewController = EnterNameViewController(
             viewModel: viewModel

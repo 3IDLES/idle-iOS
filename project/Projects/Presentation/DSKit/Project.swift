@@ -36,7 +36,7 @@ let proejct = Project(
         
         // Component를 테스트하는 Example타겟
         .target(
-            name: "DSKit_ExampleApp",
+            name: "DSKitExampleApp",
             destinations: DeploymentSettings.platform,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",

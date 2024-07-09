@@ -56,6 +56,9 @@ let project = Project(
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
                 .target(name: "AuthFeature"),
+                
+                D.Domain.ConcreteUseCase,
+                D.Data.ConcreteRepository,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

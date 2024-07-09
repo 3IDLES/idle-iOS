@@ -14,11 +14,7 @@ final class ConcreteTests: XCTestCase {
     
     func testPhoneNumberRegex() {
         
-        let usecase = DefaultCenterRegisterUseCase(
-            repository: DefaultCenterRegisterRepository(
-                networkService: CenterRegisterService()
-            )
-        )
+        let usecase = DefaultCenterRegisterUseCase(repository: DefaultCenterRegisterRepository())
         
         let result1 = usecase.checkPhoneNumberIsValid(
             phoneNumber: "01012341234"
