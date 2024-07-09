@@ -92,6 +92,14 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 guard let self else { return }
                 
+                #if DEBUG
+                // 디버그시 번호 검사 무조건 통과
+                print("✅ 디버그모드에서 번호인증 요청 무조건 통과")
+                currentAuthenticatingNumber.onNext(formattedString)
+                self.output.phoneNumberValidation?.onNext((true, formattedString))
+                return
+                #endif
+                
                 self.useCase
                     .requestPhoneNumberAuthentication(phoneNumber: formattedString)
                     .subscribe { [weak self] result in
@@ -125,6 +133,13 @@ public class CenterRegisterViewModel: ViewModelType {
                 printIfDebug("[CenterRegisterViewModel] 인증번호 검증 요청: \n 유저입력 인증번호: \(authNumber) \n 전화번호: \(phoneNumber)")
                 
                 guard let self else { return }
+                
+                #if DEBUG
+                    // 디버그시 인증번호 무조건 통과
+                    print("✅ 디버그모드에서 인증번호 무조건 통과")
+                    self.output.authNumberValidation?.onNext((true, authNumber))
+                    return
+                #endif
                 
                 self.useCase
                     .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
