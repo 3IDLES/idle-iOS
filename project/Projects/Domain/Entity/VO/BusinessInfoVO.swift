@@ -1,23 +1,23 @@
 //
-//  CenterInformation.swift
-//  ConcreteUseCase
+//  BusinessInfoVO.swift
+//  Entity
 //
-//  Created by choijunios on 7/7/24.
+//  Created by choijunios on 7/9/24.
 //
 
 import Foundation
 
-public class CenterInformation {
+public class BusinessInfoVO {
     
     public let name: String
     public let keyValue: [String: String]
     
-    public init(name: String, keyValue: [String: String]) {
+    public init(name: String, keyValue: [String: String] = [:]) {
         self.name = name
         self.keyValue = keyValue
     }
     
-    public static let mock: CenterInformation = .init(
+    public static let mock: BusinessInfoVO = .init(
         name: "센터 정보",
         keyValue: [
             "이름": "홍길동",

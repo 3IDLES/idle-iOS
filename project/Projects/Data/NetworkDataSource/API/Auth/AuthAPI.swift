@@ -14,6 +14,9 @@ public enum AuthAPI {
     // Core
     case startPhoneNumberAuth(phoneNumber: String)
     case checkAuthNumber(phoneNumber: String, authNumber: String)
+    
+    // Center
+    case authenticateBusinessNumber(businessNumber: String)
 }
 
 extension AuthAPI: BaseAPI {
@@ -27,6 +30,8 @@ extension AuthAPI: BaseAPI {
             return .post
         case .checkAuthNumber:
             return .post
+        case .authenticateBusinessNumber:
+            return .get
         }
     }
     
@@ -36,6 +41,8 @@ extension AuthAPI: BaseAPI {
             "core/send"
         case .checkAuthNumber:
             "core/confirm"
+        case .authenticateBusinessNumber(let businessNumber):
+            "center/authentication/\(businessNumber)"
         }
     }
     
@@ -47,6 +54,8 @@ extension AuthAPI: BaseAPI {
         case .checkAuthNumber(let phoneNumber, let authNumber):
             params["phoneNumber"] = phoneNumber
             params["verificationNumber"] = authNumber
+        default:
+            break
         }
         return params
     }
@@ -64,6 +73,8 @@ extension AuthAPI: BaseAPI {
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .checkAuthNumber:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
+        default:
+            return .requestPlain
         }
     }
 }
