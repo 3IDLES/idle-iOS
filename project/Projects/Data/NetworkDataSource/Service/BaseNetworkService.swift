@@ -77,8 +77,8 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
                 // TODO: 토큰 재발급후 요청 재시도
             }
         }
-        
-        completion(.doNotRetryWithError(error))
+            
+        completion(.doNotRetry)
     }
     
 }
