@@ -17,4 +17,5 @@ public protocol CenterRegisterRepository: RepositoryBase {
     func requestBusinessNumberAuthentication(businessNumber: String) -> Single<BusinessNumberAuthResult>
     
     func requestCheckingIdDuplication(id: String) -> Single<BoolResult>
+    func requestRegisterCenterAccount(managerName: String, phoneNumber: String, businessNumber: String, id: String, password: String) -> Single<BoolResult>
 }

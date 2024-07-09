@@ -8,8 +8,13 @@
 import UIKit
 import RxSwift
 
+public enum CTAButtonAction {
+    case next
+    case complete
+}
+
 public protocol CTAButtonEnableInputable {
-    var ctaButtonClicked: Observable<UITapGestureRecognizer>? { get set }
+    var ctaButtonClicked: Observable<CTAButtonAction>? { get set }
 }
 
 public protocol CTAButtonEnableOutPutable {

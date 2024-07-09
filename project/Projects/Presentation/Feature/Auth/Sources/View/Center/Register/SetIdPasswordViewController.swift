@@ -240,6 +240,7 @@ where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetI
         input.editingId = idField.textField.eventPublisher.asObservable()
         input.editingPassword = passwordField.eventPublisher.asObservable()
         input.editingCheckPassword = checkPasswordField.eventPublisher.asObservable()
+        input.ctaButtonClicked = ctaButton.eventPublisher.map({ _ in CTAButtonAction.complete }).asObservable()
         
         // id 중복확인 요청 버튼
         input.requestIdDuplicationValidation = idField.eventPublisher

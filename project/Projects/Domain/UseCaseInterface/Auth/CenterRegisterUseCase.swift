@@ -88,4 +88,14 @@ public protocol CenterRegisterUseCase: UseCaseBase {
     /// - returns:
     ///     - Bool, true: 가능, flase: 불가능
     func checkPasswordIsValid(password: String) -> Bool
+    
+    // #9.
+    /// 센터 로그인 실행
+    /// - parameters:
+    ///     - registerState: CenterRegisterState
+    /// - returns:
+    ///     - Bool, true: 성공, flase: 실패
+    func registerCenterAccount(
+        registerState: CenterRegisterState
+    ) -> Observable<BoolResult>
 }

@@ -20,6 +20,8 @@ public class CenterRegisterViewModel: ViewModelType {
     public let input = Input()
     public let output = Output()
     
+    private let stateObject = CenterRegisterState()
+    
     public init(useCase: CenterRegisterUseCase) {
         self.useCase = useCase
     }
@@ -31,13 +33,18 @@ public class CenterRegisterViewModel: ViewModelType {
         // MARK: 성함 입력
         input
             .editingName?
-            .subscribe(onNext: { name in
+            .subscribe(onNext: { [weak self] name in
                 
                 printIfDebug("[CenterRegisterViewModel] 전달받은 성함: \(name)")
                 
                 // TODO: 성함이 유효하다면
-                self.output.nameValidation?.onNext((!name.isEmpty, name))
+                let isValid = !name.isEmpty
+                self?.output.nameValidation?.onNext((isValid, name))
                 
+                if isValid {
+                    // 🚀 상태추적 🚀
+                    self?.stateObject.name = name
+                }
             })
             .disposed(by: disposeBag)
         
@@ -112,7 +119,7 @@ public class CenterRegisterViewModel: ViewModelType {
                         case .failure(let error):
                             printIfDebug("❌ \(formattedString)번호로 인증을 시작할 수 없습니다. \n 에러내용: \(error.message)")
                             
-                            // TODO: 에러처리 요망
+                            // TODO: 에러처리
                             
                             self?.output.phoneNumberValidation?.onNext((false, formattedString))
                             return
@@ -137,6 +144,9 @@ public class CenterRegisterViewModel: ViewModelType {
                     // 디버그시 인증번호 무조건 통과
                     print("✅ 디버그모드에서 인증번호 무조건 통과")
                     self.output.authNumberValidation?.onNext((true, authNumber))
+                
+                    // ☑️ 상태추적 ☑️
+                    self.stateObject.phoneNumber = phoneNumber
                     return
                 #endif
                 
@@ -147,6 +157,8 @@ public class CenterRegisterViewModel: ViewModelType {
                         case .success(_):
                             printIfDebug("✅ \(phoneNumber)번호 인증성공")
                             self?.output.authNumberValidation?.onNext((true, authNumber))
+                            // 🚀 상태추적 🚀
+                            self?.stateObject.phoneNumber = phoneNumber
                         case .failure(let error):
                             printIfDebug("❌ \(phoneNumber)번호 인증실패 \n 에러내용: \(error.message)")
                             
@@ -204,6 +216,8 @@ public class CenterRegisterViewModel: ViewModelType {
                             printIfDebug("✅ \(formattedString)번호 검색 성공")
                             
                             self?.output.businessNumberValidation?.onNext(vo)
+                            // 🚀 상태추적 🚀
+                            self?.stateObject.businessNumber = businessNumber
                         case .failure(let error):
                             
                             printIfDebug("❌ \(formattedString)번호 검색실패 \n 에러내용: \(error.message)")
@@ -243,6 +257,8 @@ public class CenterRegisterViewModel: ViewModelType {
                 #if DEBUG
                 // 디버그시 아이디 중복체크 미실시
                 print("✅ 디버그모드에서 아이디 중복검사 미실시")
+                // ☑️ 상태추적 ☑️
+                self?.stateObject.id = id
                 self?.output.idValidation?.onNext((true, id))
                 return
                 #endif
@@ -256,8 +272,12 @@ public class CenterRegisterViewModel: ViewModelType {
                         switch result {
                         case .success(let isValid):
                             printIfDebug("[CenterRegisterViewModel] \(id) 중복체크 결과: \(isValid ? "✅ 성공" : "❌ 실패")")
-                            self?.output
-                                .idValidation?.onNext((isValid, id))
+                            self?.output.idValidation?.onNext((isValid, id))
+                            
+                            if isValid {
+                                // 🚀 상태추적 🚀
+                                self?.stateObject.id = id
+                            }
                         case .failure(let error):
                             printIfDebug("❌ \(id) 아이디중복검사 실패 \n 에러내용: \(error.message)")
                         }
@@ -288,11 +308,37 @@ public class CenterRegisterViewModel: ViewModelType {
                 } else {
                     
                     self.output.passwordValidation?.onNext((.match, pwd))
+                    // 🚀 상태추적 🚀
+                    self.stateObject.password = pwd
                 }
                 
             })
             .disposed(by: disposeBag)
+        
+        let onComplete = input.ctaButtonClicked?.compactMap({ $0 == .complete ? true : nil })
+        
+        // MARK: 최종 로그인 버튼
+        onComplete?
+            .subscribe { [weak self] _ in
                 
+                guard let self else { return }
+                
+                self.useCase
+                    .registerCenterAccount(registerState: self.stateObject)
+                    .subscribe(onNext: { [weak self] result in
+                        
+                        guard let self else { return }
+                        
+                        switch result {
+                        case .success(_):
+                            printIfDebug("[CenterRegisterViewModel] ✅ 획원가입 성공 \n 가임정보 \(self.stateObject)")
+                        case .failure(let error):
+                            printIfDebug("❌ 회원가입 실패: \(error.message)")
+                        }
+                    })
+                    .disposed(by: self.disposeBag)
+            }
+            .disposed(by: disposeBag)
         return output
     }
 }
@@ -303,7 +349,7 @@ extension CenterRegisterViewModel {
     public struct Input {
         
         // CTA 버튼 클릭시
-        public var ctaButtonClicked: Observable<UITapGestureRecognizer>?
+        public var ctaButtonClicked: Observable<CTAButtonAction>?
         
         // 이름입력
         public var editingName: Observable<String>?

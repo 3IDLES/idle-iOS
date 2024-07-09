@@ -215,9 +215,6 @@ where
         input.requestAuthForPhoneNumber = phoneNumberField.eventPublisher.asObservable()
         input.requestValidationForAuthNumber = authNumberField.eventPublisher.asObservable()
         
-        // 화면전환 버튼이 눌렸음을 전송
-        input.ctaButtonClicked = ctaButton.eventPublisher.asObservable()
-        
         // MARK: Output
         let output = viewModel.transform(input: input)
         
