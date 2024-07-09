@@ -19,13 +19,13 @@ public class DefaultCenterRegisterRepository: CenterRegisterRepository {
     
     public init() { }
     
-    public func requestPhoneNumberAuthentication(phoneNumber: String) -> RxSwift.Single<PhoneNumberAuthResult> {
+    public func requestPhoneNumberAuthentication(phoneNumber: String) -> RxSwift.Single<BoolResult> {
         
         networkService.request(api: .startPhoneNumberAuth(phoneNumber: phoneNumber))
             .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
-                guard let self = self else { return PhoneNumberAuthResult.failure(.unknownError) }
+                guard let self = self else { return BoolResult.failure(.unknownError) }
                 
                 switch response.statusCode {
                 case 204:
@@ -36,13 +36,13 @@ public class DefaultCenterRegisterRepository: CenterRegisterRepository {
             }
     }
     
-    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> RxSwift.Single<PhoneNumberAuthResult> {
+    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> RxSwift.Single<BoolResult> {
         
         networkService.request(api: .checkAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber))
             .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
-                guard let self = self else { return PhoneNumberAuthResult.failure(.unknownError) }
+                guard let self = self else { return BoolResult.failure(.unknownError) }
                 
                 switch response.statusCode {
                 case 204:
@@ -66,7 +66,24 @@ public class DefaultCenterRegisterRepository: CenterRegisterRepository {
                     let dto: BusinessInfoDTO = self.decodeData(data: response.data)
                     return .success(dto.toEntity())
                 default:
-                    print(String(data: response.data, encoding: .utf8)!)
+                    return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
+                }
+            }
+    }
+    
+    public func requestCheckingIdDuplication(id: String) -> RxSwift.Single<Entity.BoolResult> {
+        networkService.request(api: .checkIdDuplication(id: id))
+            .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
+            .map { [weak self] response in
+                
+                guard let self = self else { return BoolResult.failure(.unknownError) }
+                
+                switch response.statusCode {
+                case 204:
+                    return .success(true)
+                case 400:
+                    return .success(false)
+                default:
                     return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
                 }
             }

@@ -242,7 +242,16 @@ where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetI
         input.editingCheckPassword = checkPasswordField.eventPublisher.asObservable()
         
         // id 중복확인 요청 버튼
-        input.requestIdDuplicationValidation = idField.eventPublisher.asObservable()
+        input.requestIdDuplicationValidation = idField.eventPublisher
+            .map { [weak self] in
+                    
+                // 증복검사 실행시 아이디 입력 필드 비활성화
+                self?.idField.textField.setEnabled(false)
+                self?.idField.button.setEnabled(false)
+                
+                return $0
+            }
+            .asObservable()
         
         // MARK: Output
         let output = viewModel.transform(input: input)
@@ -259,7 +268,11 @@ where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetI
         // 아이디 중복확인 결과
         let checkIdDuplication = output
             .idValidation?
-            .compactMap { (isValid, id) in
+            .compactMap { [weak self] (isValid, id) in
+                
+                // 입력 필드 활성화
+                self?.idField.textField.setEnabled(true)
+                
                 printIfDebug(isValid ? "✅ 중복되지 않은 아이디: \(id)" : "❌ 중복된 아이디: \(id)")
                 return isValid ? id : nil
             }
@@ -308,6 +321,7 @@ where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetI
             .eventPublisher
             .emit { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
+        
     }
     
     private func onPasswordMatched() {
