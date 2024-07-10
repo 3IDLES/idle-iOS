@@ -28,6 +28,13 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
         return provider
     }()
     
+    private lazy var withoutTokenProvider: MoyaProvider<TagetAPI> = {
+        
+        let provider = MoyaProvider<TagetAPI>(session: sessionWithoutToken)
+        
+        return provider
+    }()
+    
     lazy var sessionWithToken: Session = {
         
         let configuration = URLSessionConfiguration.default
@@ -81,6 +88,23 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
         completion(.doNotRetry)
     }
     
+    /// Token을 요구하지 않는 요청이 사용한다.
+    let sessionWithoutToken: Session = {
+       
+        let configuration = URLSessionConfiguration.default
+        
+        // 단일 요청이 완료되는데 걸리는 최대 시간, 초과시 타임아웃
+        configuration.timeoutIntervalForRequest = 10
+        
+        // 하나의 리소스를 로드하는데 걸리는 시간, 재시도를 포함한다 초과시 타임아웃
+        configuration.timeoutIntervalForResource = 10
+        
+        // Cache policy: 로컬캐시를 무시하고 항상 새로운 데이터를 가져온다.
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        
+        return Session(configuration: configuration)
+    }()
+    
 }
 
 // MARK: DataRequest
@@ -132,5 +156,11 @@ public extension BaseNetworkService {
                     }
                 })
         }
+    }
+    
+    /// 토큰을 사용하지 않는 요청입니다.
+    func requestWithoutToken(api: TagetAPI) -> Single<Response> {
+        
+        self.withoutTokenProvider.rx.request(api)
     }
 }

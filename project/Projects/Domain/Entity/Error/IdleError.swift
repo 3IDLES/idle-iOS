@@ -51,6 +51,14 @@ public class IdleError: Error {
         )
     }
     
+    public static var localSaveError: IdleError {
+        IdleError(
+            code: "Local-004",
+            message: "토큰을 로컬환경에 저장하는데 실패했습니다.",
+            timestamp: ISO8601DateFormatter().string(from: Date())
+        )
+    }
+    
     // MARK: static ServerError
     public static var systemError: IdleError {
         IdleError(

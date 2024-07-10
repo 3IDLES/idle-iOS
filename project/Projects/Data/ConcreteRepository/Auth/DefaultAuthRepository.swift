@@ -29,7 +29,7 @@ public class DefaultAuthRepository: AuthRepository {
         
         let data = (try? JSONEncoder().encode(dto)) ?? Data()
         
-        return networkService.request(api: .registerCenterAccount(data: data))
+        return networkService.requestWithoutToken(api: .registerCenterAccount(data: data))
             .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
@@ -46,7 +46,7 @@ public class DefaultAuthRepository: AuthRepository {
     
     public func requestCenterLogin(id: String, password: String) -> RxSwift.Single<Entity.BoolResult> {
         
-        return networkService.request(api: .centerLogin(id: id, password: password))
+        return networkService.requestWithoutToken(api: .centerLogin(id: id, password: password))
             .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
@@ -59,16 +59,20 @@ public class DefaultAuthRepository: AuthRepository {
                        let refreshToken = dict["refreshToken"] {
                         
                         // 토큰처리
-                        try! self.networkService.keyValueStore.saveAuthToken(
-                            accessToken: accessToken,
-                            refreshToken: refreshToken
-                        )
-                        
-                        #if DEBUG
-                        print("\(#function) ✅ 토큰 저장성공")
-                        #endif
-                        
-                        return .success(true)
+                        do {
+                            try self.networkService.keyValueStore.saveAuthToken(
+                                accessToken: accessToken,
+                                refreshToken: refreshToken
+                            )
+                            #if DEBUG
+                            print("\(#function) ✅ 토큰 저장성공")
+                            #endif
+                            
+                            return .success(true)
+                        } catch {
+                            
+                            return .failure(.localSaveError)
+                        }
                     }
                 }
                 return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
