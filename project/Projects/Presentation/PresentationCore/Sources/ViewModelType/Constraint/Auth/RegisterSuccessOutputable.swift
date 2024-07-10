@@ -1,0 +1,13 @@
+//
+//  RegisterSuccessOutputable.swift
+//  PresentationCore
+//
+//  Created by choijunios on 7/10/24.
+//
+
+import Foundation
+import RxSwift
+
+public protocol RegisterSuccessOutputable {
+    var registerValidation: PublishSubject<Bool>? { get }
+}

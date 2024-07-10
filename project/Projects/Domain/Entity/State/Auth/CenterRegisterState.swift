@@ -35,4 +35,9 @@ public class CenterRegisterState {
         id = nil
         password = nil
     }
+    
+    public var descroption: String {
+        return "이름: \(name ?? "")\n전화번호: \(phoneNumber ?? "")\n비즈니스번호: \(businessNumber ?? "")\n아이디: \(id ?? "")\n패스워드: \(password ?? "")"
+    }
 }
+

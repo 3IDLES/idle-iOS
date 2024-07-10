@@ -26,7 +26,7 @@ public protocol SetIdPasswordOutputable {
 }
 
 class SetIdPasswordViewController<T: ViewModelType>: DisposableViewController
-where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetIdPasswordOutputable {
+where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetIdPasswordOutputable & RegisterSuccessOutputable {
     
     var coordinator: CenterRegisterCoordinator?
     
@@ -316,11 +316,28 @@ where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetI
             .subscribe(onNext: { [weak self] in self?.ctaButton.setEnabled($0) })
             .disposed(by: disposeBag)
         
+        Observable
+            .zip(output.registerValidation ?? .empty(), ctaButton.eventPublisher.asObservable())
+            .subscribe { [weak self] (isSuccess, _) in
+                
+                if isSuccess {
+                    // 회원가입 성공
+                    self?.coordinator?.next()
+                } else {
+                    // 회원가입실패
+                    self?.ctaButton.setEnabled(true)
+                }
+            }
+            .disposed(by: disposeBag)
+        
         // MARK: ViewController한정 로직
-        // CTA버튼 클릭시 화면전환
+        // CTA버튼 클릭시 버튼 비활성화
         ctaButton
             .eventPublisher
-            .emit { [weak self] _ in self?.coordinator?.next() }
+            .emit { [weak self] _ in
+                
+                self?.ctaButton.setEnabled(false)
+            }
             .disposed(by: disposeBag)
         
     }
