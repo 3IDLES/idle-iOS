@@ -12,7 +12,9 @@ import XCTest
 
 final class ConcreteTests: XCTestCase {
     
-    let usecase = DefaultCenterRegisterUseCase(repository: DefaultCenterRegisterRepository())
+    let usecase = DefaultAuthInputValidationUseCase(
+        repository: DefaultAuthInputValidationRepository()
+    )
     
     func testPhoneNumberRegex() {
         
