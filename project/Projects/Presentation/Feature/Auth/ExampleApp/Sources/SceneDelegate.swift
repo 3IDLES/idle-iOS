@@ -27,9 +27,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             )
         )
         
-        window?.rootViewController = EnterNameViewController(
-            viewModel: viewModel
-        )
+        window?.rootViewController = CenterLoginViewController()
         window?.makeKeyAndVisible()
     }
 }
