@@ -47,8 +47,8 @@ class ViewController: UIViewController {
             text: "테스트1",
             onTouch: {
                 
-                iFType1.textField.createTimer()
-                iFType1.textField.startTimer(minute: 5, seconds: 0)
+                iFType1.idleTextField.createTimer()
+                iFType1.idleTextField.startTimer(minute: 5, seconds: 0)
             }
         )
         
@@ -57,7 +57,7 @@ class ViewController: UIViewController {
             onTouch: {
                 
                 iFType1.button.setEnabled(!iFType1.button.isEnabled)
-                iFType1.textField.setEnabled(!iFType1.textField.isEnabled)
+                iFType1.idleTextField.setEnabled(!iFType1.idleTextField.isEnabled)
             }
         )
         

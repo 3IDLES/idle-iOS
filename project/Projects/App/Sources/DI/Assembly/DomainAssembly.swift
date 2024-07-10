@@ -22,7 +22,7 @@ public struct DomainAssembly: Assembly {
         container.register(AuthUseCase.self) { resolver in
             let repository = resolver.resolve(AuthRepository.self)!
             
-            return DefualtAuthseeCase(repository: repository)
+            return DefaultAuthUseCase(repository: repository)
         }
     }
 }

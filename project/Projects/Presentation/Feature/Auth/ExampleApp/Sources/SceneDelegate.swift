@@ -21,7 +21,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-        window?.rootViewController = CenterLoginViewController()
+        window?.rootViewController = CenterLoginViewController(
+            viewModel: CenterLoginViewModel(
+                authUseCase: DefaultAuthUseCase(
+                    repository: DefaultAuthRepository()
+                )
+            )
+        )
         window?.makeKeyAndVisible()
     }
 }

@@ -11,7 +11,7 @@ import RepositoryInterface
 import RxSwift
 import Entity
 
-public class DefualtAuthseeCase: AuthUseCase {
+public class DefaultAuthUseCase: AuthUseCase {
     
     let repository: AuthRepository
     

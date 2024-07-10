@@ -29,7 +29,7 @@ final class ConcretesTests: XCTestCase {
     
     func testAuth() {
         
-        let repo = DefaultCenterRegisterRepository()
+        let repo = DefaultAuthInputValidationRepository()
         
         let expectation = expectation(description: "center register test")
         
