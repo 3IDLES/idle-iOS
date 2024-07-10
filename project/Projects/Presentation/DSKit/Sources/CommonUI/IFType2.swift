@@ -14,15 +14,15 @@ public class IFType2: UIStackView {
     public private(set) var titleLabelText: String
     public private(set) var placeHolderText: String
     public private(set) var keyboardType: UIKeyboardType
+    public private(set) var isCompletionImageAvailable: Bool
     
-    // Observable
-    /// 버튼을 누를시 텍스트를 반환하는 event publisher입니다.
-    public let eventPublisher: PublishSubject<String> = .init()
+    // Output
+    public var eventPublisher: Observable<String> { self.textField.eventPublisher }
     
     // View
     public private(set) lazy var titleLabel: ResizableUILabel = {
         let label = ResizableUILabel()
-        label.text = titleLabelText
+        label.text = self.titleLabelText
         label.font = DSKitFontFamily.Pretendard.bold.font(size: 14)
         label.textColor = DSKitAsset.Colors.gray500.color
         return label
@@ -30,17 +30,20 @@ public class IFType2: UIStackView {
     
     public private(set) lazy var textField = IdleOneLineInputField(
         placeHolderText: placeHolderText,
-        keyboardType: keyboardType
+        keyboardType: keyboardType,
+        isCompleteImageAvailable: self.isCompletionImageAvailable
     )
     
     public init(
         titleLabelText: String,
         placeHolderText: String,
+        isCompletionImageAvailable: Bool = false,
         keyboardType: UIKeyboardType = .default
     ) {
         self.placeHolderText = placeHolderText
         self.titleLabelText = titleLabelText
         self.keyboardType = keyboardType
+        self.isCompletionImageAvailable = isCompletionImageAvailable
         super.init(frame: .zero)
         
         setStack()
