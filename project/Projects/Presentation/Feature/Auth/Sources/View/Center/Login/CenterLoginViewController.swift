@@ -246,6 +246,8 @@ public class CenterLoginViewController: DisposableViewController {
             .onCustomState { textField in
                 textField.layer.borderColor = textField.normalBorderColor.cgColor
             }
+        
+        coordinator?.parent?.authFinished()
     }
     
     

@@ -13,7 +13,7 @@ import Entity
 
 public class DefaultAuthInputValidationRepository: AuthInputValidationRepository {
     
-    let networkService = CenterRegisterService()
+    let networkService = AuthService()
     
     public init() { }
     
