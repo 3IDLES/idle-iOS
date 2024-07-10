@@ -62,12 +62,15 @@ class ViewController2: UIViewController {
         }
         
         
-        let rawTextField = UITextField()
-        rawTextField.backgroundColor = .red
+        let textFieldType2 = IFType2(
+            titleLabelText: "타이틀 라벨",
+            placeHolderText: "아이디 입력"
+        )
         
         [
             box,
             textField,
+            textFieldType2,
         ].forEach {
             
             view.addSubview($0)
@@ -83,9 +86,9 @@ class ViewController2: UIViewController {
             textField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-//            rawTextField.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 30),
-//            rawTextField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-//            rawTextField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            textFieldType2.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 30),
+            textFieldType2.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            textFieldType2.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
     
