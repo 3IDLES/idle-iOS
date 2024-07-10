@@ -13,7 +13,7 @@ import Entity
 
 public class DefaultAuthRepository: AuthRepository {
 
-    let networkService = CenterRegisterService()
+    let networkService = AuthService()
     
     public init() { }
     
@@ -52,12 +52,26 @@ public class DefaultAuthRepository: AuthRepository {
                 
                 guard let self = self else { return BoolResult.failure(.unknownError) }
                 
-                switch response.statusCode {
-                case 200:
-                    return .success(true)
-                default:
-                    return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
+                if response.statusCode == 200 {
+                    
+                    if let dict = try JSONSerialization.jsonObject(with: response.data) as? [String: String],
+                       let accessToken = dict["accessToken"],
+                       let refreshToken = dict["refreshToken"] {
+                        
+                        // 토큰처리
+                        try! self.networkService.keyValueStore.saveAuthToken(
+                            accessToken: accessToken,
+                            refreshToken: refreshToken
+                        )
+                        
+                        #if DEBUG
+                        print("\(#function) ✅ 토큰 저장성공")
+                        #endif
+                        
+                        return .success(true)
+                    }
                 }
+                return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
             }
     }
 }

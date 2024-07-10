@@ -13,7 +13,7 @@ import RxMoya
 
 public class BaseNetworkService<TagetAPI: BaseAPI> {
     
-    private let keyValueStore: KeyValueStore
+    public let keyValueStore: KeyValueStore
     
     init(keyValueStore: KeyValueStore = KeyChainList.shared) {
         self.keyValueStore = keyValueStore
