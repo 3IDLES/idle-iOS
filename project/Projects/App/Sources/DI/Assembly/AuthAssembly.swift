@@ -13,10 +13,12 @@ import Swinject
 public struct AuthAssembly: Assembly {
     public func assemble(container: Container) {
         container.register(CenterRegisterViewModel.self) { resolver in
-            let useCase = resolver.resolve(CenterRegisterUseCase.self)!
+            let inputValidationUseCase = resolver.resolve(AuthInputValidationUseCase.self)!
+            let authUseCase = resolver.resolve(AuthUseCase.self)!
             
             return CenterRegisterViewModel(
-                useCase: useCase
+                inputValidationUseCase: inputValidationUseCase,
+                authUseCase: authUseCase
             )
         }
     }

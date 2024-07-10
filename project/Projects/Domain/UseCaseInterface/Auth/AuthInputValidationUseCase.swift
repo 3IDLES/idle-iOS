@@ -1,8 +1,8 @@
 //
-//  CenterRegisterUseCase.swift
+//  AuthInputValidationUseCase.swift
 //  UseCaseInterface
 //
-//  Created by choijunios on 7/8/24.
+//  Created by choijunios on 7/10/24.
 //
 
 import Foundation
@@ -18,9 +18,8 @@ import Entity
 ///     - #6. 아이디 유효성 확인
 ///     - #7. 아이디 중복확인
 ///     - #8. 패스워드 유효성 확인
-///     - #9. 회원가입
 
-public protocol CenterRegisterUseCase: UseCaseBase {
+public protocol AuthInputValidationUseCase: UseCaseBase {
     
     // #1.
     /// 전화번호 인증 요청
@@ -88,14 +87,4 @@ public protocol CenterRegisterUseCase: UseCaseBase {
     /// - returns:
     ///     - Bool, true: 가능, flase: 불가능
     func checkPasswordIsValid(password: String) -> Bool
-    
-    // #9.
-    /// 센터 로그인 실행
-    /// - parameters:
-    ///     - registerState: CenterRegisterState
-    /// - returns:
-    ///     - Bool, true: 성공, flase: 실패
-    func registerCenterAccount(
-        registerState: CenterRegisterState
-    ) -> Observable<BoolResult>
 }
