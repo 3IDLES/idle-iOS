@@ -23,6 +23,7 @@ public class IdleOneLineInputField: UIView {
     // Init parameters
     var state: BehaviorSubject<State> = .init(value: .editing)
     let initialText: String
+    public let normalBorderColor: UIColor
     
     public var eventPublisher: Observable<String> { textField.rx.text.compactMap { $0 }}
     
@@ -117,10 +118,12 @@ public class IdleOneLineInputField: UIView {
         initialText: String = "",
         placeHolderText: String,
         keyboardType: UIKeyboardType = .default,
-        isCompleteImageAvailable: Bool = true
+        isCompleteImageAvailable: Bool = true,
+        borderColor: UIColor = DSKitAsset.Colors.gray100.color
     ) {
         self.initialText = initialText
         self.isCompleteImageAvailable = isCompleteImageAvailable
+        self.normalBorderColor = borderColor
         
         super.init(frame: .zero)
         
@@ -129,7 +132,7 @@ public class IdleOneLineInputField: UIView {
         // Border
         self.layer.cornerRadius = 6
         self.layer.borderWidth = 1
-        self.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
+        self.layer.borderColor = borderColor.cgColor
         
         // Initial setting
         textField.placeholder = placeHolderText
@@ -249,6 +252,11 @@ public extension IdleOneLineInputField {
     private func onResignFocused() {
         
         self.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
+    }
+    
+    @MainActor
+    func onCustomState(changingClosure: (IdleOneLineInputField) -> Void) {
+        changingClosure(self)
     }
 }
 

@@ -65,7 +65,7 @@ where
         keyboardType: .numberPad
        )
         
-        textField.textField.isCompleteImageAvailable = false
+        textField.idleTextField.isCompleteImageAvailable = false
         
         return textField
     }()
@@ -88,7 +88,7 @@ where
         keyboardType: .numberPad
        )
         
-        textField.textField.isCompleteImageAvailable = false
+        textField.idleTextField.isCompleteImageAvailable = false
         
         return textField
     }()
@@ -195,7 +195,7 @@ where
         phoneNumberField.button.setEnabled(false)
         
         // - 인증번호 입력및 '확인'버튼 비활성화
-        authNumberField.textField.setEnabled(false)
+        authNumberField.idleTextField.setEnabled(false)
         authNumberField.button.setEnabled(false)
         
         // - CTA버튼 비활성화
@@ -208,8 +208,8 @@ where
         var input = viewModel.input
         
         // 현재 입력중인 정보 전송
-        input.editingPhoneNumber = phoneNumberField.textField.eventPublisher.asObservable()
-        input.editingAuthNumber = authNumberField.textField.eventPublisher.asObservable()
+        input.editingPhoneNumber = phoneNumberField.idleTextField.eventPublisher.asObservable()
+        input.editingAuthNumber = authNumberField.idleTextField.eventPublisher.asObservable()
         
         // 인증, 확인 버튼이 눌린 경우
         input.requestAuthForPhoneNumber = phoneNumberField.eventPublisher.asObservable()
@@ -242,9 +242,9 @@ where
                     printIfDebug("☑️ \(phoneNumber)의 인증을 시작합니다.")
                     
                     // 인증 텍스트 필드 활성화
-                    self?.authNumberField.textField.setEnabled(true)
-                    self?.authNumberField.textField.createTimer()
-                    self?.authNumberField.textField.startTimer(minute: 5, seconds: 0)
+                    self?.authNumberField.idleTextField.setEnabled(true)
+                    self?.authNumberField.idleTextField.createTimer()
+                    self?.authNumberField.idleTextField.startTimer(minute: 5, seconds: 0)
                 }
             })
             .disposed(by: disposeBag)
@@ -258,13 +258,13 @@ where
                     // 인증번호 인증성공한 경우
                     
                     // 입력과 관려된 필드와 버튼 비활성화
-                    self?.phoneNumberField.textField.setEnabled(false)
+                    self?.phoneNumberField.idleTextField.setEnabled(false)
                     self?.phoneNumberField.button.setEnabled(false)
-                    self?.authNumberField.textField.setEnabled(false)
+                    self?.authNumberField.idleTextField.setEnabled(false)
                     self?.authNumberField.button.setEnabled(false)
                     
                     // 타이머 비활성화
-                    self?.authNumberField.textField.removeTimer()
+                    self?.authNumberField.idleTextField.removeTimer()
                     
                     // 인증 완료 텍스트
                     self?.authSuccessText.isHidden = false

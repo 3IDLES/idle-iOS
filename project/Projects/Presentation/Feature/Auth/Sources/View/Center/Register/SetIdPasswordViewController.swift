@@ -61,7 +61,7 @@ where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetI
         submitButtonText: "중복 확인"
        )
         
-        textField.textField.isCompleteImageAvailable = false
+        textField.idleTextField.isCompleteImageAvailable = false
         
         return textField
     }()
@@ -237,7 +237,7 @@ where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetI
         var input = viewModel.input
         
         // 현재 입력중인 정보 전송
-        input.editingId = idField.textField.eventPublisher.asObservable()
+        input.editingId = idField.idleTextField.eventPublisher.asObservable()
         input.editingPassword = passwordField.eventPublisher.asObservable()
         input.editingCheckPassword = checkPasswordField.eventPublisher.asObservable()
         input.ctaButtonClicked = ctaButton.eventPublisher.map({ _ in CTAButtonAction.complete }).asObservable()
@@ -247,7 +247,7 @@ where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetI
             .map { [weak self] in
                     
                 // 증복검사 실행시 아이디 입력 필드 비활성화
-                self?.idField.textField.setEnabled(false)
+                self?.idField.idleTextField.setEnabled(false)
                 self?.idField.button.setEnabled(false)
                 
                 return $0
@@ -272,17 +272,17 @@ where T.Input: SetIdPasswordInputable & CTAButtonEnableInputable, T.Output: SetI
             .compactMap { [weak self] (isValid, id) in
                 
                 // 입력 필드 활성화
-                self?.idField.textField.setEnabled(true)
+                self?.idField.idleTextField.setEnabled(true)
                 
                 printIfDebug(isValid ? "✅ 중복되지 않은 아이디: \(id)" : "❌ 중복된 아이디: \(id)")
                 return isValid ? id : nil
             }
         
         let idValidation = Observable
-            .combineLatest(idField.textField.eventPublisher, checkIdDuplication ?? .empty())
+            .combineLatest(idField.idleTextField.eventPublisher, checkIdDuplication ?? .empty())
             .observe(on: MainScheduler.instance)
-            .map { [weak self] (id, validId) in
-                let isValid = id == validId
+            .map { [weak self] (editingId, validId) in
+                let isValid = editingId == validId
                 self?.thisIsValidIdLabel.isHidden = !isValid
                 return isValid
             }

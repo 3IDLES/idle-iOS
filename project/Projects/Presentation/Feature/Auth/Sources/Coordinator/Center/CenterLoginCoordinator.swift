@@ -16,19 +16,27 @@ public class CenterLoginCoordinator: ChildCoordinator {
     
     public var parent: CenterAuthCoordinatable?
     
-    public init(navigationController: UINavigationController) {
+    private var viewModel: CenterLoginViewModel?
+    
+    public init(
+        viewModel: CenterLoginViewModel,
+        navigationController: UINavigationController
+    ) {
         self.navigationController = navigationController
+        self.viewModel = viewModel
     }
     
     deinit { printIfDebug("deinit \(Self.self)") }
     
     public func start() {
         
-        let viewController = CenterLoginViewController()
-        viewController.coordinator = self
+        let viewController = CenterLoginViewController(
+            coordinator: self,
+            viewModel: self.viewModel!
+        )
         
+        self.viewModel = nil
         viewControllerRef = viewController
-        
         navigationController.pushViewController(viewController, animated: true)
     }
     

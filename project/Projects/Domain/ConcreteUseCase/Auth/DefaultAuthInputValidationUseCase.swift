@@ -13,9 +13,9 @@ import RepositoryInterface
 
 public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
 
-    let repository: CenterRegisterRepository
+    let repository: AuthInputValidationRepository
     
-    public init(repository: CenterRegisterRepository) {
+    public init(repository: AuthInputValidationRepository) {
         self.repository = repository
     }
     

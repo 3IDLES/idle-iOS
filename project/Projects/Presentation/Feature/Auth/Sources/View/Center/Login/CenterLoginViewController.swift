@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import RxSwift
 import DSKit
 import PresentationCore
 
 public class CenterLoginViewController: DisposableViewController {
+    
+    let viewModel: CenterLoginViewModel
     
     var coordinator: CenterLoginCoordinator?
     
@@ -53,6 +56,18 @@ public class CenterLoginViewController: DisposableViewController {
         return stack
     }()
     
+    private let loginFailedText: ResizableUILabel = {
+       
+        let label = ResizableUILabel()
+        
+        label.text = "비밀번호를 다시 확인해 주세요"
+        label.font = DSKitFontFamily.Pretendard.medium.font(size: 12)
+        label.textColor = .red
+        label.isHidden = true
+        
+        return label
+    }()
+    
     private let forgotPasswordButton: UIButton = {
         
         let button = UIButton()
@@ -76,8 +91,11 @@ public class CenterLoginViewController: DisposableViewController {
         return button
     }()
     
-    public init(coordinator: CenterLoginCoordinator? = nil) {
+    private let disposeBag = DisposeBag()
+    
+    public init(coordinator: CenterLoginCoordinator? = nil, viewModel: CenterLoginViewModel) {
         self.coordinator = coordinator
+        self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
         
@@ -112,6 +130,7 @@ public class CenterLoginViewController: DisposableViewController {
             inputStack,
             forgotPasswordButton,
             ctaButton,
+            loginFailedText,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -121,12 +140,15 @@ public class CenterLoginViewController: DisposableViewController {
         NSLayoutConstraint.activate([
             
             navigationBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor, constant: 20),
-            navigationBar.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            navigationBar.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
+            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 12),
             
             inputStack.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 125),
             inputStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             inputStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            loginFailedText.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            loginFailedText.topAnchor.constraint(equalTo: inputStack.bottomAnchor, constant: 4),
             
             forgotPasswordButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             forgotPasswordButton.bottomAnchor.constraint(equalTo: ctaButton.topAnchor, constant: -16),
@@ -141,6 +163,89 @@ public class CenterLoginViewController: DisposableViewController {
     private func setObservable() {
         
         setKeyboardAvoidance()
+        
+        // MARK: Input
+        var input = viewModel.input
+        
+        let inputPublisher = Observable
+            .combineLatest(
+                idField.eventPublisher,
+                passwordField.eventPublisher
+            )
+        
+        // 로그인 버튼 활성화 옵저버블
+        inputPublisher
+            .map({ (id, pw) in
+                
+                return !(id.isEmpty || pw.isEmpty)
+            })
+            .subscribe(onNext: { [weak self] canLogin in
+                
+                self?.ctaButton.setEnabled(canLogin)
+            })
+            .disposed(by: disposeBag)
+        
+        // 로그인 버튼 눌렀을 때
+        let loginPublisher = ctaButton.eventPublisher
+            .map { [weak self] _ in
+                
+                let id = self?.idField.uITextField.text ?? ""
+                let pw = self?.passwordField.uITextField.text ?? ""
+                
+                return (id: id, pw: pw)
+            }
+            
+        input.loginButtonPressed = loginPublisher.asObservable()
+        
+        // MARK: Output
+        let output = viewModel.transform(input: input)
+        
+        // 로그인 시도 결과 전송
+        output
+            .loginValidation?
+            .subscribe(onNext: { [weak self] isSuccess in
+                
+                if isSuccess {
+                    self?.onLoginSucceed()
+                } else {
+                    self?.onLoginFailed()
+                }
+                
+            })
+            .disposed(by: disposeBag)
+        
+        
+        // MARK: ViewController only
+        navigationBar
+            .eventPublisher
+            .subscribe { [weak self] _ in
+                
+                self?.coordinator?.coordinatorDidFinish()
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func onLoginFailed() {
+        
+        loginFailedText.isHidden = false
+        passwordField
+            .idleTextField
+            .onCustomState { textField in
+                textField.layer.borderColor = UIColor.red.cgColor
+            }
+        
+        // 메인화면으로 이동
+        coordinator?.parent?.authFinished()
+    }
+    
+    private func onLoginSucceed() {
+        
+        loginFailedText.isHidden = true
+        passwordField
+            .idleTextField
+            .onCustomState { textField in
+                textField.layer.borderColor = textField.normalBorderColor.cgColor
+            }
     }
     
     
@@ -176,10 +281,10 @@ extension CenterLoginViewController {
                 
                 let movingView: UIView!
                 
-                if self.idField.textField.textField.isFirstResponder {
+                if self.idField.uITextField.isFirstResponder {
                     // id field가 선택된 경우
                     movingView = self.idField
-                } else if self.passwordField.textField.textField.isFirstResponder {
+                } else if self.passwordField.uITextField.isFirstResponder {
                     // password field가 선택된 경우
                     movingView = self.passwordField
                 } else { return }
@@ -202,6 +307,4 @@ extension CenterLoginViewController {
             }
         }, completion: nil)
     }
-    
-    
 }

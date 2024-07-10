@@ -29,4 +29,16 @@ public protocol AuthUseCase: UseCaseBase {
     func registerCenterAccount(
         registerState: CenterRegisterState
     ) -> Observable<BoolResult>
+    
+    // #2.
+    /// 센터 로그인 실행
+    /// - parameters:
+    ///     - id: String
+    ///     - password: String
+    /// - returns:
+    ///     - Bool, true: 성공, flase: 실패
+    func loginCenterAccount(
+        id: String,
+        password: String
+    ) -> Observable<BoolResult>
 }

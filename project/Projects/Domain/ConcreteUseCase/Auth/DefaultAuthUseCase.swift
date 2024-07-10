@@ -13,9 +13,9 @@ import Entity
 
 public class DefualtAuthseeCase: AuthUseCase {
     
-    let repository: CenterRegisterRepository
+    let repository: AuthRepository
     
-    public init(repository: CenterRegisterRepository) {
+    public init(repository: AuthRepository) {
         self.repository = repository
     }
     
@@ -32,5 +32,10 @@ public class DefualtAuthseeCase: AuthUseCase {
         )
     }
     
-    
+    // MARK: 센터 로그인 실행
+    public func loginCenterAccount(id: String, password: String) -> RxSwift.Observable<Entity.BoolResult> {
+        filteringDataLayer(
+            domainTask: repository.requestCenterLogin(id: id, password: password).asObservable()
+        )
+    }
 }
