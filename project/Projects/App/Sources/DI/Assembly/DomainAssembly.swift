@@ -13,10 +13,16 @@ import Swinject
 
 public struct DomainAssembly: Assembly {
     public func assemble(container: Container) {
-        container.register(CenterRegisterUseCase.self) { resolver in
+        container.register(AuthInputValidationUseCase.self) { resolver in
             let repository = resolver.resolve(CenterRegisterRepository.self)!
             
-            return DefaultCenterRegisterUseCase(repository: repository)
+            return DefaultAuthInputValidationUseCase(repository: repository)
+        }
+        
+        container.register(AuthUseCase.self) { resolver in
+            let repository = resolver.resolve(CenterRegisterRepository.self)!
+            
+            return DefualtAuthseeCase(repository: repository)
         }
     }
 }

@@ -14,7 +14,8 @@ import Entity
 public class CenterRegisterViewModel: ViewModelType {
     
     // UseCase
-    public let useCase: CenterRegisterUseCase
+    public let inputValidationUseCase: AuthInputValidationUseCase
+    public let authUseCase: AuthUseCase
     
     // Input은 모든 ViewController에서 공유한다. (다만, 각가의 ViewController의 Input프로토콜에 의해 제한된다.)
     public let input = Input()
@@ -22,8 +23,11 @@ public class CenterRegisterViewModel: ViewModelType {
     
     private let stateObject = CenterRegisterState()
     
-    public init(useCase: CenterRegisterUseCase) {
-        self.useCase = useCase
+    public init(
+        inputValidationUseCase: AuthInputValidationUseCase,
+        authUseCase: AuthUseCase) {
+        self.inputValidationUseCase = inputValidationUseCase
+        self.authUseCase = authUseCase
     }
     
     deinit {
@@ -64,7 +68,7 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 // 특정 조건 만족시
                 self.output.canSubmitPhoneNumber?.onNext(
-                    self.useCase.checkPhoneNumberIsValid(phoneNumber: phoneNumber)
+                    self.inputValidationUseCase.checkPhoneNumberIsValid(phoneNumber: phoneNumber)
                 )
             })
             .disposed(by: disposeBag)
@@ -111,7 +115,7 @@ public class CenterRegisterViewModel: ViewModelType {
                 return
                 #endif
                 
-                self.useCase
+                self.inputValidationUseCase
                     .requestPhoneNumberAuthentication(phoneNumber: formattedString)
                     .subscribe { [weak self] result in
                         switch result {
@@ -154,7 +158,7 @@ public class CenterRegisterViewModel: ViewModelType {
                     return
                 #endif
                 
-                self.useCase
+                self.inputValidationUseCase
                     .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
                     .subscribe { [weak self] result in
                         switch result {
@@ -185,7 +189,7 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 guard let self else { return }
                 
-                let isValid = self.useCase.checkBusinessNumberIsValid(businessNumber: businessNumber)
+                let isValid = self.inputValidationUseCase.checkBusinessNumberIsValid(businessNumber: businessNumber)
                 self.output.canSubmitBusinessNumber?.onNext(isValid)
             })
             .disposed(by: disposeBag)
@@ -211,7 +215,7 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 guard let self else { return }
                 
-                self.useCase
+                self.inputValidationUseCase
                     .requestBusinessNumberAuthentication(businessNumber: formattedString)
                     .subscribe(onNext: { [weak self] result in
                         
@@ -245,7 +249,7 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 guard let self else { return }
                 
-                let isValid = self.useCase.checkIdIsValid(id: id)
+                let isValid = self.inputValidationUseCase.checkIdIsValid(id: id)
                 
                 self.output.canCheckIdDuplication?.onNext(isValid)
             })
@@ -269,7 +273,7 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 guard let self else { return }
                 
-                self.useCase
+                self.inputValidationUseCase
                     .requestCheckingIdDuplication(id: id)
                     .subscribe(onNext: { [weak self] result in
                         
@@ -301,7 +305,7 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 guard let self else { return }
                 
-                let isValid = self.useCase.checkPasswordIsValid(password: pwd)
+                let isValid = self.inputValidationUseCase.checkPasswordIsValid(password: pwd)
                 
                 if !isValid {
                     
@@ -327,7 +331,7 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 guard let self else { return }
                 
-                self.useCase
+                self.authUseCase
                     .registerCenterAccount(registerState: self.stateObject)
                     .subscribe(onNext: { [weak self] result in
                         

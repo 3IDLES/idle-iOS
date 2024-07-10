@@ -1,8 +1,8 @@
 //
-//  DefaultCenterRegisterUseCase.swift
+//  DefaultAuthInputValidationUseCase.swift
 //  ConcreteUseCase
 //
-//  Created by choijunios on 7/8/24.
+//  Created by choijunios on 7/10/24.
 //
 
 import Foundation
@@ -11,7 +11,7 @@ import Entity
 import UseCaseInterface
 import RepositoryInterface
 
-public class DefaultCenterRegisterUseCase: CenterRegisterUseCase {
+public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
 
     let repository: CenterRegisterRepository
     
@@ -72,19 +72,5 @@ public class DefaultCenterRegisterUseCase: CenterRegisterUseCase {
         let predicate = NSPredicate(format: "SELF MATCHES %@", passwordLengthAndCharRegex)
         
         return predicate.evaluate(with: password)
-    }
-    
-    // MARK: 로그인 실행
-    public func registerCenterAccount(registerState: CenterRegisterState) -> Observable<BoolResult> {
-        
-        filteringDataLayer(
-            domainTask: repository.requestRegisterCenterAccount(
-                managerName: registerState.name!,
-                phoneNumber: registerState.phoneNumber!,
-                businessNumber: registerState.businessNumber!,
-                id: registerState.id!,
-                password: registerState.password!
-            ).asObservable()
-        )
     }
 }

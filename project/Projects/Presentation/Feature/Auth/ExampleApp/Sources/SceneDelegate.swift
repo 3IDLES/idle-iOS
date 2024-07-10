@@ -21,12 +21,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-        let viewModel = CenterRegisterViewModel(
-            useCase: DefaultCenterRegisterUseCase(
-                repository: DefaultCenterRegisterRepository()
-            )
-        )
-        
         window?.rootViewController = CenterLoginViewController()
         window?.makeKeyAndVisible()
     }
