@@ -20,18 +20,44 @@ class KeyChainList {
 extension KeyChainList: KeyValueStore {
     
     func save(key: String, value: String) throws {
-        try keyChain.set(value, key: key)
+        do {
+            try keyChain.set(value, key: key)
+            #if DEBUG
+            print("KeyChain Save Success: \(key)")
+            #endif
+        } catch {
+            #if DEBUG
+            print("UserDefaults Save Success: \(key)")
+            #endif
+            UserDefaults.standard.setValue(value, forKey: key)
+        }
     }
     
     func delete(key: String) throws {
         try keyChain.remove(key)
+        UserDefaults.standard.removeObject(forKey: key)
     }
     
     func removeAll() throws {
         try keyChain.removeAll()
+        
+        // UserDefaults의 경우 수동으로 정보를 삭제합니다.
+        UserDefaults.standard.removeObject(forKey: Key.Auth.kaccessToken)
+        UserDefaults.standard.removeObject(forKey: Key.Auth.krefreshToken)
     }
     
     func get(key: String) -> String? {
-        try? keyChain.get(key)
+        if let value = try? keyChain.get(key) {
+            #if DEBUG
+            print("get value from KeyChain: \(key)")
+            #endif
+            return value
+        } else if let value = UserDefaults.standard.string(forKey: key) {
+            #if DEBUG
+            print("get value from UserDefaults: \(key)")
+            #endif
+            return value
+        }
+        return nil
     }
 }

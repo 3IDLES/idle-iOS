@@ -19,7 +19,7 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
     
     public func requestPhoneNumberAuthentication(phoneNumber: String) -> RxSwift.Single<BoolResult> {
         
-        networkService.request(api: .startPhoneNumberAuth(phoneNumber: phoneNumber))
+        networkService.requestWithoutToken(api: .startPhoneNumberAuth(phoneNumber: phoneNumber))
             .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
@@ -36,7 +36,7 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
     
     public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> RxSwift.Single<BoolResult> {
         
-        networkService.request(api: .checkAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber))
+        networkService.requestWithoutToken(api: .checkAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber))
             .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
@@ -53,7 +53,7 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
     
     public func requestBusinessNumberAuthentication(businessNumber: String) -> RxSwift.Single<BusinessNumberAuthResult> {
         
-        networkService.request(api: .authenticateBusinessNumber(businessNumber: businessNumber))
+        networkService.requestWithoutToken(api: .authenticateBusinessNumber(businessNumber: businessNumber))
             .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
@@ -70,7 +70,7 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
     }
     
     public func requestCheckingIdDuplication(id: String) -> RxSwift.Single<Entity.BoolResult> {
-        networkService.request(api: .checkIdDuplication(id: id))
+        networkService.requestWithoutToken(api: .checkIdDuplication(id: id))
             .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
             .map { [weak self] response in
                 
