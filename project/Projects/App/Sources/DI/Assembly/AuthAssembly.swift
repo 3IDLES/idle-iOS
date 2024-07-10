@@ -21,5 +21,14 @@ public struct AuthAssembly: Assembly {
                 authUseCase: authUseCase
             )
         }
+        
+        container.register(CenterLoginViewModel.self) { resolver in
+            
+            let authUseCase = resolver.resolve(AuthUseCase.self)!
+            
+            return CenterLoginViewModel(
+                authUseCase: authUseCase
+            )
+        }
     }
 }

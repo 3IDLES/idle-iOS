@@ -19,6 +19,7 @@ public enum AuthAPI {
     case authenticateBusinessNumber(businessNumber: String)
     case checkIdDuplication(id: String)
     case registerCenterAccount(data: Data)
+    case centerLogin(id: String, password: String)
 }
 
 extension AuthAPI: BaseAPI {
@@ -38,6 +39,8 @@ extension AuthAPI: BaseAPI {
             return .get
         case .registerCenterAccount:
             return .post
+        case .centerLogin:
+            return .post
         }
     }
     
@@ -53,6 +56,8 @@ extension AuthAPI: BaseAPI {
             "center/validation/\(id)"
         case .registerCenterAccount:
             "center/join"
+        case .centerLogin:
+            "center/login"
         }
     }
     
@@ -64,6 +69,9 @@ extension AuthAPI: BaseAPI {
         case .checkAuthNumber(let phoneNumber, let authNumber):
             params["phoneNumber"] = phoneNumber
             params["verificationNumber"] = authNumber
+        case .centerLogin(let id, let password):
+            params["identifier"] = id
+            params["password"] = password
         default:
             break
         }
@@ -85,6 +93,8 @@ extension AuthAPI: BaseAPI {
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .registerCenterAccount(let data):
             return .requestData(data)
+        case .centerLogin:
+            return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         default:
             return .requestPlain
         }

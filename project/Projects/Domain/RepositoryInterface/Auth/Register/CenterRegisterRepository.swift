@@ -9,13 +9,10 @@ import Foundation
 import RxSwift
 import Entity
 
-public protocol CenterRegisterRepository: RepositoryBase {
+public protocol AuthInputValidationRepository: RepositoryBase {
     
     func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<BoolResult>
     func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<BoolResult>
-    
     func requestBusinessNumberAuthentication(businessNumber: String) -> Single<BusinessNumberAuthResult>
-    
     func requestCheckingIdDuplication(id: String) -> Single<BoolResult>
-    func requestRegisterCenterAccount(managerName: String, phoneNumber: String, businessNumber: String, id: String, password: String) -> Single<BoolResult>
 }

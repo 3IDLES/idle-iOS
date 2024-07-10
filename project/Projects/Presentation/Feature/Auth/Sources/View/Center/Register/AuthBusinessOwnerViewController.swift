@@ -49,7 +49,7 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
         keyboardType: .numberPad
        )
         
-        textField.textField.isCompleteImageAvailable = false
+        textField.idleTextField.isCompleteImageAvailable = false
         
         return textField
     }()
@@ -163,7 +163,7 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
         var input = viewModel.input
         
         // 현재 입력중인 정보 전송
-        input.editingBusinessNumber = businessNumberField.textField.eventPublisher.asObservable()
+        input.editingBusinessNumber = businessNumberField.idleTextField.eventPublisher.asObservable()
         
         // 인증, 확인 버튼이 눌린 경우
         input.requestBusinessNumberValidation = businessNumberField.eventPublisher.asObservable()

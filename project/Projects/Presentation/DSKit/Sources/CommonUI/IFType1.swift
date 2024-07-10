@@ -25,10 +25,11 @@ public class IFType1: UIStackView {
     public let eventPublisher: PublishSubject<String> = .init()
     
     // View
-    public private(set) lazy var textField = IdleOneLineInputField(
+    public private(set) lazy var idleTextField = IdleOneLineInputField(
         placeHolderText: placeHolderText,
         keyboardType: keyboardType
     )
+    public var uITextField: UITextField { idleTextField.textField }
     public private(set) lazy var button: TextButtonType1 = {
        
         let btn = TextButtonType1(labelText: submitButtonText)
@@ -68,17 +69,17 @@ public class IFType1: UIStackView {
     func setAutoLayout() {
     
         [
-            textField,
+            idleTextField,
             button,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.addArrangedSubview($0)
         }
         
-        textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        idleTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
         button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         
-        textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        idleTextField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         
         NSLayoutConstraint.activate([
@@ -97,17 +98,17 @@ public class IFType1: UIStackView {
                 // 문자열 전송
                 self?.eventPublisher
                     .onNext(
-                        self?.textField.textField.text ?? ""
+                        self?.idleTextField.textField.text ?? ""
                     )
                 
-                _ = self?.textField.resignFirstResponder()
+                _ = self?.idleTextField.resignFirstResponder()
             }
             .disposed(by: disposeBag)
     }
     
     public override func resignFirstResponder() -> Bool {
         
-        _ = textField.resignFirstResponder()
+        _ = idleTextField.resignFirstResponder()
         
         return super.resignFirstResponder()
     }

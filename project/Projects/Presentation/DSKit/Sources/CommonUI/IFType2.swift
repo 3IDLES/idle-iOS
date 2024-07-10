@@ -17,7 +17,7 @@ public class IFType2: UIStackView {
     public private(set) var isCompletionImageAvailable: Bool
     
     // Output
-    public var eventPublisher: Observable<String> { self.textField.eventPublisher }
+    public var eventPublisher: Observable<String> { self.idleTextField.eventPublisher }
     
     // View
     public private(set) lazy var titleLabel: ResizableUILabel = {
@@ -28,11 +28,13 @@ public class IFType2: UIStackView {
         return label
     }()
     
-    public private(set) lazy var textField = IdleOneLineInputField(
+    public private(set) lazy var idleTextField = IdleOneLineInputField(
         placeHolderText: placeHolderText,
         keyboardType: keyboardType,
         isCompleteImageAvailable: self.isCompletionImageAvailable
     )
+    
+    public var uITextField: UITextField { idleTextField.textField }
     
     public init(
         titleLabelText: String,
@@ -63,20 +65,20 @@ public class IFType2: UIStackView {
     
         [
             titleLabel,
-            textField,
+            idleTextField,
         ].forEach {
             self.addArrangedSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            textField.leftAnchor.constraint(equalTo: self.leftAnchor),
-            textField.rightAnchor.constraint(equalTo: self.rightAnchor),
+            idleTextField.leftAnchor.constraint(equalTo: self.leftAnchor),
+            idleTextField.rightAnchor.constraint(equalTo: self.rightAnchor),
         ])
     }
 
     public override func resignFirstResponder() -> Bool {
         
-        _ = textField.resignFirstResponder()
+        _ = idleTextField.resignFirstResponder()
         
         return super.resignFirstResponder()
     }

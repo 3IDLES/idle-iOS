@@ -45,6 +45,7 @@ extension CenterAuthCoorinator: CenterAuthCoordinatable {
     func login() {
         
         let coordinator = CenterLoginCoordinator(
+            viewModel: injector.resolve(CenterLoginViewModel.self),
             navigationController: navigationController
         )
         

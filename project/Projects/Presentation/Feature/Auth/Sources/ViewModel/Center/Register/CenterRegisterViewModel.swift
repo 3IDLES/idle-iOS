@@ -39,7 +39,7 @@ public class CenterRegisterViewModel: ViewModelType {
     public func transform(input: Input) -> Output {
         
         // MARK: 성함 입력
-        input
+        self.input
             .editingName?
             .subscribe(onNext: { [weak self] name in
                 
@@ -58,7 +58,7 @@ public class CenterRegisterViewModel: ViewModelType {
         
         
         // MARK: 전화번호 입력
-        input
+        self.input
             .editingPhoneNumber?
             .subscribe(onNext: { [weak self] phoneNumber in
                 
@@ -73,7 +73,7 @@ public class CenterRegisterViewModel: ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        input
+        self.input
             .editingAuthNumber?
             .subscribe(onNext: { [weak self] authNumber in
                 
@@ -86,7 +86,7 @@ public class CenterRegisterViewModel: ViewModelType {
         // 인증중인 전화번호를 캐치
         let currentAuthenticatingNumber = PublishSubject<String>()
         
-        input
+        self.input
             .requestAuthForPhoneNumber?
             .subscribe(onNext: { [weak self] phoneNumber in
                 
@@ -181,7 +181,7 @@ public class CenterRegisterViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         // MARK: 사업자 번호 입력
-        input
+        self.input
             .editingBusinessNumber?
             .subscribe(onNext: { [weak self] businessNumber in
                 
@@ -194,7 +194,7 @@ public class CenterRegisterViewModel: ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        input
+        self.input
             .requestBusinessNumberValidation?
             .subscribe(onNext: { [weak self] businessNumber in
                 
@@ -241,7 +241,7 @@ public class CenterRegisterViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         // MARK: Id & Password
-        input
+        self.input
             .editingId?
             .subscribe(onNext: { [weak self] id in
                 
@@ -256,7 +256,7 @@ public class CenterRegisterViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         // 중복성 검사
-        input
+        self.input
             .requestIdDuplicationValidation?
             .subscribe(onNext: { [weak self] id in
                 
@@ -363,7 +363,7 @@ public class CenterRegisterViewModel: ViewModelType {
 // MARK: ViewModel input output
 extension CenterRegisterViewModel {
     
-    public struct Input {
+    public class Input {
         
         // CTA 버튼 클릭시
         public var ctaButtonClicked: Observable<CTAButtonAction>?
