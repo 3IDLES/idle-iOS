@@ -9,6 +9,7 @@ on:
 #4. checkout tuist project repository
 #5. fetch XCConfig from repository
 #6. test tuist project
+#7. cache binary
 
 jobs:
   test:
@@ -65,7 +66,16 @@ jobs:
         run: |
           cd project
           tuist install
+          tuist cache
           tuist test
+
+      #7. cache binaries
+      - name: cache binary
+        id: cache-binary
+        uses: actions/cache@v4
+        with:
+          path: /Users/runner/.cache/tuist-cloud
+          key: ${{ runner.os }}-tuist@${{ env.TUIST_VERSION }}
 
   
 
