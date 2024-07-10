@@ -26,6 +26,10 @@ public class CenterRegisterViewModel: ViewModelType {
         self.useCase = useCase
     }
     
+    deinit {
+        printIfDebug("deinit \(Self.self)")
+    }
+    
     let disposeBag = DisposeBag()
     
     public func transform(input: Input) -> Output {
@@ -217,7 +221,7 @@ public class CenterRegisterViewModel: ViewModelType {
                             
                             self?.output.businessNumberValidation?.onNext(vo)
                             // 🚀 상태추적 🚀
-                            self?.stateObject.businessNumber = businessNumber
+                            self?.stateObject.businessNumber = formattedString
                         case .failure(let error):
                             
                             printIfDebug("❌ \(formattedString)번호 검색실패 \n 에러내용: \(error.message)")
@@ -331,13 +335,19 @@ public class CenterRegisterViewModel: ViewModelType {
                         
                         switch result {
                         case .success(_):
-                            printIfDebug("[CenterRegisterViewModel] ✅ 획원가입 성공 \n 가임정보 \(self.stateObject)")
+                            self.output.registerValidation?.onNext(true)
+                            printIfDebug("[CenterRegisterViewModel] ✅ 획원가입 성공 \n 가임정보 \(self.stateObject.descroption)")
+                            
+                            // 현재까지 입력정보를 모두 삭제
+                            self.stateObject.clear()
+                            
                         case .failure(let error):
+                            self.output.registerValidation?.onNext(false)
                             printIfDebug("❌ 회원가입 실패: \(error.message)")
+                            
+                            // 현재까지 입력정보를 모두 삭제
+                            self.stateObject.clear()
                         }
-                        
-                        // 현재까지 입력정보를 모두 삭제
-                        self.stateObject.clear()
                     })
                     .disposed(by: self.disposeBag)
             }
@@ -393,6 +403,9 @@ extension CenterRegisterViewModel {
         public var canCheckIdDuplication: PublishSubject<Bool>? = .init()
         public var idValidation: PublishSubject<(isValid: Bool, id: String)>? = .init()
         public var passwordValidation: PublishSubject<(state: PasswordValidationState, password: String)>? = .init()
+        
+        // Register success
+        public var registerValidation: PublishSubject<Bool>? = .init()
     }
 }
 
@@ -416,3 +429,6 @@ extension CenterRegisterViewModel.Output: AuthBusinessOwnerOutputable { }
 // Id & Password
 extension CenterRegisterViewModel.Input: SetIdPasswordInputable { }
 extension CenterRegisterViewModel.Output: SetIdPasswordOutputable { }
+
+// Register
+extension CenterRegisterViewModel.Output: RegisterSuccessOutputable { }
