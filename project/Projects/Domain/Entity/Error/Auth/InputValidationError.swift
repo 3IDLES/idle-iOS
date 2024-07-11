@@ -1,13 +1,13 @@
 //
-//  CenterRegisterError.swift
+//  InputValidationError.swift
 //  Entity
 //
-//  Created by choijunios on 7/8/24.
+//  Created by choijunios on 7/10/24.
 //
 
 import Foundation
 
-public enum CenterRegisterError: String, CustomError {
+public enum InputValidationError: String, CustomError {
     
     case InvalidSmsVerificationNumber="SMS-001"
     case SmsVerificationNumberNotFound="SMS-002"

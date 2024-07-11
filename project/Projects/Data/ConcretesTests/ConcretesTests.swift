@@ -14,17 +14,39 @@ final class ConcretesTests: XCTestCase {
     
     func testToken() {
             
-        // TODO: 토큰 API구현이후 테스트 코드 작성 예정
+        // TODO: 로컬 맵핑 테스트
         
 //        let expectation = expectation(description: "Test function")
 //        
-//        let testStore = TestKeyValueStore()
+//        let repo = AuthService(
+//            keyValueStore: TestKeyValueStore()
+//        )
 //        
-//        let testService = DefaultTestService(keyValueStore: testStore)
+//        let disposeBag = DisposeBag()
 //        
-//        let single = testService.testRequest()
+//        let data = CenterRegistrationDTO(
+//            identifier: "test1234",
+//            password: "testpassword1234",
+//            phoneNumber: "010-4444-5555",
+//            managerName: "최준영",
+//            centerBusinessRegistrationNumber: "000-00-00000"
+//        )
 //
-//        waitForExpectations(timeout: 10, handler: nil)
+//        
+//        repo
+//            .request(api: .centerLogin(
+//                id: "test1234",
+//                password: "testpassword1234")
+//            )
+//            .subscribe { response in
+//            
+//            print(response)
+//            
+//            expectation.fulfill()
+//        }
+//        .disposed(by: disposeBag)
+//        
+//        waitForExpectations(timeout: 60, handler: nil)
     }
     
     func testAuth() {

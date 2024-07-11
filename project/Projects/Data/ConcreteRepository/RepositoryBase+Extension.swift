@@ -9,6 +9,7 @@ import Foundation
 import Entity
 import RepositoryInterface
 import Moya
+import NetworkDataSource
 
 extension RepositoryBase {
     
@@ -33,6 +34,14 @@ extension RepositoryBase {
     }
     
     func filterNetworkConnection(_ error: Error) -> URLError? {
+        
+        // 데이터소스 에러
+        if let dataSourceError = error as? DataSourceError {
+            #if DEBUG
+            print("데이터 소스 에러: \(error.localizedDescription)")
+            #endif
+            return nil
+        }
         
         guard let moyaError = error as? MoyaError, case .underlying(let err, _) = moyaError, let afError = err.asAFError, afError.isSessionTaskError else {
             return nil

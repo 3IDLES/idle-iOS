@@ -8,5 +8,10 @@
 import Foundation
 
 public class AuthService: BaseNetworkService<AuthAPI> {
+    
     public init() { }
+    
+    public override init(keyValueStore: KeyValueStore) {
+        super.init(keyValueStore: keyValueStore)
+    }
 }

@@ -42,4 +42,15 @@ public extension BaseAPI {
         
         return ["Content-Type": "application/json"]
     }
+    
+    var validationType: ValidationType {
+        .customCodes(
+            [
+                200,
+                201,
+                204,
+                400,
+            ]
+        )
+    }
 }
