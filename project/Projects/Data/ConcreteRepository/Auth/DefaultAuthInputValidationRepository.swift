@@ -29,7 +29,7 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
                 case 204:
                     return .success(true)
                 default:
-                    return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
+                    return .failure(self.decodeError(of: InputValidationError.self, data: response.data))
                 }
             }
     }
@@ -46,7 +46,7 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
                 case 204:
                     return .success(true)
                 default:
-                    return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
+                    return .failure(self.decodeError(of: InputValidationError.self, data: response.data))
                 }
             }
     }
@@ -64,7 +64,7 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
                     let dto: BusinessInfoDTO = self.decodeData(data: response.data)
                     return .success(dto.toEntity())
                 default:
-                    return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
+                    return .failure(self.decodeError(of: InputValidationError.self, data: response.data))
                 }
             }
     }
@@ -82,7 +82,7 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
                 case 400:
                     return .success(false)
                 default:
-                    return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
+                    return .failure(self.decodeError(of: InputValidationError.self, data: response.data))
                 }
             }
     }

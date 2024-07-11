@@ -39,7 +39,7 @@ public class DefaultAuthRepository: AuthRepository {
                 case 201:
                     return .success(true)
                 default:
-                    return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
+                    return .failure(self.decodeError(of: AuthError.self, data: response.data))
                 }
             }
     }
@@ -75,7 +75,7 @@ public class DefaultAuthRepository: AuthRepository {
                         }
                     }
                 }
-                return .failure(self.decodeError(of: CenterRegisterError.self, data: response.data))
+                return .failure(self.decodeError(of: AuthError.self, data: response.data))
             }
     }
 }

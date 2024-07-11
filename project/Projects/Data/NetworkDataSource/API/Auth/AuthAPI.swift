@@ -20,6 +20,7 @@ public enum AuthAPI {
     case checkIdDuplication(id: String)
     case registerCenterAccount(data: Data)
     case centerLogin(id: String, password: String)
+    case reissueToken(refreshToken: String)
 }
 
 extension AuthAPI: BaseAPI {
@@ -41,6 +42,8 @@ extension AuthAPI: BaseAPI {
             return .post
         case .centerLogin:
             return .post
+        case .reissueToken:
+            return .post
         }
     }
     
@@ -58,6 +61,8 @@ extension AuthAPI: BaseAPI {
             "center/join"
         case .centerLogin:
             "center/login"
+        case .reissueToken:
+            "center/refresh"
         }
     }
     
@@ -72,6 +77,8 @@ extension AuthAPI: BaseAPI {
         case .centerLogin(let id, let password):
             params["identifier"] = id
             params["password"] = password
+        case .reissueToken(let refreshToken):
+            params["refreshToken"] = refreshToken
         default:
             break
         }
@@ -94,6 +101,8 @@ extension AuthAPI: BaseAPI {
         case .registerCenterAccount(let data):
             return .requestData(data)
         case .centerLogin:
+            return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
+        case .reissueToken:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         default:
             return .requestPlain
