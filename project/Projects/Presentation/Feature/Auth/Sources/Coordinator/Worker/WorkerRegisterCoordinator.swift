@@ -1,5 +1,5 @@
 //
-//  AgentRegisterCoordinator.swift
+//  WorkerRegisterCoordinator.swift
 //  AuthFeature
 //
 //  Created by choijunios on 6/30/24.
@@ -8,7 +8,7 @@
 import UIKit
 import PresentationCore
 
-enum AgentRegisterStage: Int {
+enum WorkerRegisterStage: Int {
     
     case phoneNumber=0
     case name=1
@@ -30,9 +30,9 @@ enum AgentRegisterStage: Int {
     }
 }
 
-public class AgentRegisterCoordinator: ChildCoordinator {
+public class WorkerRegisterCoordinator: ChildCoordinator {
 
-    public var parent: AgentAuthCoordinatable?
+    public var parent: WorkerAuthCoordinatable?
     
     public let navigationController: UINavigationController
     
@@ -42,7 +42,7 @@ public class AgentRegisterCoordinator: ChildCoordinator {
     
     var stageViewControllers: [DisposableViewController] = []
     
-    var currentStage: AgentRegisterStage?
+    var currentStage: WorkerRegisterStage?
     
     public init(navigationController: UINavigationController) {
     
@@ -69,7 +69,7 @@ public class AgentRegisterCoordinator: ChildCoordinator {
         
         self.pageViewController = pageViewController
         
-        let viewController = AgentRegisterViewController(
+        let viewController = WorkerRegisterViewController(
             pageViewController: pageViewController
         )
         
@@ -90,7 +90,7 @@ public class AgentRegisterCoordinator: ChildCoordinator {
     }
 }
 
-extension AgentRegisterCoordinator {
+extension WorkerRegisterCoordinator {
     
     public func next() {
         
@@ -111,7 +111,7 @@ extension AgentRegisterCoordinator {
     
     func phoneNumberStage() {
         
-        let viewController = stageViewControllers[AgentRegisterStage.phoneNumber.rawValue]
+        let viewController = stageViewControllers[WorkerRegisterStage.phoneNumber.rawValue]
         
         showStage(viewController: viewController)
         
@@ -120,8 +120,8 @@ extension AgentRegisterCoordinator {
     
     func nameStage() {
         
-//        let viewController = stageViewControllers[AgentRegisterStage.name.rawValue]
-//        
+//        let viewController = stageViewControllers[WorkerRegisterStage.name.rawValue]
+//
 //        let nameStage = viewController as! EnterNameViewController
 //        
 //        nameStage.coordinator = self
@@ -133,7 +133,7 @@ extension AgentRegisterCoordinator {
     
     func genderStage() {
         
-        let viewController = stageViewControllers[AgentRegisterStage.gender.rawValue]
+        let viewController = stageViewControllers[WorkerRegisterStage.gender.rawValue]
         
         let genderStage = viewController as! SelectGenderViewController
         

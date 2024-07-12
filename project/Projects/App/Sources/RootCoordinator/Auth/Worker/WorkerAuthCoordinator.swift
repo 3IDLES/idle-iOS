@@ -1,5 +1,5 @@
 //
-//  AgentAuthCoordinator.swift
+//  WorkerAuthCoordinator.swift
 //  AuthFeature
 //
 //  Created by choijunios on 6/30/24.
@@ -9,7 +9,7 @@ import UIKit
 import PresentationCore
 import AuthFeature
 
-class AgentAuthCoordinator: ParentCoordinator {
+class WorkerAuthCoordinator: ParentCoordinator {
     
     var childCoordinators: [Coordinator] = []
     
@@ -27,7 +27,7 @@ class AgentAuthCoordinator: ParentCoordinator {
     
     func start() {
         
-        let coordinator = AgentAuthMainCoodinator(
+        let coordinator = WorkerAuthMainCoodinator(
             navigationController: navigationController
         )
         
@@ -39,11 +39,11 @@ class AgentAuthCoordinator: ParentCoordinator {
     }
 }
 
-extension AgentAuthCoordinator: AgentAuthCoordinatable {
+extension WorkerAuthCoordinator: WorkerAuthCoordinatable {
     
     func register() {
         
-        let coordinator = AgentRegisterCoordinator(
+        let coordinator = WorkerRegisterCoordinator(
             navigationController: navigationController
         )
         

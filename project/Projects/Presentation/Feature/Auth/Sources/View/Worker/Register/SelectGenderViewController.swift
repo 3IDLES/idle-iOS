@@ -10,9 +10,9 @@ import PresentationCore
 
 class SelectGenderViewController: DisposableViewController {
     
-    var coordinator: AgentRegisterCoordinator?
+    var coordinator: WorkerRegisterCoordinator?
     
-    public init(coordinator: AgentRegisterCoordinator? = nil) {
+    public init(coordinator: WorkerRegisterCoordinator? = nil) {
         self.coordinator = coordinator
         
         super.init(nibName: nil, bundle: nil)
