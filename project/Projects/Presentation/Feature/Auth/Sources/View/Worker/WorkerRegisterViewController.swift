@@ -1,5 +1,5 @@
 //
-//  AgentRegisterViewController.swift
+//  WorkerRegisterViewController.swift
 //  AuthFeature
 //
 //  Created by choijunios on 6/30/24.
@@ -9,9 +9,9 @@ import UIKit
 import DSKit
 import PresentationCore
 
-class AgentRegisterViewController: DisposableViewController {
+class WorkerRegisterViewController: DisposableViewController {
     
-    var coordinator: AgentRegisterCoordinator?
+    var coordinator: WorkerRegisterCoordinator?
     
     var pageViewController: UIPageViewController
     

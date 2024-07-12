@@ -15,7 +15,7 @@ extension AuthCoordinator: AuthCoordinatable {
         switch type {
         case .agent:
             
-            let coordinator = AgentAuthCoordinator(navigationController: navigationController)
+            let coordinator = WorkerAuthCoordinator(navigationController: navigationController)
             
             addChildCoordinator(coordinator)
             

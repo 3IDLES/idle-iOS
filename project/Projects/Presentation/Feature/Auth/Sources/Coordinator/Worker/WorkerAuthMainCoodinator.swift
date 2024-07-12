@@ -1,5 +1,5 @@
 //
-//  AgentAuthMainCoodinator.swift
+//  WorkerAuthMainCoodinator.swift
 //  AuthFeature
 //
 //  Created by choijunios on 6/30/24.
@@ -8,13 +8,13 @@
 import UIKit
 import PresentationCore
 
-public class AgentAuthMainCoodinator: ChildCoordinator {
+public class WorkerAuthMainCoodinator: ChildCoordinator {
 
     public var navigationController: UINavigationController
     
     public weak var viewControllerRef: DisposableViewController?
     
-    public var parent: AgentAuthCoordinatable?
+    public var parent: WorkerAuthCoordinatable?
     
     public init(navigationController: UINavigationController) {
             
@@ -27,7 +27,7 @@ public class AgentAuthMainCoodinator: ChildCoordinator {
     
     public func start() {
         
-        let viewController = AgentAuthMainViewController()
+        let viewController = WorkerAuthMainViewController()
         viewController.coordinator = self
         
         viewControllerRef = viewController

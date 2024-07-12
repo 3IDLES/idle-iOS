@@ -1,5 +1,5 @@
 //
-//  AgentAuthMainViewController.swift
+//  WorkerAuthMainViewController.swift
 //  AuthFeature
 //
 //  Created by choijunios on 6/30/24.
@@ -9,9 +9,9 @@ import UIKit
 import DSKit
 import PresentationCore
 
-public class AgentAuthMainViewController: DisposableViewController {
+public class WorkerAuthMainViewController: DisposableViewController {
     
-    var coordinator: AgentAuthMainCoodinator?
+    var coordinator: WorkerAuthMainCoodinator?
     
     lazy var startRegisterButton = ButtonPrototype(text: "요양보호사 등록") { [weak self] in
         
