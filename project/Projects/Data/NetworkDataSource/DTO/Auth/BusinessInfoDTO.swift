@@ -8,13 +8,13 @@
 import Foundation
 import Entity
 
-struct BusinessInfoDTO: Decodable {
+public struct BusinessInfoDTO: Decodable {
     
-    let businessRegistrationNumber: String
-    let companyName: String
+    public let businessRegistrationNumber: String
+    public let companyName: String
 }
 
-extension BusinessInfoDTO {
+public extension BusinessInfoDTO {
     
     func toEntity() -> BusinessInfoVO {
         

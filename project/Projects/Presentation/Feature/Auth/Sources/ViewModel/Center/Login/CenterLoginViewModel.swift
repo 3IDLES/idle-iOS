@@ -37,7 +37,7 @@ public class CenterLoginViewModel: ViewModelType {
                 
                 self.authUseCase
                     .loginCenterAccount(id: id, password: pw)
-                    .subscribe(onNext: { [weak self] result in
+                    .subscribe { [weak self] result in
                         
                         switch result {
                         case .success(_):
@@ -47,7 +47,7 @@ public class CenterLoginViewModel: ViewModelType {
                             printIfDebug("❌ 로그인 실패, 에러내용: \(error.message)")
                             self?.output.loginValidation?.onNext(false)
                         }
-                    })
+                    }
                     .disposed(by: self.disposeBag)
                 
             }

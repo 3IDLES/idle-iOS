@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum AuthError: String, CustomError {
+public enum AuthError: String, DomainError {
     
     // undefinedError
     case undefinedError="Err-000"

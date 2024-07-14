@@ -66,6 +66,7 @@ let project = Project(
                 SecretSource.networkDataSource,
             ],
             dependencies: [
+                D.Domain.Entity,
                 
                 // ThirdParty
                 D.ThirdParty.Alamofire,

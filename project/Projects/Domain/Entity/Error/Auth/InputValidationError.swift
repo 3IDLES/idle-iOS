@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum InputValidationError: String, CustomError {
+public enum InputValidationError: String, DomainError {
     
     case InvalidSmsVerificationNumber="SMS-001"
     case SmsVerificationNumberNotFound="SMS-002"

@@ -20,10 +20,10 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
     }
     
     // MARK: 전화번호 인증
-    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Observable<BoolResult> {
-        filteringDataLayer(
-            domainTask: repository.requestPhoneNumberAuthentication(phoneNumber: phoneNumber).asObservable()
-        )
+    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<Void, InputValidationError>> {
+        convert(task: self.repository.requestPhoneNumberAuthentication(phoneNumber: phoneNumber)) { [unowned self] error in
+            toDomainError(error: error)
+        }
     }
     
     public func checkPhoneNumberIsValid(phoneNumber: String) -> Bool {
@@ -33,17 +33,17 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         return predicate.evaluate(with: phoneNumber)
     }
     
-    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Observable<BoolResult> {
-        filteringDataLayer(
-            domainTask: repository.authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber).asObservable()
-        )
+    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<Void, InputValidationError>> {
+        convert(task: repository.authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)) { [unowned self] error in
+            toDomainError(error: error)
+        }
     }
     
     // MARK: 사업자 번호 인증
-    public func requestBusinessNumberAuthentication(businessNumber: String) -> Observable<BusinessNumberAuthResult> {
-        filteringDataLayer(
-            domainTask: repository.requestBusinessNumberAuthentication(businessNumber: businessNumber).asObservable()
-        )
+    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<BusinessInfoVO, InputValidationError>> {
+        convert(task: repository.requestBusinessNumberAuthentication(businessNumber: businessNumber)) { [unowned self] error in
+            toDomainError(error: error)
+        }
     }
     
     public func checkBusinessNumberIsValid(businessNumber: String) -> Bool {
@@ -61,10 +61,10 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         return predicate.evaluate(with: id)
     }
     
-    public func requestCheckingIdDuplication(id: String) -> Observable<BoolResult> {
-        filteringDataLayer(
-            domainTask: repository.requestCheckingIdDuplication(id: id).asObservable()
-        )
+    public func requestCheckingIdDuplication(id: String) -> Single<Result<Void, InputValidationError>> {
+        convert(task: repository.requestCheckingIdDuplication(id: id)) { [unowned self] error in
+            toDomainError(error: error)
+        }
     }
     
     public func checkPasswordIsValid(password: String) -> Bool {

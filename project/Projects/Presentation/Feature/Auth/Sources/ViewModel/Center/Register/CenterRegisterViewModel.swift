@@ -217,7 +217,7 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 self.inputValidationUseCase
                     .requestBusinessNumberAuthentication(businessNumber: formattedString)
-                    .subscribe(onNext: { [weak self] result in
+                    .subscribe { [weak self] result in
                         
                         switch result {
                         case .success(let vo):
@@ -234,7 +234,7 @@ public class CenterRegisterViewModel: ViewModelType {
                             
                             self?.output.businessNumberValidation?.onNext(nil)
                         }
-                    })
+                    }
                     .disposed(by: self.disposeBag)
                 
             })
@@ -275,21 +275,20 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 self.inputValidationUseCase
                     .requestCheckingIdDuplication(id: id)
-                    .subscribe(onNext: { [weak self] result in
+                    .subscribe { [weak self] result in
                         
                         switch result {
-                        case .success(let isValid):
-                            printIfDebug("[CenterRegisterViewModel] \(id) 중복체크 결과: \(isValid ? "✅ 성공" : "❌ 실패")")
-                            self?.output.idValidation?.onNext((isValid, id))
+                        case .success:
+                            printIfDebug("[CenterRegisterViewModel] \(id) 중복체크 결과: ✅ 성공")
+                            self?.output.idValidation?.onNext((true, id))
                             
-                            if isValid {
-                                // 🚀 상태추적 🚀
-                                self?.stateObject.id = id
-                            }
+                            // 🚀 상태추적 🚀
+                            self?.stateObject.id = id
+                            
                         case .failure(let error):
                             printIfDebug("❌ \(id) 아이디중복검사 실패 \n 에러내용: \(error.message)")
                         }
-                    })
+                    }
                     .disposed(by: self.disposeBag)
             })
             .disposed(by: disposeBag)
@@ -333,26 +332,22 @@ public class CenterRegisterViewModel: ViewModelType {
                 
                 self.authUseCase
                     .registerCenterAccount(registerState: self.stateObject)
-                    .subscribe(onNext: { [weak self] result in
+                    .subscribe { [weak self] result in
                         
                         guard let self else { return }
                         
                         switch result {
-                        case .success(_):
+                        case .success:
                             self.output.registerValidation?.onNext(true)
-                            printIfDebug("[CenterRegisterViewModel] ✅ 획원가입 성공 \n 가임정보 \(self.stateObject.descroption)")
+                            printIfDebug("[CenterRegisterViewModel] ✅ 회원가입 성공 \n 가임정보 \(self.stateObject.description)")
                             
-                            // 현재까지 입력정보를 모두 삭제
                             self.stateObject.clear()
                             
                         case .failure(let error):
                             self.output.registerValidation?.onNext(false)
                             printIfDebug("❌ 회원가입 실패: \(error.message)")
-                            
-                            // 현재까지 입력정보를 모두 삭제
-                            self.stateObject.clear()
                         }
-                    })
+                    }
                     .disposed(by: self.disposeBag)
             }
             .disposed(by: disposeBag)

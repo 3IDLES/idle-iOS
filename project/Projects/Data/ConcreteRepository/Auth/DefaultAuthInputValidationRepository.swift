@@ -17,74 +17,30 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
     
     public init() { }
     
-    public func requestPhoneNumberAuthentication(phoneNumber: String) -> RxSwift.Single<BoolResult> {
+    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Void> {
         
-        networkService.requestWithoutToken(api: .startPhoneNumberAuth(phoneNumber: phoneNumber))
-            .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
-            .map { [weak self] response in
-                
-                guard let self = self else { return BoolResult.failure(.unknownError) }
-                
-                switch response.statusCode {
-                case 204:
-                    return .success(true)
-                default:
-                    return .failure(self.decodeError(of: InputValidationError.self, data: response.data))
-                }
-            }
+        networkService
+            .request(api: .startPhoneNumberAuth(phoneNumber: phoneNumber), with: .plain)
+            .map { _ in return () }
     }
     
-    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> RxSwift.Single<BoolResult> {
+    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Void> {
         
-        networkService.requestWithoutToken(api: .checkAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber))
-            .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
-            .map { [weak self] response in
-                
-                guard let self = self else { return BoolResult.failure(.unknownError) }
-                
-                switch response.statusCode {
-                case 204:
-                    return .success(true)
-                default:
-                    return .failure(self.decodeError(of: InputValidationError.self, data: response.data))
-                }
-            }
+        networkService.request(api: .checkAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber), with: .plain)
+            .map { _ in return () }
     }
     
-    public func requestBusinessNumberAuthentication(businessNumber: String) -> RxSwift.Single<BusinessNumberAuthResult> {
+    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<BusinessInfoVO> {
         
-        networkService.requestWithoutToken(api: .authenticateBusinessNumber(businessNumber: businessNumber))
-            .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
-            .map { [weak self] response in
-                
-                guard let self = self else { return BusinessNumberAuthResult.failure(.unknownError) }
-                
-                switch response.statusCode {
-                case 200:
-                    let dto: BusinessInfoDTO = self.decodeData(data: response.data)
-                    return .success(dto.toEntity())
-                default:
-                    return .failure(self.decodeError(of: InputValidationError.self, data: response.data))
-                }
-            }
+        networkService.requestDecodable(
+            api: .authenticateBusinessNumber(businessNumber: businessNumber),
+            with: .plain
+        ).map { (dto: BusinessInfoDTO) in dto.toEntity() }
     }
     
-    public func requestCheckingIdDuplication(id: String) -> RxSwift.Single<Entity.BoolResult> {
-        networkService.requestWithoutToken(api: .checkIdDuplication(id: id))
-            .catch { [weak self] in .error(self?.filterNetworkConnection($0) ?? $0) }
-            .map { [weak self] response in
-                
-                guard let self = self else { return BoolResult.failure(.unknownError) }
-                
-                switch response.statusCode {
-                case 204:
-                    return .success(true)
-                case 400:
-                    return .success(false)
-                default:
-                    return .failure(self.decodeError(of: InputValidationError.self, data: response.data))
-                }
-            }
+    public func requestCheckingIdDuplication(id: String) -> Single<Void> {
+        networkService.request(api: .checkIdDuplication(id: id), with: .plain)
+            .map { _ in return () }
     }
 }
 
