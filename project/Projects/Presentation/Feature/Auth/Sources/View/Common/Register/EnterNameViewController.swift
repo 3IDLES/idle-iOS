@@ -12,11 +12,11 @@ import RxCocoa
 import PresentationCore
 
 public protocol EnterNameInputable {
-    var editingName: Observable<String>? { get set }
+    var editingName: PublishRelay<String?> { get set }
 }
 
 public protocol EnterNameOutputable {
-    var nameValidation: PublishSubject<(isValid: Bool, name: String)>? { get set }
+    var nameValidation: PublishSubject<(isValid: Bool, name: String)> { get set }
 }
 
 public class EnterNameViewController<T: ViewModelType>: DisposableViewController
@@ -130,12 +130,18 @@ where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNam
         
         // MARK: Input
         var input = viewModel.input
-        input.editingName = textField.eventPublisher.asObservable()
+        
+        textField
+            .textField.rx.text
+            .bind(to: input.editingName)
+            .disposed(by: disposeBag)
+            
         
         // MARK: Output
         let output = viewModel.transform(input: input)
+        
         output
-            .nameValidation?
+            .nameValidation
             .subscribe(onNext: { [weak self] (isValid, name) in
                 
                 printIfDebug("성함 입력: \(name), 유효성: \(isValid)")

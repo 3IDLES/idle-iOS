@@ -24,71 +24,28 @@ class ViewController2: UIViewController {
             right: 20
         )
         
-        let box = InfoBox(
-            titleText: "세얼간이 요양 보호소",
-            items: [
-                (key: "주소1", value: "강남구 개포동"),
-                (key: "주소2", value: "강남구 개포동 테헤란로"),
-                (key: "주소3", value: "서울시 영등포구 서울시 영등포구 서울시 영등포구 서울시 영등포구 서울시 영등포구"),
-            ]
-        )
+        let st1 = StateButtonTyp1(text: "여성", initial: .normal)
+        let st2 = StateButtonTyp1(text: "남성", initial: .normal)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            
-            box.titleText.onNext("Hello world")
-            
-            box.items.onNext([
-                (key: "주소1", value: "강남구 대치동"),
-                (key: "주소2", value: "강남구 역삼동"),
-                (key: "주소3", value: "서울시 영등포구"),
-            ])
-        }
-        
-        
-        let textField = IdleOneLineInputField(
-            placeHolderText: "placeHolderText"
-        )
-        
-        var fontSize: CGFloat = 10
-        
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
-            
-            fontSize+=2;
-            
-            DispatchQueue.main.async {
-                
-                textField.textField.font = .systemFont(ofSize: fontSize)
-            }
-        }
-        
-        
-        let textFieldType2 = IFType2(
-            titleLabelText: "타이틀 라벨",
-            placeHolderText: "아이디 입력"
-        )
         
         [
-            box,
-            textField,
-            textFieldType2,
+            st1,
+            st2
         ].forEach {
-            
-            view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
         }
-        
+
         NSLayoutConstraint.activate([
-            box.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            box.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            box.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            st1.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            st1.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            st1.heightAnchor.constraint(equalToConstant: 44),
+            st1.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.5),
             
-            textField.topAnchor.constraint(equalTo: box.bottomAnchor, constant: 30),
-            textField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            textField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            
-            textFieldType2.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 30),
-            textFieldType2.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            textFieldType2.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            st2.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.5),
+            st2.heightAnchor.constraint(equalToConstant: 44),
+            st2.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            st2.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
     

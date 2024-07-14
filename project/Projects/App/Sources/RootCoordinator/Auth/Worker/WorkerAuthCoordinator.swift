@@ -7,6 +7,7 @@
 
 import UIKit
 import PresentationCore
+import UseCaseInterface
 import AuthFeature
 
 class WorkerAuthCoordinator: ParentCoordinator {
@@ -14,11 +15,13 @@ class WorkerAuthCoordinator: ParentCoordinator {
     var childCoordinators: [Coordinator] = []
     
     var navigationController: UINavigationController
+    let injector: Injector
     
     var parent: AuthCoordinator?
     
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
+    init(dependency: Dependency) {
+        self.navigationController = dependency.navigationController
+        self.injector = dependency.injector
     }
     
     deinit {
@@ -44,7 +47,10 @@ extension WorkerAuthCoordinator: WorkerAuthCoordinatable {
     func register() {
         
         let coordinator = WorkerRegisterCoordinator(
-            navigationController: navigationController
+            navigationController: navigationController,
+            viewModel: WorkerRegisterViewModel(
+                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self)
+            )
         )
         
         coordinator.parent = self

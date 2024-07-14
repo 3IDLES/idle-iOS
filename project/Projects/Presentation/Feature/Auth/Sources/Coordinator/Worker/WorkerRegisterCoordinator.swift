@@ -44,14 +44,16 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
     
     var currentStage: WorkerRegisterStage?
     
-    public init(navigationController: UINavigationController) {
+    public init(
+        navigationController: UINavigationController,
+        viewModel: WorkerRegisterViewModel
+    ) {
     
         self.navigationController = navigationController
         
         self.stageViewControllers = [
-//            ValidatePhoneNumberViewController(coordinator: self, viewModel: CenterRegisterViewModel()),
-//            EnterNameViewController(coordinator: self, viewModel: CenterRegisterViewModel()),
-//            SelectGenderViewController(coordinator: self),
+            EnterNameViewController(coordinator: self, viewModel: viewModel),
+            SelectGenderViewController(coordinator: self, viewModel: viewModel)
         ]
     }
     
@@ -120,26 +122,18 @@ extension WorkerRegisterCoordinator {
     
     func nameStage() {
         
-//        let viewController = stageViewControllers[WorkerRegisterStage.name.rawValue]
-//
-//        let nameStage = viewController as! EnterNameViewController
-//        
-//        nameStage.coordinator = self
-//
-//        showStage(viewController: nameStage)
-//        
-//        currentStage = .name
+        let viewController = stageViewControllers[WorkerRegisterStage.name.rawValue]
+
+        showStage(viewController: viewController)
+        
+        currentStage = .name
     }
     
     func genderStage() {
         
         let viewController = stageViewControllers[WorkerRegisterStage.gender.rawValue]
         
-        let genderStage = viewController as! SelectGenderViewController
-        
-        genderStage.coordinator = self
-        
-        showStage(viewController: genderStage)
+        showStage(viewController: viewController)
         
         currentStage = .gender
     }

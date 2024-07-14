@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 import PresentationCore
 import UseCaseInterface
 import Entity
@@ -28,6 +29,26 @@ public class CenterRegisterViewModel: ViewModelType {
         authUseCase: AuthUseCase) {
         self.inputValidationUseCase = inputValidationUseCase
         self.authUseCase = authUseCase
+            
+        // MARK: 성함입력
+        
+        _ = input
+            .editingName
+            .compactMap({ $0 })
+            .map { [weak self] name in
+                
+                guard let self else { return (false, name) }
+                
+                let isValid = self.inputValidationUseCase.checkNameIsValid(name: name)
+                
+                if isValid {
+                    // 🚀 상태추적 🚀
+                    self.stateObject.name = name
+                }
+                
+                return (isValid, name)
+            }
+            .bind(to: output.nameValidation)
     }
     
     deinit {
@@ -37,25 +58,6 @@ public class CenterRegisterViewModel: ViewModelType {
     let disposeBag = DisposeBag()
     
     public func transform(input: Input) -> Output {
-        
-        // MARK: 성함 입력
-        self.input
-            .editingName?
-            .subscribe(onNext: { [weak self] name in
-                
-                printIfDebug("[CenterRegisterViewModel] 전달받은 성함: \(name)")
-                
-                // TODO: 성함이 유효하다면
-                let isValid = !name.isEmpty
-                self?.output.nameValidation?.onNext((isValid, name))
-                
-                if isValid {
-                    // 🚀 상태추적 🚀
-                    self?.stateObject.name = name
-                }
-            })
-            .disposed(by: disposeBag)
-        
         
         // MARK: 전화번호 입력
         self.input
@@ -364,7 +366,7 @@ extension CenterRegisterViewModel {
         public var ctaButtonClicked: Observable<CTAButtonAction>?
         
         // 이름입력
-        public var editingName: Observable<String>?
+        public var editingName: PublishRelay<String?> = .init()
         
         // 전화번호 입력
         public var editingPhoneNumber: Observable<String>?
@@ -386,7 +388,7 @@ extension CenterRegisterViewModel {
     public struct Output {
         
         // 이름 입력
-        public var nameValidation: PublishSubject<(isValid: Bool, name: String)>? = .init()
+        public var nameValidation: PublishSubject<(isValid: Bool, name: String)> = .init()
         
         // 전화번호 입력
         public var canSubmitPhoneNumber: PublishSubject<Bool>? = .init()
