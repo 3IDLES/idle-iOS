@@ -20,22 +20,21 @@ public class DefaultAuthUseCase: AuthUseCase {
     }
     
     // MARK: 센터 회원가입 실행
-    public func registerCenterAccount(registerState: Entity.CenterRegisterState) -> RxSwift.Observable<Entity.BoolResult> {
-        filteringDataLayer(
-            domainTask: repository.requestRegisterCenterAccount(
-                managerName: registerState.name!,
-                phoneNumber: registerState.phoneNumber!,
-                businessNumber: registerState.businessNumber!,
-                id: registerState.id!,
-                password: registerState.password!
-            ).asObservable()
-        )
+    public func registerCenterAccount(registerState: CenterRegisterState) -> Single<Result<Void, AuthError>> {
+        convert(
+            task: repository.requestRegisterCenterAccount(
+                managerName: registerState.name,
+                phoneNumber: registerState.phoneNumber,
+                businessNumber: registerState.businessNumber,
+                id: registerState.id,
+                password: registerState.password
+        )) { [unowned self] error in toDomainError(error: error) }
     }
     
     // MARK: 센터 로그인 실행
-    public func loginCenterAccount(id: String, password: String) -> RxSwift.Observable<Entity.BoolResult> {
-        filteringDataLayer(
-            domainTask: repository.requestCenterLogin(id: id, password: password).asObservable()
-        )
+    public func loginCenterAccount(id: String, password: String) -> Single<Result<Void, AuthError>> {
+        convert(task: repository.requestCenterLogin(id: id, password: password)) { [unowned self] error in
+            toDomainError(error: error)
+        }
     }
 }

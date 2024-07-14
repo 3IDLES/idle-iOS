@@ -13,25 +13,34 @@ public protocol UseCaseBase: AnyObject { }
 
 public extension UseCaseBase {
     
-    func filteringDataLayer<T>(domainTask: Observable<Result<T, IdleError>>?) -> Observable<Result<T, IdleError>> {
-        
-        return Observable.create { observer in
-            let task = domainTask?
-                .subscribe { result in observer.onNext(result) } onError: { error in
-                    
-                    // UseCase영역에서 네트워크 오류가 발생하였음을 확인합니다.
-                    
-                    if let urlError = error as? URLError, urlError.code == .notConnectedToInternet {
-                        // 네트워크 비연결 에러
-                        observer.onNext(.failure(.networkError))
-                    } else {
-                        // 알수 없는 에러
-                        observer.onNext(.failure(.unknownError))
-                    }
+    /// Repository로 부터 전달받은 언어레벨의 에러를 도메인 특화 에러로 변경하고, error를 Result의 Failure로, 성공을 Success로 변경합니다.
+    func convert<T, F>(task: Single<T>, errorClosure: @escaping (Error) -> F) -> Single<Result<T, F>> {
+        Single.create { single in
+            let disposable = task
+                .subscribe { success in
+                    single(.success(.success(success)))
+                } onFailure: { error in
+                    single(.failure(errorClosure(error)))
                 }
-            return Disposables.create {
-                task?.dispose()
-            }
+            return Disposables.create { disposable.dispose() }
         }
+    }
+    
+    // MARK: InputValidationError
+    func toDomainError<T: DomainError>(error: Error) -> T {
+
+        if let httpError = error as? HTTPResponseException {
+            
+            if let code = httpError.rawCode {
+                
+                return .init(rawValue: code) ?? .undefinedError
+            }
+            
+            #if DEBUG
+            print("InputValidationError변환실패 Error: \(httpError)")
+            #endif
+        }
+        
+        return .undefinedError
     }
 }
