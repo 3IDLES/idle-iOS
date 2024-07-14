@@ -13,6 +13,7 @@ public protocol ViewModelType: AnyObject {
     associatedtype Output
     
     var input: Input { get }
+    var output: Output { get }
     
     func transform(input: Input) -> Output
 }

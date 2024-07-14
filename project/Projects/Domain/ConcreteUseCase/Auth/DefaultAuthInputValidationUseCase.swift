@@ -19,6 +19,12 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         self.repository = repository
     }
     
+    // MARK: 이름 인증
+    public func checkNameIsValid(name: String) -> Bool {
+        return name.count >= 2
+    }
+    
+    
     // MARK: 전화번호 인증
     public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<Void, InputValidationError>> {
         convert(task: self.repository.requestPhoneNumberAuthentication(phoneNumber: phoneNumber)) { [unowned self] error in

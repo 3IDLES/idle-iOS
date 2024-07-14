@@ -15,7 +15,7 @@ public class CenterLoginViewModel: ViewModelType {
     let authUseCase: AuthUseCase
     
     public var input: Input = .init()
-    private var output: Output = .init()
+    public var output: Output = .init()
     
     private let disposeBag = DisposeBag()
     
