@@ -9,20 +9,21 @@ import UIKit
 import Entity
 import DSKit
 import RxSwift
+import RxCocoa
 import PresentationCore
 
 public protocol AuthBusinessOwnerInputable {
-    var editingBusinessNumber: Observable<String>? { get set }
-    var requestBusinessNumberValidation: Observable<String>? { get set }
+    var editingBusinessNumber: PublishRelay<String?> { get set }
+    var requestBusinessNumberValidation: PublishRelay<String?> { get set }
 }
 
 public protocol AuthBusinessOwnerOutputable {
-    var canSubmitBusinessNumber: PublishSubject<Bool>? { get set }
-    var businessNumberValidation: PublishSubject<BusinessInfoVO?>? { get set }
+    var canSubmitBusinessNumber: PublishRelay<Bool?> { get set }
+    var businessNumberValidation: PublishRelay<BusinessInfoVO?> { get set }
 }
 
 public class AuthBusinessOwnerViewController<T: ViewModelType>: DisposableViewController
-where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: AuthBusinessOwnerOutputable {
+where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable {
     
     public var coordinator: CenterRegisterCoordinator?
     
@@ -160,37 +161,44 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
     private func setObservable() {
         
         // MARK: Input
-        var input = viewModel.input
+        let input = viewModel.input
         
         // 현재 입력중인 정보 전송
-        input.editingBusinessNumber = businessNumberField.idleTextField.eventPublisher.asObservable()
+        businessNumberField
+            .idleTextField
+            .textField.rx.text
+            .bind(to: input.editingBusinessNumber)
+            .disposed(by: disposeBag)
         
         // 인증, 확인 버튼이 눌린 경우
-        input.requestBusinessNumberValidation = businessNumberField.eventPublisher.asObservable()
+        businessNumberField
+            .eventPublisher
+            .bind(to: input.requestBusinessNumberValidation)
+            .disposed(by: disposeBag)
         
         // MARK: Output
-        let output = viewModel.transform(input: input)
+        let output = viewModel.output
         
         // 입력중인 사업자 번호가 특정 조건(ex: 입력길이)을 만족한 경우 '인증'버튼 활성화
         output
-            .canSubmitBusinessNumber?
-            .asDriver(onErrorJustReturn: false)
-            .drive(onNext: { [weak self] in self?.businessNumberField.button.setEnabled($0) })
+            .canSubmitBusinessNumber
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(onNext: { [weak self] isValid in
+                self?.businessNumberField.button.setEnabled(isValid)
+            })
             .disposed(by: disposeBag)
         
         // 사업자 번호 조회 결과
         output
-            .businessNumberValidation?
-            .subscribe(onNext: { [weak self] (info) in
-                
+            .businessNumberValidation
+            .asDriver(onErrorJustReturn: nil)
+            .drive(onNext: { [weak self] info in
                 if let centerInfo = info {
-                    
                     printIfDebug("✅ \(centerInfo.name) 조회결과")
-                    
                     self?.displayCenterInfo(vo: centerInfo)
                     self?.ctaButton.setEnabled(true)
                 } else {
-                    
                     // 정보가 없는 경우
                     self?.dismissCenterInfo()
                     self?.ctaButton.setEnabled(false)
@@ -202,7 +210,7 @@ where T.Input: AuthBusinessOwnerInputable & CTAButtonEnableInputable, T.Output: 
         // CTA버튼 클릭시 화면전환
         ctaButton
             .eventPublisher
-            .emit { [weak self] _ in self?.coordinator?.next() }
+            .subscribe { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
     }
     

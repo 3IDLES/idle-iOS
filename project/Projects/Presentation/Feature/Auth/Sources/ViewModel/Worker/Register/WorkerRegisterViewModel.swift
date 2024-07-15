@@ -94,7 +94,7 @@ public class WorkerRegisterViewModel: ViewModelType {
                 
                 #if DEBUG
                 print("✅ 디버그모드에서 번호인증 요청 무조건 통과")
-                return Single.just(Result<Void, InputValidationError>.success(()))
+                return Single.just(Result<String, InputValidationError>.success(formatted))
                 #endif
                 
                 return self.inputValidationUseCase.requestPhoneNumberAuthentication(phoneNumber: formatted)
@@ -103,8 +103,9 @@ public class WorkerRegisterViewModel: ViewModelType {
         
         _ = phoneNumberAuthRequestResult
             .compactMap { $0.value }
-            .map { _ in
+            .map { [weak self] phoneNumber in
                 printIfDebug("✅ 번호로 인증을 시작합니다.")
+                self?.stateObject.phoneNumber = phoneNumber
                 return true
             }
             .bind(to: output.phoneNumberValidation)
@@ -119,8 +120,8 @@ public class WorkerRegisterViewModel: ViewModelType {
         
         
         let phoneNumberAuthResult = input.requestValidationForAuthNumber
-            .compactMap({ [unowned self] authNumber in
-                if let phoneNumber = self.input.requestAuthForPhoneNumber.value, let authNumber {
+            .compactMap({ [weak self] authNumber in
+                if let phoneNumber = self?.stateObject.phoneNumber, let authNumber {
                     return (phoneNumber, authNumber)
                 }
                 return nil
@@ -130,7 +131,7 @@ public class WorkerRegisterViewModel: ViewModelType {
                 #if DEBUG
                 // 디버그시 인증번호 무조건 통과
                 print("✅ 디버그모드에서 번호인증 무조건 통과")
-                return Single.just(Result<Void, InputValidationError>.success(()))
+                return Single.just(Result<String, InputValidationError>.success(phoneNumber))
                 #endif
                 
                 return self.inputValidationUseCase
@@ -158,17 +159,46 @@ public class WorkerRegisterViewModel: ViewModelType {
         
         // MARK: 주소 입력
         _ = input
-            .editingPostalCode
+            .addressInformation
             .compactMap { $0 }
-            .map { [unowned self] postalCode in
-                self.stateObject.postalCode = postalCode
+            .map { [unowned self] addressInfo in
+                self.stateObject.addressInformation = addressInfo
             }
-        _ = input
-            .editingDetailAddress
+        
+        // MARK: 회원가입 성공 여부
+        
+        
+        let registerValidation = input
+            .ctaButtonClicked
             .compactMap { $0 }
-            .map { [unowned self] detailAddress in
-                self.stateObject.detailAddress = detailAddress
+            .map { _ in
+                
+                #if DEBUG
+                print("✅ 디버그모드에서 회원가입 무조건 통과")
+                return Result<Void, InputValidationError>.success(())
+                #endif
+                
+                //TODO: UseCase사용
+                return Result<Void, InputValidationError>.success(())
             }
+            .share()
+        
+        _ = registerValidation
+            .compactMap { $0.value }
+            .map {
+                print("✅ 회원가입 성공")
+                return true
+            }
+            .bind(to: output.registerValidation)
+        
+        _ = registerValidation
+            .compactMap { $0.error }
+            .map({ error in
+                print("❌ 회원가입 실패 \n 에러내용: \(error.message)")
+                return false
+            })
+            .bind(to: output.registerValidation)
+            
     }
 }
 
@@ -197,7 +227,7 @@ extension WorkerRegisterViewModel {
     
     public class Input {
         // CTA 버튼 클릭시
-        public var ctaButtonClicked: Observable<CTAButtonAction>?
+        public var ctaButtonClicked: PublishRelay<Void?> = .init()
         
         // 이름입력
         public var editingName: PublishRelay<String?> = .init()
@@ -208,11 +238,12 @@ extension WorkerRegisterViewModel {
         // 전화번호 입력
         public var editingPhoneNumber: PublishRelay<String?> = .init()
         public var editingAuthNumber: PublishRelay<String?> = .init()
-        public var requestAuthForPhoneNumber: BehaviorRelay<String?> = .init(value: nil)
+        public var requestAuthForPhoneNumber: PublishRelay<String?> = .init()
         public var requestValidationForAuthNumber: PublishRelay<String?> = .init()
         
-        public var editingPostalCode: PublishRelay<String?> = .init()
-        public var editingDetailAddress: PublishRelay<String?> = .init()
+        // 주소 입력
+        public var addressInformation: PublishRelay<AddressInformation?> = .init()
+//        public var editingDetailAddress: PublishRelay<String?> = .init()
     }
     
     public class Output {
@@ -227,6 +258,9 @@ extension WorkerRegisterViewModel {
         public var canSubmitAuthNumber: PublishRelay<Bool?> = .init()
         public var phoneNumberValidation: PublishRelay<Bool?> = .init()
         public var authNumberValidation: PublishRelay<Bool?> = .init()
+        
+        // 회원가입 성공 여부
+        public var registerValidation: PublishRelay<Bool?> = .init()
     }
 }
 
@@ -247,3 +281,6 @@ extension WorkerRegisterViewModel.Output: AuthPhoneNumberOutputable { }
 
 // Postal code
 extension WorkerRegisterViewModel.Input: EnterAddressInputable { }
+extension WorkerRegisterViewModel.Output: EnterAddressOutputable { }
+
+extension WorkerRegisterViewModel.Output: RegisterSuccessOutputable { }

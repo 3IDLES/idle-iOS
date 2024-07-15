@@ -15,7 +15,7 @@ public protocol AuthPhoneNumberInputable {
     
     var editingPhoneNumber: PublishRelay<String?> { get set }
     var editingAuthNumber: PublishRelay<String?> { get set }
-    var requestAuthForPhoneNumber: BehaviorRelay<String?> { get set }
+    var requestAuthForPhoneNumber: PublishRelay<String?> { get set }
     var requestValidationForAuthNumber: PublishRelay<String?> { get set }
 }
 
@@ -29,7 +29,7 @@ public protocol AuthPhoneNumberOutputable {
 
 class ValidatePhoneNumberViewController<T: ViewModelType>: DisposableViewController
 where 
-    T.Input: AuthPhoneNumberInputable & CTAButtonEnableInputable,
+    T.Input: AuthPhoneNumberInputable,
     T.Output: AuthPhoneNumberOutputable {
     
     var coordinator: Coordinator?
@@ -84,7 +84,7 @@ where
     private let authNumberField: IFType1 = {
         
        let textField = IFType1(
-        placeHolderText: "",
+            placeHolderText: "",
         submitButtonText: "확인",
         keyboardType: .numberPad
        )
@@ -229,7 +229,7 @@ where
             .disposed(by: disposeBag)
         
         // MARK: Output
-        let output = viewModel.transform(input: input)
+        let output = viewModel.output
         
         // 입력중인 전화번호가 특정 조건(ex: 입력길이)을 만족한 경우 '인증'버튼 활성화
         output
@@ -271,7 +271,7 @@ where
         // CTA버튼 클릭시 화면전환
         ctaButton
             .eventPublisher
-            .emit { [weak self] _ in self?.coordinator?.next() }
+            .subscribe { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
     }
     

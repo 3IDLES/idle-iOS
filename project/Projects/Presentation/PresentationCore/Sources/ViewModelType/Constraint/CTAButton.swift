@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 
 public enum CTAButtonAction {
     case next
@@ -14,7 +15,7 @@ public enum CTAButtonAction {
 }
 
 public protocol CTAButtonEnableInputable {
-    var ctaButtonClicked: Observable<CTAButtonAction>? { get set }
+    var ctaButtonClicked: PublishRelay<Void?> { get set }
 }
 
 public protocol CTAButtonEnableOutPutable {

@@ -31,7 +31,7 @@ public class CTAButtonType1: UIView {
     
     private var tapGesture: UITapGestureRecognizer!
     
-    public var eventPublisher: Signal<UITapGestureRecognizer> { tapGesture.rx.event.asSignal() }
+    public var eventPublisher: Observable<Void> { tapGesture.rx.event.map { _ in () }.asObservable() }
     
     public override var intrinsicContentSize: CGSize {
         .init(width: 0, height: 58)

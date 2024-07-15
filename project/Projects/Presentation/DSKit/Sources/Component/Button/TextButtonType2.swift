@@ -18,7 +18,7 @@ public class TextButtonType2: UIView {
     
     private let textOriginColor: UIColor
     
-    private lazy var label: IdleLabel = {
+    public private(set) lazy var label: IdleLabel = {
        
         let label = IdleLabel(typography: .Body3)
         

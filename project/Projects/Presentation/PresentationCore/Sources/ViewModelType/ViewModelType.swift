@@ -14,6 +14,4 @@ public protocol ViewModelType: AnyObject {
     
     var input: Input { get }
     var output: Output { get }
-    
-    func transform(input: Input) -> Output
 }

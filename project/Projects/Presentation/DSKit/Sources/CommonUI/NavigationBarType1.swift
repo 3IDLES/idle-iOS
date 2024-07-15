@@ -29,7 +29,7 @@ public class NavigationBarType1: UIStackView {
     }()
     
     // Observable
-    public let eventPublisher: PublishSubject<Void> = .init()
+    public let eventPublisher: PublishRelay<Void> = .init()
     
     private lazy var titleText: ResizableUILabel = {
         
@@ -92,7 +92,7 @@ public class NavigationBarType1: UIStackView {
             .subscribe(onNext: { [weak self] in
                 
                 self?.eventPublisher
-                    .onNext(())
+                    .accept(())
             })
             .disposed(by: disposeBag)
     }

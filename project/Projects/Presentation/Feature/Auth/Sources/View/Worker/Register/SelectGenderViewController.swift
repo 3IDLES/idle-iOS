@@ -164,7 +164,7 @@ where T.Input: SelectGenderInputable & CTAButtonEnableInputable, T.Output: Selec
         // CTA버튼 클릭시 화면전환
         ctaButton
             .eventPublisher
-            .emit { [weak self] _ in self?.coordinator?.next() }
+            .subscribe { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
     }
     
