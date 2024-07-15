@@ -26,8 +26,11 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
     
     
     // MARK: 전화번호 인증
-    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<Void, InputValidationError>> {
-        convert(task: self.repository.requestPhoneNumberAuthentication(phoneNumber: phoneNumber)) { [unowned self] error in
+    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<String, InputValidationError>> {
+        convert(task: self.repository
+            .requestPhoneNumberAuthentication(phoneNumber: phoneNumber)
+            .map { _ in phoneNumber }
+        ) { [unowned self] error in
             toDomainError(error: error)
         }
     }
@@ -39,15 +42,21 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         return predicate.evaluate(with: phoneNumber)
     }
     
-    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<Void, InputValidationError>> {
-        convert(task: repository.authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)) { [unowned self] error in
+    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<String, InputValidationError>> {
+        convert(task: repository
+            .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
+            .map({ _ in phoneNumber })
+        ) { [unowned self] error in
             toDomainError(error: error)
         }
     }
     
     // MARK: 사업자 번호 인증
-    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<BusinessInfoVO, InputValidationError>> {
-        convert(task: repository.requestBusinessNumberAuthentication(businessNumber: businessNumber)) { [unowned self] error in
+    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<(businessNumber: String, vo: BusinessInfoVO), InputValidationError>> {
+        convert(task: repository
+            .requestBusinessNumberAuthentication(businessNumber: businessNumber)
+            .map({ vo in (businessNumber, vo) })
+        ) { [unowned self] error in
             toDomainError(error: error)
         }
     }
@@ -67,8 +76,11 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         return predicate.evaluate(with: id)
     }
     
-    public func requestCheckingIdDuplication(id: String) -> Single<Result<Void, InputValidationError>> {
-        convert(task: repository.requestCheckingIdDuplication(id: id)) { [unowned self] error in
+    public func requestCheckingIdDuplication(id: String) -> Single<Result<String, InputValidationError>> {
+        convert(task: repository
+            .requestCheckingIdDuplication(id: id)
+            .map({ _ in id })
+        ) { [unowned self] error in
             toDomainError(error: error)
         }
     }

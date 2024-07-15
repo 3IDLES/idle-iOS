@@ -31,7 +31,7 @@ public class IdleLabel: UILabel {
         return CGSize(width: size.width, height: typography.lineHeight)
     }
     
-    var typography: Typography {
+    public var typography: Typography {
         get {
             currentTypography
         }

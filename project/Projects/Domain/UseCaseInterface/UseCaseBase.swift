@@ -33,7 +33,7 @@ public extension UseCaseBase {
             
             if let code = httpError.rawCode {
                 
-                return .init(rawValue: code) ?? .undefinedError
+                return T.init(rawValue: code) ?? T.undefinedError
             }
             
             #if DEBUG
@@ -41,6 +41,6 @@ public extension UseCaseBase {
             #endif
         }
         
-        return .undefinedError
+        return T.undefinedError
     }
 }

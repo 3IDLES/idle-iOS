@@ -29,10 +29,16 @@ class ViewController2: UIViewController {
         
         let type2Btn = TextButtonType2(labelText: "우편번호 찾으로 가기")
         
+        let idleTextField = IdleTextField(typography: .Body3)
+        idleTextField.attrPlaceholder = "Hello world"
+        idleTextField.layer.borderColor = UIColor.black.cgColor
+        idleTextField.layer.borderWidth = 1
+        
         [
             st1,
             st2,
             type2Btn,
+            idleTextField
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -52,6 +58,10 @@ class ViewController2: UIViewController {
             type2Btn.topAnchor.constraint(equalTo: st1.bottomAnchor),
             type2Btn.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             type2Btn.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            idleTextField.topAnchor.constraint(equalTo: type2Btn.bottomAnchor),
+            idleTextField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            idleTextField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
     

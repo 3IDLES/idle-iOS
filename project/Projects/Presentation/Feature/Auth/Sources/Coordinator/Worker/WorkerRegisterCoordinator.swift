@@ -46,6 +46,7 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
             EnterNameViewController(coordinator: self, viewModel: viewModel),
             SelectGenderViewController(coordinator: self, viewModel: viewModel),
             ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
+            EnterAddressViewController(coordinator: self, viewModel: viewModel),
         ]
     }
     
@@ -96,7 +97,7 @@ extension WorkerRegisterCoordinator {
             case .gender:
                 genderStage()
             case .address:
-                return
+                addressStage()
             case .finish:
                 authFinished()
             default:
@@ -133,6 +134,10 @@ extension WorkerRegisterCoordinator {
     }
     
     func addressStage() {
+        
+        let viewController = stageViewControllers[WorkerRegisterStage.address.rawValue]
+
+        showStage(viewController: viewController)
         
         currentStage = .address
     }

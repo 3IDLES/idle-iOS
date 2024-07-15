@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import RxSwift
+import RxCocoa
 
 public protocol RegisterSuccessOutputable {
-    var registerValidation: PublishSubject<Bool>? { get }
+    var registerValidation: PublishRelay<Bool?> { get }
 }

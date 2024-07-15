@@ -20,7 +20,7 @@ public protocol EnterNameOutputable {
 }
 
 public class EnterNameViewController<T: ViewModelType>: DisposableViewController
-where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNameOutputable {
+where T.Input: EnterNameInputable, T.Output: EnterNameOutputable {
     
     public var coordinator: Coordinator?
     
@@ -129,7 +129,7 @@ where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNam
         ctaButton.setEnabled(false)
         
         // MARK: Input
-        var input = viewModel.input
+        let input = viewModel.input
         
         textField
             .textField.rx.text
@@ -138,7 +138,7 @@ where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNam
             
         
         // MARK: Output
-        let output = viewModel.transform(input: input)
+        let output = viewModel.output
         
         output
             .nameValidation
@@ -154,7 +154,7 @@ where T.Input: EnterNameInputable & CTAButtonEnableInputable, T.Output: EnterNam
         // CTA버튼 클릭시 화면전환
         ctaButton
             .eventPublisher
-            .emit { [weak self] _ in self?.coordinator?.next() }
+            .subscribe { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
     }
     
