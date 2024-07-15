@@ -1,34 +1,35 @@
 //
-//  TextButtonType1.swift
+//  TextButtonType2.swift
 //  DSKit
 //
-//  Created by choijunios on 7/5/24.
+//  Created by choijunios on 7/15/24.
 //
 
 import UIKit
 import RxSwift
 import RxCocoa
 
-/// - 텍스트가 중앙에 배치된다.
+/// - 텍스트의 배치가 자유롭다.
+/// - 텍스트 필드처럼 볼더를 가진다.
 
-public class TextButtonType1: UIView {
+public class TextButtonType2: UIView {
     
     public private(set) var isEnabled: Bool = true
     
     private let textOriginColor: UIColor
     
-    lazy var label: ResizableUILabel = {
+    private lazy var label: IdleLabel = {
        
-        let view = ResizableUILabel()
+        let label = IdleLabel(typography: .Body3)
         
-        view.text = labelText
-        view.textColor = .white
-        view.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
-        view.textAlignment = .center
+        label.textString = labelText
+        label.attrTextColor = textOriginColor
+        label.textAlignment = .left
         
-        return view
+        return label
     }()
     
+    // Init values
     public let labelText: String
     
     private var tapGesture: UITapGestureRecognizer!
@@ -37,7 +38,7 @@ public class TextButtonType1: UIView {
     
     public init(
         labelText: String,
-        textOriginColor: UIColor = DSKitAsset.Colors.orange500.color
+        textOriginColor: UIColor = DSKitAsset.Colors.gray200.color
     ) {
         
         self.labelText = labelText
@@ -56,8 +57,12 @@ public class TextButtonType1: UIView {
     
     func setApearance() {
         
-        self.backgroundColor = DSKitAsset.Colors.orange500.color
+        self.backgroundColor = .white
         self.layer.cornerRadius = 6
+        self.layer.borderWidth = 1
+        self.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
+        
+        self.layoutMargins = .init(top: 10, left: 16, bottom: 10, right: 24)
     }
     
     func setAutoLayout() {
@@ -70,26 +75,25 @@ public class TextButtonType1: UIView {
         }
         
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            label.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
+            label.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            label.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
         ])
     }
     
     @objc
     func onTouchAction(_ tapGesture: UITapGestureRecognizer) {
         
-        self.backgroundColor = DSKitAsset.Colors.orange300.color
-        
-        UIView.animate(withDuration: 0.3) {
-            
-            self.backgroundColor = self.textOriginColor
-            self.layer.displayIfNeeded()
+        self.alpha = 0.5
+        UIView.animate(withDuration: 0.2) {
+            self.alpha = 1.0
         }
     }
 }
 
 // MARK: 활성상태
-extension TextButtonType1: DisablableComponent {
+extension TextButtonType2: DisablableComponent {
     
     public func setEnabled(_ isEnabled: Bool) {
         self.isEnabled = isEnabled

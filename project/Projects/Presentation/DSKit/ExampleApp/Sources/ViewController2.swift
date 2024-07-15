@@ -27,10 +27,12 @@ class ViewController2: UIViewController {
         let st1 = StateButtonTyp1(text: "여성", initial: .normal)
         let st2 = StateButtonTyp1(text: "남성", initial: .normal)
         
+        let type2Btn = TextButtonType2(labelText: "우편번호 찾으로 가기")
         
         [
             st1,
-            st2
+            st2,
+            type2Btn,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -46,6 +48,10 @@ class ViewController2: UIViewController {
             st2.heightAnchor.constraint(equalToConstant: 44),
             st2.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             st2.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            type2Btn.topAnchor.constraint(equalTo: st1.bottomAnchor),
+            type2Btn.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            type2Btn.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
     
