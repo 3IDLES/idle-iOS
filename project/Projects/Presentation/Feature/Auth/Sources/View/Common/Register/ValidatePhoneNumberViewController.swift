@@ -7,23 +7,24 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 import DSKit
 import PresentationCore
 
 public protocol AuthPhoneNumberInputable {
     
-    var editingPhoneNumber: Observable<String>? { get set }
-    var editingAuthNumber: Observable<String>? { get set }
-    var requestAuthForPhoneNumber: Observable<String>? { get set }
-    var requestValidationForAuthNumber: Observable<String>? { get set }
+    var editingPhoneNumber: PublishRelay<String?> { get set }
+    var editingAuthNumber: PublishRelay<String?> { get set }
+    var requestAuthForPhoneNumber: BehaviorRelay<String?> { get set }
+    var requestValidationForAuthNumber: PublishRelay<String?> { get set }
 }
 
 public protocol AuthPhoneNumberOutputable {
     
-    var canSubmitPhoneNumber: PublishSubject<Bool>? { get set }
-    var canSubmitAuthNumber: PublishSubject<Bool>? { get set }
-    var phoneNumberValidation: PublishSubject<(isValid: Bool, phoneNumber: String)>? { get set }
-    var authNumberValidation: PublishSubject<(isValid: Bool, authNumber: String)>? { get set }
+    var canSubmitPhoneNumber: PublishRelay<Bool?> { get set }
+    var canSubmitAuthNumber: PublishRelay<Bool?> { get set }
+    var phoneNumberValidation: PublishRelay<Bool?> { get set }
+    var authNumberValidation: PublishRelay<Bool?> { get set }
 }
 
 class ValidatePhoneNumberViewController<T: ViewModelType>: DisposableViewController
@@ -205,76 +206,66 @@ where
     private func setObservable() {
         
         // MARK: Input
-        var input = viewModel.input
+        let input = viewModel.input
         
         // 현재 입력중인 정보 전송
-        input.editingPhoneNumber = phoneNumberField.idleTextField.eventPublisher.asObservable()
-        input.editingAuthNumber = authNumberField.idleTextField.eventPublisher.asObservable()
+        phoneNumberField.idleTextField.textField.rx.text
+            .bind(to: input.editingPhoneNumber)
+            .disposed(by: disposeBag)
+        
+        authNumberField.idleTextField.textField.rx.text
+            .bind(to: input.editingAuthNumber)
+            .disposed(by: disposeBag)
         
         // 인증, 확인 버튼이 눌린 경우
-        input.requestAuthForPhoneNumber = phoneNumberField.eventPublisher.asObservable()
-        input.requestValidationForAuthNumber = authNumberField.eventPublisher.asObservable()
+        phoneNumberField
+            .eventPublisher
+            .bind(to: input.requestAuthForPhoneNumber)
+            .disposed(by: disposeBag)
+        
+        authNumberField
+            .eventPublisher
+            .bind(to: input.requestValidationForAuthNumber)
+            .disposed(by: disposeBag)
         
         // MARK: Output
         let output = viewModel.transform(input: input)
         
         // 입력중인 전화번호가 특정 조건(ex: 입력길이)을 만족한 경우 '인증'버튼 활성화
         output
-            .canSubmitPhoneNumber?
+            .canSubmitPhoneNumber
+            .compactMap { $0 }
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] in self?.phoneNumberField.button.setEnabled($0) })
             .disposed(by: disposeBag)
         
         // 입력중인 인증번호가 특정 조건(ex: 입력길이)을 만족한 경우 '확인'버튼 활성화
         output
-            .canSubmitAuthNumber?
+            .canSubmitAuthNumber
+            .compactMap { $0 }
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] in self?.authNumberField.button.setEnabled($0) })
             .disposed(by: disposeBag)
         
         // 휴대전화 인증의 시작
         output
-            .phoneNumberValidation?
-            .subscribe(onNext: { [weak self] (isValid, phoneNumber) in
-                
-                if isValid {
-                    // 인증이 사작된 경우
-                    printIfDebug("☑️ \(phoneNumber)의 인증을 시작합니다.")
-                    
-                    // 인증 텍스트 필드 활성화
-                    self?.authNumberField.idleTextField.setEnabled(true)
-                    self?.authNumberField.idleTextField.createTimer()
-                    self?.authNumberField.idleTextField.startTimer(minute: 5, seconds: 0)
-                }
+            .phoneNumberValidation
+            .compactMap { $0 }
+            .filter { $0 }
+            .subscribe(onNext: { [weak self] _ in
+                self?.activateAuthNumberField()
             })
             .disposed(by: disposeBag)
         
         // 인증번호 인증 성공여부
         output
-            .authNumberValidation?
-            .subscribe(onNext: { [weak self] (isValid, authNumber) in
-                
-                if isValid {
-                    // 인증번호 인증성공한 경우
-                    
-                    // 입력과 관려된 필드와 버튼 비활성화
-                    self?.phoneNumberField.idleTextField.setEnabled(false)
-                    self?.phoneNumberField.button.setEnabled(false)
-                    self?.authNumberField.idleTextField.setEnabled(false)
-                    self?.authNumberField.button.setEnabled(false)
-                    
-                    // 타이머 비활성화
-                    self?.authNumberField.idleTextField.removeTimer()
-                    
-                    // 인증 완료 텍스트
-                    self?.authSuccessText.isHidden = false
-                    
-                    // CTA버튼 활성화
-                    self?.ctaButton.setEnabled(true)
-                }
+            .authNumberValidation
+            .compactMap { $0 }
+            .filter { $0 }
+            .subscribe(onNext: { [weak self] _ in
+                self?.onAuthSuccess()
             })
             .disposed(by: disposeBag)
-        
         
         // MARK: ViewController한정 로직
         // CTA버튼 클릭시 화면전환
@@ -286,5 +277,34 @@ where
     
     func cleanUp() {
         
+    }
+}
+
+extension ValidatePhoneNumberViewController {
+    
+    func activateAuthNumberField() {
+        
+        // 인증 텍스트 필드 활성화
+        authNumberField.idleTextField.setEnabled(true)
+        authNumberField.idleTextField.createTimer()
+        authNumberField.idleTextField.startTimer(minute: 5, seconds: 0)
+    }
+    
+    func onAuthSuccess() {
+        
+        // 입력과 관려된 필드와 버튼 비활성화
+        phoneNumberField.idleTextField.setEnabled(false)
+        phoneNumberField.button.setEnabled(false)
+        authNumberField.idleTextField.setEnabled(false)
+        authNumberField.button.setEnabled(false)
+        
+        // 타이머 비활성화
+        authNumberField.idleTextField.removeTimer()
+        
+        // 인증 완료 텍스트
+        authSuccessText.isHidden = false
+        
+        // CTA버튼 활성화
+        ctaButton.setEnabled(true)
     }
 }
