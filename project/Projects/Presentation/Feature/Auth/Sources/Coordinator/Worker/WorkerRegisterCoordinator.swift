@@ -13,20 +13,11 @@ enum WorkerRegisterStage: Int {
     case phoneNumber=0
     case name=1
     case gender=2
-    case finish=3
+    case address=3
+    case finish=4
     
     var nextStage: Self? {
-        
-        switch self {
-        case .phoneNumber:
-            return .name
-        case .name:
-            return .gender
-        case .gender:
-            return .finish
-        default:
-            return nil
-        }
+        return .init(rawValue: rawValue+1)
     }
 }
 
@@ -104,6 +95,8 @@ extension WorkerRegisterCoordinator {
                 nameStage()
             case .gender:
                 genderStage()
+            case .address:
+                return
             case .finish:
                 authFinished()
             default:
@@ -137,6 +130,11 @@ extension WorkerRegisterCoordinator {
         showStage(viewController: viewController)
         
         currentStage = .gender
+    }
+    
+    func addressStage() {
+        
+        currentStage = .address
     }
     
     func showStage(viewController: UIViewController) {

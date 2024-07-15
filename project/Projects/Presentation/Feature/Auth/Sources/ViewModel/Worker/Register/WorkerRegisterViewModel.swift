@@ -156,8 +156,20 @@ public class WorkerRegisterViewModel: ViewModelType {
             }
             .bind(to: output.authNumberValidation)
         
+        // MARK: 주소 입력
+        _ = input
+            .editingPostalCode
+            .compactMap { $0 }
+            .map { [unowned self] postalCode in
+                self.stateObject.postalCode = postalCode
+            }
+        _ = input
+            .editingDetailAddress
+            .compactMap { $0 }
+            .map { [unowned self] detailAddress in
+                self.stateObject.detailAddress = detailAddress
+            }
     }
-    
 }
 
 extension WorkerRegisterViewModel {
@@ -199,6 +211,8 @@ extension WorkerRegisterViewModel {
         public var requestAuthForPhoneNumber: BehaviorRelay<String?> = .init(value: nil)
         public var requestValidationForAuthNumber: PublishRelay<String?> = .init()
         
+        public var editingPostalCode: PublishRelay<String?> = .init()
+        public var editingDetailAddress: PublishRelay<String?> = .init()
     }
     
     public class Output {
@@ -230,3 +244,6 @@ extension WorkerRegisterViewModel.Output: SelectGenderOutputable { }
 // Auth phoneNumber
 extension WorkerRegisterViewModel.Input: AuthPhoneNumberInputable { }
 extension WorkerRegisterViewModel.Output: AuthPhoneNumberOutputable { }
+
+// Postal code
+extension WorkerRegisterViewModel.Input: EnterAddressInputable { }

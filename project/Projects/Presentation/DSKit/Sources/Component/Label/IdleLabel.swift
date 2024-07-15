@@ -51,7 +51,7 @@ public class IdleLabel: UILabel {
         }
     }
     
-    public var attTextColor: UIColor {
+    public var attrTextColor: UIColor {
         get {
             return .black
         }

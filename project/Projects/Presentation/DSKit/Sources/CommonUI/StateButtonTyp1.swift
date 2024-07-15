@@ -95,7 +95,7 @@ public class StateButtonTyp1: UIView {
             self.backgroundColor = setting.backgroundColor
             
             label.typography = setting.typography
-            label.attTextColor = setting.textColor
+            label.attrTextColor = setting.textColor
         }
     }
 }
