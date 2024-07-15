@@ -27,29 +27,121 @@ public class CenterRegisterViewModel: ViewModelType {
     public init(
         inputValidationUseCase: AuthInputValidationUseCase,
         authUseCase: AuthUseCase) {
-        self.inputValidationUseCase = inputValidationUseCase
-        self.authUseCase = authUseCase
+            self.inputValidationUseCase = inputValidationUseCase
+            self.authUseCase = authUseCase
             
-        // MARK: 성함입력
-        
-        _ = input
-            .editingName
-            .compactMap({ $0 })
-            .map { [weak self] name in
-                
-                guard let self else { return (false, name) }
-                
-                let isValid = self.inputValidationUseCase.checkNameIsValid(name: name)
-                
-                if isValid {
-                    // 🚀 상태추적 🚀
-                    self.stateObject.name = name
+            // MARK: 성함입력
+            _ = input
+                .editingName
+                .compactMap({ $0 })
+                .map { [weak self] name in
+                    
+                    guard let self else { return (false, name) }
+                    
+                    let isValid = self.inputValidationUseCase.checkNameIsValid(name: name)
+                    
+                    if isValid {
+                        // 🚀 상태추적 🚀
+                        self.stateObject.name = name
+                    }
+                    
+                    return (isValid, name)
                 }
-                
-                return (isValid, name)
-            }
-            .bind(to: output.nameValidation)
-    }
+                .bind(to: output.nameValidation)
+            
+            // MARK: 전화번호 입력
+            _ = input
+                .editingPhoneNumber
+                .compactMap({ $0 })
+                .map({ [unowned self] phoneNumber in
+                    printIfDebug("[CenterRegisterViewModel] 전달받은 전화번호: \(phoneNumber)")
+                    return self.inputValidationUseCase.checkPhoneNumberIsValid(phoneNumber: phoneNumber)
+                })
+                .bind(to: output.canSubmitPhoneNumber)
+            
+            _ = input
+                .editingAuthNumber
+                .compactMap({ $0 })
+                .map({ authNumber in
+                    printIfDebug("[CenterRegisterViewModel] 전달받은 인증번호: \(authNumber)")
+                    return authNumber.count >= 6
+                })
+                .bind(to: output.canSubmitAuthNumber)
+            
+            let phoneNumberAuthRequestResult = input
+                .requestAuthForPhoneNumber
+                .compactMap({ $0 })
+                .flatMap({ [unowned self] number in
+                    let formatted = self.formatPhoneNumber(phoneNumber: number)
+                    
+                    // 상태추적
+                    self.stateObject.phoneNumber = formatted
+                    
+                    #if DEBUG
+                    print("✅ 디버그모드에서 번호인증 요청 무조건 통과")
+                    return Single.just(Result<Void, InputValidationError>.success(()))
+                    #endif
+                    
+                    return self.inputValidationUseCase.requestPhoneNumberAuthentication(phoneNumber: formatted)
+                })
+                .share()
+            
+            _ = phoneNumberAuthRequestResult
+                .compactMap { $0.value }
+                .map { _ in
+                    printIfDebug("✅ 번호로 인증을 시작합니다.")
+                    return true
+                }
+                .bind(to: output.phoneNumberValidation)
+            
+            _ = phoneNumberAuthRequestResult
+                .compactMap { $0.error }
+                .map { error in
+                    printIfDebug("❌ 인증을 시작할 수 없습니다. \n 에러내용: \(error.message)")
+                    return false
+                }
+                .bind(to: output.phoneNumberValidation)
+            
+            
+            let phoneNumberAuthResult = input.requestValidationForAuthNumber
+                .compactMap({ [unowned self] authNumber in
+                    if let phoneNumber = self.input.requestAuthForPhoneNumber.value, let authNumber {
+                        return (phoneNumber, authNumber)
+                    }
+                    return nil
+                })
+                .flatMap { [unowned self] (phoneNumber: String, authNumber: String) in
+                    
+                    #if DEBUG
+                    // 디버그시 인증번호 무조건 통과
+                    print("✅ 디버그모드에서 번호인증 무조건 통과")
+                    return Single.just(Result<Void, InputValidationError>.success(()))
+                    #endif
+                    
+                    return self.inputValidationUseCase
+                        .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
+                }
+                .share()
+            
+            // 번호인증 성공
+            _ = phoneNumberAuthResult
+                .compactMap { $0.value }
+                .map { _ in
+                    printIfDebug("✅ 인증성공")
+                    return true
+                }
+                .bind(to: output.authNumberValidation)
+        
+            // 번호인증 실패
+            _ = phoneNumberAuthResult
+                .compactMap { $0.error }
+                .map { error in
+                    printIfDebug("❌ 번호 인증실패 \n 에러내용: \(error.message)")
+                    return false
+                }
+                .bind(to: output.authNumberValidation)
+            
+        }
     
     deinit {
         printIfDebug("deinit \(Self.self)")
@@ -58,129 +150,6 @@ public class CenterRegisterViewModel: ViewModelType {
     let disposeBag = DisposeBag()
     
     public func transform(input: Input) -> Output {
-        
-        // MARK: 전화번호 입력
-        self.input
-            .editingPhoneNumber?
-            .subscribe(onNext: { [weak self] phoneNumber in
-                
-                printIfDebug("[CenterRegisterViewModel] 전달받은 전화번호: \(phoneNumber)")
-                
-                guard let self else { return }
-                
-                // 특정 조건 만족시
-                self.output.canSubmitPhoneNumber?.onNext(
-                    self.inputValidationUseCase.checkPhoneNumberIsValid(phoneNumber: phoneNumber)
-                )
-            })
-            .disposed(by: disposeBag)
-        
-        self.input
-            .editingAuthNumber?
-            .subscribe(onNext: { [weak self] authNumber in
-                
-                printIfDebug("[CenterRegisterViewModel] 전달받은 인증번호: \(authNumber)")
-                
-                self?.output.canSubmitAuthNumber?.onNext(authNumber.count >= 6)
-            })
-            .disposed(by: disposeBag)
-        
-        // 인증중인 전화번호를 캐치
-        let currentAuthenticatingNumber = PublishSubject<String>()
-        
-        self.input
-            .requestAuthForPhoneNumber?
-            .subscribe(onNext: { [weak self] phoneNumber in
-                
-                let s1 = phoneNumber.startIndex
-                let e1 = phoneNumber.index(s1, offsetBy: 3)
-                let s2 = e1
-                let e2 = phoneNumber.index(s2, offsetBy: 4)
-                let s3 = e2
-                let e3 = phoneNumber.index(s3, offsetBy: 4)
-               
-                let formattedString = [
-                    phoneNumber[s1..<e1],
-                    phoneNumber[s2..<e2],
-                    phoneNumber[s3..<e3]
-                ].joined(separator: "-")
-                
-                printIfDebug("[CenterRegisterViewModel] 전화번호 인증 요청: \(formattedString)")
-                
-                guard let self else { return }
-                
-                #if DEBUG
-                // 디버그시 번호 검사 무조건 통과
-                print("✅ 디버그모드에서 번호인증 요청 무조건 통과")
-                currentAuthenticatingNumber.onNext(formattedString)
-                self.output.phoneNumberValidation?.onNext((true, formattedString))
-                return
-                #endif
-                
-                self.inputValidationUseCase
-                    .requestPhoneNumberAuthentication(phoneNumber: formattedString)
-                    .subscribe { [weak self] result in
-                        switch result {
-                        case .success(_):
-                            printIfDebug("✅ \(formattedString)번호로 인증을 시작합니다.")
-                            currentAuthenticatingNumber.onNext(formattedString)
-                            
-                            self?.output.phoneNumberValidation?.onNext((true, formattedString))
-                        case .failure(let error):
-                            printIfDebug("❌ \(formattedString)번호로 인증을 시작할 수 없습니다. \n 에러내용: \(error.message)")
-                            
-                            // TODO: 에러처리
-                            
-                            self?.output.phoneNumberValidation?.onNext((false, formattedString))
-                            return
-                        }
-                    }
-                    .disposed(by: self.disposeBag)
-            })
-            .disposed(by: disposeBag)
-        
-        Observable
-            .combineLatest(
-                currentAuthenticatingNumber,
-                input.requestValidationForAuthNumber ?? .empty()
-            )
-            .subscribe(onNext: { [weak self] (phoneNumber, authNumber) in
-                
-                printIfDebug("[CenterRegisterViewModel] 인증번호 검증 요청: \n 유저입력 인증번호: \(authNumber) \n 전화번호: \(phoneNumber)")
-                
-                guard let self else { return }
-                
-                #if DEBUG
-                    // 디버그시 인증번호 무조건 통과
-                    print("✅ 디버그모드에서 인증번호 무조건 통과")
-                    self.output.authNumberValidation?.onNext((true, authNumber))
-                
-                    // ☑️ 상태추적 ☑️
-                    self.stateObject.phoneNumber = phoneNumber
-                    return
-                #endif
-                
-                self.inputValidationUseCase
-                    .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
-                    .subscribe { [weak self] result in
-                        switch result {
-                        case .success(_):
-                            printIfDebug("✅ \(phoneNumber)번호 인증성공")
-                            self?.output.authNumberValidation?.onNext((true, authNumber))
-                            // 🚀 상태추적 🚀
-                            self?.stateObject.phoneNumber = phoneNumber
-                        case .failure(let error):
-                            printIfDebug("❌ \(phoneNumber)번호 인증실패 \n 에러내용: \(error.message)")
-                            
-                            // TODO: 에러처리
-                            
-                            self?.output.authNumberValidation?.onNext((false, authNumber))
-                            return
-                        }
-                    }
-                    .disposed(by: self.disposeBag)
-            })
-            .disposed(by: disposeBag)
         
         // MARK: 사업자 번호 입력
         self.input
@@ -357,6 +326,26 @@ public class CenterRegisterViewModel: ViewModelType {
     }
 }
 
+extension CenterRegisterViewModel {
+    
+    func formatPhoneNumber(phoneNumber: String) -> String {
+        let s1 = phoneNumber.startIndex
+        let e1 = phoneNumber.index(s1, offsetBy: 3)
+        let s2 = e1
+        let e2 = phoneNumber.index(s2, offsetBy: 4)
+        let s3 = e2
+        let e3 = phoneNumber.index(s3, offsetBy: 4)
+       
+        let formattedString = [
+            phoneNumber[s1..<e1],
+            phoneNumber[s2..<e2],
+            phoneNumber[s3..<e3]
+        ].joined(separator: "-")
+        
+        return formattedString
+    }
+}
+
 // MARK: ViewModel input output
 extension CenterRegisterViewModel {
     
@@ -369,10 +358,10 @@ extension CenterRegisterViewModel {
         public var editingName: PublishRelay<String?> = .init()
         
         // 전화번호 입력
-        public var editingPhoneNumber: Observable<String>?
-        public var editingAuthNumber: Observable<String>?
-        public var requestAuthForPhoneNumber: Observable<String>?
-        public var requestValidationForAuthNumber: Observable<String>?
+        public var editingPhoneNumber: PublishRelay<String?> = .init()
+        public var editingAuthNumber: PublishRelay<String?> = .init()
+        public var requestAuthForPhoneNumber: BehaviorRelay<String?> = .init(value: nil)
+        public var requestValidationForAuthNumber: PublishRelay<String?> = .init()
         
         // 사업자 번호 입력
         public var editingBusinessNumber: Observable<String>?
@@ -391,10 +380,10 @@ extension CenterRegisterViewModel {
         public var nameValidation: PublishSubject<(isValid: Bool, name: String)> = .init()
         
         // 전화번호 입력
-        public var canSubmitPhoneNumber: PublishSubject<Bool>? = .init()
-        public var canSubmitAuthNumber: PublishSubject<Bool>? = .init()
-        public var phoneNumberValidation: PublishSubject<(isValid: Bool, phoneNumber: String)>? = .init()
-        public var authNumberValidation: PublishSubject<(isValid: Bool, authNumber: String)>? = .init()
+        public var canSubmitPhoneNumber: PublishRelay<Bool?> = .init()
+        public var canSubmitAuthNumber: PublishRelay<Bool?> = .init()
+        public var phoneNumberValidation: PublishRelay<Bool?> = .init()
+        public var authNumberValidation: PublishRelay<Bool?> = .init()
         
         // 사업자 번호 입력
         public var canSubmitBusinessNumber: PublishSubject<Bool>? = .init()

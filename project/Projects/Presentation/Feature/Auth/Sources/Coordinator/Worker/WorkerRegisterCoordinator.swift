@@ -53,7 +53,8 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
         
         self.stageViewControllers = [
             EnterNameViewController(coordinator: self, viewModel: viewModel),
-            SelectGenderViewController(coordinator: self, viewModel: viewModel)
+            SelectGenderViewController(coordinator: self, viewModel: viewModel),
+            ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
         ]
     }
     
