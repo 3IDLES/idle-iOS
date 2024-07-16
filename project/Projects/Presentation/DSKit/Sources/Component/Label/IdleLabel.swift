@@ -11,7 +11,9 @@ import RxCocoa
 public class IdleLabel: UILabel {
     
     private var currentTypography: Typography
+    private var currentTextColor: UIColor = DSKitAsset.Colors.gray900.color
     private var currentText: String = ""
+    private var currentLineCount: Int = 1
     
     public init(typography: Typography) {
         
@@ -28,7 +30,7 @@ public class IdleLabel: UILabel {
         
         let size = super.intrinsicContentSize
         
-        return CGSize(width: size.width, height: typography.lineHeight)
+        return CGSize(width: size.width, height: typography.lineHeight * CGFloat(currentLineCount))
     }
     
     public var typography: Typography {
@@ -53,10 +55,22 @@ public class IdleLabel: UILabel {
     
     public var attrTextColor: UIColor {
         get {
-            return .black
+            currentTextColor
         }
         set {
+            currentTextColor = newValue
             setAttr(attr: .foregroundColor, value: newValue)
+        }
+    }
+    
+    public override var numberOfLines: Int {
+        get {
+            super.numberOfLines
+        }
+        set {
+            super.numberOfLines = newValue
+            currentLineCount = newValue
+            self.invalidateIntrinsicContentSize()
         }
     }
     

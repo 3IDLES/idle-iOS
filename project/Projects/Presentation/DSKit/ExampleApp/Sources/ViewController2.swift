@@ -34,11 +34,32 @@ class ViewController2: UIViewController {
         idleTextField.layer.borderColor = UIColor.black.cgColor
         idleTextField.layer.borderWidth = 1
         
+        let btnStack = UIStackView()
+        
+        btnStack.axis = .horizontal
+        btnStack.spacing = 4
+        btnStack.distribution = .fillEqually
+        
+        [
+            TextImageButtonType1(
+                titleText: "센터 관리자로\n시작하기",
+                labelImage: UIImage()
+            ),
+            TextImageButtonType1(
+                titleText: "요양 보호사로\n시작하기",
+                labelImage: UIImage()
+            )
+        ].forEach {
+            btnStack.addArrangedSubview($0)
+        }
+        
+        
         [
             st1,
             st2,
             type2Btn,
-            idleTextField
+            idleTextField,
+            btnStack
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -62,6 +83,10 @@ class ViewController2: UIViewController {
             idleTextField.topAnchor.constraint(equalTo: type2Btn.bottomAnchor),
             idleTextField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             idleTextField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            btnStack.topAnchor.constraint(equalTo: idleTextField.bottomAnchor),
+            btnStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            btnStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
     

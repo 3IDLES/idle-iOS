@@ -9,8 +9,8 @@ import Foundation
 
 public enum AuthType {
     
-    case agent
-    case agency
+    case worker
+    case center
 }
 
 public protocol AuthCoordinatable: ParentCoordinator {
