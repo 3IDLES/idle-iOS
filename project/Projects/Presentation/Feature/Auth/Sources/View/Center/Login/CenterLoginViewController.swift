@@ -165,19 +165,18 @@ public class CenterLoginViewController: DisposableViewController {
         setKeyboardAvoidance()
         
         // MARK: Input
-        var input = viewModel.input
+        let input = viewModel.input
         
-        let inputPublisher = Observable
+        // 로그인 버튼 활성화
+        let loginInput = Observable
             .combineLatest(
                 idField.eventPublisher,
                 passwordField.eventPublisher
             )
         
-        // 로그인 버튼 활성화 옵저버블
-        inputPublisher
-            .map({ (id, pw) in
-                
-                return !(id.isEmpty || pw.isEmpty)
+        loginInput
+            .map({
+                !($0.isEmpty || $1.isEmpty)
             })
             .subscribe(onNext: { [weak self] canLogin in
                 
@@ -186,7 +185,7 @@ public class CenterLoginViewController: DisposableViewController {
             .disposed(by: disposeBag)
         
         // 로그인 버튼 눌렀을 때
-        let loginPublisher = ctaButton.eventPublisher
+        ctaButton.eventPublisher
             .map { [weak self] _ in
                 
                 let id = self?.idField.uITextField.text ?? ""
@@ -194,23 +193,22 @@ public class CenterLoginViewController: DisposableViewController {
                 
                 return (id: id, pw: pw)
             }
-            
-        input.loginButtonPressed = loginPublisher.asObservable()
+            .bind(to: input.loginButtonPressed)
+            .disposed(by: disposeBag)
         
-        // MARK: Output
-        let output = viewModel.transform(input: input)
+        
+        let output = viewModel.output
         
         // 로그인 시도 결과 전송
         output
-            .loginValidation?
+            .loginValidation
+            .compactMap { $0 }
             .subscribe(onNext: { [weak self] isSuccess in
-                
                 if isSuccess {
                     self?.onLoginSucceed()
                 } else {
                     self?.onLoginFailed()
                 }
-                
             })
             .disposed(by: disposeBag)
         
@@ -234,8 +232,8 @@ public class CenterLoginViewController: DisposableViewController {
                 textField.layer.borderColor = DSKitColors.Color.red.cgColor
             }
         
-        // 메인화면으로 이동
-        coordinator?.parent?.authFinished()
+        // Alert
+        
     }
     
     private func onLoginSucceed() {
