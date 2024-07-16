@@ -98,7 +98,7 @@ public class DaumAddressSearchViewController: Conformance {
         navigationBar
             .eventPublisher
             .subscribe { [unowned self] _ in
-                self.dismiss(animated: true)
+                self.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
     }

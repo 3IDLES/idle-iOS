@@ -20,7 +20,7 @@ public extension UseCaseBase {
                 .subscribe { success in
                     single(.success(.success(success)))
                 } onFailure: { error in
-                    single(.failure(errorClosure(error)))
+                    single(.success(.failure(errorClosure(error))))
                 }
             return Disposables.create { disposable.dispose() }
         }

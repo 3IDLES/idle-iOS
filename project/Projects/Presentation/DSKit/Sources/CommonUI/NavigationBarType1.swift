@@ -11,6 +11,9 @@ import RxCocoa
 
 public class NavigationBarType1: UIStackView {
     
+    // Observable
+    public let eventPublisher: PublishRelay<Void> = .init()
+    
     // Init parameters
     public let navigationTitle: String
     
@@ -27,9 +30,6 @@ public class NavigationBarType1: UIStackView {
         
         return btn
     }()
-    
-    // Observable
-    public let eventPublisher: PublishRelay<Void> = .init()
     
     private lazy var titleText: ResizableUILabel = {
         
