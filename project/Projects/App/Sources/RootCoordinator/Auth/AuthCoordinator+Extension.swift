@@ -13,7 +13,7 @@ extension AuthCoordinator: AuthCoordinatable {
     public func auth(type: AuthType) {
         
         switch type {
-        case .agent:
+        case .worker:
             
             let coordinator = WorkerAuthCoordinator(
                 dependency: .init(
@@ -28,7 +28,7 @@ extension AuthCoordinator: AuthCoordinatable {
             
             coordinator.start()
             
-        case .agency:
+        case .center:
             
             let coordinator = CenterAuthCoorinator(
                 dependency: .init(

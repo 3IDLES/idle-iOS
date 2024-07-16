@@ -39,13 +39,13 @@ public class SelectAuthTypeCoordinator: ChildCoordinator {
 
 extension SelectAuthTypeCoordinator {
     
-    func authAgent() {
+    func authWorker() {
         
-        parent?.auth(type: .agent)
+        parent?.auth(type: .worker)
     }
     
-    func authAgency() {
+    func authCenter() {
         
-        parent?.auth(type: .agency)
+        parent?.auth(type: .center)
     }
 }
