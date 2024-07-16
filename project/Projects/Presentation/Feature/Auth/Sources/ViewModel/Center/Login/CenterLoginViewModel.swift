@@ -6,6 +6,7 @@
 //
 
 import RxSwift
+import RxCocoa
 import UseCaseInterface
 import PresentationCore
 
@@ -17,44 +18,42 @@ public class CenterLoginViewModel: ViewModelType {
     public var input: Input = .init()
     public var output: Output = .init()
     
-    private let disposeBag = DisposeBag()
-    
     public init(authUseCase: AuthUseCase) {
         self.authUseCase = authUseCase
+        
+        setObservable()
     }
     
     deinit {
         printIfDebug("deinit \(Self.self)")
     }
     
-    public func transform(input: Input) -> Output {
+    private func setObservable() {
         
-        input
-            .loginButtonPressed?
-            .subscribe { [weak self] (id, pw) in
-                
-                guard let self else { return }
-                
+        let loginResult = input
+            .loginButtonPressed
+            .compactMap { $0 }
+            .flatMap { [unowned self] (id, pw) in
                 self.authUseCase
                     .loginCenterAccount(id: id, password: pw)
-                    .subscribe { [weak self] result in
-                        
-                        switch result {
-                        case .success(_):
-                            printIfDebug("✅ 로그인 성공")
-                            self?.output.loginValidation?.onNext(true)
-                        case .failure(let error):
-                            printIfDebug("❌ 로그인 실패, 에러내용: \(error.message)")
-                            self?.output.loginValidation?.onNext(false)
-                        }
-                    }
-                    .disposed(by: self.disposeBag)
-                
             }
-            .disposed(by: disposeBag)
-            
+            .share()
         
-        return self.output
+        _ = loginResult
+            .compactMap { $0.value }
+            .map { _ in
+                printIfDebug("✅ 로그인 성공")
+                return true
+            }
+            .bind(to: output.loginValidation)
+        
+        _ = loginResult
+            .compactMap { $0.error }
+            .map { error in
+                printIfDebug("❌ 로그인 실패, 에러내용: \(error.message)")
+                return false
+            }
+            .bind(to: output.loginValidation)
     }
 }
 
@@ -63,12 +62,12 @@ public extension CenterLoginViewModel {
     
     struct Input {
         
-        public var loginButtonPressed: Observable<(id: String, pw: String)>?
+        public var loginButtonPressed: PublishRelay<(id: String, pw: String)?> = .init()
         
     }
     
     struct Output {
         
-        public var loginValidation: PublishSubject<Bool>? = .init()
+        public var loginValidation: PublishSubject<Bool?> = .init()
     }
 }
