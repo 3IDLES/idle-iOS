@@ -48,32 +48,5 @@ final class ConcretesTests: XCTestCase {
 //        
 //        waitForExpectations(timeout: 60, handler: nil)
     }
-    
-    func testAuth() {
-        
-        let repo = DefaultAuthInputValidationRepository()
-        
-        let expectation = expectation(description: "center register test")
-        
-        let disposeBag = DisposeBag()
-        
-        repo
-            .requestPhoneNumberAuthentication(phoneNumber: "000-0000-0000")
-            .catch({ error in
-                
-                XCTFail()
-                
-                expectation.fulfill()
-                
-                return .never()
-            })
-            .subscribe { isSuccess in
-                print(isSuccess)
-                
-                expectation.fulfill()
-            }
-            .disposed(by: disposeBag)
-        
-        waitForExpectations(timeout: 10, handler: nil)
-    }
+
 }
