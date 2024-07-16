@@ -64,7 +64,7 @@ class ViewController: UIViewController {
         let ctaButton1 = CTAButtonType1(labelText: "이전")
         ctaButton1
             .eventPublisher
-            .emit(onNext: { _ in
+            .subscribe(onNext: { _ in
                 
                 processStatusBar.moveToSignal.onNext(.prev)
             })
@@ -74,7 +74,7 @@ class ViewController: UIViewController {
         let ctaButton2 = CTAButtonType1(labelText: "다음")
         ctaButton2
             .eventPublisher
-            .emit(onNext: { _ in
+            .subscribe(onNext: { _ in
                 
                 processStatusBar.moveToSignal.onNext(.next)
             })
@@ -100,12 +100,12 @@ class ViewController: UIViewController {
         NSLayoutConstraint.activate([
 
             navBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navBar.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            navBar.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            navBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            navBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
                                      
             processStatusBar.topAnchor.constraint(equalTo: navBar.bottomAnchor),
-            processStatusBar.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            processStatusBar.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            processStatusBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            processStatusBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             
             iFType1.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             iFType1.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),

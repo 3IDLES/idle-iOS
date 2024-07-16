@@ -7,6 +7,8 @@
 
 import UIKit
 import DSKit
+import RxCocoa
+import RxSwift
 import PresentationCore
 
 class WorkerRegisterViewController: DisposableViewController {
@@ -15,51 +17,97 @@ class WorkerRegisterViewController: DisposableViewController {
     
     var pageViewController: UIPageViewController
     
-    lazy var nextButton = ButtonPrototype(text: "다음") { [weak self] in
-        
-        self?.coordinator?.next()
-    }
+    let pageCount: Int
     
-    init(pageViewController: UIPageViewController) {
+    // View
+    let navigationBar: NavigationBarType1 = {
+        let bar = NavigationBarType1(
+            navigationTitle: "요양보호사 회원가입"
+        )
+        return bar
+    }()
+    
+    lazy var statusBar: ProcessStatusBar = {
+        
+        let view = ProcessStatusBar(
+            processCount: pageCount,
+            startIndex: 0
+        )
+        return view
+    }()
+    
+    private let disposeBag = DisposeBag()
+    
+    init(
+        pageCount: Int,
+        pageViewController: UIPageViewController
+    ) {
         
         self.pageViewController = pageViewController
+        self.pageCount = pageCount
         
         super.init(nibName: nil, bundle: nil)
         
         addChild(pageViewController)
+        
+        setAppearance()
+        setAutoLayout()
+        setObservable()
     }
     
     required init?(coder: NSCoder) { fatalError() }
     
-    override func viewDidLoad() {
+    func setAppearance() {
         
         view.backgroundColor = .white
-        
-        let statusView = UILabel()
-        
-        statusView.textColor = .black
-        statusView.text = "스테이터스 바"
+    }
+    
+    func setAutoLayout() {
         
         [
-            statusView,
-            pageViewController.view
+            navigationBar,
+            statusBar,
+            pageViewController.view,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-        
-            statusView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            statusView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            statusView.heightAnchor.constraint(equalToConstant: 100),
             
-            pageViewController.view.topAnchor.constraint(equalTo: statusView.bottomAnchor),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
+            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
+            
+            statusBar.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 7),
+            statusBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            statusBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            pageViewController.view.topAnchor.constraint(equalTo: statusBar.bottomAnchor, constant: 32),
             pageViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             pageViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            pageViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            pageViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
     }
+    
+    func setObservable() {
+        navigationBar
+            .eventPublisher
+            .subscribe { [weak self] _ in
+                self?.coordinator?.prev()
+            }
+            .disposed(by: disposeBag)
+        
+        NotificationCenter.default.rx
+            .notification(.workerRegisterProcess)
+            .compactMap({ $0.userInfo?["move"] as? String })
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] move in
+                self?.statusBar.moveToSignal.onNext(move == "next" ? .next : .prev)
+            })
+            .disposed(by: disposeBag)
+    }
+    
     
     func cleanUp() {
         

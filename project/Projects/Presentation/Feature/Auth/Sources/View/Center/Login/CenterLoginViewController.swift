@@ -62,7 +62,7 @@ public class CenterLoginViewController: DisposableViewController {
         
         label.text = "비밀번호를 다시 확인해 주세요"
         label.font = DSKitFontFamily.Pretendard.medium.font(size: 12)
-        label.textColor = .red
+        label.textColor = DSKitColors.Color.red
         label.isHidden = true
         
         return label
@@ -231,7 +231,7 @@ public class CenterLoginViewController: DisposableViewController {
         passwordField
             .idleTextField
             .onCustomState { textField in
-                textField.layer.borderColor = UIColor.red.cgColor
+                textField.layer.borderColor = DSKitColors.Color.red.cgColor
             }
         
         // 메인화면으로 이동
@@ -249,7 +249,6 @@ public class CenterLoginViewController: DisposableViewController {
         
         coordinator?.parent?.authFinished()
     }
-    
     
     public func cleanUp() {
         

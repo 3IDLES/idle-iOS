@@ -10,15 +10,12 @@ import PresentationCore
 
 enum WorkerRegisterStage: Int {
     
-    case phoneNumber=0
+    case registerFinished=0
     case name=1
     case gender=2
-    case address=3
-    case finish=4
-    
-    var nextStage: Self? {
-        return .init(rawValue: rawValue+1)
-    }
+    case phoneNumber=3
+    case address=4
+    case finish=5
 }
 
 public class WorkerRegisterCoordinator: ChildCoordinator {
@@ -33,7 +30,7 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
     
     var stageViewControllers: [DisposableViewController] = []
     
-    var currentStage: WorkerRegisterStage?
+    private var currentStage: WorkerRegisterStage!
     
     public init(
         navigationController: UINavigationController,
@@ -65,6 +62,7 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
         self.pageViewController = pageViewController
         
         let viewController = WorkerRegisterViewController(
+            pageCount: stageViewControllers.count,
             pageViewController: pageViewController
         )
         
@@ -74,12 +72,14 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
         
         navigationController.pushViewController(viewController, animated: true)
         
-        phoneNumberStage()
+        excuteStage(.name, moveTo: .next)
     }
 
     public func coordinatorDidFinish() {
         
         viewControllerRef?.cleanUp()
+        
+        stageViewControllers = []
         
         parent?.removeChildCoordinator(self)
     }
@@ -87,64 +87,49 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
 
 extension WorkerRegisterCoordinator {
     
+    enum MoveTo {
+        case next
+        case prev
+    }
+    
     public func next() {
-        
-        if let nextStage = currentStage?.nextStage {
-            
-            switch nextStage {
-            case .name:
-                nameStage()
-            case .gender:
-                genderStage()
-            case .address:
-                addressStage()
-            case .finish:
-                authFinished()
-            default:
-                return
-            }
+        if let nextStage = WorkerRegisterStage(rawValue: currentStage.rawValue+1) {
+            excuteStage(nextStage, moveTo: .next)
+            NotificationCenter.default.post(name: .workerRegisterProcess, object: nil, userInfo: [
+                "move": "next"
+            ])
         }
     }
     
-    func phoneNumberStage() {
-        
-        let viewController = stageViewControllers[WorkerRegisterStage.phoneNumber.rawValue]
-        
-        showStage(viewController: viewController)
-        
-        currentStage = .phoneNumber
+    public func prev() {
+        if let prevStage = WorkerRegisterStage(rawValue: currentStage.rawValue-1) {
+            excuteStage(prevStage, moveTo: .prev)
+            NotificationCenter.default.post(name: .workerRegisterProcess, object: nil, userInfo: [
+                "move": "prev"
+            ])
+        }
     }
     
-    func nameStage() {
-        
-        let viewController = stageViewControllers[WorkerRegisterStage.name.rawValue]
-
-        showStage(viewController: viewController)
-        
-        currentStage = .name
+    private func excuteStage(_ stage: WorkerRegisterStage, moveTo: MoveTo) {
+        currentStage = stage
+        switch stage {
+        case .registerFinished:
+            registerFinished()
+        case .finish:
+            authFinished()
+        default:
+            let vc = stageViewControllers[stage.rawValue-1]
+            showStage(viewController: vc, moveTo: moveTo)
+        }
     }
     
-    func genderStage() {
+    func showStage(viewController: UIViewController, moveTo: MoveTo) {
         
-        let viewController = stageViewControllers[WorkerRegisterStage.gender.rawValue]
-        
-        showStage(viewController: viewController)
-        
-        currentStage = .gender
-    }
-    
-    func addressStage() {
-        
-        let viewController = stageViewControllers[WorkerRegisterStage.address.rawValue]
-
-        showStage(viewController: viewController)
-        
-        currentStage = .address
-    }
-    
-    func showStage(viewController: UIViewController) {
-        
-        pageViewController?.setViewControllers([viewController], direction: .forward, animated: true)
+        pageViewController?.setViewControllers(
+            [viewController],
+            direction: moveTo == .next ? .forward : .reverse,
+            animated: true
+        )
     }
     
     func authFinished() {
@@ -153,4 +138,15 @@ extension WorkerRegisterCoordinator {
         
         parent?.authFinished()
     }
+    
+    func registerFinished() {
+        stageViewControllers = []
+        popViewController()
+        parent?.removeChildCoordinator(self)
+    }
+}
+
+extension Notification.Name {
+    
+    static let workerRegisterProcess: Self = .init(rawValue: "workerRegisterProcess")
 }

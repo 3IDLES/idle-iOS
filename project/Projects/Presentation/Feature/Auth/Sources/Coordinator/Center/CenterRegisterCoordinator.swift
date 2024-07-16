@@ -10,27 +10,12 @@ import PresentationCore
 
 enum CenterRegisterStage: Int {
     
-    case name=0
-    case phoneNumber=1
-    case businessOwner=2
-    case idPassword=3
-    case finish=4
-    
-    var nextStage: Self? {
-        
-        switch self {
-        case .name:
-            return .phoneNumber
-        case .phoneNumber:
-            return .businessOwner
-        case .businessOwner:
-            return .idPassword
-        case .idPassword:
-            return .finish
-        default:
-            return nil
-        }
-    }
+    case registerFinished=0
+    case name=1
+    case phoneNumber=2
+    case businessOwner=3
+    case idPassword=4
+    case finish=5
 }
 
 public class CenterRegisterCoordinator: ChildCoordinator {
@@ -45,7 +30,7 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
     var stageViewControllers: [DisposableViewController] = []
     
-    private var currentStage: CenterRegisterStage?
+    private var currentStage: CenterRegisterStage!
     
     public init(
         viewModel: CenterRegisterViewModel,
@@ -75,6 +60,7 @@ public class CenterRegisterCoordinator: ChildCoordinator {
         self.pageViewController = pageViewController
         
         let viewController = CenterRegisterViewController(
+            pageCount: stageViewControllers.count,
             pageViewController: pageViewController
         )
         
@@ -84,7 +70,7 @@ public class CenterRegisterCoordinator: ChildCoordinator {
         
         navigationController.pushViewController(viewController, animated: true)
         
-        enterName()
+        excuteStage(.name, moveTo: .next)
     }
     
     public func coordinatorDidFinish() {
@@ -101,66 +87,49 @@ public class CenterRegisterCoordinator: ChildCoordinator {
 
 extension CenterRegisterCoordinator {
     
+    enum MoveTo {
+        case next
+        case prev
+    }
+    
     public func next() {
-        
-        if let nextStage = currentStage?.nextStage {
-            
-            switch nextStage {
-            case .name:
-                enterName()
-            case .phoneNumber:
-                authPhoneNumber()
-            case .businessOwner:
-                authBusinessOwner()
-            case .idPassword:
-                setIdPassword()
-            case .finish:
-                authFinished()
-            default:
-                return
-            }
+        if let nextStage = CenterRegisterStage(rawValue: currentStage.rawValue+1) {
+            excuteStage(nextStage, moveTo: .next)
+            NotificationCenter.default.post(name: .centerRegisterProcess, object: nil, userInfo: [
+                "move": "next"
+            ])
         }
     }
     
-    func authPhoneNumber() {
-        
-        let viewController = stageViewControllers[CenterRegisterStage.phoneNumber.rawValue]
-        
-        showStage(viewController: viewController)
-        
-        currentStage = .phoneNumber
+    public func prev() {
+        if let prevStage = CenterRegisterStage(rawValue: currentStage.rawValue-1) {
+            excuteStage(prevStage, moveTo: .prev)
+            NotificationCenter.default.post(name: .centerRegisterProcess, object: nil, userInfo: [
+                "move": "prev"
+            ])
+        }
     }
     
-    func enterName() {
-        
-        let viewController = stageViewControllers[CenterRegisterStage.name.rawValue]
-        
-        showStage(viewController: viewController)
-        
-        currentStage = .name
+    private func excuteStage(_ stage: CenterRegisterStage, moveTo: MoveTo) {
+        currentStage = stage
+        switch stage {
+        case .registerFinished:
+            registerFinished()
+        case .finish:
+            authFinished()
+        default:
+            let vc = stageViewControllers[stage.rawValue-1]
+            showStage(viewController: vc, moveTo: moveTo)
+        }
     }
     
-    func authBusinessOwner() {
+    func showStage(viewController: UIViewController, moveTo: MoveTo) {
         
-        let viewController = stageViewControllers[CenterRegisterStage.businessOwner.rawValue]
-        
-        showStage(viewController: viewController)
-        
-        currentStage = .businessOwner
-    }
-    
-    func setIdPassword() {
-        
-        let viewController = stageViewControllers[CenterRegisterStage.idPassword.rawValue]
-        
-        showStage(viewController: viewController)
-        
-        currentStage = .idPassword
-    }
-    
-    func showStage(viewController: UIViewController) {
-        
-        pageViewController?.setViewControllers([viewController], direction: .forward, animated: true)
+        pageViewController?.setViewControllers(
+            [viewController],
+            direction: moveTo == .next ? .forward : .reverse,
+            animated: true
+        )
     }
     
     func authFinished() {
@@ -169,4 +138,15 @@ extension CenterRegisterCoordinator {
         
         parent?.authFinished()
     }
+    
+    func registerFinished() {
+        stageViewControllers = []
+        popViewController()
+        parent?.removeChildCoordinator(self)
+    }
+}
+
+extension Notification.Name {
+    
+    static let centerRegisterProcess: Self = .init(rawValue: "centerRegisterProcess")
 }

@@ -36,10 +36,10 @@ extension CenterRegisterViewModel {
         
         _ = registerValidation
             .compactMap { $0.error }
-            .map({ error in
+            .map { error in
                 printIfDebug("❌ 회원가입 실패: \(error.message)")
                 return false
-            })
+            }
             .bind(to: output.registerValidation)
     }
 }
