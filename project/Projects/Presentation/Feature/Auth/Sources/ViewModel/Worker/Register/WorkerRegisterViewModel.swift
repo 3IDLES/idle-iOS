@@ -106,18 +106,15 @@ public class WorkerRegisterViewModel: ViewModelType {
             .map { [weak self] phoneNumber in
                 printIfDebug("✅ 번호로 인증을 시작합니다.")
                 self?.stateObject.phoneNumber = phoneNumber
-                return true
+                self?.output.phoneNumberValidation.accept(true)
             }
-            .bind(to: output.phoneNumberValidation)
         
         _ = phoneNumberAuthRequestResult
             .compactMap { $0.error }
-            .map { error in
+            .map { [weak self] error in
                 printIfDebug("❌ 인증을 시작할 수 없습니다. \n 에러내용: \(error.message)")
-                return false
+                self?.output.phoneNumberValidation.accept(false)
             }
-            .bind(to: output.phoneNumberValidation)
-        
         
         let phoneNumberAuthResult = input.requestValidationForAuthNumber
             .compactMap({ [weak self] authNumber in
@@ -142,20 +139,18 @@ public class WorkerRegisterViewModel: ViewModelType {
         // 번호인증 성공
         _ = phoneNumberAuthResult
             .compactMap { $0.value }
-            .map { _ in
+            .map { [weak self] _ in
                 printIfDebug("✅ 인증성공")
-                return true
+                self?.output.authNumberValidation.accept(true)
             }
-            .bind(to: output.authNumberValidation)
     
         // 번호인증 실패
         _ = phoneNumberAuthResult
             .compactMap { $0.error }
-            .map { error in
+            .map { [weak self] error in
                 printIfDebug("❌ 번호 인증실패 \n 에러내용: \(error.message)")
-                return false
+                self?.output.authNumberValidation.accept(false)
             }
-            .bind(to: output.authNumberValidation)
         
         // MARK: 주소 입력
         _ = input
@@ -185,20 +180,17 @@ public class WorkerRegisterViewModel: ViewModelType {
         
         _ = registerValidation
             .compactMap { $0.value }
-            .map {
+            .map { [weak self] in
                 print("✅ 회원가입 성공")
-                return true
+                self?.output.registerValidation.accept(true)
             }
-            .bind(to: output.registerValidation)
         
         _ = registerValidation
             .compactMap { $0.error }
-            .map({ error in
+            .map { [weak self] error in
                 print("❌ 회원가입 실패 \n 에러내용: \(error.message)")
-                return false
-            })
-            .bind(to: output.registerValidation)
-            
+                self?.output.registerValidation.accept(false)
+            }
     }
 }
 

@@ -44,20 +44,10 @@ extension CenterAuthCoorinator: CenterAuthCoordinatable {
     
     func login() {
         
+        let viewModel = injector.resolve(CenterLoginViewModel.self)
+        
         let coordinator = CenterLoginCoordinator(
-            viewModel: injector.resolve(CenterLoginViewModel.self),
-            navigationController: navigationController
-        )
-        
-        coordinator.parent = self
-        addChildCoordinator(coordinator)
-        
-        coordinator.start()
-    }
-    
-    func findPassword() {
-        
-        let coordinator = CenterFindPasswordCoordinator(
+            viewModel: viewModel,
             navigationController: navigationController
         )
         
@@ -69,7 +59,10 @@ extension CenterAuthCoorinator: CenterAuthCoordinatable {
     
     func setNewPassword() {
         
+        let viewModel = injector.resolve(CenterSetNewPasswordViewModel.self)
+        
         let coordinator = CenterSetNewPasswordCoordinator(
+            viewModel: viewModel,
             navigationController: navigationController
         )
         
@@ -86,7 +79,6 @@ extension CenterAuthCoorinator: CenterAuthCoordinatable {
         let coordinator = CenterRegisterCoordinator(viewModel: viewModel, navigationController: navigationController)
         
         coordinator.parent = self
-        
         addChildCoordinator(coordinator)
         
         coordinator.start()

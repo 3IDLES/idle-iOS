@@ -68,18 +68,14 @@ public class CenterLoginViewController: DisposableViewController {
         return label
     }()
     
-    private let forgotPasswordButton: UIButton = {
+    private let forgotPasswordButton: TextButtonType3 = {
         
-        let button = UIButton()
+        let button = TextButtonType3(typography: .Body2)
         
-        let text = "비밀번호가 기억나지 않나요?"
-        
-        let attributedText = NSAttributedString(string: text, attributes: [
-            .font : DSKitFontFamily.Pretendard.medium.font(size: 14),
-            .foregroundColor : DSKitAsset.Colors.gray500.color.cgColor,
-            .underlineStyle : NSUnderlineStyle.single.rawValue
-        ])
-        button.setAttributedTitle(attributedText, for: .normal)
+        button.textString = "비밀번호가 기억나지 않나요?"
+        button.attrTextColor = DSKitAsset.Colors.gray500.color
+        button.setAttr(attr: .underlineStyle, value: NSUnderlineStyle.single.rawValue)
+        button.setAttr(attr: .underlineColor, value: DSKitAsset.Colors.gray500.color)
         
         return button
     }()
@@ -113,7 +109,7 @@ public class CenterLoginViewController: DisposableViewController {
     private func setAppearance() {
         
         view.backgroundColor = .white
-        view.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
+        view.layoutMargins = .init(top: 0, left: 20, bottom: 16, right: 20)
     }
     
     private func setAutoLayout() {
@@ -168,23 +164,17 @@ public class CenterLoginViewController: DisposableViewController {
         let input = viewModel.input
         
         // 로그인 버튼 활성화
-        let loginInput = Observable
+        Observable
             .combineLatest(
                 idField.eventPublisher,
                 passwordField.eventPublisher
             )
-        
-        loginInput
-            .map({
-                !($0.isEmpty || $1.isEmpty)
-            })
-            .subscribe(onNext: { [weak self] canLogin in
-                
-                self?.ctaButton.setEnabled(canLogin)
+            .subscribe(onNext: { [weak self] in
+                self?.ctaButton.setEnabled(!($0.isEmpty || $1.isEmpty))
             })
             .disposed(by: disposeBag)
         
-        // 로그인 버튼 눌렀을 때
+        // 로그인 버튼 눌림
         ctaButton.eventPublisher
             .map { [weak self] _ in
                 
@@ -196,10 +186,9 @@ public class CenterLoginViewController: DisposableViewController {
             .bind(to: input.loginButtonPressed)
             .disposed(by: disposeBag)
         
-        
         let output = viewModel.output
         
-        // 로그인 시도 결과 전송
+        // 로그인 시도 결과 수신
         output
             .loginValidation
             .compactMap { $0 }
@@ -212,13 +201,18 @@ public class CenterLoginViewController: DisposableViewController {
             })
             .disposed(by: disposeBag)
         
-        
-        // MARK: ViewController only
+        // MARK: ViewController 내부에서 진행되는 로직
         navigationBar
             .eventPublisher
             .subscribe { [weak self] _ in
-                
                 self?.coordinator?.coordinatorDidFinish()
+            }
+            .disposed(by: disposeBag)
+        
+        forgotPasswordButton
+            .eventPublisher
+            .emit { [weak self] _ in
+                self?.coordinator?.parent?.setNewPassword()
             }
             .disposed(by: disposeBag)
     }

@@ -16,7 +16,7 @@ public class CenterLoginCoordinator: ChildCoordinator {
     
     public var parent: CenterAuthCoordinatable?
     
-    private var viewModel: CenterLoginViewModel?
+    private var viewModel: CenterLoginViewModel
     
     public init(
         viewModel: CenterLoginViewModel,
@@ -32,17 +32,33 @@ public class CenterLoginCoordinator: ChildCoordinator {
         
         let viewController = CenterLoginViewController(
             coordinator: self,
-            viewModel: self.viewModel!
+            viewModel: viewModel
         )
-        
-        self.viewModel = nil
         viewControllerRef = viewController
         navigationController.pushViewController(viewController, animated: true)
     }
     
     public func coordinatorDidFinish() {
-        
         popViewController()
         parent?.removeChildCoordinator(self)
+    }
+}
+
+extension CenterLoginCoordinator {
+    
+    /// 비밀번호 변경창을 종료한 경우
+    func findPasswordFinished() {
+        popViewController()
+    }
+    
+    /// 로그인창을 종료한 경우
+    func loginFinished() {
+        popViewController()
+        parent?.removeChildCoordinator(self)
+    }
+    
+    /// Auth가 종료된 경우
+    func authFinished() {
+        parent?.authFinished()
     }
 }

@@ -147,7 +147,7 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Enter
 //            stack3.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
 //            stack3.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            ctaButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            ctaButton.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
             ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])

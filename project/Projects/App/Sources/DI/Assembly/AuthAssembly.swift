@@ -30,5 +30,16 @@ public struct AuthAssembly: Assembly {
                 authUseCase: authUseCase
             )
         }
+        
+        container.register(CenterSetNewPasswordViewModel.self) { resolver in
+            
+            let authUseCase = resolver.resolve(AuthUseCase.self)!
+            let inputValidationUseCase = resolver.resolve(AuthInputValidationUseCase.self)!
+            
+            return CenterSetNewPasswordViewModel(
+                authUseCase: authUseCase,
+                inputValidationUseCase: inputValidationUseCase
+            )
+        }
     }
 }
