@@ -124,7 +124,6 @@ extension CenterRegisterCoordinator {
     }
     
     func showStage(viewController: UIViewController, moveTo: MoveTo) {
-        
         pageViewController?.setViewControllers(
             [viewController],
             direction: moveTo == .next ? .forward : .reverse,
@@ -133,9 +132,7 @@ extension CenterRegisterCoordinator {
     }
     
     func authFinished() {
-        
         stageViewControllers = []
-        
         parent?.authFinished()
     }
     

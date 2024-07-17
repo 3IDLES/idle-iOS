@@ -11,6 +11,7 @@ import RxCocoa
 public class IdleLabel: UILabel {
     
     private var currentTypography: Typography
+    private var currentAttributes: Typography.Attrubutes
     private var currentTextColor: UIColor = DSKitAsset.Colors.gray900.color
     private var currentText: String = ""
     private var currentLineCount: Int = 1
@@ -18,6 +19,7 @@ public class IdleLabel: UILabel {
     public init(typography: Typography) {
         
         self.currentTypography = typography
+        self.currentAttributes = currentTypography.attributes
         
         super.init(frame: .zero)
         
@@ -74,11 +76,11 @@ public class IdleLabel: UILabel {
         }
     }
     
-    private func setAttr(attr: NSAttributedString.Key, value: Any) {
+    public func setAttr(attr: NSAttributedString.Key, value: Any) {
         let newAttr: [NSAttributedString.Key: Any] = [attr: value]
-        let newAttrs = newAttr.merging(typography.attributes) { first, _ in first }
+        currentAttributes = newAttr.merging(currentAttributes) { first, _ in first }
         
-        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: newAttrs))
+        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: currentAttributes))
         invalidateIntrinsicContentSize()
     }
     

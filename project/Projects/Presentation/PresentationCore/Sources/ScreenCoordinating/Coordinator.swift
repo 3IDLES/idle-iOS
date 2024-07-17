@@ -14,6 +14,7 @@ public protocol Coordinator: AnyObject {
     
     func start()
     func next()
+    func prev()
     func popViewController(animated: Bool)
 }
 
@@ -25,6 +26,7 @@ public extension Coordinator {
     }
     
     func next() { }
+    func prev() { }
 }
 
 // MARK: ParentCoordinator

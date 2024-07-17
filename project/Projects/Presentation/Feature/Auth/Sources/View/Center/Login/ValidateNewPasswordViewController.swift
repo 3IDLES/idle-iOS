@@ -1,84 +1,39 @@
 //
-//  SetIdPasswordViewController.swift
+//  ValidateNewPasswordViewController.swift
 //  AuthFeature
 //
-//  Created by choijunios on 7/1/24.
+//  Created by choijunios on 7/16/24.
 //
 
 import UIKit
-import Entity
 import DSKit
-import RxSwift
 import RxCocoa
+import RxSwift
 import PresentationCore
 
-public protocol SetIdInputable {
-    var editingId: PublishRelay<String?> { get set }
-    var requestIdDuplicationValidation: PublishRelay<String?> { get set }
+public protocol ChangePasswordSuccessInputable {
+    var changePasswordButtonClicked: PublishRelay<Void?> { get }
 }
 
-public protocol SetPasswordInputable {
-    var editingPassword: PublishRelay<(pwd: String, cpwd: String)?> { get set }
+public protocol ChangePasswordSuccessOutputable {
+    var changePasswordSuccessValidation: PublishRelay<Bool?> { get }
 }
 
-public protocol SetIdOutputable {
-    
-    var canCheckIdDuplication: PublishRelay<Bool?> { get set }
-    var idDuplicationValidation: PublishRelay<String?> { get set }
-}
-
-public protocol SetPasswordOutputable {
-    
-    var passwordValidation: PublishRelay<PasswordValidationState?> { get set }
-}
-
-class SetIdPasswordViewController<T: ViewModelType>: DisposableViewController
-where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
-      T.Output: SetIdOutputable & SetPasswordOutputable & RegisterSuccessOutputable {
-    
-    var coordinator: CenterRegisterCoordinator?
+class ValidateNewPasswordViewController<T: ViewModelType>: DisposableViewController
+where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
+      T.Output: SetPasswordOutputable & ChangePasswordSuccessOutputable {
     
     private let viewModel: T
+    
+    var coordinator: Coordinator?
     
     // View
     private let processTitle: ResizableUILabel = {
        
         let label = ResizableUILabel()
         
-        label.text = "아이디와 비밀번호를 설정해주세요."
+        label.text = "새로운 비밀번호를 입력해주세요."
         label.font = DSKitFontFamily.Pretendard.bold.font(size: 20)
-        label.textAlignment = .left
-        
-        return label
-    }()
-    
-    // MARK: Id 입력
-    private let idLabel: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
-        label.text = "아이디 설정"
-        label.textAlignment = .left
-        
-        return label
-    }()
-    private let idField: IFType1 = {
-        
-       let textField = IFType1(
-        placeHolderText: "아이디를 입력해주세요",
-        submitButtonText: "중복 확인"
-       )
-        
-        textField.idleTextField.isCompleteImageAvailable = false
-        
-        return textField
-    }()
-    private let thisIsValidIdLabel: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 12)
-        label.text = "사용 가능한 아이디입니다."
-        label.textColor = DSKitAsset.Colors.gray300.color
         label.textAlignment = .left
         
         return label
@@ -141,7 +96,7 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
     
     private let disposeBag = DisposeBag()
     
-    public init(coordinator: CenterRegisterCoordinator?, viewModel: T) {
+    public init(coordinator: Coordinator, viewModel: T) {
         
         self.coordinator = coordinator
         self.viewModel = viewModel
@@ -170,9 +125,6 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
         
         [
             processTitle,
-            idLabel,
-            idField,
-            thisIsValidIdLabel,
             passwordLabel,
             passwordField,
             thisIsValidPasswordLabel,
@@ -190,19 +142,7 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
             processTitle.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             processTitle.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            idLabel.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            idLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            idLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            
-            idField.topAnchor.constraint(equalTo: idLabel.bottomAnchor, constant: 4),
-            idField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            idField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            
-            thisIsValidIdLabel.topAnchor.constraint(equalTo: idField.bottomAnchor, constant: 6),
-            thisIsValidIdLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            thisIsValidIdLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            
-            passwordLabel.topAnchor.constraint(equalTo: idField.bottomAnchor, constant: 32),
+            passwordLabel.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
             passwordLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             passwordLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
@@ -230,25 +170,16 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
     
     private func initialUISettuing() {
         
-        idField.button.setEnabled(false)
-        
-        thisIsValidIdLabel.isHidden = true
         thisIsValidPasswordLabel.isHidden = true
         
         // - CTA버튼 비활성화
         ctaButton.setEnabled(false)
     }
     
-    private func setObservable() {
+    func setObservable() {
         
         // MARK: Input
         let input = viewModel.input
-        
-        // 현재 입력중인 정보 전송
-        idField.idleTextField.textField.rx.text
-            .bind(to: input.editingId)
-            .disposed(by: disposeBag)
-        
         
         Observable
             .combineLatest(
@@ -261,112 +192,49 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
         
         ctaButton
             .eventPublisher
-            .bind(to: input.ctaButtonClicked)
+            .map { [weak self] _ in
+                self?.ctaButton.setEnabled(false)
+            }
+            .bind(to: input.changePasswordButtonClicked)
             .disposed(by: disposeBag)
         
-        // id 중복확인 요청 버튼
-        idField.eventPublisher
-            .map { [weak self] in
-                // 증복검사 실행시 아이디 입력 필드 비활성화
-                self?.idField.idleTextField.setEnabled(false)
-                self?.idField.button.setEnabled(false)
-                return $0
-            }
-            .bind(to: input.requestIdDuplicationValidation)
-            .disposed(by: disposeBag)
         
         // MARK: Output
         let output = viewModel.output
         
-        // 중복확인이 가능한 아이디인가?
-        output
-            .canCheckIdDuplication
-            .compactMap { $0 }
-            .subscribe(onNext: { [weak self] in
-                self?.idField.button.setEnabled($0)
-            })
-            .disposed(by: disposeBag)
-        
-        // 아이디 중복확인 결과
-        let idDuplicationValidation = output
-            .idDuplicationValidation
-            .compactMap { [weak self] checkedId in
-                // 아이디 입력 필드 활성화
-                self?.idField.idleTextField.setEnabled(true)
-                return checkedId
-            }
-        
-        // 중복검사를 통과한 아이디와 입력창의 아이디가 일치하는지 확인한다.
-        let finalIdValidation = Observable
-            .combineLatest(
-                idField.idleTextField.eventPublisher,
-                idDuplicationValidation
-            )
-            .observe(on: MainScheduler.instance)
-            .map { [weak self] (editingId, validId) in
-                let isValid = editingId == validId
-                self?.thisIsValidIdLabel.isHidden = !isValid
-                return isValid
-            }
-
         // 비밀번호 검증
-        let finalPaswordValidation = output
+        output
             .passwordValidation
             .compactMap { $0 }
-            .map({ [weak self] validationState in
+            .subscribe(onNext: { [weak self] validationState in
                 switch validationState {
-                    
                 case .invalidPassword:
-                    printIfDebug("❌ 비밀번호가 유효하지 않습니다.")
                     self?.onPasswordUnMatched()
-                    return false
                 case .unMatch:
-                    printIfDebug("☑️ 비밀번호가 일치하지 않습니다.")
                     self?.onPasswordUnMatched()
-                    return false
                 case .match:
-                    printIfDebug("✅ 비밀번호가 일치합니다.")
                     self?.onPasswordMatched()
                     self?.ctaButton.setEnabled(true)
-                    return true
                 }
             })
-        
-        // id, password 유효성 검사
-        Observable
-            .combineLatest(
-                finalIdValidation,
-                finalPaswordValidation
-            )
-            .map { $0 && $1 }
-            .subscribe(onNext: { [weak self] in self?.ctaButton.setEnabled($0) })
             .disposed(by: disposeBag)
-        
         
         output
-            .registerValidation
+            .changePasswordSuccessValidation
             .compactMap { $0 }
-            .subscribe { [weak self] isSuccess in
+            .subscribe (onNext: { [weak self] isSuccess in
+                
                 if isSuccess {
-                    // 회원가입 성공
+                    // 비밀번호 변경 성공
                     self?.coordinator?.next()
+                    
                 } else {
-                    // 회원가입실패
+                    // 비밀번호 변경 실패
                     self?.ctaButton.setEnabled(true)
                 }
-            }
+            })
             .disposed(by: disposeBag)
     
-        
-        // MARK: ViewController한정 로직
-        // CTA버튼 클릭시 버튼 비활성화
-        ctaButton
-            .eventPublisher
-            .subscribe { [weak self] _ in
-                
-                self?.ctaButton.setEnabled(false)
-            }
-            .disposed(by: disposeBag)
     }
     
     private func onPasswordMatched() {

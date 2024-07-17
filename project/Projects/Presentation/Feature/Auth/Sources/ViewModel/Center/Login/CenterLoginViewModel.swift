@@ -8,6 +8,7 @@
 import RxSwift
 import RxCocoa
 import UseCaseInterface
+import Entity
 import PresentationCore
 
 public class CenterLoginViewModel: ViewModelType {
@@ -17,6 +18,8 @@ public class CenterLoginViewModel: ViewModelType {
     
     public var input: Input = .init()
     public var output: Output = .init()
+    
+    var validPassword: String?
     
     public init(authUseCase: AuthUseCase) {
         self.authUseCase = authUseCase
@@ -28,7 +31,7 @@ public class CenterLoginViewModel: ViewModelType {
         printIfDebug("deinit \(Self.self)")
     }
     
-    private func setObservable() {
+    func setObservable() {
         
         let loginResult = input
             .loginButtonPressed
@@ -41,33 +44,31 @@ public class CenterLoginViewModel: ViewModelType {
         
         _ = loginResult
             .compactMap { $0.value }
-            .map { _ in
+            .map { [weak self] _ in
                 printIfDebug("✅ 로그인 성공")
-                return true
+                
+                self?.output.loginValidation.accept(true)
             }
-            .bind(to: output.loginValidation)
         
         _ = loginResult
             .compactMap { $0.error }
-            .map { error in
+            .map { [weak self] error in
                 printIfDebug("❌ 로그인 실패, 에러내용: \(error.message)")
-                return false
+                
+                self?.output.loginValidation.accept(false)
             }
-            .bind(to: output.loginValidation)
     }
 }
 
-
 public extension CenterLoginViewModel {
     
-    struct Input {
+    class Input {
         
         public var loginButtonPressed: PublishRelay<(id: String, pw: String)?> = .init()
-        
     }
     
-    struct Output {
+    class Output {
         
-        public var loginValidation: PublishSubject<Bool?> = .init()
+        public var loginValidation: PublishRelay<Bool?> = .init()
     }
 }

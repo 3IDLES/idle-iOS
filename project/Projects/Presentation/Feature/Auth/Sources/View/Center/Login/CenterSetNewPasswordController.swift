@@ -7,49 +7,85 @@
 
 import UIKit
 import DSKit
+import RxSwift
+import RxCocoa
 import PresentationCore
-
-
 
 class CenterSetNewPasswordController: DisposableViewController {
     
-    private lazy var setNewPasswordButton = ButtonPrototype(text: "새로운 비밀번호 설정완료") { [weak self] in
-        
-        self?.coordinator?.parent?.authFinished()
-    }
+    // Init
+    var pageViewController: UIPageViewController
+    
+    let pageCount: Int
     
     var coordinator: CenterSetNewPasswordCoordinator?
     
+    let disposeBag = DisposeBag()
+    
+    public init(pageViewController: UIPageViewController, pageCount: Int) {
+        self.pageViewController = pageViewController
+        self.pageCount = pageCount
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        setAppearance()
+        setAutoLayout()
+        setObservable()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // View
+    private let navigationBar: NavigationBarType1 = {
+       
+        let bar = NavigationBarType1(
+            navigationTitle: "신규 비밀번호 발급"
+        )
+        return bar
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+    }
+    
+    private func setAppearance() {
         view.backgroundColor = .white
-        view.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
-        
-        let title = UILabel()
-        title.text = "비밀번호 재설정"
-        title.font = .boldSystemFont(ofSize: 24)
+        view.layoutMargins = .init(top: 0, left: 20, bottom: 16, right: 20)   
+    }
+    
+    func setAutoLayout() {
         
         [
-            title,
-            setNewPasswordButton,
+            navigationBar,
+            pageViewController.view,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
         
-        
         NSLayoutConstraint.activate([
-        
-            // 등록 버튼
-            setNewPasswordButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            setNewPasswordButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            setNewPasswordButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            // 타이틀
-            title.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            title.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
+            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
+            
+            pageViewController.view.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 64),
+            pageViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            pageViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            pageViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
         ])
+    }
+    
+    func setObservable() {
+        
+        navigationBar
+            .eventPublisher
+            .subscribe { [weak self] _ in
+                self?.coordinator?.prev()
+            }
+            .disposed(by: disposeBag)
     }
     
     func cleanUp() {

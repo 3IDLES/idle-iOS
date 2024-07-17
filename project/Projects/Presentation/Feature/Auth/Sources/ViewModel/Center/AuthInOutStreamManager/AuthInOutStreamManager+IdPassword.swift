@@ -1,5 +1,5 @@
 //
-//  CenterRegisterViewModel+Extension5.swift
+//  AuthInOutStreamManager+IdPassword.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/15/24.
@@ -11,24 +11,32 @@ import RxCocoa
 import PresentationCore
 import UseCaseInterface
 import Entity
-extension CenterRegisterViewModel {
+
+
+extension AuthInOutStreamManager {
     
-    func IdPasswordInOut() {
+    static func idInOut(
+        input: SetIdInputable & AnyObject,
+        output: SetIdOutputable & AnyObject,
+        useCase: AuthInputValidationUseCase,
+        stateTracker: @escaping (String) -> ()
+    ) {
         
-        // MARK: Id & Password
+        // MARK: Id
         _ = input
             .editingId
             .compactMap { $0 }
-            .map({ [unowned self] id in
-                self.inputValidationUseCase.checkIdIsValid(id: id)
+            .map({ [unowned useCase, output] id in
+                output.canCheckIdDuplication.accept(
+                    useCase.checkIdIsValid(id: id)
+                )
             })
-            .bind(to: output.canCheckIdDuplication)
         
         // 중복성 검사
         let idDuplicationValidation = input
             .requestIdDuplicationValidation
             .compactMap { $0 }
-            .flatMap { [unowned self] id in
+            .flatMap { [unowned useCase] id in
                 
                 printIfDebug("[CenterRegisterViewModel] 중복성 검사 대상 id: \(id)")
                 
@@ -36,51 +44,58 @@ extension CenterRegisterViewModel {
                 // 디버그시 아이디 중복체크 미실시
                 print("✅ 디버그모드에서 아이디 중복검사 미실시")
                 // ☑️ 상태추적 ☑️
-                self.stateObject.id = id
+                stateTracker(id)
                 return Single.just(Result<String, InputValidationError>.success(id))
                 #endif
                 
-                return self.inputValidationUseCase.requestCheckingIdDuplication(id: id)
+                return useCase.requestCheckingIdDuplication(id: id)
             }
             .share()
         
         _ = idDuplicationValidation
             .compactMap { $0.value }
-            .map { [weak self] validId in
+            .map { [weak output] validId in
                 printIfDebug("[CenterRegisterViewModel] \(validId) 중복체크 결과: ✅ 성공")
                 // 🚀 상태추적 🚀
-                self?.stateObject.id = validId
-                return validId
+                stateTracker(validId)
+                output?.idDuplicationValidation.accept(validId)
             }
-            .bind(to: output.idDuplicationValidation)
         
         _ = idDuplicationValidation
             .compactMap { $0.error }
-            .map({ error in
+            .map({ [weak output] error in
                 printIfDebug("❌ 아이디중복검사 실패 \n 에러내용: \(error.message)")
-                return nil
+                output?.idDuplicationValidation.accept(nil)
             })
-            .bind(to: output.idDuplicationValidation)
-        
-        
+    }
+    
+    static func passwordInOut(
+        input: SetPasswordInputable & AnyObject,
+        output: SetPasswordOutputable & AnyObject,
+        useCase: AuthInputValidationUseCase,
+        stateTracker: @escaping (String) -> ()) {
+            
         _ = input.editingPassword
             .compactMap { $0 }
-            .map { [unowned self] (pwd, cpwd) in
-                
+            .map { [unowned useCase] (pwd, cpwd) in
+                    
                 printIfDebug("[CenterRegisterViewModel] \n 입력중인 비밀번호: \(pwd) \n 확인 비밀번호: \(cpwd)")
-                
-                let isValid = self.inputValidationUseCase.checkPasswordIsValid(password: pwd)
-                
+                    
+                let isValid = useCase.checkPasswordIsValid(password: pwd)
                 if !isValid {
+                    printIfDebug("❌ 비밀번호가 유효하지 않습니다.")
                     return PasswordValidationState.invalidPassword
                 } else if pwd != cpwd {
+                    printIfDebug("☑️ 비밀번호가 일치하지 않습니다.")
                     return PasswordValidationState.unMatch
                 } else {
-                    // 🚀 상태추적 🚀
-                    self.stateObject.password = pwd
+                    printIfDebug("✅ 비밀번호가 일치합니다.")
+                    stateTracker(pwd)
                     return PasswordValidationState.match
                 }
             }
-            .bind(to: output.passwordValidation)
+            .map { [weak output] result in
+                output?.passwordValidation.accept(result)
+            }
     }
 }

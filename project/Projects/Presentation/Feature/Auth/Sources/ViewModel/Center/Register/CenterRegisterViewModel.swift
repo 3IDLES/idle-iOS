@@ -30,53 +30,46 @@ public class CenterRegisterViewModel: ViewModelType {
             self.inputValidationUseCase = inputValidationUseCase
             self.authUseCase = authUseCase
             
-            enterNameInOut()
-            validatePhoneNumberInOut()
+            AuthInOutStreamManager.enterNameInOut(
+                input: input,
+                output: output,
+                useCase: inputValidationUseCase) { [weak self] validName in
+                    // 🚀 상태추적 🚀
+                    self?.stateObject.name = validName
+                }
+            
+            AuthInOutStreamManager.validatePhoneNumberInOut(
+                input: input,
+                output: output,
+                useCase: inputValidationUseCase) { [weak self] authedPhoneNumber in
+                    // 🚀 상태추적 🚀
+                    self?.stateObject.phoneNumber = authedPhoneNumber
+                }
+            
+            // viewmodel native
             registerInOut()
             validateBusinessNumberInOut()
-            IdPasswordInOut()
-    }
+            
+            
+            AuthInOutStreamManager.idInOut(
+                input: input,
+                output: output,
+                useCase: inputValidationUseCase) { [weak self] validId in
+                    // 🚀 상태추적 🚀
+                    self?.stateObject.id = validId
+                }
+            
+            AuthInOutStreamManager.passwordInOut(
+                input: input,
+                output: output,
+                useCase: inputValidationUseCase) { [weak self] validPassword in
+                    // 🚀 상태추적 🚀
+                    self?.stateObject.password = validPassword
+                }
+        }
     
     deinit {
         printIfDebug("deinit \(Self.self)")
-    }
-}
-
-extension CenterRegisterViewModel {
-    
-    func formatPhoneNumber(phoneNumber: String) -> String {
-        let s1 = phoneNumber.startIndex
-        let e1 = phoneNumber.index(s1, offsetBy: 3)
-        let s2 = e1
-        let e2 = phoneNumber.index(s2, offsetBy: 4)
-        let s3 = e2
-        let e3 = phoneNumber.index(s3, offsetBy: 4)
-       
-        let formattedString = [
-            phoneNumber[s1..<e1],
-            phoneNumber[s2..<e2],
-            phoneNumber[s3..<e3]
-        ].joined(separator: "-")
-        
-        return formattedString
-    }
-    
-    func formatBusinessNumber(businessNumber: String) -> String {
-        
-        let s1 = businessNumber.startIndex
-        let e1 = businessNumber.index(s1, offsetBy: 3)
-        let s2 = e1
-        let e2 = businessNumber.index(s2, offsetBy: 2)
-        let s3 = e2
-        let e3 = businessNumber.index(s3, offsetBy: 5)
-       
-        let formattedString = [
-            businessNumber[s1..<e1],
-            businessNumber[s2..<e2],
-            businessNumber[s3..<e3]
-        ].joined(separator: "-")
-        
-        return formattedString
     }
 }
 
@@ -101,10 +94,12 @@ extension CenterRegisterViewModel {
         public var editingBusinessNumber: PublishRelay<String?> = .init()
         public var requestBusinessNumberValidation: PublishRelay<String?> = .init()
         
-        // Id & password
+        // Id
         public var editingId: PublishRelay<String?> = .init()
-        public var editingPassword: PublishRelay<(pwd: String, cpwd: String)?> = .init()
         public var requestIdDuplicationValidation: PublishRelay<String?> = .init()
+        
+        // Password
+        public var editingPassword: PublishRelay<(pwd: String, cpwd: String)?> = .init()
     }
     
     public class Output {
@@ -122,15 +117,91 @@ extension CenterRegisterViewModel {
         public var canSubmitBusinessNumber: PublishRelay<Bool?> = .init()
         public var businessNumberValidation: PublishRelay<BusinessInfoVO?> = .init()
         
-        // Id & password
+        // Id
         public var canCheckIdDuplication: PublishRelay<Bool?> = .init()
         public var idDuplicationValidation: PublishRelay<String?> = .init()
+        
+        // Password
         public var passwordValidation: PublishRelay<PasswordValidationState?> = .init()
         
         // Register success
         public var registerValidation: PublishRelay<Bool?> = .init()
     }
 }
+
+extension CenterRegisterViewModel {
+    
+    func registerInOut() {
+        // MARK: 최종 회원가입 버튼
+        let registerValidation = input
+            .ctaButtonClicked
+            .compactMap({ $0 })
+            .flatMap { [unowned self] _ in
+                self.authUseCase
+                    .registerCenterAccount(registerState: self.stateObject)
+            }
+            .share()
+        
+        _ = registerValidation
+            .compactMap { $0.value }
+            .map { [unowned self] _ in
+                printIfDebug("[CenterRegisterViewModel] ✅ 회원가입 성공 \n 가임정보 \(self.stateObject.description)")
+                self.stateObject.clear()
+                self.output.registerValidation.accept(true)
+            }
+        
+        _ = registerValidation
+            .compactMap { $0.error }
+            .map({ error in
+                printIfDebug("❌ 회원가입 실패: \(error.message)")
+                self.output.registerValidation.accept(false)
+            })
+    }
+}
+
+extension CenterRegisterViewModel {
+    
+    func validateBusinessNumberInOut() {
+        // MARK: 사업자 번호 입력
+        _ = input
+            .editingBusinessNumber
+            .compactMap { $0 }
+            .map({ [unowned self] businessNumber in
+                self.inputValidationUseCase.checkBusinessNumberIsValid(businessNumber: businessNumber)
+            })
+            .bind(to: output.canSubmitBusinessNumber)
+        
+        let businessNumberValidationResult = input
+            .requestBusinessNumberValidation
+            .compactMap { $0 }
+            .flatMap({ [unowned self] businessNumber in
+                let formatted = AuthInOutStreamManager.formatBusinessNumber(businessNumber: businessNumber)
+                printIfDebug("[CenterRegisterViewModel] 사업자 번호 인증 요청: \(formatted)")
+                return self.inputValidationUseCase
+                    .requestBusinessNumberAuthentication(businessNumber: formatted)
+            })
+            .share()
+        
+        _ = businessNumberValidationResult
+            .compactMap { $0.value }
+            .map({ [weak self] (businessNumber, infoVO) in
+                printIfDebug("✅ 사업자번호 검색 성공")
+                // 🚀 상태추적 🚀
+                self?.stateObject.businessNumber = businessNumber
+                self?.output.businessNumberValidation.accept(infoVO)
+            })
+        
+        
+        _ = businessNumberValidationResult
+            .compactMap { $0.error }
+            .map({ [weak self] error in
+                printIfDebug("❌ 사업자번호 검색실패 \n 에러내용: \(error.message)")
+                self?.output.businessNumberValidation.accept(nil)
+            })
+    }
+
+}
+
 
 // MARK: Input Validation
 
@@ -150,8 +221,10 @@ extension CenterRegisterViewModel.Input: AuthBusinessOwnerInputable { }
 extension CenterRegisterViewModel.Output: AuthBusinessOwnerOutputable { }
 
 // Id & Password
-extension CenterRegisterViewModel.Input: SetIdPasswordInputable { }
-extension CenterRegisterViewModel.Output: SetIdPasswordOutputable { }
+extension CenterRegisterViewModel.Input: SetIdInputable { }
+extension CenterRegisterViewModel.Output: SetIdOutputable { }
+extension CenterRegisterViewModel.Input: SetPasswordInputable { }
+extension CenterRegisterViewModel.Output: SetPasswordOutputable { }
 
 // Register
 extension CenterRegisterViewModel.Output: RegisterSuccessOutputable { }
