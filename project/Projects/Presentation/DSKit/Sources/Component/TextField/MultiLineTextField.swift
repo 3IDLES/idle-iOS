@@ -26,6 +26,8 @@ public class MultiLineTextField: UITextView {
         }
     }
     
+    private let disposeBag = DisposeBag()
+    
     public init(typography: Typography, placeholderText: String = "") {
         self.placeholderText = placeholderText
         self.typography = typography
@@ -37,11 +39,6 @@ public class MultiLineTextField: UITextView {
     }
     
     required init?(coder: NSCoder) { fatalError() }
-    
-    public override var intrinsicContentSize: CGSize {
-        .init(width: super.intrinsicContentSize.width, height: 156)
-    }
-    
     
     func setAppearance() {
         // Delegate
@@ -61,6 +58,32 @@ public class MultiLineTextField: UITextView {
         
         // Scroll
         self.isScrollEnabled = true
+    }
+    
+    public func addToolbar() {
+        // TextField toolbar
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        
+        // flexibleSpace 추가
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        
+        let closeButton = UIBarButtonItem()
+        closeButton.title = "완료"
+        closeButton.style = .done
+        toolbar.setItems([
+            flexibleSpace,
+            closeButton
+        ], animated: false)
+        toolbar.isUserInteractionEnabled = true
+        
+        self.inputAccessoryView = toolbar
+        
+        closeButton.rx.tap.subscribe { [weak self] _ in
+            
+            self?.resignFirstResponder()
+        }
+        .disposed(by: disposeBag)
     }
     
     private func updateText() {

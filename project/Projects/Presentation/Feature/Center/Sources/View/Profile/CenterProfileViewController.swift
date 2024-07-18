@@ -17,6 +17,8 @@ public protocol CenterProfileViewModelable where Input: CenterProfileInputable, 
     associatedtype Output
     var input: Input { get }
     var output: Output? { get }
+    
+    func requestData()
 }
 
 public protocol CenterProfileInputable {
@@ -38,7 +40,7 @@ public protocol CenterProfileOutputable {
     var alert: Driver<DefaultAlertContentVO> { get }
 }
 
-public class CenterProfileViewController: DisposableViewController  {
+public class CenterProfileViewController: DisposableViewController {
     
     var viewModel: (any CenterProfileViewModelable)?
     
@@ -99,10 +101,14 @@ public class CenterProfileViewController: DisposableViewController  {
         return label
     }()
     /// 센터 전화번호를 편집할 수 있는 텍스트 필드
-    let centerPhoneNumeberField: IdleOneLineInputField = {
-        let field = IdleOneLineInputField(placeHolderText: "")
-        
-        return field
+    let centerPhoneNumeberField: MultiLineTextField = {
+        let textView = MultiLineTextField(
+            typography: .Body3,
+            placeholderText: "추가적으로 요구사항이 있다면 작성해주세요."
+        )
+        textView.textContainerInset = .init(top: 10, left: 16, bottom: 10, right: 24)
+        textView.isScrollEnabled = false
+        return textView
     }()
     
     /// ☑️ "센토 소개" 라벨 ☑️
@@ -144,10 +150,13 @@ public class CenterProfileViewController: DisposableViewController  {
     let centerImageEditButton: UIButton = {
         let btn = UIButton()
         btn.setImage(DSKitAsset.Icons.editPhoto.image, for: .normal)
+        btn.isUserInteractionEnabled = true
         return btn
     }()
     
     let edtingImage: PublishRelay<UIImage> = .init()
+    
+    let disposeBag = DisposeBag()
     
     public init() {
         
@@ -155,6 +164,7 @@ public class CenterProfileViewController: DisposableViewController  {
         
         setApearance()
         setAutoLayout()
+        setObservable()
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -216,8 +226,8 @@ public class CenterProfileViewController: DisposableViewController  {
         )
         
         // 센터 이미지뷰 세팅
-        centerImageView.addSubview(centerImageEditButton)
-        centerImageEditButton.translatesAutoresizingMaskIntoConstraints = false
+//        centerImageView.addSubview(centerImageEditButton)
+//        centerImageEditButton.translatesAutoresizingMaskIntoConstraints = false
         
         let scrollView = UIScrollView()
         
@@ -238,7 +248,8 @@ public class CenterProfileViewController: DisposableViewController  {
             centerIntroductionStack,
             
             centerPictureLabel,
-            centerImageView
+            centerImageView,
+            centerImageEditButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             scrollView.addSubview($0)
@@ -274,10 +285,13 @@ public class CenterProfileViewController: DisposableViewController  {
             
             centerImageEditButton.widthAnchor.constraint(equalToConstant: 28),
             centerImageEditButton.heightAnchor.constraint(equalTo: centerImageEditButton.widthAnchor),
+            
+            centerIntroductionTextView.heightAnchor.constraint(equalToConstant: 156),
         ])
         
         let contentGuide = scrollView.contentLayoutGuide
         scrollView.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
+        scrollView.delaysContentTouches = false
         
         // 스크롤 뷰의 서브뷰
         NSLayoutConstraint.activate([
@@ -322,7 +336,15 @@ public class CenterProfileViewController: DisposableViewController  {
         ])
     }
     
-    let disposBag = DisposeBag()
+    func setObservable() {
+        
+        centerImageEditButton
+            .rx.tap
+            .subscribe { [weak self] _ in
+                self?.showPhotoGalley()
+            }
+            .disposed(by: disposeBag)
+    }
     
     public func bind(viewModel: any CenterProfileViewModelable) {
         
@@ -334,26 +356,26 @@ public class CenterProfileViewController: DisposableViewController  {
         profileEditButton
             .eventPublisher
             .bind(to: input.editingButtonPressed)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         editingCompleteButton
             .eventPublisher
             .bind(to: input.editingFinishButtonPressed)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
-        centerPhoneNumeberField.textField.rx.text
+        centerPhoneNumeberField.rx.text
             .compactMap { $0 }
             .bind(to: input.editingPhoneNumber)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         centerIntroductionTextView.rx.text
             .compactMap { $0 }
             .bind(to: input.editingInstruction)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         edtingImage
             .bind(to: input.editingImage)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         // output
         guard let output = viewModel.output else { fatalError() }
@@ -361,87 +383,88 @@ public class CenterProfileViewController: DisposableViewController  {
         output
             .centerName
             .drive(centerNameLabel.rx.textString)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         output
             .centerLocation
             .drive(centerLocationLabel.rx.textString)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         output
             .centerPhoneNumber
             .drive(centerPhoneNumeberLabel.rx.textString)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         output
             .centerPhoneNumber
-            .drive(centerPhoneNumeberField.textField.rx.text)
-            .disposed(by: disposBag)
+            .drive(centerPhoneNumeberField.rx.textString)
+            .disposed(by: disposeBag)
         
         output
             .centerIntroduction
             .drive(centerIntroductionLabel.rx.textString)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         output
             .centerIntroduction
             .drive(centerIntroductionTextView.rx.textString)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         output
             .centerImage
             .drive(centerImageView.rx.image)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         // MARK: Edit Mode
         output
             .isEditingMode
             .map { !$0 }
             .drive(centerPhoneNumeberField.rx.isHidden)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         output
             .isEditingMode
             .drive(centerPhoneNumeberLabel.rx.isHidden)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         output
             .isEditingMode
             .map { !$0 }
             .drive(centerIntroductionTextView.rx.isHidden)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         output
             .isEditingMode
             .drive(centerIntroductionLabel.rx.isHidden)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         output
             .isEditingMode
             .map { !$0 }
             .drive(centerImageEditButton.rx.isHidden)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         output
             .isEditingMode
             .map { !$0 }
             .drive(editingCompleteButton.rx.isHidden)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         output
             .isEditingMode
             .drive(profileEditButton.rx.isHidden)
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
-  
         output
             .alert
             .drive { [weak self] vo in
                 self?.showAlert(vo: vo)
             }
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
         
         output
             .editingValidation
             .drive { _ in
                 // do something when editing success
             }
-            .disposed(by: disposBag)
+            .disposed(by: disposeBag)
+        
+        viewModel.requestData()
     }
     
     public func showAlert(vo: DefaultAlertContentVO) {
@@ -455,16 +478,35 @@ public class CenterProfileViewController: DisposableViewController  {
         
     }
 }
-    
+
 extension CenterProfileViewController {
     
-    private func onEditMode() {
+    func showPhotoGalley() {
         
+        let imagePickerVC = UIImagePickerController()
+        imagePickerVC.delegate = self
+        
+        if !UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
+            return
+        }
+        
+        imagePickerVC.sourceType = .photoLibrary
+        
+//        let modiaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary)
+        present(imagePickerVC, animated: true)
     }
+}
     
-    private func onDisplayMode() {
-        editingCompleteButton.isHidden = true
-        profileEditButton.isHidden = false
-        
+extension CenterProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+     
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            
+            edtingImage.accept(image)
+            centerImageView.image = image
+            
+            picker.dismiss(animated: true)
+        }
     }
 }

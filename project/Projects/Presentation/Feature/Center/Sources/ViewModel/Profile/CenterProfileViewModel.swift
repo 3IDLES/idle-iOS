@@ -37,28 +37,14 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
     public init() {
         self.input = Input()
         
-        let centerName = BehaviorRelay<String>(value: "")
-        let centerLocation = BehaviorRelay<String>(value: "")
-        let centerPhoneNumber = BehaviorRelay<String>(value: "")
-        let centerIntroduction = BehaviorRelay<String>(value: "")
-        let centerImage = BehaviorRelay<UIImage>(value: .init())
-        
-        // 서버로 부터 데이터를 요청하는 API
-        centerName.accept("네 얼간이 방문요양센터")
-        centerLocation.accept("강남구 삼성동 512-3")
-        centerPhoneNumber.accept("(02) 123-4567")
-        centerIntroduction.accept("안녕하세요 반갑습니다!")
-        centerImage.accept(UIImage())
-
-        
         // 최신 값들 + 버튼이 눌릴 경우 변경 로직이 실행된다.
         let editingRequestResult = input
             .editingFinishButtonPressed
             .map({ [unowned self] _ in
                 self.checkModification(
-                    prev_phoneNumber: centerPhoneNumber.value,
-                    prev_introduction: centerIntroduction.value,
-                    prev_image: centerImage.value
+                    prev_phoneNumber: self.input.centerPhoneNumber.value,
+                    prev_introduction: self.input.centerIntroduction.value,
+                    prev_image: self.input.centerImage.value
                 )
             })
             .flatMap { (inputs) in
@@ -81,21 +67,21 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         // 스트림을 유지하기위해 생성한 Driver로 필수적으로 사용되지 않는다.
         let editingValidation = editingRequestResult
             .compactMap { $0.value }
-            .map { info in
+            .map { [weak input] info in
                 
                 if let phoneNumber = info.phoneNumber {
                     printIfDebug("✅ 전화번호 변경 반영되었음")
-                    centerPhoneNumber.accept(phoneNumber)
+                    input?.centerPhoneNumber.accept(phoneNumber)
                 }
                 
                 if let introduction = info.introduction {
                     printIfDebug("✅ 센터소개 반영되었음")
-                    centerIntroduction.accept(introduction)
+                    input?.centerIntroduction.accept(introduction)
                 }
                 
                 if let image = info.image {
                     printIfDebug("✅ 센터 이미지 변경 반영되었음")
-                    centerImage.accept(image)
+                    input?.centerImage.accept(image)
                 }
                 
                 return ()
@@ -142,15 +128,25 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
             .asDriver(onErrorJustReturn: .default)
         
         self.output = .init(
-            centerName: centerName.asDriver(onErrorJustReturn: ""),
-            centerLocation: centerLocation.asDriver(onErrorJustReturn: ""),
-            centerPhoneNumber: centerPhoneNumber.asDriver(onErrorJustReturn: ""),
-            centerIntroduction: centerIntroduction.asDriver(onErrorJustReturn: ""),
-            centerImage: centerImage.asDriver(onErrorJustReturn: UIImage()),
+            centerName: input.centerName.asDriver(onErrorJustReturn: ""),
+            centerLocation: input.centerLocation.asDriver(onErrorJustReturn: ""),
+            centerPhoneNumber: input.centerPhoneNumber.asDriver(onErrorJustReturn: ""),
+            centerIntroduction: input.centerIntroduction.asDriver(onErrorJustReturn: ""),
+            centerImage: input.centerImage.asDriver(onErrorJustReturn: UIImage()),
             isEditingMode: isEditingMode,
             editingValidation: editingValidation,
             alert: alertDriver
         )
+    }
+    
+    public func requestData() {
+        
+        // 서버로 부터 데이터를 요청하는 API
+        input.centerName.accept("네 얼간이 방문요양센터")
+        input.centerLocation.accept("강남구 삼성동 512-3")
+        input.centerPhoneNumber.accept("(02) 123-4567")
+        input.centerIntroduction.accept("안녕하세요 반갑습니다!")
+        input.centerImage.accept(UIImage())
     }
 }
 
@@ -158,6 +154,14 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
 public extension CenterProfileViewModel {
     
     class Input: CenterProfileInputable {
+        
+        // 서버에서 받아오는데이터
+        public var centerName = BehaviorRelay<String>(value: "")
+        public var centerLocation = BehaviorRelay<String>(value: "")
+        public var centerPhoneNumber = BehaviorRelay<String>(value: "")
+        public var centerIntroduction = BehaviorRelay<String>(value: "")
+        public var centerImage = BehaviorRelay<UIImage>(value: .init())
+        
         // 모드설정
         public var editingButtonPressed: PublishRelay<Void> = .init()
         public var editingFinishButtonPressed: PublishRelay<Void> = .init()
