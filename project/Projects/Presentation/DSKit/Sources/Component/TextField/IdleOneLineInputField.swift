@@ -9,13 +9,6 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-/// 총 Height 44(42 + border(1pt)x2)
-///
-/// TextBox사이즈 24
-/// inset
-///     vertical: 11
-///     horizontal: 20
-
 public class IdleOneLineInputField: UIView {
     
     public var isEnabled: Bool = true

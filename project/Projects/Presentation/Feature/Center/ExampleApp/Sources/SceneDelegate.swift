@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CenterFeature
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -17,7 +18,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = ViewController3()
+        
+        let viewModel = CenterProfileViewModel()
+        let viewController = CenterProfileViewController()
+        
+        viewController.bind(viewModel: viewModel)
+        
+        window?.rootViewController = viewController
         window?.makeKeyAndVisible()
     }
 }

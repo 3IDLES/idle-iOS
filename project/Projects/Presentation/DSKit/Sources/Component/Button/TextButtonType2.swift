@@ -34,7 +34,7 @@ public class TextButtonType2: UIView {
     
     private var tapGesture: UITapGestureRecognizer!
     
-    public var eventPublisher: Signal<UITapGestureRecognizer> { tapGesture.rx.event.asSignal() }
+    public var eventPublisher: Observable<Void> { tapGesture.rx.event.map { _ in () } }
     
     public init(
         labelText: String,

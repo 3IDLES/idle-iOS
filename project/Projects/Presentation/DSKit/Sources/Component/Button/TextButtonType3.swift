@@ -15,7 +15,7 @@ public class TextButtonType3: IdleLabel {
     
     private var tapGesture: UITapGestureRecognizer!
     
-    public var eventPublisher: Signal<Void> { tapGesture.rx.event.asSignal().map { _ in () } }
+    public var eventPublisher: Observable<Void> { tapGesture.rx.event.map { _ in () } }
     
     public override init(typography: Typography) {
         

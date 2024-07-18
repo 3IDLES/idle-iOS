@@ -1,21 +1,20 @@
 //
-//  Stack.swift
+//  HStack.swift
 //  DSKit
 //
-//  Created by choijunios on 7/15/24.
+//  Created by choijunios on 7/18/24.
 //
 
 import UIKit
 
-
-public class VStack: UIStackView {
+public class HStack: UIStackView {
     
     public init(_ elements: [UIView], spacing: CGFloat = 0.0, alignment: UIStackView.Alignment = .center) {
         
         super.init(frame: .zero)
         
         self.spacing = spacing
-        self.axis = .vertical
+        self.axis = .horizontal
         self.distribution = .fill
         self.alignment = alignment
         
@@ -27,3 +26,4 @@ public class VStack: UIStackView {
     
     required init(coder: NSCoder) { fatalError() }
 }
+
