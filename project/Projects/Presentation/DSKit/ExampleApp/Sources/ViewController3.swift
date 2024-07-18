@@ -29,9 +29,17 @@ class ViewController3: UIViewController {
         let label = IdleLabel(typography: .Body3)
         label.textString = "엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장엄청나게 긴 문장"
         label.numberOfLines = 0
+        
+        let centerImageEditButton: UIButton = {
+            let btn = UIButton()
+            btn.setImage(DSKitAsset.Icons.editPhoto.image, for: .normal)
+            btn.isUserInteractionEnabled = true
+            return btn
+        }()
         [
             field,
-            label
+            label,
+            centerImageEditButton
         ]
             .forEach {
                 $0.translatesAutoresizingMaskIntoConstraints = false
@@ -46,6 +54,9 @@ class ViewController3: UIViewController {
             label.topAnchor.constraint(equalTo: field.bottomAnchor, constant: 30),
             label.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             label.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            centerImageEditButton.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 30),
+            centerImageEditButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
         ])
     }
 }

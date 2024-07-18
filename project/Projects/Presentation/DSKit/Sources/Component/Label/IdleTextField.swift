@@ -18,6 +18,15 @@ public class IdleTextField: UITextField {
         bottom: 10,
         right: 24
     )
+    public var textString: String {
+        get {
+            return currentText
+        }
+        set {
+            currentText = newValue
+            updateText()
+        }
+    }
     
     public init(typography: Typography) {
         
@@ -98,6 +107,9 @@ public class IdleTextField: UITextField {
                 with: DSKitAsset.Colors.gray200.color
             )
         }
+    }
+    private func updateText() {
+        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: typography.attributes))
     }
 }
 
