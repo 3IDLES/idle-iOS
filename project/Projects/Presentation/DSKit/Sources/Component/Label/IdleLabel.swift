@@ -32,7 +32,10 @@ public class IdleLabel: UILabel {
         
         let size = super.intrinsicContentSize
         
-        return CGSize(width: size.width, height: typography.lineHeight * CGFloat(currentLineCount))
+        if currentLineCount != 0 {
+            return CGSize(width: size.width, height: typography.lineHeight * CGFloat(currentLineCount))
+        }
+        return super.intrinsicContentSize
     }
     
     public var typography: Typography {
