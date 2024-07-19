@@ -162,7 +162,7 @@ public extension CenterProfileViewModel {
         public var centerIntroduction = BehaviorRelay<String>(value: "")
         public var centerImage = BehaviorRelay<UIImage>(value: .init())
         
-        // 모드설정
+        // ViewController에서 받아오는 데이터
         public var editingButtonPressed: PublishRelay<Void> = .init()
         public var editingFinishButtonPressed: PublishRelay<Void> = .init()
         public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
