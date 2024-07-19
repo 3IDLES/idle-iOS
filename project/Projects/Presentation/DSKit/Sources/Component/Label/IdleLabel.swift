@@ -82,13 +82,12 @@ public class IdleLabel: UILabel {
     public func setAttr(attr: NSAttributedString.Key, value: Any) {
         let newAttr: [NSAttributedString.Key: Any] = [attr: value]
         currentAttributes = newAttr.merging(currentAttributes) { first, _ in first }
-        
-        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: currentAttributes))
+        updateText()
         invalidateIntrinsicContentSize()
     }
     
     private func updateText() {
-        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: typography.attributes))
+        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: currentAttributes))
         invalidateIntrinsicContentSize()
     }
 }

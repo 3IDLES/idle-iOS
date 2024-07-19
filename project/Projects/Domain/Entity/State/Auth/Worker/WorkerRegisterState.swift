@@ -11,6 +11,17 @@ public enum Gender {
     case notDetermined
     case male
     case female
+    
+    public var str: String {
+        switch self {
+        case .notDetermined:
+            "무결"
+        case .male:
+            "남성"
+        case .female:
+            "여성"
+        }
+    }
 }
 
 public class WorkerRegisterState {

@@ -15,18 +15,17 @@ public class TextButtonType1: UIView {
     
     public private(set) var isEnabled: Bool = true
     
-    private let textOriginColor: UIColor
+    private let originBackground: UIColor
     
-    lazy var label: ResizableUILabel = {
+    lazy var label: IdleLabel = {
        
-        let view = ResizableUILabel()
+        let label = IdleLabel(typography: .Subtitle4)
         
-        view.text = labelText
-        view.textColor = .white
-        view.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
-        view.textAlignment = .center
+        label.textString = labelText
+        label.textColor = .white
+        label.textAlignment = .center
         
-        return view
+        return label
     }()
     
     public let labelText: String
@@ -37,14 +36,15 @@ public class TextButtonType1: UIView {
     
     public init(
         labelText: String,
-        textOriginColor: UIColor = DSKitAsset.Colors.orange500.color
+        originBackground: UIColor = DSKitAsset.Colors.orange500.color
     ) {
         
         self.labelText = labelText
-        self.textOriginColor = textOriginColor
+        self.originBackground = originBackground
         
         super.init(frame: .zero)
         
+        self.backgroundColor = originBackground
         self.tapGesture = UITapGestureRecognizer(target: self, action: #selector(onTouchAction))
         self.addGestureRecognizer(tapGesture)
         
@@ -55,8 +55,6 @@ public class TextButtonType1: UIView {
     required init?(coder: NSCoder) { fatalError() }
     
     func setApearance() {
-        
-        self.backgroundColor = DSKitAsset.Colors.orange500.color
         self.layer.cornerRadius = 6
     }
     
@@ -82,7 +80,7 @@ public class TextButtonType1: UIView {
         
         UIView.animate(withDuration: 0.3) {
             
-            self.backgroundColor = self.textOriginColor
+            self.backgroundColor = self.originBackground
             self.layer.displayIfNeeded()
         }
     }
@@ -94,6 +92,6 @@ extension TextButtonType1: DisablableComponent {
     public func setEnabled(_ isEnabled: Bool) {
         self.isEnabled = isEnabled
         self.isUserInteractionEnabled = isEnabled
-        self.backgroundColor = isEnabled ? textOriginColor : DSKitAsset.Colors.gray200.color
+        self.backgroundColor = isEnabled ? originBackground : DSKitAsset.Colors.gray200.color
     }
 }
