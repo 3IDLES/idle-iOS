@@ -27,3 +27,14 @@ public extension UIImageView {
         return view
     }()
 }
+
+public extension UIImage {
+    
+    /// ScaleToAspectFit한 뷰를 만듭니다.
+    func toView() -> UIImageView {
+        let view = UIImageView()
+        view.image = self
+        view.contentMode = .scaleAspectFit
+        return view
+    }
+}

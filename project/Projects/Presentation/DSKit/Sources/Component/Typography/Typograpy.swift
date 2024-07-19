@@ -30,7 +30,8 @@ public enum Typography {
     case Body1
     case Body2
     case Body3
-    case Body4
+    
+    case caption
     
     var lineHeight: CGFloat {
         switch self {
@@ -56,8 +57,8 @@ public enum Typography {
             22
         case .Body3:
             20
-        case .Body4:
-            20
+        case .caption:
+            18.6
         }
     }
     
@@ -69,84 +70,84 @@ public enum Typography {
                 weight: .Bold,
                 size: 24,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Heading2:
             Self.createAttribute(
                 weight: .Bold,
                 size: 20,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Heading3:
             Self.createAttribute(
                 weight: .Bold,
                 size: 18,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Heading4:
             Self.createAttribute(
                 weight: .Bold,
                 size: 16,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Subtitle1:
             Self.createAttribute(
                 weight: .Semibold,
                 size: 20,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Subtitle2:
             Self.createAttribute(
                 weight: .Semibold,
                 size: 18,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Subtitle3:
             Self.createAttribute(
                 weight: .Semibold,
                 size: 16,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Subtitle4:
             Self.createAttribute(
                 weight: .Semibold,
                 size: 14,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Body1:
             Self.createAttribute(
                 weight: .medium,
                 size: 18,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Body2:
             Self.createAttribute(
                 weight: .medium,
                 size: 16,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         case .Body3:
             Self.createAttribute(
                 weight: .medium,
                 size: 14,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
-        case .Body4:
+        case .caption:
             Self.createAttribute(
                 weight: .medium,
                 size: 12,
                 letterSpacing: -0.2,
-                color: .black
+                color: DSKitAsset.Colors.gray900.color
             )
         }
         

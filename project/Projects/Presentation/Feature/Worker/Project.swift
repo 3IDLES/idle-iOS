@@ -1,8 +1,8 @@
 //
 //  Project.swift
-//  FeatureManifests
+//  ProjectDescriptionHelpers
 //
-//  Created by 최준영 on 6/21/24.
+//  Created by choijunios on 2024/07/19
 //
 
 import ProjectDescription
@@ -10,23 +10,31 @@ import ProjectDescriptionHelpers
 import ConfigurationPlugin
 import DependencyPlugin
 
-let proejct = Project(
-    name: "DSKit",
+let project = Project(
+    name: "Worker",
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
     targets: [
+        
+        /// FeatureConcrete
         .target(
-            name: "DSKit",
+            name: "WorkerFeature",
             destinations: DeploymentSettings.platform,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Sources/**"],
-            resources: ["Resources/**",],
+            resources: ["Resources/**"],
             dependencies: [
-                D.Domain.Entity,
-                
+                // Presentation
+                D.Presentation.PresentationCore,
+                D.Presentation.DSKit,
+
+                // Domain
+                D.Domain.UseCaseInterface,
+                D.Domain.RepositoryInterface,
+
                 // ThirdParty
                 D.ThirdParty.RxSwift,
                 D.ThirdParty.RxCocoa,
@@ -36,9 +44,9 @@ let proejct = Project(
             )
         ),
         
-        // Component를 테스트하는 Example타겟
+        /// FeatureConcrete ExampleApp
         .target(
-            name: "DSKitExampleApp",
+            name: "Worker_ExampleApp",
             destinations: DeploymentSettings.platform,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -47,12 +55,27 @@ let proejct = Project(
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
-                D.Presentation.DSKit,
+                .target(name: "WorkerFeature"),
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
             )
         ),
     ],
-    resourceSynthesizers: .default
+    schemes: [
+        Scheme.makeSchemes(
+            .target("WorkerFeature"),
+            configNames: [
+                IdleConfiguration.debugConfigName,
+                IdleConfiguration.releaseConfigName
+            ]
+        ),
+        Scheme.makeSchemes(
+            .target("Worker_ExampleApp"),
+            configNames: [
+                IdleConfiguration.debugConfigName,
+                IdleConfiguration.releaseConfigName
+            ]
+        )
+    ].flatMap { $0 }
 )
