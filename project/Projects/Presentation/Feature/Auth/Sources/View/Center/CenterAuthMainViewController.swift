@@ -129,7 +129,7 @@ public class CenterAuthMainViewController: DisposableViewController {
         
         loginButton
             .eventPublisher
-            .emit { [weak self] _ in
+            .subscribe { [weak self] _ in
                 self?.coordinator?.parent?.login()
             }
             .disposed(by: disposeBag)
