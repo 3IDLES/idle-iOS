@@ -36,6 +36,7 @@ public class MultiLineTextField: UITextView {
         
         setAppearance()
         setPlaceholderText(textView: self)
+        addToolbar()
     }
     
     required init?(coder: NSCoder) { fatalError() }
