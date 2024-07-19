@@ -125,7 +125,7 @@ public class CenterProfileViewController: DisposableViewController {
         return label
     }()
     /// 센터 소개를 수정하는 텍스트 필드
-    let centerIntroductionTextView: MultiLineTextField = {
+    let centerIntroductionField: MultiLineTextField = {
         let textView = MultiLineTextField(
             typography: .Body3,
             placeholderText: "추가적으로 요구사항이 있다면 작성해주세요."
@@ -145,6 +145,11 @@ public class CenterProfileViewController: DisposableViewController {
         view.layer.cornerRadius = 6
         view.clipsToBounds = true
         view.backgroundColor = DSKitAsset.Colors.gray100.color
+        view.contentMode = .scaleAspectFill
+        
+        /// 이미지 뷰는 버튼을 자식으로 가지는데 기본적으로 isUserInteractionEnabled값이 fale라 자식 버튼에도 영향을 미친다.
+        /// 따라서 이터렉션이 필요한 자식이 있는 경우 명시적으로 아래 프로퍼티값을 true로 설정해야한다.
+        view.isUserInteractionEnabled = true
         return view
     }()
     let centerImageEditButton: UIButton = {
@@ -175,6 +180,7 @@ public class CenterProfileViewController: DisposableViewController {
     
     func setAutoLayout() {
         
+        // 상단 네비게이션바 세팅
         let navigationStack = HStack([
             navigationBar,
             editingCompleteButton,
@@ -219,15 +225,15 @@ public class CenterProfileViewController: DisposableViewController {
             [
                 centerIntroductionTitleLabel,
                 centerIntroductionLabel,
-                centerIntroductionTextView,
+                centerIntroductionField,
             ],
             spacing: 6,
             alignment: .fill
         )
         
         // 센터 이미지뷰 세팅
-//        centerImageView.addSubview(centerImageEditButton)
-//        centerImageEditButton.translatesAutoresizingMaskIntoConstraints = false
+        centerImageView.addSubview(centerImageEditButton)
+        centerImageEditButton.translatesAutoresizingMaskIntoConstraints = false
         
         let scrollView = UIScrollView()
         
@@ -249,7 +255,6 @@ public class CenterProfileViewController: DisposableViewController {
             
             centerPictureLabel,
             centerImageView,
-            centerImageEditButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             scrollView.addSubview($0)
@@ -286,7 +291,7 @@ public class CenterProfileViewController: DisposableViewController {
             centerImageEditButton.widthAnchor.constraint(equalToConstant: 28),
             centerImageEditButton.heightAnchor.constraint(equalTo: centerImageEditButton.widthAnchor),
             
-            centerIntroductionTextView.heightAnchor.constraint(equalToConstant: 156),
+            centerIntroductionField.heightAnchor.constraint(equalToConstant: 156),
         ])
         
         let contentGuide = scrollView.contentLayoutGuide
@@ -368,7 +373,7 @@ public class CenterProfileViewController: DisposableViewController {
             .bind(to: input.editingPhoneNumber)
             .disposed(by: disposeBag)
         
-        centerIntroductionTextView.rx.text
+        centerIntroductionField.rx.text
             .compactMap { $0 }
             .bind(to: input.editingInstruction)
             .disposed(by: disposeBag)
@@ -405,7 +410,7 @@ public class CenterProfileViewController: DisposableViewController {
             .disposed(by: disposeBag)
         output
             .centerIntroduction
-            .drive(centerIntroductionTextView.rx.textString)
+            .drive(centerIntroductionField.rx.textString)
             .disposed(by: disposeBag)
         
         output
@@ -416,38 +421,21 @@ public class CenterProfileViewController: DisposableViewController {
         // MARK: Edit Mode
         output
             .isEditingMode
-            .map { !$0 }
-            .drive(centerPhoneNumeberField.rx.isHidden)
-            .disposed(by: disposeBag)
-        output
-            .isEditingMode
-            .drive(centerPhoneNumeberLabel.rx.isHidden)
-            .disposed(by: disposeBag)
-        
-        output
-            .isEditingMode
-            .map { !$0 }
-            .drive(centerIntroductionTextView.rx.isHidden)
-            .disposed(by: disposeBag)
-        output
-            .isEditingMode
-            .drive(centerIntroductionLabel.rx.isHidden)
-            .disposed(by: disposeBag)
-        
-        output
-            .isEditingMode
-            .map { !$0 }
-            .drive(centerImageEditButton.rx.isHidden)
-            .disposed(by: disposeBag)
-        
-        output
-            .isEditingMode
-            .map { !$0 }
-            .drive(editingCompleteButton.rx.isHidden)
-            .disposed(by: disposeBag)
-        output
-            .isEditingMode
-            .drive(profileEditButton.rx.isHidden)
+            .drive { [weak self] in
+                guard let self else { return }
+                
+                centerPhoneNumeberField.isHidden = !$0
+                centerPhoneNumeberLabel.isHidden = $0
+                
+                centerIntroductionField.isHidden = !$0
+                centerIntroductionLabel.isHidden = $0
+                
+                centerImageEditButton.isHidden = !$0
+                
+                editingCompleteButton.isHidden = !$0
+                profileEditButton.isHidden = $0
+                
+            }
             .disposed(by: disposeBag)
         
         output
@@ -487,6 +475,12 @@ extension CenterProfileViewController {
         imagePickerVC.delegate = self
         
         if !UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
+            
+            showAlert(vo: .init(
+                title: "오류",
+                message: "사진함을 열 수 없습니다.")
+            )
+            
             return
         }
         
