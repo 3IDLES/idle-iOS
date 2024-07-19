@@ -211,7 +211,7 @@ public class CenterLoginViewController: DisposableViewController {
         
         forgotPasswordButton
             .eventPublisher
-            .emit { [weak self] _ in
+            .subscribe { [weak self] _ in
                 self?.coordinator?.parent?.setNewPassword()
             }
             .disposed(by: disposeBag)

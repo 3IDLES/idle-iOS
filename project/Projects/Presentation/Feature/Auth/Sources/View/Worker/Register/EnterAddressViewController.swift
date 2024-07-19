@@ -177,7 +177,7 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Enter
         
         addressSearchButton
             .eventPublisher
-            .emit { [weak self] _ in
+            .subscribe { [weak self] _ in
                 self?.showDaumSearchView()
             }
             .disposed(by: disposeBag)
