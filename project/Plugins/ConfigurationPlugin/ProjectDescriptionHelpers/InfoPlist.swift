@@ -30,6 +30,9 @@ public enum IdleInfoPlist {
     
     public static let exampleAppDefault: InfoPlist = .extendingDefault(with: [
         "Privacy - Photo Library Usage Description" : "프로필 사진 설정을 위해 사진 라이브러리에 접근합니다.",
+        "NSAppTransportSecurity" : [
+            "NSAllowsArbitraryLoads" : true
+        ],
         "UILaunchStoryboardName": "LaunchScreen.storyboard",
         "CFBundleDisplayName" : "$(BUNDLE_DISPLAY_NAME)",
         "UIApplicationSceneManifest": [

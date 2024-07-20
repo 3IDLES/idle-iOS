@@ -17,11 +17,10 @@ public protocol CenterProfileViewModelable where Input: CenterProfileInputable, 
     associatedtype Output
     var input: Input { get }
     var output: Output? { get }
-    
-    func requestData()
 }
 
 public protocol CenterProfileInputable {
+    var readyToFetch: PublishRelay<Void> { get }
     var editingButtonPressed: PublishRelay<Void> { get }
     var editingFinishButtonPressed: PublishRelay<Void> { get }
     var editingPhoneNumber: BehaviorRelay<String> { get }
@@ -34,7 +33,7 @@ public protocol CenterProfileOutputable {
     var centerLocation: Driver<String> { get }
     var centerPhoneNumber: Driver<String> { get }
     var centerIntroduction: Driver<String> { get }
-    var centerImage: Driver<UIImage> { get }
+    var centerImage: Driver<UIImage?> { get }
     var isEditingMode: Driver<Bool> { get }
     var editingValidation: Driver<Void> { get }
     var alert: Driver<DefaultAlertContentVO> { get }
@@ -122,6 +121,7 @@ public class CenterProfileViewController: DisposableViewController {
     /// 센터 소개가 표시되는 라벨
     let centerIntroductionLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
+        label.numberOfLines = 0
         return label
     }()
     /// 센터 소개를 수정하는 텍스트 필드
@@ -358,6 +358,12 @@ public class CenterProfileViewController: DisposableViewController {
         // input
         let input = viewModel.input
         
+        let bindFinished = PublishRelay<Void>()
+        
+        bindFinished
+            .bind(to: input.readyToFetch)
+            .disposed(by: disposeBag)
+        
         profileEditButton
             .eventPublisher
             .bind(to: input.editingButtonPressed)
@@ -452,7 +458,8 @@ public class CenterProfileViewController: DisposableViewController {
             }
             .disposed(by: disposeBag)
         
-        viewModel.requestData()
+        // 바인딩 종료
+        bindFinished.accept(())
     }
     
     public func showAlert(vo: DefaultAlertContentVO) {
