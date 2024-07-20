@@ -10,6 +10,7 @@ import Entity
 import RxSwift
 import RxCocoa
 import PresentationCore
+import UseCaseInterface
 
 public struct ChangeCenterInformation {
     let phoneNumber: String?
@@ -19,8 +20,14 @@ public struct ChangeCenterInformation {
 
 public class CenterProfileViewModel: CenterProfileViewModelable {
     
+    let profileUseCase: CenterProfileUseCase
+    
     public var input: Input
     public var output: Output? = nil
+    
+    private var currentPhoneNumber: String?
+    private var currentIntroduction: String?
+    private var currentImage: UIImage?
     
     func checkModification(
         prev_phoneNumber: String,
@@ -34,17 +41,75 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         )
     }
     
-    public init() {
+    public init(useCase: CenterProfileUseCase) {
+        
+        self.profileUseCase = useCase
+        
         self.input = Input()
+        
+        let profileRequestResult = input
+            .readyToFetch
+            .flatMap { [unowned self] _ in
+                self.profileUseCase.getProfile()
+            }
+            .share()
+        
+        let profileRequestSuccess = profileRequestResult
+            .compactMap { $0.value }
+        
+        let profileRequestFailure = profileRequestResult
+            .compactMap { $0.error }
+            .map { error in
+                DefaultAlertContentVO(title: "프로필 정보 불러오기 실패", message: error.message)
+            }
+            
+        let centerNameDriver = profileRequestSuccess
+            .map { [weak self] in
+                let name = $0.centerName
+                self?.currentPhoneNumber = name
+                return name
+            }
+            .asDriver(onErrorJustReturn: "")
+
+        let centerAddressDriver = profileRequestSuccess
+            .map { $0.roadNameAddress }
+            .asDriver(onErrorJustReturn: "")
+        
+        let centerIntroductionDriver = profileRequestSuccess
+            .map { [weak self] in
+                let introduce = $0.introduce
+                self?.currentIntroduction = introduce
+                return introduce
+            }
+            .asDriver(onErrorJustReturn: "")
+    
+        let centerPhoneNumberDriver = profileRequestSuccess
+            .map { $0.officeNumber }
+            .asDriver(onErrorJustReturn: "")
+        
+        let centerImageDriver = profileRequestSuccess
+            .map { $0.profileImageURL }
+            .compactMap { $0 }
+            .observe(on: OperationQueueScheduler.init(operationQueue: .init(), queuePriority: .high))
+            .map({ [weak self] imageUrl in
+                if let data = try? Data(contentsOf: imageUrl) {
+                    let image = UIImage(data: data)
+                    self?.currentImage = image
+                    return image
+                }
+                return nil
+            })
+            .asDriver(onErrorJustReturn: nil)
+        
         
         // 최신 값들 + 버튼이 눌릴 경우 변경 로직이 실행된다.
         let editingRequestResult = input
             .editingFinishButtonPressed
             .map({ [unowned self] _ in
                 self.checkModification(
-                    prev_phoneNumber: self.input.centerPhoneNumber.value,
-                    prev_introduction: self.input.centerIntroduction.value,
-                    prev_image: self.input.centerImage.value
+                    prev_phoneNumber: self.currentPhoneNumber ?? "",
+                    prev_introduction: self.currentIntroduction ?? "",
+                    prev_image: self.currentImage ?? .init()
                 )
             })
             .flatMap { (inputs) in
@@ -67,26 +132,41 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         // 스트림을 유지하기위해 생성한 Driver로 필수적으로 사용되지 않는다.
         let editingValidation = editingRequestResult
             .compactMap { $0.value }
-            .map { [weak input] info in
+            .map { [weak self] info in
+                
+                guard let self else { return () }
                 
                 if let phoneNumber = info.phoneNumber {
                     printIfDebug("✅ 전화번호 변경 반영되었음")
-                    input?.centerPhoneNumber.accept(phoneNumber)
+                    currentPhoneNumber = phoneNumber
                 }
                 
                 if let introduction = info.introduction {
                     printIfDebug("✅ 센터소개 반영되었음")
-                    input?.centerIntroduction.accept(introduction)
+                    currentIntroduction = introduction
                 }
                 
                 if let image = info.image {
                     printIfDebug("✅ 센터 이미지 변경 반영되었음")
-                    input?.centerImage.accept(image)
+                    currentImage = image
                 }
+                
+                // 업데이트된 정보 요청
+                input.readyToFetch.accept(())
                 
                 return ()
             }
             .asDriver(onErrorJustReturn: ())
+        
+        let editingRequestFailure = editingRequestResult
+            .compactMap({ $0.error })
+            .map({ error in
+                // 변경 실패 Alert
+                return DefaultAlertContentVO(
+                    title: "변경 실패",
+                    message: "변경 싪패 이유"
+                )
+            })
         
         enum Mode {
             case editing, display
@@ -116,37 +196,23 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
             .asDriver(onErrorJustReturn: false)
         
         
-        let alertDriver = editingRequestResult
-            .compactMap({ $0.error })
-            .map({ error in
-                // 변경 실패 Alert
-                return DefaultAlertContentVO(
-                    title: "변경 실패",
-                    message: "변경 싪패 이유"
-                )
-            })
+        let alertDriver = Observable
+            .merge(
+                profileRequestFailure,
+                editingRequestFailure
+            )
             .asDriver(onErrorJustReturn: .default)
         
         self.output = .init(
-            centerName: input.centerName.asDriver(onErrorJustReturn: ""),
-            centerLocation: input.centerLocation.asDriver(onErrorJustReturn: ""),
-            centerPhoneNumber: input.centerPhoneNumber.asDriver(onErrorJustReturn: ""),
-            centerIntroduction: input.centerIntroduction.asDriver(onErrorJustReturn: ""),
-            centerImage: input.centerImage.asDriver(onErrorJustReturn: UIImage()),
+            centerName: centerNameDriver,
+            centerLocation: centerAddressDriver,
+            centerPhoneNumber: centerPhoneNumberDriver,
+            centerIntroduction: centerIntroductionDriver,
+            centerImage: centerImageDriver,
             isEditingMode: isEditingMode,
             editingValidation: editingValidation,
             alert: alertDriver
         )
-    }
-    
-    public func requestData() {
-        
-        // 서버로 부터 데이터를 요청하는 API
-        input.centerName.accept("네 얼간이 방문요양센터")
-        input.centerLocation.accept("강남구 삼성동 512-3")
-        input.centerPhoneNumber.accept("(02) 123-4567")
-        input.centerIntroduction.accept("안녕하세요 반갑습니다!")
-        input.centerImage.accept(UIImage())
     }
 }
 
@@ -155,14 +221,8 @@ public extension CenterProfileViewModel {
     
     class Input: CenterProfileInputable {
         
-        // 서버에서 받아오는데이터
-        public var centerName = BehaviorRelay<String>(value: "")
-        public var centerLocation = BehaviorRelay<String>(value: "")
-        public var centerPhoneNumber = BehaviorRelay<String>(value: "")
-        public var centerIntroduction = BehaviorRelay<String>(value: "")
-        public var centerImage = BehaviorRelay<UIImage>(value: .init())
-        
         // ViewController에서 받아오는 데이터
+        public var readyToFetch: PublishRelay<Void> = .init()
         public var editingButtonPressed: PublishRelay<Void> = .init()
         public var editingFinishButtonPressed: PublishRelay<Void> = .init()
         public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
@@ -176,7 +236,7 @@ public extension CenterProfileViewModel {
         public var centerLocation: Driver<String>
         public var centerPhoneNumber: Driver<String>
         public var centerIntroduction: Driver<String>
-        public var centerImage: Driver<UIImage>
+        public var centerImage: Driver<UIImage?>
         
         // 수정 상태 여부
         public var isEditingMode: Driver<Bool>
@@ -186,7 +246,7 @@ public extension CenterProfileViewModel {
         
         public var alert: Driver<DefaultAlertContentVO>
         
-        init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, centerImage: Driver<UIImage>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>, alert: Driver<DefaultAlertContentVO>) {
+        init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, centerImage: Driver<UIImage?>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>, alert: Driver<DefaultAlertContentVO>) {
             self.centerName = centerName
             self.centerLocation = centerLocation
             self.centerPhoneNumber = centerPhoneNumber

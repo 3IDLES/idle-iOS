@@ -11,6 +11,7 @@ import Moya
 public enum APIType {
     
     case auth
+    case users
 }
 
 // MARK: BaseAPI
@@ -25,13 +26,11 @@ public extension BaseAPI {
         
         var baseStr = NetworkConfig.baseUrl
         
-        let apiVersion = "v1"
-        
-        baseStr += "/api/\(apiVersion)"
-        
         switch apiType {
         case .auth:
             baseStr += "/auth"
+        case .users:
+            baseStr += "/users"
         }
         
         return URL(string: baseStr)!

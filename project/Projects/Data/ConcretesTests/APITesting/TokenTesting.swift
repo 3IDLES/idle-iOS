@@ -10,9 +10,9 @@ import RxSwift
 @testable import NetworkDataSource
 
 // TestKeyValueStore
-class TestKeyValueStore: KeyValueStore {
+public class TestKeyValueStore: KeyValueStore {
     
-    init(testStore: [String : String] = [:]) {
+    public init(testStore: [String : String] = [:]) {
         self.testStore = [
             Key.Auth.kaccessToken: "access_token",
             Key.Auth.krefreshToken: "refresh_token",
@@ -21,22 +21,22 @@ class TestKeyValueStore: KeyValueStore {
     
     var testStore: [String: String] = [:]
     
-    func save(key: String, value: String) throws {
+    public func save(key: String, value: String) throws {
         
         testStore[key] = value
     }
     
-    func get(key: String) -> String? {
+    public func get(key: String) -> String? {
         
         return testStore[key]
     }
     
-    func delete(key: String) throws {
+    public func delete(key: String) throws {
         
         testStore.removeValue(forKey: key)
     }
     
-    func removeAll() throws {
+    public func removeAll() throws {
         
         testStore.removeAll()
     }
