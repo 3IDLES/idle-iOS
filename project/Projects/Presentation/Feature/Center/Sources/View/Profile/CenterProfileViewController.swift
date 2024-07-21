@@ -25,7 +25,7 @@ public protocol CenterProfileInputable {
     var editingFinishButtonPressed: PublishRelay<Void> { get }
     var editingPhoneNumber: BehaviorRelay<String> { get }
     var editingInstruction: BehaviorRelay<String> { get }
-    var editingImage: BehaviorRelay<UIImage> { get }
+    var selectedImage: PublishRelay<UIImage> { get }
 }
 
 public protocol CenterProfileOutputable {
@@ -33,7 +33,7 @@ public protocol CenterProfileOutputable {
     var centerLocation: Driver<String> { get }
     var centerPhoneNumber: Driver<String> { get }
     var centerIntroduction: Driver<String> { get }
-    var centerImage: Driver<UIImage?> { get }
+    var displayingImage: Driver<UIImage?> { get }
     var isEditingMode: Driver<Bool> { get }
     var editingValidation: Driver<Void> { get }
     var alert: Driver<DefaultAlertContentVO> { get }
@@ -385,7 +385,7 @@ public class CenterProfileViewController: DisposableViewController {
             .disposed(by: disposeBag)
         
         edtingImage
-            .bind(to: input.editingImage)
+            .bind(to: input.selectedImage)
             .disposed(by: disposeBag)
         
         // output
@@ -420,7 +420,7 @@ public class CenterProfileViewController: DisposableViewController {
             .disposed(by: disposeBag)
         
         output
-            .centerImage
+            .displayingImage
             .drive(centerImageView.rx.image)
             .disposed(by: disposeBag)
         
@@ -505,8 +505,6 @@ extension CenterProfileViewController: UIImagePickerControllerDelegate, UINaviga
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             
             edtingImage.accept(image)
-            centerImageView.image = image
-            
             picker.dismiss(animated: true)
         }
     }

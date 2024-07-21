@@ -12,6 +12,7 @@ public enum APIType {
     
     case auth
     case users
+    case external(url: String)
 }
 
 // MARK: BaseAPI
@@ -31,6 +32,8 @@ public extension BaseAPI {
             baseStr += "/auth"
         case .users:
             baseStr += "/users"
+        case .external(let url):
+            baseStr = url
         }
         
         return URL(string: baseStr)!
@@ -39,7 +42,10 @@ public extension BaseAPI {
     /// Default header
     var headers: [String : String]? {
         
-        return ["Content-Type": "application/json"]
+        switch apiType {
+        default:
+            ["Content-Type": "application/json"]
+        }
     }
     
     var validationType: ValidationType { .successCodes }
