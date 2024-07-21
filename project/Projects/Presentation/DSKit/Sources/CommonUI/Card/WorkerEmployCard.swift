@@ -13,11 +13,11 @@ import Entity
 public class WorkerEmployCard: UITableViewCell {
     
     // View
-    let starButton: IconStateButton = {
-        let button = IconStateButton(
-            normal: DSKitAsset.Icons.star.image,
-            accent: DSKitAsset.Icons.activestar.image,
-            initial: .normal
+    let starButton: IconWithColorStateButton = {
+        let button = IconWithColorStateButton(
+            representImage: DSKitAsset.Icons.subscribeStar.image,
+            normalColor: DSKitAsset.Colors.gray200.color,
+            accentColor: DSKitAsset.Colors.orange300.color
         )
         return button
     }()
@@ -254,7 +254,7 @@ public class WorkerEmployCard: UITableViewCell {
         dayLeftTag.textString = "D-\(mock.dayLeft)"
         titleLabel.textString = mock.title
         timeTakenForWalkLabel.textString = mock.timeTakenForWalk
-        serviceTargetInfoLabel.textString = "\(mock.targetLevel)등급 \(mock.targetAge)세 \(mock.targetGender.str)"
+        serviceTargetInfoLabel.textString = "\(mock.targetLevel)등급 \(mock.targetAge)세 \(mock.targetGender.twoLetterKoreanWord)"
         workDaysLabel.textString = mock.days.map({ $0.rawValue }).joined(separator: ",")
         workTimeLabel.textString = "\(mock.startTime) - \(mock.endTime)"
         payPerHourLabel.textString = "시급 \(mock.payPerHour) 원"
