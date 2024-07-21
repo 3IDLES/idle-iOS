@@ -8,32 +8,27 @@
 import UIKit
 import RxCocoa
 
-public class IconStateButton: UIImageView {
+public class IconWithColorStateButton: UIImageView {
     
     // Init values
     public private(set) var state: State
     
-    public var normalImage: UIImage
-    public var accentImage: UIImage
+    public var representImage: UIImage
+    public var normalColor: UIColor
+    public var accentColor: UIColor
     
     public let eventPublisher: PublishRelay<State> = .init()
     
-    // View
-    let label: IdleLabel = {
-       
-        let view = IdleLabel(typography: .Body3)
-        
-        return view
-    }()
-    
     public init(
-        normal: UIImage,
-        accent: UIImage,
-        initial: State) 
+        representImage: UIImage,
+        normalColor: UIColor,
+        accentColor: UIColor,
+        initial: State = .normal)
     {
         self.state = initial
-        self.normalImage = normal
-        self.accentImage = accent
+        self.representImage = representImage
+        self.normalColor = normalColor
+        self.accentColor = accentColor
         
         super.init(frame: .zero)
         
@@ -48,6 +43,11 @@ public class IconStateButton: UIImageView {
     private func setAppearance() {
         
         self.contentMode = .scaleAspectFit
+        
+        // 이미지를 템플릿 모드로 변경
+        let templateImage = self.representImage.withRenderingMode(.alwaysTemplate)
+        self.image = templateImage
+        
         setState(.normal)
     }
     
@@ -73,17 +73,17 @@ public class IconStateButton: UIImageView {
         
         eventPublisher.accept(state)
         
-        let nextImage = state == .normal ? normalImage : accentImage
+        let nextColor = state == .normal ? normalColor : accentColor
         
         // UIView.animate - 뷰 속성 변화에 적합
         // UIView.tranistion - 뷰컨텐츠변화 혹은 뷰자체에 대한 변화, 이미지의 경우 여기 해당한다.
         UIView.transition(with: self, duration: withAnimation ? 0.1 : 0.0, options: .transitionCrossDissolve, animations: { [weak self] in
-            self?.image = nextImage
+            self?.tintColor = nextColor
         }, completion: nil)
     }
 }
 
-public extension IconStateButton {
+public extension IconWithColorStateButton {
     
     enum State {
         case normal, accent
