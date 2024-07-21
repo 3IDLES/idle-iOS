@@ -14,8 +14,8 @@ import Entity
 /// 3. 센터 프로필 정보 업데이트(이미지, pre-signed-url)
 /// 4. 센터 프로필 정보 업데이트(이미지, pre-signed-url-callback)
 
-
 public protocol CenterProfileUseCase: UseCaseBase {
     
     func getProfile() -> Single<Result<CenterProfileVO, UserInfoError>>
+    func updateProfile(phoneNumber: String?, introduction: String?, imageInfo: ImageUploadInfo?) -> Single<Result<Void, UserInfoError>>
 }

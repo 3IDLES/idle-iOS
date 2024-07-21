@@ -56,6 +56,10 @@ let project = Project(
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
                 .target(name: "WorkerFeature"),
+                
+                D.Domain.ConcreteUseCase,
+                D.Data.ConcreteRepository,
+                D.Data.NetworkDataSource,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

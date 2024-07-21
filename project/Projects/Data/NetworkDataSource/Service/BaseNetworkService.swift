@@ -195,7 +195,7 @@ public extension BaseNetworkService {
         
         _request(
             api: api,
-            provider: with == .plain ? self.providerWithoutToken : self.providerWithoutToken
+            provider: with == .plain ? self.providerWithoutToken : self.providerWithToken
         )
     }
     
@@ -243,6 +243,7 @@ public extension BaseNetworkService {
 //    }
 }
 
+// MARK: HTTPResponseException+Extension
 extension HTTPResponseException {
     init(response: Response) {
         

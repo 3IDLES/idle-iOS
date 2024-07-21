@@ -25,19 +25,21 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
     public var input: Input
     public var output: Output? = nil
     
-    private var currentPhoneNumber: String?
-    private var currentIntroduction: String?
-    private var currentImage: UIImage?
+    private var fetchedPhoneNumber: String?
+    private var fetchedIntroduction: String?
+    private var fetchedImage: UIImage?
     
-    func checkModification(
-        prev_phoneNumber: String,
-        prev_introduction: String,
-        prev_image: UIImage) -> (String?, String?, UIImage?)
-    {
-        (
-            input.editingPhoneNumber.value == prev_phoneNumber ? nil : input.editingPhoneNumber.value,
-            input.editingInstruction.value == prev_introduction ? nil : input.editingInstruction.value,
-            input.editingImage.value == prev_image ? nil : input.editingImage.value
+    private var editingImageInfo: ImageUploadInfo?
+    
+    func checkModification() -> (String?, String?, ImageUploadInfo?) {
+        
+        let phoneNumber = input.editingPhoneNumber.value
+        let instruction = input.editingInstruction.value
+        
+        return (
+            phoneNumber == fetchedPhoneNumber ? nil : phoneNumber,
+            instruction == fetchedIntroduction ? nil : instruction,
+            editingImageInfo
         )
     }
     
@@ -47,6 +49,7 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         
         self.input = Input()
         
+        // MARK: fetch from server
         let profileRequestResult = input
             .readyToFetch
             .flatMap { [unowned self] _ in
@@ -64,11 +67,7 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
             }
             
         let centerNameDriver = profileRequestSuccess
-            .map { [weak self] in
-                let name = $0.centerName
-                self?.currentPhoneNumber = name
-                return name
-            }
+            .map { $0.centerName }
             .asDriver(onErrorJustReturn: "")
 
         let centerAddressDriver = profileRequestSuccess
@@ -78,78 +77,88 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         let centerIntroductionDriver = profileRequestSuccess
             .map { [weak self] in
                 let introduce = $0.introduce
-                self?.currentIntroduction = introduce
+                self?.fetchedIntroduction = introduce
                 return introduce
             }
             .asDriver(onErrorJustReturn: "")
     
         let centerPhoneNumberDriver = profileRequestSuccess
-            .map { $0.officeNumber }
+            .map { [weak self] in
+                let phoneNumber = $0.officeNumber
+                self?.fetchedPhoneNumber = phoneNumber
+                return phoneNumber
+            }
             .asDriver(onErrorJustReturn: "")
         
-        let centerImageDriver = profileRequestSuccess
+        let fetchCenterImage = profileRequestSuccess
             .map { $0.profileImageURL }
             .compactMap { $0 }
             .observe(on: OperationQueueScheduler.init(operationQueue: .init(), queuePriority: .high))
             .map({ [weak self] imageUrl in
                 if let data = try? Data(contentsOf: imageUrl) {
                     let image = UIImage(data: data)
-                    self?.currentImage = image
+                    self?.fetchedImage = image
                     return image
                 }
                 return nil
             })
-            .asDriver(onErrorJustReturn: nil)
+        
+        // MARK: image validation
+        let imageValidationResult = input
+            .selectedImage
+            .map { [unowned self] image -> UIImage? in
+                guard let imageInfo = self.validateSelectedImage(image: image) else { return nil }
+                printIfDebug("✅ 업로드 가능한 이미지 타입 \(imageInfo.ext)")
+                self.editingImageInfo = imageInfo
+                return image
+            }
+            .share()
+        
+        let imageValidationFailure = imageValidationResult
+            .filter { $0 == nil }
+            .map { _ in
+                DefaultAlertContentVO(
+                    title: "이미지 선택 오류",
+                    message: "지원하지 않는 이미지 형식입니다."
+                )
+            }
+        
+        let displayingImageDriver = Observable
+            .merge(
+                fetchCenterImage,
+                imageValidationResult.compactMap { $0 }
+            )
+            .asDriver(onErrorJustReturn: .init())
         
         
         // 최신 값들 + 버튼이 눌릴 경우 변경 로직이 실행된다.
         let editingRequestResult = input
             .editingFinishButtonPressed
             .map({ [unowned self] _ in
-                self.checkModification(
-                    prev_phoneNumber: self.currentPhoneNumber ?? "",
-                    prev_introduction: self.currentIntroduction ?? "",
-                    prev_image: self.currentImage ?? .init()
-                )
+                checkModification()
             })
-            .flatMap { (inputs) in
+            .flatMap { [useCase] (inputs) in
                 
-                let (phoneNumber, introduction, image) = inputs
+                let (phoneNumber, introduction, imageInfo) = inputs
                 
                 // 변경이 발생하지 않은 곳은 nil값이 전달된다.
+                if let _ = phoneNumber { printIfDebug("✅ 전화번호 변경되었음") }
+                if let _ = introduction { printIfDebug("✅ 센터소개 변경되었음") }
+                if let _ = imageInfo { printIfDebug("✅ 센터 이미지 변경되었음") }
                 
-                // API 호출
-                return Single.just(Result<ChangeCenterInformation, Error>.success(
-                    ChangeCenterInformation(
-                        phoneNumber: phoneNumber,
-                        introduction: introduction,
-                        image: image
-                    )
-                ))
+                return useCase.updateProfile(
+                    phoneNumber: phoneNumber,
+                    introduction: introduction,
+                    imageInfo: imageInfo
+                )
             }
             .share()
         
-        // 스트림을 유지하기위해 생성한 Driver로 필수적으로 사용되지 않는다.
         let editingValidation = editingRequestResult
             .compactMap { $0.value }
-            .map { [weak self] info in
+            .map { [input] info in
                 
-                guard let self else { return () }
-                
-                if let phoneNumber = info.phoneNumber {
-                    printIfDebug("✅ 전화번호 변경 반영되었음")
-                    currentPhoneNumber = phoneNumber
-                }
-                
-                if let introduction = info.introduction {
-                    printIfDebug("✅ 센터소개 반영되었음")
-                    currentIntroduction = introduction
-                }
-                
-                if let image = info.image {
-                    printIfDebug("✅ 센터 이미지 변경 반영되었음")
-                    currentImage = image
-                }
+                printIfDebug("✅ 정보가 성공적으로 업데이트됨")
                 
                 // 업데이트된 정보 요청
                 input.readyToFetch.accept(())
@@ -199,7 +208,8 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         let alertDriver = Observable
             .merge(
                 profileRequestFailure,
-                editingRequestFailure
+                editingRequestFailure,
+                imageValidationFailure
             )
             .asDriver(onErrorJustReturn: .default)
         
@@ -208,11 +218,20 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
             centerLocation: centerAddressDriver,
             centerPhoneNumber: centerPhoneNumberDriver,
             centerIntroduction: centerIntroductionDriver,
-            centerImage: centerImageDriver,
+            displayingImage: displayingImageDriver,
             isEditingMode: isEditingMode,
             editingValidation: editingValidation,
             alert: alertDriver
         )
+    }
+    
+    func validateSelectedImage(image: UIImage) -> ImageUploadInfo? {
+        if let pngData = image.pngData() {
+            return .init(data: pngData, ext: "PNG")
+        } else if let jpegData = image.jpegData(compressionQuality: 1) {
+            return .init(data: jpegData, ext: "JPEG")
+        }
+        return nil
     }
 }
 
@@ -227,7 +246,7 @@ public extension CenterProfileViewModel {
         public var editingFinishButtonPressed: PublishRelay<Void> = .init()
         public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
         public var editingInstruction: BehaviorRelay<String> = .init(value: "")
-        public var editingImage: BehaviorRelay<UIImage> = .init(value: .init())
+        public var selectedImage: PublishRelay<UIImage> = .init()
     }
     
     class Output: CenterProfileOutputable {
@@ -236,7 +255,7 @@ public extension CenterProfileViewModel {
         public var centerLocation: Driver<String>
         public var centerPhoneNumber: Driver<String>
         public var centerIntroduction: Driver<String>
-        public var centerImage: Driver<UIImage?>
+        public var displayingImage: Driver<UIImage?>
         
         // 수정 상태 여부
         public var isEditingMode: Driver<Bool>
@@ -246,12 +265,12 @@ public extension CenterProfileViewModel {
         
         public var alert: Driver<DefaultAlertContentVO>
         
-        init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, centerImage: Driver<UIImage?>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>, alert: Driver<DefaultAlertContentVO>) {
+        init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, displayingImage: Driver<UIImage?>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>, alert: Driver<DefaultAlertContentVO>) {
             self.centerName = centerName
             self.centerLocation = centerLocation
             self.centerPhoneNumber = centerPhoneNumber
             self.centerIntroduction = centerIntroduction
-            self.centerImage = centerImage
+            self.displayingImage = displayingImage
             self.isEditingMode = isEditingMode
             self.editingValidation = editingValidation
             self.alert = alert
