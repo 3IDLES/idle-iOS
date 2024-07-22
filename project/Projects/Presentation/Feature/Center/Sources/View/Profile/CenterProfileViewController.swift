@@ -103,7 +103,7 @@ public class CenterProfileViewController: DisposableViewController {
     let centerPhoneNumeberField: MultiLineTextField = {
         let textView = MultiLineTextField(
             typography: .Body3,
-            placeholderText: "추가적으로 요구사항이 있다면 작성해주세요."
+            placeholderText: "연락처를 입력해주세요."
         )
         textView.textContainerInset = .init(top: 10, left: 16, bottom: 10, right: 24)
         textView.isScrollEnabled = false
