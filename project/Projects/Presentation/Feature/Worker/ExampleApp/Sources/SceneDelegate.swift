@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import WorkerFeature
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -15,7 +16,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         guard let windowScene = scene as? UIWindowScene else { return }
         
+        self.window = UIWindow(windowScene: windowScene)
         
+        let vm = WorkerProfileViewModel()
+        
+        let vc = WorkerProfileViewController()
+        
+        vc.bind(vm)
+        
+        window?.rootViewController = vc
         window?.makeKeyAndVisible()
     }
 }

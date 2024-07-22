@@ -19,7 +19,7 @@ public protocol CenterProfileViewModelable where Input: CenterProfileInputable, 
     var output: Output? { get }
 }
 
-public protocol CenterProfileInputable {
+public protocol CenterProfileInputable: AnyObject {
     var readyToFetch: PublishRelay<Void> { get }
     var editingButtonPressed: PublishRelay<Void> { get }
     var editingFinishButtonPressed: PublishRelay<Void> { get }
@@ -28,7 +28,7 @@ public protocol CenterProfileInputable {
     var selectedImage: PublishRelay<UIImage> { get }
 }
 
-public protocol CenterProfileOutputable {
+public protocol CenterProfileOutputable: AnyObject {
     var centerName: Driver<String> { get }
     var centerLocation: Driver<String> { get }
     var centerPhoneNumber: Driver<String> { get }
