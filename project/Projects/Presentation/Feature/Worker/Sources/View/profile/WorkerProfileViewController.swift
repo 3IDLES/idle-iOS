@@ -31,6 +31,8 @@ public protocol WorkerProfileOutputable: AnyObject {
 
 public class WorkerProfileViewController: DisposableViewController {
     
+    private var viewModel: (any WorkerProfileViewModelable)?
+    
     // 네비게이션 바
     let navigationBar: NavigationBarType1 = {
         let bar = NavigationBarType1(navigationTitle: "내 프로필")
@@ -191,7 +193,7 @@ public class WorkerProfileViewController: DisposableViewController {
         fatalError()
     }
     
-    func setApearance() {
+    private func setApearance() {
         view.backgroundColor = .white
         view.layoutMargins = .init(
             top: 0,
@@ -201,7 +203,7 @@ public class WorkerProfileViewController: DisposableViewController {
         )
     }
     
-    func setAutoLayout() {
+    private func setAutoLayout() {
         
         // 상단 네비게이션바 세팅
         let navigationStack = HStack([
@@ -284,29 +286,23 @@ public class WorkerProfileViewController: DisposableViewController {
         // 요양보호사 구직정보
         
         let employeeInfoStack = VStack(
-            [],
+            [
+                (addressTitleLabel, addressLabel),
+                (introductionTitleLabel, introductionLabel),
+                (abilityTitleLabel, abilityLabel),
+            ]
+                .map { (title, content) in
+                return VStack(
+                    [
+                        title,
+                        content
+                    ],
+                    spacing: 6,
+                    alignment: .leading
+                )
+            },
             spacing: 28,
             alignment: .leading)
-        let employeeInfoStackInfoList = [
-            (addressTitleLabel, addressLabel),
-            (introductionTitleLabel, introductionLabel),
-            (abilityTitleLabel, abilityLabel),
-        ]
-        
-        employeeInfoStackInfoList
-            .map { (title, content) in
-            return VStack(
-                [
-                    title,
-                    content
-                ],
-                spacing: 6,
-                alignment: .leading
-            )
-        }
-        .forEach {
-            employeeInfoStack.addArrangedSubview($0)
-        }
 
         // view hierarchy
         [
@@ -358,13 +354,23 @@ public class WorkerProfileViewController: DisposableViewController {
         ])
     }
     
-    func setObservable() {
+    private func setObservable() {
         
-        
+        profileEditButton
+            .eventPublisher
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                let editVC = EditWorkerProfileViewController()
+                editVC.modalPresentationStyle = .fullScreen
+                self?.present(editVC, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     
     public func bind(_ viewModel: any WorkerProfileViewModelable) {
+        
+        self.viewModel = viewModel
         
         let input = viewModel.input
            
