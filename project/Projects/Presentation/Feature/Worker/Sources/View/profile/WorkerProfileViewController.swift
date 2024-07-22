@@ -20,7 +20,7 @@ public protocol WorkerProfileViewModelable where Input: WorkerProfileInputable, 
 }
 
 public protocol WorkerProfileInputable: AnyObject {
-    var readyToFetch: PublishRelay<Void> { get }
+    var viewWillAppear: PublishRelay<Void> { get }
 }
 
 public protocol WorkerProfileOutputable: AnyObject {
@@ -49,10 +49,28 @@ public class WorkerProfileViewController: DisposableViewController {
     }()
     
     // 프로필 이미지
-    let profileImage: UIImageView = {
+    let profileImageContainer: UIView = {
+        
+        let view = UIView()
+        view.backgroundColor = DSKitAsset.Colors.orange100.color
+        view.layer.cornerRadius = 48
+        view.clipsToBounds = true
+        
+        let imageView = DSKitAsset.Icons.workerProfilePlaceholder.image.toView()
+        view.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 26),
+            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25),
+            imageView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -29),
+            imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -27),
+        ])
+
+        return view
+    }()
+    let workerProfileImage: UIImageView = {
         
         let imageView = UIImageView()
-        imageView.backgroundColor = .blue
         imageView.layer.cornerRadius = 48
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
@@ -197,6 +215,16 @@ public class WorkerProfileViewController: DisposableViewController {
         let grayBackgrounnd = UIView()
         grayBackgrounnd.backgroundColor = DSKitAsset.Colors.gray050.color
         
+        // 프로필 이미지
+        profileImageContainer.addSubview(workerProfileImage)
+        workerProfileImage.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            workerProfileImage.topAnchor.constraint(equalTo: profileImageContainer.topAnchor),
+            workerProfileImage.leadingAnchor.constraint(equalTo: profileImageContainer.leadingAnchor),
+            workerProfileImage.trailingAnchor.constraint(equalTo: profileImageContainer.trailingAnchor),
+            workerProfileImage.bottomAnchor.constraint(equalTo: profileImageContainer.bottomAnchor),
+        ])
+        
         // 구직태그 + 이름 스택
         let nameStack = HStack(
             [
@@ -284,7 +312,7 @@ public class WorkerProfileViewController: DisposableViewController {
         [
             grayBackgrounnd,
             navigationStack,
-            profileImage,
+            profileImageContainer,
             tagNameStack,
             humanInfoStack,
             divider,
@@ -308,12 +336,12 @@ public class WorkerProfileViewController: DisposableViewController {
             navigationStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             navigationStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            profileImage.widthAnchor.constraint(equalToConstant: 96),
-            profileImage.heightAnchor.constraint(equalTo: profileImage.widthAnchor),
-            profileImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            profileImage.centerYAnchor.constraint(equalTo: grayBackgrounnd.bottomAnchor),
+            profileImageContainer.widthAnchor.constraint(equalToConstant: 96),
+            profileImageContainer.heightAnchor.constraint(equalTo: profileImageContainer.widthAnchor),
+            profileImageContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            profileImageContainer.centerYAnchor.constraint(equalTo: grayBackgrounnd.bottomAnchor),
             
-            tagNameStack.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: 16),
+            tagNameStack.topAnchor.constraint(equalTo: profileImageContainer.bottomAnchor, constant: 16),
             tagNameStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             humanInfoStack.topAnchor.constraint(equalTo: tagNameStack.bottomAnchor, constant: 16),
@@ -362,12 +390,16 @@ public class WorkerProfileViewController: DisposableViewController {
         
         output
             .displayingImage
-            .drive(profileImage.rx.image)
+            .drive(workerProfileImage.rx.image)
             .disposed(by: disposeBag)
         
-        input
-            .readyToFetch
-            .accept(())
+        self.rx
+            .viewWillAppear
+            .filter { $0 }
+            .map { _ in () }
+            .bind(to: input.viewWillAppear)
+            .disposed(by: disposeBag)
+        
     }
     
     public func cleanUp() {

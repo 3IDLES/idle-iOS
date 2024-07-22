@@ -20,7 +20,7 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
     public init() {
         
         let fetchedProfileVOResult = input
-            .readyToFetch
+            .viewWillAppear
             .flatMap { [unowned self] _ in
                 fetchProfileVO()
             }
@@ -74,7 +74,7 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
 public extension WorkerProfileViewModel {
     
     class Input: WorkerProfileInputable {
-        public var readyToFetch: PublishRelay<Void> = .init()
+        public var viewWillAppear: PublishRelay<Void> = .init()
     }
     
     class Output: WorkerProfileOutputable {
