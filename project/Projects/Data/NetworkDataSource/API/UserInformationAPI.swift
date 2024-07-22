@@ -59,7 +59,7 @@ extension UserInformationAPI: BaseAPI {
         case .getCenterProfile:
             .get
         case .updateCenterProfile:
-            .post
+            .patch
         case .getPreSignedUrl:
             .get
         case .imageUploadSuccessCallback:

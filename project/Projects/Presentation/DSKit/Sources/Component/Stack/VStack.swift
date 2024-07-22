@@ -10,13 +10,13 @@ import UIKit
 
 public class VStack: UIStackView {
     
-    public init(_ elements: [UIView], spacing: CGFloat = 0.0, alignment: UIStackView.Alignment = .center) {
+    public init(_ elements: [UIView], spacing: CGFloat = 0.0, alignment: UIStackView.Alignment = .center, distribution: UIStackView.Distribution = .fill) {
         
         super.init(frame: .zero)
         
         self.spacing = spacing
         self.axis = .vertical
-        self.distribution = .fill
+        self.distribution = distribution
         self.alignment = alignment
         
         elements
