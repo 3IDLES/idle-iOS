@@ -28,7 +28,7 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
     
     weak var pageViewController: UIPageViewController?
     
-    var stageViewControllers: [DisposableViewController] = []
+    var stageViewControllers: [UIViewController] = []
     
     private var currentStage: WorkerRegisterStage!
     

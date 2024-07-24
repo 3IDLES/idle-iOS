@@ -35,22 +35,13 @@ public class WorkerRegisterViewModel: ViewModelType {
     private func setInput() {
         
         // MARK: 이름 입력
-        _ = input
-            .editingName
-            .compactMap({ $0 })
-            .map { [weak self] name in
-                
-                guard let self else { return (false, name) }
-                
-                let isValid = self.inputValidationUseCase.checkNameIsValid(name: name)
-                
-                if isValid {
-                    stateObject.name = name
-                }
-                
-                return (isValid, name)
+        AuthInOutStreamManager.enterNameInOut(
+            input: input,
+            output: output,
+            useCase: inputValidationUseCase) { [weak self] validName in
+                // 🚀 상태추적 🚀
+                self?.stateObject.name = validName
             }
-            .bind(to: output.nameValidation)
         
         // MARK: 성별 선택
         _ = input
@@ -64,92 +55,12 @@ public class WorkerRegisterViewModel: ViewModelType {
             .bind(to: output.genderIsSelected)
             
         // MARK: 전화번호 입력
-        _ = input
-            .editingPhoneNumber
-            .compactMap({ $0 })
-            .map({ [unowned self] phoneNumber in
-                printIfDebug("[CenterRegisterViewModel] 전달받은 전화번호: \(phoneNumber)")
-                return self.inputValidationUseCase.checkPhoneNumberIsValid(phoneNumber: phoneNumber)
-            })
-            .bind(to: output.canSubmitPhoneNumber)
-        
-        _ = input
-            .editingAuthNumber
-            .compactMap({ $0 })
-            .map({ authNumber in
-                printIfDebug("[CenterRegisterViewModel] 전달받은 인증번호: \(authNumber)")
-                return authNumber.count >= 6
-            })
-            .bind(to: output.canSubmitAuthNumber)
-        
-        let phoneNumberAuthRequestResult = input
-            .requestAuthForPhoneNumber
-            .compactMap({ $0 })
-            .flatMap({ [unowned self] number in
-                
-                let formatted = self.formatPhoneNumber(phoneNumber: number)
-                
-                // 상태추적
-                self.stateObject.phoneNumber = formatted
-                
-                #if DEBUG
-                print("✅ 디버그모드에서 번호인증 요청 무조건 통과")
-                return Single.just(Result<String, InputValidationError>.success(formatted))
-                #endif
-                
-                return self.inputValidationUseCase.requestPhoneNumberAuthentication(phoneNumber: formatted)
-            })
-            .share()
-        
-        _ = phoneNumberAuthRequestResult
-            .compactMap { $0.value }
-            .map { [weak self] phoneNumber in
-                printIfDebug("✅ 번호로 인증을 시작합니다.")
-                self?.stateObject.phoneNumber = phoneNumber
-                self?.output.phoneNumberValidation.accept(true)
-            }
-        
-        _ = phoneNumberAuthRequestResult
-            .compactMap { $0.error }
-            .map { [weak self] error in
-                printIfDebug("❌ 인증을 시작할 수 없습니다. \n 에러내용: \(error.message)")
-                self?.output.phoneNumberValidation.accept(false)
-            }
-        
-        let phoneNumberAuthResult = input.requestValidationForAuthNumber
-            .compactMap({ [weak self] authNumber in
-                if let phoneNumber = self?.stateObject.phoneNumber, let authNumber {
-                    return (phoneNumber, authNumber)
-                }
-                return nil
-            })
-            .flatMap { [unowned self] (phoneNumber: String, authNumber: String) in
-                
-                #if DEBUG
-                // 디버그시 인증번호 무조건 통과
-                print("✅ 디버그모드에서 번호인증 무조건 통과")
-                return Single.just(Result<String, InputValidationError>.success(phoneNumber))
-                #endif
-                
-                return self.inputValidationUseCase
-                    .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
-            }
-            .share()
-        
-        // 번호인증 성공
-        _ = phoneNumberAuthResult
-            .compactMap { $0.value }
-            .map { [weak self] _ in
-                printIfDebug("✅ 인증성공")
-                self?.output.authNumberValidation.accept(true)
-            }
-    
-        // 번호인증 실패
-        _ = phoneNumberAuthResult
-            .compactMap { $0.error }
-            .map { [weak self] error in
-                printIfDebug("❌ 번호 인증실패 \n 에러내용: \(error.message)")
-                self?.output.authNumberValidation.accept(false)
+        AuthInOutStreamManager.validatePhoneNumberInOut(
+            input: input,
+            output: output,
+            useCase: inputValidationUseCase) { [weak self] authedPhoneNumber in
+                // 🚀 상태추적 🚀
+                self?.stateObject.phoneNumber = authedPhoneNumber
             }
         
         // MARK: 주소 입력
@@ -228,10 +139,10 @@ extension WorkerRegisterViewModel {
         public var selectingGender: BehaviorRelay<Gender> = .init(value: .notDetermined)
         
         // 전화번호 입력
-        public var editingPhoneNumber: PublishRelay<String?> = .init()
-        public var editingAuthNumber: PublishRelay<String?> = .init()
-        public var requestAuthForPhoneNumber: PublishRelay<String?> = .init()
-        public var requestValidationForAuthNumber: PublishRelay<String?> = .init()
+        public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
+        public var editingAuthNumber: BehaviorRelay<String> = .init(value: "")
+        public var requestAuthForPhoneNumber: PublishRelay<Void> = .init()
+        public var requestValidationForAuthNumber: PublishRelay<Void> = .init()
         
         // 주소 입력
         public var addressInformation: PublishRelay<AddressInformation?> = .init()
@@ -246,13 +157,16 @@ extension WorkerRegisterViewModel {
         public var genderIsSelected: PublishRelay<Void> = .init()
         
         // 전화번호 입력
-        public var canSubmitPhoneNumber: PublishRelay<Bool?> = .init()
-        public var canSubmitAuthNumber: PublishRelay<Bool?> = .init()
-        public var phoneNumberValidation: PublishRelay<Bool?> = .init()
-        public var authNumberValidation: PublishRelay<Bool?> = .init()
+        public var canSubmitPhoneNumber: Driver<Bool>?
+        public var canSubmitAuthNumber: Driver<Bool>?
+        public var phoneNumberValidation: Driver<Bool>?
+        public var authNumberValidation: Driver<Bool>?
         
         // 회원가입 성공 여부
         public var registerValidation: PublishRelay<Bool?> = .init()
+        
+        // Alert
+        public var alert: Driver<DefaultAlertContentVO>?
     }
 }
 

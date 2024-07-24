@@ -28,7 +28,7 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
     public var navigationController: UINavigationController
     
-    var stageViewControllers: [DisposableViewController] = []
+    var stageViewControllers: [UIViewController] = []
     
     private var currentStage: CenterRegisterStage!
     

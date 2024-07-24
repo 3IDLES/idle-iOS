@@ -19,7 +19,7 @@ public protocol CenterProfileViewModelable where Input: CenterProfileInputable, 
     var output: Output? { get }
 }
 
-public protocol CenterProfileInputable: AnyObject {
+public protocol CenterProfileInputable {
     var readyToFetch: PublishRelay<Void> { get }
     var editingButtonPressed: PublishRelay<Void> { get }
     var editingFinishButtonPressed: PublishRelay<Void> { get }
@@ -28,7 +28,7 @@ public protocol CenterProfileInputable: AnyObject {
     var selectedImage: PublishRelay<UIImage> { get }
 }
 
-public protocol CenterProfileOutputable: AnyObject {
+public protocol CenterProfileOutputable: DefaultAlertOutputable {
     var centerName: Driver<String> { get }
     var centerLocation: Driver<String> { get }
     var centerPhoneNumber: Driver<String> { get }
@@ -36,10 +36,9 @@ public protocol CenterProfileOutputable: AnyObject {
     var displayingImage: Driver<UIImage?> { get }
     var isEditingMode: Driver<Bool> { get }
     var editingValidation: Driver<Void> { get }
-    var alert: Driver<DefaultAlertContentVO> { get }
 }
 
-public class CenterProfileViewController: DisposableViewController {
+public class CenterProfileViewController: BaseViewController {
     
     var viewModel: (any CenterProfileViewModelable)?
     
@@ -103,7 +102,7 @@ public class CenterProfileViewController: DisposableViewController {
     let centerPhoneNumeberField: MultiLineTextField = {
         let textView = MultiLineTextField(
             typography: .Body3,
-            placeholderText: "연락처를 입력해주세요."
+            placeholderText: "추가적으로 요구사항이 있다면 작성해주세요."
         )
         textView.textContainerInset = .init(top: 10, left: 16, bottom: 10, right: 24)
         textView.isScrollEnabled = false
@@ -460,17 +459,6 @@ public class CenterProfileViewController: DisposableViewController {
         
         // 바인딩 종료
         bindFinished.accept(())
-    }
-    
-    public func showAlert(vo: DefaultAlertContentVO) {
-        let alret = UIAlertController(title: vo.title, message: vo.message, preferredStyle: .alert)
-        let close = UIAlertAction(title: "닫기", style: .default, handler: nil)
-        alret.addAction(close)
-        present(alret, animated: true, completion: nil)
-    }
-    
-    public func cleanUp() {
-        
     }
 }
 
