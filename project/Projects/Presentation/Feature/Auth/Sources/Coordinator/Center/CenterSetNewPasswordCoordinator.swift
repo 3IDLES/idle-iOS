@@ -21,7 +21,7 @@ public class CenterSetNewPasswordCoordinator: ChildCoordinator {
     public weak var viewControllerRef: (any PresentationCore.DisposableViewController)?
     public var navigationController: UINavigationController
     
-    var stageViewControllers: [DisposableViewController] = []
+    var stageViewControllers: [UIViewController] = []
     weak var pageViewController: UIPageViewController?
     
     public var parent: CenterAuthCoordinatable?

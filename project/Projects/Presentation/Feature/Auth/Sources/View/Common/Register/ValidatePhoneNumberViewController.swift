@@ -9,26 +9,29 @@ import UIKit
 import RxSwift
 import RxCocoa
 import DSKit
+import Entity
 import PresentationCore
 
 public protocol AuthPhoneNumberInputable {
     
-    var editingPhoneNumber: PublishRelay<String?> { get set }
-    var editingAuthNumber: PublishRelay<String?> { get set }
-    var requestAuthForPhoneNumber: PublishRelay<String?> { get set }
-    var requestValidationForAuthNumber: PublishRelay<String?> { get set }
+    var editingPhoneNumber: BehaviorRelay<String> { get set }
+    var editingAuthNumber: BehaviorRelay<String> { get set }
+    var requestAuthForPhoneNumber: PublishRelay<Void> { get set }
+    var requestValidationForAuthNumber: PublishRelay<Void> { get set }
 }
 
 public protocol AuthPhoneNumberOutputable {
     
-    var canSubmitPhoneNumber: PublishRelay<Bool?> { get set }
-    var canSubmitAuthNumber: PublishRelay<Bool?> { get set }
-    var phoneNumberValidation: PublishRelay<Bool?> { get set }
-    var authNumberValidation: PublishRelay<Bool?> { get set }
+    var canSubmitPhoneNumber: Driver<Bool>? { get set }
+    var canSubmitAuthNumber: Driver<Bool>? { get set }
+    var phoneNumberValidation: Driver<Bool>? { get set }
+    var authNumberValidation: Driver<Bool>? { get set }
+    
+    var alert: Driver<DefaultAlertContentVO>? { get set }
 }
 
-class ValidatePhoneNumberViewController<T: ViewModelType>: DisposableViewController
-where 
+class ValidatePhoneNumberViewController<T: ViewModelType>: BaseViewController
+where
     T.Input: AuthPhoneNumberInputable,
     T.Output: AuthPhoneNumberOutputable {
     
@@ -210,21 +213,25 @@ where
         
         // 현재 입력중인 정보 전송
         phoneNumberField.idleTextField.textField.rx.text
+            .compactMap { $0 }
             .bind(to: input.editingPhoneNumber)
             .disposed(by: disposeBag)
         
         authNumberField.idleTextField.textField.rx.text
+            .compactMap { $0 }
             .bind(to: input.editingAuthNumber)
             .disposed(by: disposeBag)
         
         // 인증, 확인 버튼이 눌린 경우
         phoneNumberField
             .eventPublisher
+            .map { _ in () }
             .bind(to: input.requestAuthForPhoneNumber)
             .disposed(by: disposeBag)
         
         authNumberField
             .eventPublisher
+            .map { _ in () }
             .bind(to: input.requestValidationForAuthNumber)
             .disposed(by: disposeBag)
         
@@ -233,7 +240,7 @@ where
         
         // 입력중인 전화번호가 특정 조건(ex: 입력길이)을 만족한 경우 '인증'버튼 활성화
         output
-            .canSubmitPhoneNumber
+            .canSubmitPhoneNumber?
             .compactMap { $0 }
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] in self?.phoneNumberField.button.setEnabled($0) })
@@ -241,7 +248,7 @@ where
         
         // 입력중인 인증번호가 특정 조건(ex: 입력길이)을 만족한 경우 '확인'버튼 활성화
         output
-            .canSubmitAuthNumber
+            .canSubmitAuthNumber?
             .compactMap { $0 }
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] in self?.authNumberField.button.setEnabled($0) })
@@ -249,21 +256,26 @@ where
         
         // 휴대전화 인증의 시작
         output
-            .phoneNumberValidation
-            .compactMap { $0 }
-            .filter { $0 }
-            .subscribe(onNext: { [weak self] _ in
+            .phoneNumberValidation?
+            .drive(onNext: { [weak self] _ in
                 self?.activateAuthNumberField()
             })
             .disposed(by: disposeBag)
         
         // 인증번호 인증 성공여부
         output
-            .authNumberValidation
-            .compactMap { $0 }
+            .authNumberValidation?
             .filter { $0 }
-            .subscribe(onNext: { [weak self] _ in
+            .drive(onNext: { [weak self] _ in
                 self?.onAuthSuccess()
+            })
+            .disposed(by: disposeBag)
+        
+        // Alert
+        output
+            .alert?
+            .drive(onNext: { [weak self] vo in
+                self?.showAlert(vo: vo)
             })
             .disposed(by: disposeBag)
         
@@ -273,10 +285,6 @@ where
             .eventPublisher
             .subscribe { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
-    }
-    
-    func cleanUp() {
-        
     }
 }
 

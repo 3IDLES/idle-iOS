@@ -20,68 +20,62 @@ extension AuthInOutStreamManager {
         useCase: AuthInputValidationUseCase,
         stateTracker: @escaping (String) -> ()
     ) {
+        
+        var output = output
+        
         // MARK: 전화번호 입력
-        _ = input
+        output.canSubmitPhoneNumber = input
             .editingPhoneNumber
-            .compactMap({ $0 })
             .map({ [unowned useCase] phoneNumber in
                 printIfDebug("[CenterRegisterViewModel] 전달받은 전화번호: \(phoneNumber)")
                 return useCase.checkPhoneNumberIsValid(phoneNumber: phoneNumber)
             })
-            .map({ [weak output] isValid in
-                output?.canSubmitPhoneNumber.accept(isValid)
-            })
+            .asDriver(onErrorJustReturn: false)
         
-        _ = input
+        output.canSubmitAuthNumber = input
             .editingAuthNumber
             .compactMap({ $0 })
-            .map({ [weak output] authNumber in
+            .map { authNumber in
                 printIfDebug("[CenterRegisterViewModel] 전달받은 인증번호: \(authNumber)")
-                output?.canSubmitAuthNumber.accept(authNumber.count == 6)
-            })
+                
+                return authNumber.count == 6
+            }
+            .asDriver(onErrorJustReturn: false)
         
         let phoneNumberAuthRequestResult = input
             .requestAuthForPhoneNumber
-            .compactMap({ $0 })
-            .flatMap({ [unowned useCase] number in
-                
-                let formatted = Self.formatPhoneNumber(phoneNumber: number)
+            .flatMap { [unowned useCase, input] _ in
+
+                let formatted = Self.formatPhoneNumber(phoneNumber: input.editingPhoneNumber.value)
 #if DEBUG
                 print("✅ 디버그모드에서 번호인증 요청 무조건 통과")
                 return Single.just(Result<String, InputValidationError>.success(formatted))
 #endif
-                
                 return useCase.requestPhoneNumberAuthentication(phoneNumber: formatted)
-            })
-            .share()
-        
-        var authingNumber: String = ""
-        
-        _ = phoneNumberAuthRequestResult
-            .compactMap { $0.value }
-            .map { [weak output] phoneNumber in
-                printIfDebug("✅ 번호로 인증을 시작합니다.")
-                authingNumber = phoneNumber
-                output?.phoneNumberValidation.accept(true)
             }
         
-        _ = phoneNumberAuthRequestResult
+        output
+            .phoneNumberValidation = phoneNumberAuthRequestResult
+            .compactMap { $0.value }
+            .map { phoneNumber in
+                printIfDebug("✅ \(phoneNumber) 번호로 인증을 시작합니다.")
+                return true
+            }
+            .asDriver(onErrorJustReturn: false)
+
+        let phoneNumeberAuthRequestFailure = phoneNumberAuthRequestResult
             .compactMap { $0.error }
-            .map { [weak output] error in
+            .map { error in
                 printIfDebug("❌ 인증을 시작할 수 없습니다. \n 에러내용: \(error.message)")
-                output?.phoneNumberValidation.accept(false)
+                return error.message
             }
         
         
         let phoneNumberAuthResult = input.requestValidationForAuthNumber
-            .compactMap({ authNumber in
-                if let authNumber {
-                    return (authingNumber, authNumber)
-                }
-                return nil
-            })
-            .flatMap { [unowned useCase] (phoneNumber: String, authNumber: String) in
+            .flatMap { [unowned useCase, input] _ in
                 
+                let phoneNumber = input.editingPhoneNumber.value
+                let authNumber = input.editingAuthNumber.value
 #if DEBUG
                 // 디버그시 인증번호 무조건 통과
                 print("✅ 디버그모드에서 번호인증 무조건 통과")
@@ -93,21 +87,49 @@ extension AuthInOutStreamManager {
             .share()
         
         // 번호인증 성공
-        _ = phoneNumberAuthResult
+        output.authNumberValidation = phoneNumberAuthResult
             .compactMap { $0.value }
-            .map { [weak output] phoneNumber in
+            .map { phoneNumber in
                 printIfDebug("✅ \(phoneNumber) 인증성공")
                 stateTracker(phoneNumber)
-                output?.authNumberValidation.accept(true)
+                return true
             }
+            .asDriver(onErrorJustReturn: false)
     
         // 번호인증 실패
-        _ = phoneNumberAuthResult
+        let phoneNumeberAuthFailure = phoneNumberAuthResult
             .compactMap { $0.error }
-            .map { [weak output] error in
+            .map { error in
                 printIfDebug("❌ 번호 인증실패 \n 에러내용: \(error.message)")
-                output?.authNumberValidation.accept(false)
+                return error.message
             }
+        
+        // 번호 인증 관련 Alert
+        let phoneAuthValidation = Observable
+            .merge(
+                phoneNumeberAuthRequestFailure,
+                phoneNumeberAuthFailure
+            )
+            .map { errorMessage in
+                DefaultAlertContentVO(
+                    title: "번호 인증 실패",
+                    message: errorMessage
+                )
+            }
+        
+        // 이미 alert드라이버가 존재할 경우 merge
+        var newAlertDrvier: Observable<DefaultAlertContentVO>!
+        if let alertDrvier = output.alert {
+            newAlertDrvier = Observable
+                .merge(
+                    alertDrvier.asObservable(),
+                    phoneAuthValidation
+                )
+        } else {
+            newAlertDrvier = phoneAuthValidation
+        }
+        output
+            .alert = newAlertDrvier.asDriver(onErrorJustReturn: .default)
     }
 }
 

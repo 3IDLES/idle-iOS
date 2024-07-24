@@ -85,10 +85,10 @@ extension CenterRegisterViewModel {
         public var editingName: PublishRelay<String?> = .init()
         
         // 전화번호 입력
-        public var editingPhoneNumber: PublishRelay<String?> = .init()
-        public var editingAuthNumber: PublishRelay<String?> = .init()
-        public var requestAuthForPhoneNumber: PublishRelay<String?> = .init()
-        public var requestValidationForAuthNumber: PublishRelay<String?> = .init()
+        public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
+        public var editingAuthNumber: BehaviorRelay<String> = .init(value: "")
+        public var requestAuthForPhoneNumber: PublishRelay<Void> = .init()
+        public var requestValidationForAuthNumber: PublishRelay<Void> = .init()
         
         // 사업자 번호 입력
         public var editingBusinessNumber: PublishRelay<String?> = .init()
@@ -108,10 +108,10 @@ extension CenterRegisterViewModel {
         public var nameValidation: PublishSubject<(isValid: Bool, name: String)> = .init()
         
         // 전화번호 입력
-        public var canSubmitPhoneNumber: PublishRelay<Bool?> = .init()
-        public var canSubmitAuthNumber: PublishRelay<Bool?> = .init()
-        public var phoneNumberValidation: PublishRelay<Bool?> = .init()
-        public var authNumberValidation: PublishRelay<Bool?> = .init()
+        public var canSubmitPhoneNumber: Driver<Bool>?
+        public var canSubmitAuthNumber: Driver<Bool>?
+        public var phoneNumberValidation: Driver<Bool>?
+        public var authNumberValidation: Driver<Bool>?
         
         // 사업자 번호 입력
         public var canSubmitBusinessNumber: PublishRelay<Bool?> = .init()
@@ -126,6 +126,9 @@ extension CenterRegisterViewModel {
         
         // Register success
         public var registerValidation: PublishRelay<Bool?> = .init()
+        
+        // Alert
+        public var alert: Driver<DefaultAlertContentVO>?
     }
 }
 

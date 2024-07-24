@@ -11,7 +11,7 @@ import Alamofire
 
 public enum AuthAPI {
     
-    // Core
+    // Common
     case startPhoneNumberAuth(phoneNumber: String)
     case checkAuthNumber(phoneNumber: String, authNumber: String)
     
@@ -50,9 +50,9 @@ extension AuthAPI: BaseAPI {
     public var path: String {
         switch self {
         case .startPhoneNumberAuth:
-            "core/send"
+            "common/send"
         case .checkAuthNumber:
-            "core/confirm"
+            "common/confirm"
         case .authenticateBusinessNumber(let businessNumber):
             "center/authentication/\(businessNumber)"
         case .checkIdDuplication(id: let id):

@@ -84,10 +84,10 @@ public extension CenterSetNewPasswordViewModel {
     class Input {
         
         // 전화번호 입력
-        public var editingPhoneNumber: PublishRelay<String?> = .init()
-        public var editingAuthNumber: PublishRelay<String?> = .init()
-        public var requestAuthForPhoneNumber: PublishRelay<String?> = .init()
-        public var requestValidationForAuthNumber: PublishRelay<String?> = .init()
+        public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
+        public var editingAuthNumber: BehaviorRelay<String> = .init(value: "")
+        public var requestAuthForPhoneNumber: PublishRelay<Void> = .init()
+        public var requestValidationForAuthNumber: PublishRelay<Void> = .init()
         
         // Password
         public var editingPassword: PublishRelay<(pwd: String, cpwd: String)?> = .init()
@@ -99,16 +99,18 @@ public extension CenterSetNewPasswordViewModel {
     class Output {
         
         // 전화번호 입력
-        public var canSubmitPhoneNumber: PublishRelay<Bool?> = .init()
-        public var canSubmitAuthNumber: PublishRelay<Bool?> = .init()
-        public var phoneNumberValidation: PublishRelay<Bool?> = .init()
-        public var authNumberValidation: PublishRelay<Bool?> = .init()
+        public var canSubmitPhoneNumber: Driver<Bool>?
+        public var canSubmitAuthNumber: Driver<Bool>?
+        public var phoneNumberValidation: Driver<Bool>?
+        public var authNumberValidation: Driver<Bool>?
         
         // Password
         public var passwordValidation: PublishRelay<PasswordValidationState?> = .init()
         
         // Change password
         public var changePasswordSuccessValidation: PublishRelay<Bool?> = .init()
+        
+        public var alert: Driver<Entity.DefaultAlertContentVO>?
     }
 }
 
