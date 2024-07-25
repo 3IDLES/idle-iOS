@@ -17,9 +17,8 @@ class AlertViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        let alertVC = IdleBigAlertController(
+        let alertVC = IdleSmallAlertController(
             titleText: "정말 탈퇴하시겠어요?",
-            descriptionText: "탈퇴 버튼 선택 시 모든 정보가 삭제되며, 되돌릴 수 없습니다.",
             button1Info: .init(
                 text: "취소하기",
                 backgroundColor: .white,
