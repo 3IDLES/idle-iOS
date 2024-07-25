@@ -93,7 +93,7 @@ public class IFType1: UIStackView {
         
         button
             .eventPublisher
-            .emit { [weak self] _ in
+            .subscribe { [weak self] _ in
                 
                 // 문자열 전송
                 self?.eventPublisher
