@@ -21,6 +21,10 @@ public enum AuthAPI {
     case registerCenterAccount(data: Data)
     case centerLogin(id: String, password: String)
     case reissueToken(refreshToken: String)
+    
+    // Worker
+    case registerWorkerAccount(data: Data)
+    case workerLogin(phoneNumber: String, verificationNumber: String)
 }
 
 extension AuthAPI: BaseAPI {
@@ -44,6 +48,10 @@ extension AuthAPI: BaseAPI {
             return .post
         case .reissueToken:
             return .post
+        case .registerWorkerAccount:
+            return .post
+        case .workerLogin:
+            return .post
         }
     }
     
@@ -63,6 +71,10 @@ extension AuthAPI: BaseAPI {
             "center/login"
         case .reissueToken:
             "center/refresh"
+        case .registerWorkerAccount:
+            "auth/carer/join"
+        case .workerLogin:
+            "auth/carer/login"
         }
     }
     
@@ -79,6 +91,9 @@ extension AuthAPI: BaseAPI {
             params["password"] = password
         case .reissueToken(let refreshToken):
             params["refreshToken"] = refreshToken
+        case .workerLogin(let phoneNumber, let verificationNumber):
+            params["phoneNumber"] = phoneNumber
+            params["verificationNumber"] = verificationNumber
         default:
             break
         }
@@ -103,6 +118,10 @@ extension AuthAPI: BaseAPI {
         case .centerLogin:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .reissueToken:
+            return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
+        case .registerWorkerAccount(let data):
+            return .requestData(data)
+        case .workerLogin:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         default:
             return .requestPlain

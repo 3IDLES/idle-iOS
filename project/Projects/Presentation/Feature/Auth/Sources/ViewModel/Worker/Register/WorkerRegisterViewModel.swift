@@ -22,9 +22,7 @@ public class WorkerRegisterViewModel: ViewModelType {
     
     private let stateObject = WorkerRegisterState()
     
-    public func transform(input: Input) -> Output {
-        return output
-    }
+    private let disposeBag = DisposeBag()
     
     public init(inputValidationUseCase: AuthInputValidationUseCase) {
         self.inputValidationUseCase = inputValidationUseCase
@@ -44,15 +42,15 @@ public class WorkerRegisterViewModel: ViewModelType {
             }
         
         // MARK: 성별 선택
-        _ = input
+        // 예외적으로 ViewModel에서 구독처리
+        input
             .selectingGender
             .filter({ $0 != .notDetermined })
-            .map({ [weak self] gender in
+            .subscribe { [weak self] gender in
                 printIfDebug("선택된 성별: \(gender)")
                 self?.stateObject.gender = gender
-                return ()
-            })
-            .bind(to: output.genderIsSelected)
+            }
+            .disposed(by: disposeBag)
             
         // MARK: 전화번호 입력
         AuthInOutStreamManager.validatePhoneNumberInOut(
@@ -64,15 +62,18 @@ public class WorkerRegisterViewModel: ViewModelType {
             }
         
         // MARK: 주소 입력
-        _ = input
+        // 예외적으로 ViewModel에서 구독처리
+        input
             .addressInformation
-            .compactMap { $0 }
-            .map { [unowned self] addressInfo in
-                self.stateObject.addressInformation = addressInfo
+            .subscribe { [unowned self] info in
+                self.stateObject.addressInformation = info
             }
+            .disposed(by: disposeBag)
         
-        // MARK: 회원가입 성공 여부
-        
+        registerInOut()
+    }
+    
+    func registerInOut() {
         
         let registerValidation = input
             .ctaButtonClicked
@@ -89,19 +90,37 @@ public class WorkerRegisterViewModel: ViewModelType {
             }
             .share()
         
-        _ = registerValidation
+        output.registerValidation = registerValidation
             .compactMap { $0.value }
-            .map { [weak self] in
+            .map {
                 print("✅ 회원가입 성공")
-                self?.output.registerValidation.accept(true)
+                return ()
+            }
+            .asDriver(onErrorJustReturn: ())
+        
+        let registerFailure = registerValidation
+            .compactMap { $0.error }
+            .map { error in
+                print("❌ 회원가입 실패 \n 에러내용: \(error.message)")
+                return DefaultAlertContentVO(
+                    title: "회원가입 실패",
+                    message: error.message
+                )
             }
         
-        _ = registerValidation
-            .compactMap { $0.error }
-            .map { [weak self] error in
-                print("❌ 회원가입 실패 \n 에러내용: \(error.message)")
-                self?.output.registerValidation.accept(false)
-            }
+        // 이미 alert드라이버가 존재할 경우 merge
+        var newAlertDrvier: Observable<DefaultAlertContentVO>!
+        if let alertDrvier = output.alert {
+            newAlertDrvier = Observable
+                .merge(
+                    alertDrvier.asObservable(),
+                    registerFailure
+                )
+        } else {
+            newAlertDrvier = registerFailure
+        }
+        output
+            .alert = newAlertDrvier.asDriver(onErrorJustReturn: .default)
     }
 }
 
@@ -130,10 +149,10 @@ extension WorkerRegisterViewModel {
     
     public class Input {
         // CTA 버튼 클릭시
-        public var ctaButtonClicked: PublishRelay<Void?> = .init()
+        public var ctaButtonClicked: PublishRelay<Void> = .init()
         
         // 이름입력
-        public var editingName: PublishRelay<String?> = .init()
+        public var editingName: PublishRelay<String> = .init()
         
         // 성별 선택
         public var selectingGender: BehaviorRelay<Gender> = .init(value: .notDetermined)
@@ -145,16 +164,13 @@ extension WorkerRegisterViewModel {
         public var requestValidationForAuthNumber: PublishRelay<Void> = .init()
         
         // 주소 입력
-        public var addressInformation: PublishRelay<AddressInformation?> = .init()
+        public var addressInformation: PublishRelay<AddressInformation> = .init()
 //        public var editingDetailAddress: PublishRelay<String?> = .init()
     }
     
     public class Output {
         // 이름 입력
-        public var nameValidation: PublishSubject<(isValid: Bool, name: String)> = .init()
-        
-        // 성별 선택완료
-        public var genderIsSelected: PublishRelay<Void> = .init()
+        public var nameValidation: Driver<Bool>?
         
         // 전화번호 입력
         public var canSubmitPhoneNumber: Driver<Bool>?
@@ -163,7 +179,7 @@ extension WorkerRegisterViewModel {
         public var authNumberValidation: Driver<Bool>?
         
         // 회원가입 성공 여부
-        public var registerValidation: PublishRelay<Bool?> = .init()
+        public var registerValidation: Driver<Void>?
         
         // Alert
         public var alert: Driver<DefaultAlertContentVO>?
@@ -179,7 +195,6 @@ extension WorkerRegisterViewModel.Output: EnterNameOutputable { }
 
 // Gender selection
 extension WorkerRegisterViewModel.Input: SelectGenderInputable { }
-extension WorkerRegisterViewModel.Output: SelectGenderOutputable { }
 
 // Auth phoneNumber
 extension WorkerRegisterViewModel.Input: AuthPhoneNumberInputable { }
@@ -187,6 +202,5 @@ extension WorkerRegisterViewModel.Output: AuthPhoneNumberOutputable { }
 
 // Postal code
 extension WorkerRegisterViewModel.Input: EnterAddressInputable { }
-extension WorkerRegisterViewModel.Output: EnterAddressOutputable { }
 
-extension WorkerRegisterViewModel.Output: RegisterSuccessOutputable { }
+extension WorkerRegisterViewModel.Output: RegisterValidationOutputable { }

@@ -22,20 +22,19 @@ extension AuthInOutStreamManager {
         stateTracker: @escaping (String) -> ()
     ) {
         
+        var output = output
+        
         // MARK: Id
-        _ = input
+        output.canCheckIdDuplication = input
             .editingId
-            .compactMap { $0 }
-            .map({ [unowned useCase, output] id in
-                output.canCheckIdDuplication.accept(
-                    useCase.checkIdIsValid(id: id)
-                )
-            })
+            .map { [unowned useCase] id in
+                useCase.checkIdIsValid(id: id)
+            }
+            .asDriver(onErrorJustReturn: false)
         
         // 중복성 검사
         let idDuplicationValidation = input
             .requestIdDuplicationValidation
-            .compactMap { $0 }
             .flatMap { [unowned useCase] id in
                 
                 printIfDebug("[CenterRegisterViewModel] 중복성 검사 대상 id: \(id)")
@@ -50,33 +49,32 @@ extension AuthInOutStreamManager {
                 
                 return useCase.requestCheckingIdDuplication(id: id)
             }
-            .share()
         
-        _ = idDuplicationValidation
-            .compactMap { $0.value }
-            .map { [weak output] validId in
-                printIfDebug("[CenterRegisterViewModel] \(validId) 중복체크 결과: ✅ 성공")
-                // 🚀 상태추적 🚀
-                stateTracker(validId)
-                output?.idDuplicationValidation.accept(validId)
+        output.idDuplicationValidation = idDuplicationValidation
+            .map { [stateTracker] result in
+                switch result {
+                case .success(let id):
+                    printIfDebug("[CenterRegisterViewModel] 중복체크 결과: ✅ 성공")
+                    // 🚀 상태추적 🚀
+                    stateTracker(id)
+                    return true
+                case .failure(let error):
+                    printIfDebug("❌ 아이디중복검사 실패 \n 에러내용: \(error.message)")
+                    return false
+                }
             }
-        
-        _ = idDuplicationValidation
-            .compactMap { $0.error }
-            .map({ [weak output] error in
-                printIfDebug("❌ 아이디중복검사 실패 \n 에러내용: \(error.message)")
-                output?.idDuplicationValidation.accept(nil)
-            })
+            .asDriver(onErrorJustReturn: false)
     }
     
     static func passwordInOut(
         input: SetPasswordInputable & AnyObject,
         output: SetPasswordOutputable & AnyObject,
         useCase: AuthInputValidationUseCase,
-        stateTracker: @escaping (String) -> ()) {
-            
-        _ = input.editingPassword
-            .compactMap { $0 }
+        stateTracker: @escaping (String) -> ()) 
+    {
+        var output = output
+        output.passwordValidation = input.editingPasswords
+            .filter { (pwd, cpwd) in !pwd.isEmpty && !cpwd.isEmpty }
             .map { [unowned useCase] (pwd, cpwd) in
                     
                 printIfDebug("[CenterRegisterViewModel] \n 입력중인 비밀번호: \(pwd) \n 확인 비밀번호: \(cpwd)")
@@ -94,8 +92,6 @@ extension AuthInOutStreamManager {
                     return PasswordValidationState.match
                 }
             }
-            .map { [weak output] result in
-                output?.passwordValidation.accept(result)
-            }
+            .asDriver(onErrorJustReturn: .invalidPassword)
     }
 }

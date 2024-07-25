@@ -13,13 +13,11 @@ import Entity
 import PresentationCore
 
 public protocol EnterAddressInputable {
-    var addressInformation: PublishRelay<AddressInformation?> { get }
-//    var editingDetailAddress: PublishRelay<String?> { get }
+    var addressInformation: PublishRelay<AddressInformation> { get }
 }
-public protocol EnterAddressOutputable { }
 
-public class EnterAddressViewController<T: ViewModelType>: DisposableViewController
-where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: EnterAddressOutputable & RegisterSuccessOutputable {
+public class EnterAddressViewController<T: ViewModelType>: BaseViewController
+where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: RegisterValidationOutputable {
     
     public var coordinator: WorkerRegisterCoordinator?
     
@@ -194,14 +192,9 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Enter
         let output = viewModel.output
         
         output
-            .registerValidation
-            .compactMap { $0 }
-            .subscribe(onNext: { [weak self] isSuccess in
-                if isSuccess {
-                    self?.coordinator?.next()
-                } else {
-                    self?.ctaButton.setEnabled(true)
-                }
+            .registerValidation?
+            .drive(onNext: { [weak self] _ in
+                self?.coordinator?.next()
             })
             .disposed(by: disposeBag)
     }
@@ -212,10 +205,6 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Enter
         vc.deleage = self
         vc.modalPresentationStyle = .fullScreen
         navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    public func cleanUp() {
-        coordinator?.coordinatorDidFinish()
     }
 }
 

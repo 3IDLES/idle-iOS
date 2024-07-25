@@ -16,7 +16,7 @@ class TestMainTabBarCoodinator: ChildCoordinator {
     
     var parent: RootCoordinator?
     
-    weak var viewControllerRef: DisposableViewController?
+    weak var viewControllerRef: UIViewController?
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController

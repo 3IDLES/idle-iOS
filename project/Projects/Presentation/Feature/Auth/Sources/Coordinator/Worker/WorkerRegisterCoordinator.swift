@@ -24,7 +24,7 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
     
     public let navigationController: UINavigationController
     
-    public weak var viewControllerRef: DisposableViewController?
+    public weak var viewControllerRef: UIViewController?
     
     weak var pageViewController: UIPageViewController?
     
@@ -76,8 +76,6 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
     }
 
     public func coordinatorDidFinish() {
-        
-        viewControllerRef?.cleanUp()
         
         stageViewControllers = []
         

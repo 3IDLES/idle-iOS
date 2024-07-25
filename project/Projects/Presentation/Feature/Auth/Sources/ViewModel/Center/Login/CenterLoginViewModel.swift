@@ -33,42 +33,52 @@ public class CenterLoginViewModel: ViewModelType {
     
     func setObservable() {
         
+        output.canRequestLoginAction = Observable
+            .combineLatest(
+                input.editingId,
+                input.editingPassword
+            )
+            .map { (id, password) in
+                return !id.isEmpty && !password.isEmpty
+            }
+            .asDriver(onErrorJustReturn: false)
+        
         let loginResult = input
             .loginButtonPressed
-            .compactMap { $0 }
-            .flatMap { [unowned self] (id, pw) in
-                self.authUseCase
-                    .loginCenterAccount(id: id, password: pw)
+            .flatMap { [unowned self, input] _ in
+                let id = input.editingId.value
+                let password = input.editingPassword.value
+                return self.authUseCase
+                    .loginCenterAccount(id: id, password: password)
             }
             .share()
         
-        _ = loginResult
-            .compactMap { $0.value }
-            .map { [weak self] _ in
-                printIfDebug("✅ 로그인 성공")
+        output.loginValidation = loginResult
+            .map { result in
                 
-                self?.output.loginValidation.accept(true)
+                switch result {
+                case .success:
+                    printIfDebug("✅ 로그인 성공")
+                    return true
+                case .failure(let error):
+                    printIfDebug("❌ 로그인 실패: \(error.message)")
+                    return false
+                }
             }
-        
-        _ = loginResult
-            .compactMap { $0.error }
-            .map { [weak self] error in
-                printIfDebug("❌ 로그인 실패, 에러내용: \(error.message)")
-                
-                self?.output.loginValidation.accept(false)
-            }
+            .asDriver(onErrorJustReturn: false)
     }
 }
 
 public extension CenterLoginViewModel {
     
     class Input {
-        
-        public var loginButtonPressed: PublishRelay<(id: String, pw: String)?> = .init()
+        public let editingId: BehaviorRelay<String> = .init(value: "")
+        public let editingPassword: BehaviorRelay<String> = .init(value: "")
+        public let loginButtonPressed: PublishRelay<Void> = .init()
     }
     
     class Output {
-        
-        public var loginValidation: PublishRelay<Bool?> = .init()
+        public var canRequestLoginAction: Driver<Bool>?
+        public var loginValidation: Driver<Bool>?
     }
 }

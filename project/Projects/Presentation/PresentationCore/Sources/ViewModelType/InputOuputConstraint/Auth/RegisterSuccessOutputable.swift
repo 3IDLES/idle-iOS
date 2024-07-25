@@ -7,7 +7,9 @@
 
 import Foundation
 import RxCocoa
+import Entity
 
-public protocol RegisterSuccessOutputable {
-    var registerValidation: PublishRelay<Bool?> { get }
+public protocol RegisterValidationOutputable {
+    var registerValidation: Driver<Void>? { get }
+    var alert: Driver<DefaultAlertContentVO>? { get }
 }

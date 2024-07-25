@@ -74,7 +74,7 @@ extension AuthInOutStreamManager {
         let phoneNumberAuthResult = input.requestValidationForAuthNumber
             .flatMap { [unowned useCase, input] _ in
                 
-                let phoneNumber = input.editingPhoneNumber.value
+                let phoneNumber = formatPhoneNumber(phoneNumber: input.editingPhoneNumber.value)
                 let authNumber = input.editingAuthNumber.value
 #if DEBUG
                 // 디버그시 인증번호 무조건 통과

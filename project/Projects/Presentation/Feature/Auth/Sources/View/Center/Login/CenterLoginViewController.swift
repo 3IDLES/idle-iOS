@@ -10,7 +10,7 @@ import RxSwift
 import DSKit
 import PresentationCore
 
-public class CenterLoginViewController: DisposableViewController {
+public class CenterLoginViewController: BaseViewController {
     
     let viewModel: CenterLoginViewModel
     
@@ -163,26 +163,19 @@ public class CenterLoginViewController: DisposableViewController {
         // MARK: Input
         let input = viewModel.input
         
-        // 로그인 버튼 활성화
-        Observable
-            .combineLatest(
-                idField.eventPublisher,
-                passwordField.eventPublisher
-            )
-            .subscribe(onNext: { [weak self] in
-                self?.ctaButton.setEnabled(!($0.isEmpty || $1.isEmpty))
-            })
+        // 인풋 전달
+        idField.uITextField.rx.text
+            .compactMap { $0 }
+            .bind(to: input.editingId)
+            .disposed(by: disposeBag)
+        
+        passwordField.uITextField.rx.text
+            .compactMap { $0 }
+            .bind(to: input.editingPassword)
             .disposed(by: disposeBag)
         
         // 로그인 버튼 눌림
         ctaButton.eventPublisher
-            .map { [weak self] _ in
-                
-                let id = self?.idField.uITextField.text ?? ""
-                let pw = self?.passwordField.uITextField.text ?? ""
-                
-                return (id: id, pw: pw)
-            }
             .bind(to: input.loginButtonPressed)
             .disposed(by: disposeBag)
         
@@ -190,9 +183,8 @@ public class CenterLoginViewController: DisposableViewController {
         
         // 로그인 시도 결과 수신
         output
-            .loginValidation
-            .compactMap { $0 }
-            .subscribe(onNext: { [weak self] isSuccess in
+            .loginValidation?
+            .drive(onNext: { [weak self] isSuccess in
                 if isSuccess {
                     self?.onLoginSucceed()
                 } else {
@@ -225,9 +217,6 @@ public class CenterLoginViewController: DisposableViewController {
             .onCustomState { textField in
                 textField.layer.borderColor = DSKitColors.Color.red.cgColor
             }
-        
-        // Alert
-        
     }
     
     private func onLoginSucceed() {

@@ -16,8 +16,12 @@ public class DefaultAuthRepository: AuthRepository {
     let networkService = AuthService()
     
     public init() { }
+}
+
+// MARK: Center auth
+public extension DefaultAuthRepository {
     
-    public func requestRegisterCenterAccount(
+    func requestRegisterCenterAccount(
         managerName: String,
         phoneNumber: String,
         businessNumber: String,
@@ -39,7 +43,7 @@ public class DefaultAuthRepository: AuthRepository {
             .map { _ in return () }
     }
     
-    public func requestCenterLogin(id: String, password: String) -> Single<Void> {
+    func requestCenterLogin(id: String, password: String) -> Single<Void> {
         return networkService.requestDecodable(api: .centerLogin(id: id, password: password), with: .plain)
             .flatMap { [weak self] (token: TokenDTO) in
                 
@@ -57,4 +61,10 @@ public class DefaultAuthRepository: AuthRepository {
                 return .error(KeyValueStoreError.tokenSavingFailure)
             }
     }
+}
+
+// MARK: Worker auth
+public extension DefaultAuthRepository {
+    
+    
 }

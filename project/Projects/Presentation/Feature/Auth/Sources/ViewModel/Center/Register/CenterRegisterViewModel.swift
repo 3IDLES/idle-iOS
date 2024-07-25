@@ -79,10 +79,10 @@ extension CenterRegisterViewModel {
     public class Input {
         
         // CTA 버튼 클릭시
-        public var ctaButtonClicked: PublishRelay<Void?> = .init()
+        public var ctaButtonClicked: PublishRelay<Void> = .init()
         
         // 이름입력
-        public var editingName: PublishRelay<String?> = .init()
+        public var editingName: PublishRelay<String> = .init()
         
         // 전화번호 입력
         public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
@@ -91,21 +91,21 @@ extension CenterRegisterViewModel {
         public var requestValidationForAuthNumber: PublishRelay<Void> = .init()
         
         // 사업자 번호 입력
-        public var editingBusinessNumber: PublishRelay<String?> = .init()
-        public var requestBusinessNumberValidation: PublishRelay<String?> = .init()
+        public var editingBusinessNumber: BehaviorRelay<String> = .init(value: "")
+        public var requestBusinessNumberValidation: PublishRelay<Void> = .init()
         
         // Id
-        public var editingId: PublishRelay<String?> = .init()
-        public var requestIdDuplicationValidation: PublishRelay<String?> = .init()
+        public var editingId: BehaviorRelay<String> = .init(value: "")
+        public var requestIdDuplicationValidation: PublishRelay<String> = .init()
         
         // Password
-        public var editingPassword: PublishRelay<(pwd: String, cpwd: String)?> = .init()
+        public var editingPasswords: PublishRelay<(pwd: String, cpwd: String)> = .init()
     }
     
     public class Output {
         
         // 이름 입력
-        public var nameValidation: PublishSubject<(isValid: Bool, name: String)> = .init()
+        public var nameValidation: Driver<Bool>?
         
         // 전화번호 입력
         public var canSubmitPhoneNumber: Driver<Bool>?
@@ -114,18 +114,19 @@ extension CenterRegisterViewModel {
         public var authNumberValidation: Driver<Bool>?
         
         // 사업자 번호 입력
-        public var canSubmitBusinessNumber: PublishRelay<Bool?> = .init()
-        public var businessNumberValidation: PublishRelay<BusinessInfoVO?> = .init()
+        public var canSubmitBusinessNumber: Driver<Bool>?
+        public var businessNumberVO: Driver<BusinessInfoVO>?
+        public var businessNumberValidationFailrue: Driver<Void>?
         
         // Id
-        public var canCheckIdDuplication: PublishRelay<Bool?> = .init()
-        public var idDuplicationValidation: PublishRelay<String?> = .init()
+        public var canCheckIdDuplication: Driver<Bool>?
+        public var idDuplicationValidation: Driver<Bool>?
         
         // Password
-        public var passwordValidation: PublishRelay<PasswordValidationState?> = .init()
+        public var passwordValidation: Driver<PasswordValidationState>?
         
         // Register success
-        public var registerValidation: PublishRelay<Bool?> = .init()
+        public var registerValidation: Driver<Void>?
         
         // Alert
         public var alert: Driver<DefaultAlertContentVO>?
@@ -138,27 +139,53 @@ extension CenterRegisterViewModel {
         // MARK: 최종 회원가입 버튼
         let registerValidation = input
             .ctaButtonClicked
-            .compactMap({ $0 })
             .flatMap { [unowned self] _ in
                 self.authUseCase
                     .registerCenterAccount(registerState: self.stateObject)
             }
             .share()
         
-        _ = registerValidation
+        let loginResult = registerValidation
             .compactMap { $0.value }
             .map { [unowned self] _ in
-                printIfDebug("[CenterRegisterViewModel] ✅ 회원가입 성공 \n 가임정보 \(self.stateObject.description)")
-                self.stateObject.clear()
-                self.output.registerValidation.accept(true)
+                printIfDebug("[\(#function)] ✅ 회원가입 성공 \n 가임정보 \(stateObject.description)")
+                return (id: stateObject.id, password: stateObject.password)
+            }
+            .flatMap { [authUseCase] (id, pw) in
+                printIfDebug("[\(#function)] 로그인 실행")
+                return authUseCase
+                    .loginCenterAccount(id: id, password: pw)
+            }
+            .map { [weak self] _ in
+                // 로그인 결과무시
+                self?.stateObject.clear()
+                return ()
+            }
+        output.registerValidation = loginResult.asDriver(onErrorJustReturn: ())
+        
+        let registrationFailure = registerValidation
+            .compactMap { $0.error }
+            .map { error in
+                printIfDebug("❌ 회원가입 실패: \(error.message)")
+                return DefaultAlertContentVO(
+                    title: "회원가입 실패",
+                    message: error.message
+                )
             }
         
-        _ = registerValidation
-            .compactMap { $0.error }
-            .map({ error in
-                printIfDebug("❌ 회원가입 실패: \(error.message)")
-                self.output.registerValidation.accept(false)
-            })
+        // 이미 alert드라이버가 존재할 경우 merge
+        var newAlertDrvier: Observable<DefaultAlertContentVO>!
+        if let alertDrvier = output.alert {
+            newAlertDrvier = Observable
+                .merge(
+                    alertDrvier.asObservable(),
+                    registrationFailure
+                )
+        } else {
+            newAlertDrvier = registrationFailure
+        }
+        output
+            .alert = newAlertDrvier.asDriver(onErrorJustReturn: .default)
     }
 }
 
@@ -166,41 +193,42 @@ extension CenterRegisterViewModel {
     
     func validateBusinessNumberInOut() {
         // MARK: 사업자 번호 입력
-        _ = input
+        output.canSubmitBusinessNumber = input
             .editingBusinessNumber
-            .compactMap { $0 }
-            .map({ [unowned self] businessNumber in
+            .map { [unowned self] businessNumber in
                 self.inputValidationUseCase.checkBusinessNumberIsValid(businessNumber: businessNumber)
-            })
-            .bind(to: output.canSubmitBusinessNumber)
+            }
+            .asDriver(onErrorJustReturn: false)
         
         let businessNumberValidationResult = input
             .requestBusinessNumberValidation
             .compactMap { $0 }
-            .flatMap({ [unowned self] businessNumber in
+            .flatMap { [unowned input] _ in
+                let businessNumber = input.editingBusinessNumber.value
                 let formatted = AuthInOutStreamManager.formatBusinessNumber(businessNumber: businessNumber)
                 printIfDebug("[CenterRegisterViewModel] 사업자 번호 인증 요청: \(formatted)")
                 return self.inputValidationUseCase
                     .requestBusinessNumberAuthentication(businessNumber: formatted)
-            })
+            }
             .share()
         
-        _ = businessNumberValidationResult
+        output.businessNumberVO = businessNumberValidationResult
             .compactMap { $0.value }
-            .map({ [weak self] (businessNumber, infoVO) in
+            .map { [stateObject] (businessNumber, infoVO) in
                 printIfDebug("✅ 사업자번호 검색 성공")
                 // 🚀 상태추적 🚀
-                self?.stateObject.businessNumber = businessNumber
-                self?.output.businessNumberValidation.accept(infoVO)
-            })
+                stateObject.businessNumber = businessNumber
+                return infoVO
+            }
+            .asDriver(onErrorJustReturn: .onError)
         
-        
-        _ = businessNumberValidationResult
+        output.businessNumberValidationFailrue = businessNumberValidationResult
             .compactMap { $0.error }
-            .map({ [weak self] error in
+            .map { error in
                 printIfDebug("❌ 사업자번호 검색실패 \n 에러내용: \(error.message)")
-                self?.output.businessNumberValidation.accept(nil)
-            })
+                return ()
+            }
+            .asDriver(onErrorJustReturn: ())
     }
 
 }
@@ -225,9 +253,9 @@ extension CenterRegisterViewModel.Output: AuthBusinessOwnerOutputable { }
 
 // Id & Password
 extension CenterRegisterViewModel.Input: SetIdInputable { }
-extension CenterRegisterViewModel.Output: SetIdOutputable { }
 extension CenterRegisterViewModel.Input: SetPasswordInputable { }
+extension CenterRegisterViewModel.Output: SetIdOutputable { }
 extension CenterRegisterViewModel.Output: SetPasswordOutputable { }
 
 // Register
-extension CenterRegisterViewModel.Output: RegisterSuccessOutputable { }
+extension CenterRegisterViewModel.Output: RegisterValidationOutputable { }

@@ -22,7 +22,7 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
     public var parent: CenterAuthCoordinatable?
     
-    public weak var viewControllerRef: (any PresentationCore.DisposableViewController)?
+    public weak var viewControllerRef: UIViewController?
     
     weak var pageViewController: UIPageViewController?
     
@@ -74,8 +74,6 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     }
     
     public func coordinatorDidFinish() {
-        
-        viewControllerRef?.cleanUp()
         
         stageViewControllers = []
         
