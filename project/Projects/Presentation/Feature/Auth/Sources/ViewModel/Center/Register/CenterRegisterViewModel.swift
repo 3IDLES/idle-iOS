@@ -50,7 +50,6 @@ public class CenterRegisterViewModel: ViewModelType {
             registerInOut()
             validateBusinessNumberInOut()
             
-            
             AuthInOutStreamManager.idInOut(
                 input: input,
                 output: output,

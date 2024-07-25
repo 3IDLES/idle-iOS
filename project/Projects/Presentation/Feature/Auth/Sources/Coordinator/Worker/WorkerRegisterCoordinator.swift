@@ -11,11 +11,10 @@ import PresentationCore
 enum WorkerRegisterStage: Int {
     
     case registerFinished=0
-    case name=1
-    case gender=2
-    case phoneNumber=3
-    case address=4
-    case finish=5
+    case info=1
+    case phoneNumber=2
+    case address=3
+    case finish=4
 }
 
 public class WorkerRegisterCoordinator: ChildCoordinator {
@@ -40,8 +39,7 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
         self.navigationController = navigationController
         
         self.stageViewControllers = [
-            EnterNameViewController(coordinator: self, viewModel: viewModel),
-            SelectGenderViewController(coordinator: self, viewModel: viewModel),
+            EntetPersonalInfoViewController(coordinator: self, viewModel: viewModel),
             ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
             EnterAddressViewController(coordinator: self, viewModel: viewModel),
         ]
@@ -72,7 +70,7 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
         
         navigationController.pushViewController(viewController, animated: true)
         
-        excuteStage(.name, moveTo: .next)
+        excuteStage(.info, moveTo: .next)
     }
 
     public func coordinatorDidFinish() {
@@ -131,9 +129,7 @@ extension WorkerRegisterCoordinator {
     }
     
     func authFinished() {
-        
         stageViewControllers = []
-        
         parent?.authFinished()
     }
     

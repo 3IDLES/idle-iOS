@@ -19,7 +19,7 @@ public class DefaultAuthUseCase: AuthUseCase {
         self.repository = repository
     }
     
-    // MARK: 센터 회원가입 실행
+    /// 센터 회원가입 실행
     public func registerCenterAccount(registerState: CenterRegisterState) -> Single<Result<Void, AuthError>> {
         convert(
             task: repository.requestRegisterCenterAccount(
@@ -31,10 +31,24 @@ public class DefaultAuthUseCase: AuthUseCase {
         )) { [unowned self] error in toDomainError(error: error) }
     }
     
-    // MARK: 센터 로그인 실행
+    /// 센터 로그인 실행
     public func loginCenterAccount(id: String, password: String) -> Single<Result<Void, AuthError>> {
         convert(task: repository.requestCenterLogin(id: id, password: password)) { [unowned self] error in
             toDomainError(error: error)
         }
+    }
+    
+    /// 요양 보호사 회원가입 실행
+    public func registerWorkerAccount(registerState: WorkerRegisterState) -> Single<Result<Void, AuthError>> {
+        convert(
+            task: repository.requestRegisterWorkerAccount(registerState: registerState)) { [unowned self] error in toDomainError(error: error)
+            }
+    }
+    
+    /// 요양 보호사 로그인 실행
+    public func loginWorkerAccount(phoneNumber: String, authNumber: String) -> Single<Result<Void, AuthError>> {
+        convert(
+            task: repository.requestWorkerLogin(phoneNumber: phoneNumber, authNumber: authNumber)) { [unowned self] error in toDomainError(error: error)
+            }
     }
 }

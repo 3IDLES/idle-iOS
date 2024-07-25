@@ -45,26 +45,51 @@ public extension DefaultAuthRepository {
     
     func requestCenterLogin(id: String, password: String) -> Single<Void> {
         return networkService.requestDecodable(api: .centerLogin(id: id, password: password), with: .plain)
-            .flatMap { [weak self] (token: TokenDTO) in
-                
-                if let accessToken = token.accessToken, let refreshToken = token.refreshToken {
-                    
-                    guard let self else { fatalError() }
-                    
-                    if let _ = try? self.networkService.keyValueStore.saveAuthToken(
-                        accessToken: accessToken,
-                        refreshToken: refreshToken
-                    ) {
-                        return .just(())
-                    }
-                }
-                return .error(KeyValueStoreError.tokenSavingFailure)
-            }
+            .flatMap { [unowned self] in saveTokenToStore(token: $0) }
     }
 }
 
 // MARK: Worker auth
 public extension DefaultAuthRepository {
     
+    func requestRegisterWorkerAccount(registerState: WorkerRegisterState) -> Single<Void> {
+        let dto = WorkerRegistrationDTO(
+            carerName: registerState.name,
+            birthYear: registerState.birthYear,
+            genderType: registerState.gender,
+            phoneNumber: registerState.phoneNumber,
+            roadNameAddress: registerState.addressInformation.roadAddress,
+            lotNumberAddress: registerState.addressInformation.jibunAddress,
+            longitude: registerState.latitude,
+            latitude: registerState.logitude
+        )
+        
+        let data = (try? JSONEncoder().encode(dto)) ?? Data()
+        
+        return networkService.request(api: .registerWorkerAccount(data: data), with: .plain)
+            .map { _ in return () }
+    }
     
+    func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Void> {
+        return networkService.requestDecodable(api: .workerLogin(phoneNumber: phoneNumber, verificationNumber: authNumber), with: .plain)
+            .flatMap { [unowned self] in saveTokenToStore(token: $0) }
+    }
+}
+
+// MARK: Token management
+extension DefaultAuthRepository {
+    
+    private func saveTokenToStore(token: TokenDTO) -> Single<Void>{
+        
+        if let accessToken = token.accessToken, let refreshToken = token.refreshToken {
+            
+            if let _ = try? networkService.keyValueStore.saveAuthToken(
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            ) {
+                return .just(())
+            }
+        }
+        return .error(KeyValueStoreError.tokenSavingFailure)
+    }
 }

@@ -197,6 +197,13 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
                 self?.coordinator?.next()
             })
             .disposed(by: disposeBag)
+        
+        output
+            .alert?
+            .drive(onNext: { [weak self] vo in
+                self?.showAlert(vo: vo)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func showDaumSearchView() {

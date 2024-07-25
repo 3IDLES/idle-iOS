@@ -37,4 +37,17 @@ public protocol AuthUseCase: UseCaseBase {
         id: String,
         password: String
     ) -> Single<Result<Void, AuthError>>
+    
+    
+    // #4
+    /// 요양 보호사 회원가입 실행
+    func registerWorkerAccount(
+        registerState: WorkerRegisterState
+    ) -> Single<Result<Void, AuthError>>
+    // #5
+    /// 요양 보호사 로그인 실행
+    func loginWorkerAccount(
+        phoneNumber: String,
+        authNumber: String
+    ) -> Single<Result<Void, AuthError>>
 }

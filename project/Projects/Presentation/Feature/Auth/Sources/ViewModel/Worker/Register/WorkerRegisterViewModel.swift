@@ -16,6 +16,7 @@ public class WorkerRegisterViewModel: ViewModelType {
     
     // UseCase
     public let inputValidationUseCase: AuthInputValidationUseCase
+    public let authUseCase: AuthUseCase
     
     public var input: Input = .init()
     public var output: Output = .init()
@@ -24,8 +25,12 @@ public class WorkerRegisterViewModel: ViewModelType {
     
     private let disposeBag = DisposeBag()
     
-    public init(inputValidationUseCase: AuthInputValidationUseCase) {
+    public init(
+        inputValidationUseCase: AuthInputValidationUseCase,
+        authUseCase: AuthUseCase
+    ) {
         self.inputValidationUseCase = inputValidationUseCase
+        self.authUseCase = authUseCase
         
         setInput()
     }
@@ -42,15 +47,28 @@ public class WorkerRegisterViewModel: ViewModelType {
             }
         
         // MARK: 성별 선택
-        // 예외적으로 ViewModel에서 구독처리
-        input
-            .selectingGender
+        output.genderIsSelected = input.selectingGender
             .filter({ $0 != .notDetermined })
-            .subscribe { [weak self] gender in
+            .map { [weak self] gender in
                 printIfDebug("선택된 성별: \(gender)")
                 self?.stateObject.gender = gender
+                return true
             }
-            .disposed(by: disposeBag)
+            .asDriver(onErrorJustReturn: false)
+            
+        
+        // MARK: 생년월일 입력
+        output.edtingBirthYearValidation = input
+            .edtingBirthYear
+            .map { [unowned self] in
+                printIfDebug("입력중인 생년월일: \($0)")
+                let isValid = self.validateBirthYear($0)
+                if isValid {
+                    self.stateObject.birthYear = $0
+                }
+                return isValid
+            }
+            .asDriver(onErrorJustReturn: false)
             
         // MARK: 전화번호 입력
         AuthInOutStreamManager.validatePhoneNumberInOut(
@@ -67,26 +85,28 @@ public class WorkerRegisterViewModel: ViewModelType {
             .addressInformation
             .subscribe { [unowned self] info in
                 self.stateObject.addressInformation = info
+                
+                // TODO: 위동 경도 API 적용
+                self.stateObject.latitude = "37.5036833"
+                self.stateObject.logitude = "127.0448556"
             }
             .disposed(by: disposeBag)
         
         registerInOut()
     }
     
-    func registerInOut() {
+    private func validateBirthYear(_ year: Int) -> Bool {
+        let currentYear: Int = Calendar.current.component(.year, from: Date())
+        return (1900..<currentYear).contains(year)
+    }
+    
+    private func registerInOut() {
         
         let registerValidation = input
             .ctaButtonClicked
             .compactMap { $0 }
-            .map { _ in
-                
-                #if DEBUG
-                print("✅ 디버그모드에서 회원가입 무조건 통과")
-                return Result<Void, InputValidationError>.success(())
-                #endif
-                
-                //TODO: UseCase사용
-                return Result<Void, InputValidationError>.success(())
+            .flatMap { [authUseCase, stateObject] _ in
+                authUseCase.registerWorkerAccount(registerState: stateObject)
             }
             .share()
         
@@ -151,10 +171,9 @@ extension WorkerRegisterViewModel {
         // CTA 버튼 클릭시
         public var ctaButtonClicked: PublishRelay<Void> = .init()
         
-        // 이름입력
+        // 이름입력, 생년월일 입력, 성별 선택
         public var editingName: PublishRelay<String> = .init()
-        
-        // 성별 선택
+        public var edtingBirthYear: PublishRelay<Int> = .init()
         public var selectingGender: BehaviorRelay<Gender> = .init(value: .notDetermined)
         
         // 전화번호 입력
@@ -171,6 +190,10 @@ extension WorkerRegisterViewModel {
     public class Output {
         // 이름 입력
         public var nameValidation: Driver<Bool>?
+        public var edtingBirthYearValidation: Driver<Bool>?
+        
+        // 성별
+        public var genderIsSelected: Driver<Bool>?
         
         // 전화번호 입력
         public var canSubmitPhoneNumber: Driver<Bool>?
@@ -189,12 +212,9 @@ extension WorkerRegisterViewModel {
 // CTAButton
 extension WorkerRegisterViewModel.Input: CTAButtonEnableInputable { }
 
-// Enter name
-extension WorkerRegisterViewModel.Input: EnterNameInputable { }
-extension WorkerRegisterViewModel.Output: EnterNameOutputable { }
-
-// Gender selection
-extension WorkerRegisterViewModel.Input: SelectGenderInputable { }
+// Enter personal info
+extension WorkerRegisterViewModel.Input: WorkerPersonalInfoInputable { }
+extension WorkerRegisterViewModel.Output: WorkerPersonalInfoOutputable { }
 
 // Auth phoneNumber
 extension WorkerRegisterViewModel.Input: AuthPhoneNumberInputable { }

@@ -49,7 +49,8 @@ extension WorkerAuthCoordinator: WorkerAuthCoordinatable {
         let coordinator = WorkerRegisterCoordinator(
             navigationController: navigationController,
             viewModel: WorkerRegisterViewModel(
-                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self)
+                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self),
+                authUseCase: injector.resolve(AuthUseCase.self)
             )
         )
         

@@ -9,7 +9,12 @@ import RxSwift
 import Entity
 
 public protocol AuthRepository: RepositoryBase {
-    
+ 
+    // MARK: Center
     func requestRegisterCenterAccount(managerName: String, phoneNumber: String, businessNumber: String, id: String, password: String) -> Single<Void>
     func requestCenterLogin(id: String, password: String) -> Single<Void>
+    
+    // MARK: Worker
+    func requestRegisterWorkerAccount(registerState: WorkerRegisterState) -> Single<Void>
+    func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Void>
 }
