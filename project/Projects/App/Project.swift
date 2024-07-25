@@ -30,6 +30,7 @@ let project = Project(
                 
                 // Presentation
                 D.Presentation.PresentationCore,
+                D.Presentation.RootFeature,
                 D.Presentation.AuthFeature,
                 
                 // Domain
