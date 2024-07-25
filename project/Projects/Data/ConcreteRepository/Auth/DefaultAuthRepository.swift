@@ -52,6 +52,7 @@ public extension DefaultAuthRepository {
 // MARK: Worker auth
 public extension DefaultAuthRepository {
     
+    /// 요양보호사의 경우 회원가입시 곧바로 토큰을 발급받습니다.
     func requestRegisterWorkerAccount(registerState: WorkerRegisterState) -> Single<Void> {
         let dto = WorkerRegistrationDTO(
             carerName: registerState.name,
@@ -66,8 +67,8 @@ public extension DefaultAuthRepository {
         
         let data = (try? JSONEncoder().encode(dto)) ?? Data()
         
-        return networkService.request(api: .registerWorkerAccount(data: data), with: .plain)
-            .map { _ in return () }
+        return networkService.requestDecodable(api: .registerWorkerAccount(data: data), with: .plain)
+            .flatMap { [unowned self] in saveTokenToStore(token: $0) }
     }
     
     func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Void> {
