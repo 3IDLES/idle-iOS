@@ -15,7 +15,7 @@ public enum CTAButtonAction {
 }
 
 public protocol CTAButtonEnableInputable {
-    var ctaButtonClicked: PublishRelay<Void?> { get set }
+    var ctaButtonClicked: PublishRelay<Void> { get set }
 }
 
 public protocol CTAButtonEnableOutPutable {

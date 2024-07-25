@@ -16,12 +16,8 @@ protocol SelectGenderInputable {
     var selectingGender: BehaviorRelay<Gender> { get }
 }
 
-protocol SelectGenderOutputable {
-    var genderIsSelected: PublishRelay<Void> { get }
-}
-
-class SelectGenderViewController<T: ViewModelType>: DisposableViewController 
-where T.Input: SelectGenderInputable & CTAButtonEnableInputable, T.Output: SelectGenderOutputable {
+class SelectGenderViewController<T: ViewModelType>: BaseViewController
+where T.Input: SelectGenderInputable & CTAButtonEnableInputable {
     
     var coordinator: WorkerRegisterCoordinator?
     
@@ -149,15 +145,11 @@ where T.Input: SelectGenderInputable & CTAButtonEnableInputable, T.Output: Selec
         
         Observable
             .merge(femaleClicked, maleClicked)
-            .bind(to: viewModel.input.selectingGender)
-            .disposed(by: disposeBag)
-        
-        viewModel
-            .output
-            .genderIsSelected
-            .subscribe(onNext: { [weak self] _ in
+            .map { [weak self] in
                 self?.ctaButton.setEnabled(true)
-            })
+                return $0
+            }
+            .bind(to: viewModel.input.selectingGender)
             .disposed(by: disposeBag)
         
         // MARK: ViewController한정 로직
@@ -166,9 +158,5 @@ where T.Input: SelectGenderInputable & CTAButtonEnableInputable, T.Output: Selec
             .eventPublisher
             .subscribe { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
-    }
-    
-    func cleanUp() {
-        coordinator?.coordinatorDidFinish()
     }
 }

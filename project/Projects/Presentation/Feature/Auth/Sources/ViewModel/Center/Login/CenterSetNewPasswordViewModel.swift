@@ -20,7 +20,8 @@ public class CenterSetNewPasswordViewModel: ViewModelType {
     public var input: Input = .init()
     public var output: Output = .init()
     
-    var validPassword: String?
+    // State
+    private var validPassword: String?
     
     public init(
         authUseCase: AuthUseCase,
@@ -52,30 +53,34 @@ public class CenterSetNewPasswordViewModel: ViewModelType {
                 output: output,
                 useCase: inputValidationUseCase) { _ in }
         
+        changePasswordInOut()
+    }
+    
+    private func changePasswordInOut() {
+        
         let changePasswordResult = input.changePasswordButtonClicked
-            .compactMap { $0 }
             .flatMap { [weak self] _ in
                 
                 printIfDebug("변경 요청 비밀번호 \(self?.validPassword ?? "")")
                 
+                // TODO: 비밀번호 변경 API 연동
                 // 이벤트 전송
                 return Single.just(Result<Void, HTTPResponseException>.success(()))
             }
             .share()
         
-        _ = changePasswordResult
-            .compactMap { $0.value }
-            .map({ [weak self] _ in
-                printIfDebug("비밀번호 변경 성공")
-                self?.output.changePasswordSuccessValidation.accept(true)
-            })
-        
-        _ = changePasswordResult
-            .compactMap { $0.error }
-            .map({ [weak self] _ in
-                printIfDebug("비밀번호 변경 실패")
-                self?.output.changePasswordSuccessValidation.accept(false)
-            })
+        output.changePasswordValidation = changePasswordResult
+            .map { result in
+                switch result {
+                case .success:
+                    printIfDebug("비밀번호 변경 성공")
+                    return true
+                case .failure(let error):
+                    printIfDebug("비밀번호 변경 실패")
+                    return false
+                }
+            }
+            .asDriver(onErrorJustReturn: false)
     }
 }
 
@@ -90,10 +95,10 @@ public extension CenterSetNewPasswordViewModel {
         public var requestValidationForAuthNumber: PublishRelay<Void> = .init()
         
         // Password
-        public var editingPassword: PublishRelay<(pwd: String, cpwd: String)?> = .init()
+        public var editingPasswords: PublishRelay<(pwd: String, cpwd: String)> = .init()
         
         // Change password
-        public var changePasswordButtonClicked: PublishRelay<Void?> = .init()
+        public var changePasswordButtonClicked: PublishRelay<Void> = .init()
     }
     
     class Output {
@@ -105,10 +110,10 @@ public extension CenterSetNewPasswordViewModel {
         public var authNumberValidation: Driver<Bool>?
         
         // Password
-        public var passwordValidation: PublishRelay<PasswordValidationState?> = .init()
+        public var passwordValidation: Driver<PasswordValidationState>?
         
         // Change password
-        public var changePasswordSuccessValidation: PublishRelay<Bool?> = .init()
+        public var changePasswordValidation: Driver<Bool>?
         
         public var alert: Driver<Entity.DefaultAlertContentVO>?
     }

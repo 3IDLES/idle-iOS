@@ -12,7 +12,7 @@ public class SelectAuthTypeCoordinator: ChildCoordinator {
     
     public var navigationController: UINavigationController
     
-    public weak var viewControllerRef: DisposableViewController?
+    public weak var viewControllerRef: UIViewController?
     
     public var parent: AuthCoordinatable?
     

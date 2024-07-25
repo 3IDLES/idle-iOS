@@ -18,7 +18,7 @@ enum SetNewPasswordStage: Int {
 
 public class CenterSetNewPasswordCoordinator: ChildCoordinator {
     
-    public weak var viewControllerRef: (any PresentationCore.DisposableViewController)?
+    public weak var viewControllerRef: UIViewController?
     public var navigationController: UINavigationController
     
     var stageViewControllers: [UIViewController] = []

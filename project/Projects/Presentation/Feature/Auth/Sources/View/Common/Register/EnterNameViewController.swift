@@ -12,11 +12,11 @@ import RxCocoa
 import PresentationCore
 
 public protocol EnterNameInputable {
-    var editingName: PublishRelay<String?> { get set }
+    var editingName: PublishRelay<String> { get }
 }
 
 public protocol EnterNameOutputable {
-    var nameValidation: PublishSubject<(isValid: Bool, name: String)> { get set }
+    var nameValidation: Driver<Bool>? { get set }
 }
 
 public class EnterNameViewController<T: ViewModelType>: DisposableViewController
@@ -133,6 +133,7 @@ where T.Input: EnterNameInputable, T.Output: EnterNameOutputable {
         
         textField
             .textField.rx.text
+            .compactMap { $0 }
             .bind(to: input.editingName)
             .disposed(by: disposeBag)
             
@@ -141,11 +142,8 @@ where T.Input: EnterNameInputable, T.Output: EnterNameOutputable {
         let output = viewModel.output
         
         output
-            .nameValidation
-            .subscribe(onNext: { [weak self] (isValid, name) in
-                
-                printIfDebug("성함 입력: \(name), 유효성: \(isValid)")
-                
+            .nameValidation?
+            .drive(onNext: { [weak self] isValid in
                 self?.ctaButton.setEnabled(isValid)
             })
             .disposed(by: disposeBag)

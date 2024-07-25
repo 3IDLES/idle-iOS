@@ -13,28 +13,26 @@ import RxCocoa
 import PresentationCore
 
 public protocol SetIdInputable {
-    var editingId: PublishRelay<String?> { get set }
-    var requestIdDuplicationValidation: PublishRelay<String?> { get set }
-}
-
-public protocol SetPasswordInputable {
-    var editingPassword: PublishRelay<(pwd: String, cpwd: String)?> { get set }
+    var editingId: BehaviorRelay<String> { get set }
+    var requestIdDuplicationValidation: PublishRelay<String> { get set }
 }
 
 public protocol SetIdOutputable {
-    
-    var canCheckIdDuplication: PublishRelay<Bool?> { get set }
-    var idDuplicationValidation: PublishRelay<String?> { get set }
+    var canCheckIdDuplication: Driver<Bool>? { get set }
+    var idDuplicationValidation: Driver<Bool>? { get set }
+}
+
+public protocol SetPasswordInputable {
+    var editingPasswords: PublishRelay<(pwd: String, cpwd: String)> { get set }
 }
 
 public protocol SetPasswordOutputable {
-    
-    var passwordValidation: PublishRelay<PasswordValidationState?> { get set }
+    var passwordValidation: Driver<PasswordValidationState>? { get set }
 }
 
-class SetIdPasswordViewController<T: ViewModelType>: DisposableViewController
+class SetIdPasswordViewController<T: ViewModelType>: BaseViewController
 where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
-      T.Output: SetIdOutputable & SetPasswordOutputable & RegisterSuccessOutputable {
+      T.Output: SetIdOutputable & SetPasswordOutputable & RegisterValidationOutputable {
     
     var coordinator: CenterRegisterCoordinator?
     
@@ -246,9 +244,9 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
         
         // 현재 입력중인 정보 전송
         idField.idleTextField.textField.rx.text
+            .compactMap{ $0 }
             .bind(to: input.editingId)
             .disposed(by: disposeBag)
-        
         
         Observable
             .combineLatest(
@@ -256,7 +254,7 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
                 checkPasswordField.eventPublisher
             )
             .map({ ($0, $1) })
-            .bind(to: input.editingPassword)
+            .bind(to: input.editingPasswords)
             .disposed(by: disposeBag)
         
         ctaButton
@@ -280,90 +278,63 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
         
         // 중복확인이 가능한 아이디인가?
         output
-            .canCheckIdDuplication
-            .compactMap { $0 }
-            .subscribe(onNext: { [weak self] in
+            .canCheckIdDuplication?
+            .drive(onNext: { [weak self] in
                 self?.idField.button.setEnabled($0)
             })
             .disposed(by: disposeBag)
         
         // 아이디 중복확인 결과
         let idDuplicationValidation = output
-            .idDuplicationValidation
-            .compactMap { [weak self] checkedId in
-                // 아이디 입력 필드 활성화
-                self?.idField.idleTextField.setEnabled(true)
-                return checkedId
+            .idDuplicationValidation?
+            .map { [weak self] isSuccess in
+                self?.idField.idleTextField.setEnabled(isSuccess)
+                return isSuccess
             }
+            .asObservable() ?? .empty()
         
-        // 중복검사를 통과한 아이디와 입력창의 아이디가 일치하는지 확인한다.
-        let finalIdValidation = Observable
-            .combineLatest(
-                idField.idleTextField.eventPublisher,
-                idDuplicationValidation
-            )
-            .observe(on: MainScheduler.instance)
-            .map { [weak self] (editingId, validId) in
-                let isValid = editingId == validId
-                self?.thisIsValidIdLabel.isHidden = !isValid
-                return isValid
+        // 비밀번호 검증 결과
+        let passwordValidationResult = output
+            .passwordValidation?
+            .map { state in
+                state == .match
             }
-
-        // 비밀번호 검증
-        let finalPaswordValidation = output
-            .passwordValidation
-            .compactMap { $0 }
-            .map({ [weak self] validationState in
-                switch validationState {
-                    
-                case .invalidPassword:
-                    printIfDebug("❌ 비밀번호가 유효하지 않습니다.")
-                    self?.onPasswordUnMatched()
-                    return false
-                case .unMatch:
-                    printIfDebug("☑️ 비밀번호가 일치하지 않습니다.")
-                    self?.onPasswordUnMatched()
-                    return false
-                case .match:
-                    printIfDebug("✅ 비밀번호가 일치합니다.")
-                    self?.onPasswordMatched()
-                    self?.ctaButton.setEnabled(true)
-                    return true
-                }
-            })
+            .asObservable() ?? .empty()
         
         // id, password 유효성 검사
         Observable
             .combineLatest(
-                finalIdValidation,
-                finalPaswordValidation
+                idDuplicationValidation,
+                passwordValidationResult
             )
             .map { $0 && $1 }
             .subscribe(onNext: { [weak self] in self?.ctaButton.setEnabled($0) })
             .disposed(by: disposeBag)
         
-        
         output
-            .registerValidation
-            .compactMap { $0 }
-            .subscribe { [weak self] isSuccess in
-                if isSuccess {
-                    // 회원가입 성공
-                    self?.coordinator?.next()
-                } else {
-                    // 회원가입실패
-                    self?.ctaButton.setEnabled(true)
-                }
+            .registerValidation?
+            .drive { [weak self] isSuccess in
+                
+                // 로그인 시도
+                
+                // 회원가입 성공
+                self?.coordinator?.next()
             }
             .disposed(by: disposeBag)
-    
+        
+        // 경고창 표시 로직
+        output
+            .alert?
+            .drive(onNext: { [weak self] vo in
+                self?.showAlert(vo: vo)
+            })
+            .disposed(by: disposeBag)
         
         // MARK: ViewController한정 로직
         // CTA버튼 클릭시 버튼 비활성화
         ctaButton
             .eventPublisher
             .subscribe { [weak self] _ in
-                
                 self?.ctaButton.setEnabled(false)
             }
             .disposed(by: disposeBag)

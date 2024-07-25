@@ -13,13 +13,14 @@ import RxCocoa
 import PresentationCore
 
 public protocol AuthBusinessOwnerInputable {
-    var editingBusinessNumber: PublishRelay<String?> { get set }
-    var requestBusinessNumberValidation: PublishRelay<String?> { get set }
+    var editingBusinessNumber: BehaviorRelay<String> { get set }
+    var requestBusinessNumberValidation: PublishRelay<Void> { get set }
 }
 
 public protocol AuthBusinessOwnerOutputable {
-    var canSubmitBusinessNumber: PublishRelay<Bool?> { get set }
-    var businessNumberValidation: PublishRelay<BusinessInfoVO?> { get set }
+    var canSubmitBusinessNumber: Driver<Bool>? { get set }
+    var businessNumberVO: Driver<BusinessInfoVO>? { get set }
+    var businessNumberValidationFailrue: Driver<Void>? { get set }
 }
 
 public class AuthBusinessOwnerViewController<T: ViewModelType>: DisposableViewController
@@ -167,12 +168,14 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
         businessNumberField
             .idleTextField
             .textField.rx.text
+            .compactMap { $0 }
             .bind(to: input.editingBusinessNumber)
             .disposed(by: disposeBag)
         
         // 인증, 확인 버튼이 눌린 경우
         businessNumberField
             .eventPublisher
+            .map { _ in () }
             .bind(to: input.requestBusinessNumberValidation)
             .disposed(by: disposeBag)
         
@@ -181,9 +184,7 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
         
         // 입력중인 사업자 번호가 특정 조건(ex: 입력길이)을 만족한 경우 '인증'버튼 활성화
         output
-            .canSubmitBusinessNumber
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap { $0 }
+            .canSubmitBusinessNumber?
             .drive(onNext: { [weak self] isValid in
                 self?.businessNumberField.button.setEnabled(isValid)
             })
@@ -191,18 +192,20 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
         
         // 사업자 번호 조회 결과
         output
-            .businessNumberValidation
-            .asDriver(onErrorJustReturn: nil)
-            .drive(onNext: { [weak self] info in
-                if let centerInfo = info {
-                    printIfDebug("✅ \(centerInfo.name) 조회결과")
-                    self?.displayCenterInfo(vo: centerInfo)
-                    self?.ctaButton.setEnabled(true)
-                } else {
-                    // 정보가 없는 경우
-                    self?.dismissCenterInfo()
-                    self?.ctaButton.setEnabled(false)
-                }
+            .businessNumberVO?
+            .drive(onNext: { [weak self] vo in
+                printIfDebug("✅ \(vo.name) 조회결과")
+                self?.displayCenterInfo(vo: vo)
+                self?.ctaButton.setEnabled(true)
+            })
+            .disposed(by: disposeBag)
+        
+        output
+            .businessNumberValidationFailrue?
+            .drive(onNext: { [weak self] in
+                // 정보가 없는 경우
+                self?.dismissCenterInfo()
+                self?.ctaButton.setEnabled(false)
             })
             .disposed(by: disposeBag)
         
@@ -215,7 +218,6 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
     }
     
     private func displayCenterInfo(vo: BusinessInfoVO) {
-        
         centerInfoBox.update(
             titleText: vo.name,
             items: vo.keyValue.map { (key: $0, value: $1) }

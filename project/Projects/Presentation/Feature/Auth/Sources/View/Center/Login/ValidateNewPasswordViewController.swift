@@ -12,11 +12,11 @@ import RxSwift
 import PresentationCore
 
 public protocol ChangePasswordSuccessInputable {
-    var changePasswordButtonClicked: PublishRelay<Void?> { get }
+    var changePasswordButtonClicked: PublishRelay<Void> { get }
 }
 
 public protocol ChangePasswordSuccessOutputable {
-    var changePasswordSuccessValidation: PublishRelay<Bool?> { get }
+    var changePasswordValidation: Driver<Bool>? { get set }
 }
 
 class ValidateNewPasswordViewController<T: ViewModelType>: DisposableViewController
@@ -187,7 +187,7 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
                 checkPasswordField.eventPublisher
             )
             .map({ ($0, $1) })
-            .bind(to: input.editingPassword)
+            .bind(to: input.editingPasswords)
             .disposed(by: disposeBag)
         
         ctaButton
@@ -204,9 +204,8 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
         
         // 비밀번호 검증
         output
-            .passwordValidation
-            .compactMap { $0 }
-            .subscribe(onNext: { [weak self] validationState in
+            .passwordValidation?
+            .drive(onNext: { [weak self] validationState in
                 switch validationState {
                 case .invalidPassword:
                     self?.onPasswordUnMatched()
@@ -220,9 +219,8 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
             .disposed(by: disposeBag)
         
         output
-            .changePasswordSuccessValidation
-            .compactMap { $0 }
-            .subscribe (onNext: { [weak self] isSuccess in
+            .changePasswordValidation?
+            .drive (onNext: { [weak self] isSuccess in
                 
                 if isSuccess {
                     // 비밀번호 변경 성공

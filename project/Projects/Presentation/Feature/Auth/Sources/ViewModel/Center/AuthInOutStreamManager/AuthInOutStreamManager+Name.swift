@@ -23,21 +23,15 @@ extension AuthInOutStreamManager {
         stateTracker: @escaping (String) -> ()
     ) {
         // MARK: 성함입력
-        _ = input
+        var output = output
+        output.nameValidation = input
             .editingName
-            .compactMap({ $0 })
-            .map { [weak useCase] name in
-                
-                guard let useCase else { return (false, name) }
-                
+            .map { [useCase] name in
+                printIfDebug("[\(#function)] 입력중인 이름: \(name)")
                 let isValid = useCase.checkNameIsValid(name: name)
-                
-                if isValid {
-                    stateTracker(name)
-                }
-                
-                return (isValid, name)
+                if isValid { stateTracker(name) }
+                return isValid
             }
-            .bind(to: output.nameValidation)
+            .asDriver(onErrorJustReturn: false)
     }
 }

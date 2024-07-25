@@ -64,8 +64,6 @@ public extension ParentCoordinator {
                 
                 let child = coordinator as! ChildCoordinator
                 
-                child.viewControllerRef?.cleanUp()
-                
                 if let middleViewController = child.viewControllerRef {
                     
                     middleViewControllers.append(middleViewController)
@@ -87,11 +85,6 @@ public extension ParentCoordinator {
             
             if let lastCoordinator {
                 
-                if lastCoordinator is ChildCoordinator {
-                    
-                    (lastCoordinator as! ChildCoordinator).viewControllerRef?.cleanUp()
-                }
-                
                 self.removeChildCoordinator(lastCoordinator)
                 lastCoordinator.popViewController()
             }
@@ -104,7 +97,7 @@ public extension ParentCoordinator {
 // MARK: ChildCoordinator
 public protocol ChildCoordinator: Coordinator {
     
-    var viewControllerRef: DisposableViewController? { get }
+    var viewControllerRef: UIViewController? { get }
     
     func coordinatorDidFinish()
 }
