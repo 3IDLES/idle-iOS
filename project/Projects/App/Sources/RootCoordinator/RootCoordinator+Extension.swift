@@ -31,7 +31,7 @@ extension RootCoordinator {
                 injector: injector
             )
         )
-//        coordinator.parent = self
+        coordinator.parent = self
         
         addChildCoordinator(coordinator)
         
@@ -41,6 +41,16 @@ extension RootCoordinator {
     /// 센터 메인화면을 시작합니다.
     func centerMain() {
         
+        let coordinator = CenterMainCoordinator(
+            dependency: .init(
+                navigationController: navigationController,
+                injector: injector
+            )
+        )
+        coordinator.parent = self
         
+        addChildCoordinator(coordinator)
+        
+        coordinator.start()
     }
 }

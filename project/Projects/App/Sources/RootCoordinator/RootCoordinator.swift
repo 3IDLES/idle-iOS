@@ -28,7 +28,7 @@ class RootCoordinator: ParentCoordinator {
     func start() {
         navigationController.setNavigationBarHidden(true, animated: false)
         
-        workerMain()
+        centerMain()
     }
     
     func popViewController() {
