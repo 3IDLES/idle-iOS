@@ -16,6 +16,7 @@ public class TextButtonType1: UIView {
     public private(set) var isEnabled: Bool = true
     
     private let originBackground: UIColor
+    private let accentBackground: UIColor
     
     lazy var label: IdleLabel = {
        
@@ -32,18 +33,21 @@ public class TextButtonType1: UIView {
     
     private var tapGesture: UITapGestureRecognizer!
     
-    public var eventPublisher: Signal<UITapGestureRecognizer> { tapGesture.rx.event.asSignal() }
+    public var eventPublisher: Observable<UITapGestureRecognizer> { tapGesture.rx.event.asObservable() }
     
     public init(
         labelText: String,
-        originBackground: UIColor = DSKitAsset.Colors.orange500.color
+        originBackground: UIColor = DSKitAsset.Colors.orange500.color,
+        accentBackgroundColor: UIColor = DSKitAsset.Colors.orange300.color
     ) {
         
         self.labelText = labelText
         self.originBackground = originBackground
+        self.accentBackground = accentBackgroundColor
         
         super.init(frame: .zero)
         
+        self.isUserInteractionEnabled = true
         self.backgroundColor = originBackground
         self.tapGesture = UITapGestureRecognizer(target: self, action: #selector(onTouchAction))
         self.addGestureRecognizer(tapGesture)
@@ -76,7 +80,7 @@ public class TextButtonType1: UIView {
     @objc
     func onTouchAction(_ tapGesture: UITapGestureRecognizer) {
         
-        self.backgroundColor = DSKitAsset.Colors.orange300.color
+        self.backgroundColor = accentBackground
         
         UIView.animate(withDuration: 0.3) {
             
