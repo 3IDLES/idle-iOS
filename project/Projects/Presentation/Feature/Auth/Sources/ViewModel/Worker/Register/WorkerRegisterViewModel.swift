@@ -74,7 +74,9 @@ public class WorkerRegisterViewModel: ViewModelType {
         AuthInOutStreamManager.validatePhoneNumberInOut(
             input: input,
             output: output,
-            useCase: inputValidationUseCase) { [weak self] authedPhoneNumber in
+            useCase: inputValidationUseCase,
+            authUseCase: authUseCase
+        ) { [weak self] authedPhoneNumber in
                 // 🚀 상태추적 🚀
                 self?.stateObject.phoneNumber = authedPhoneNumber
             }
@@ -203,6 +205,9 @@ extension WorkerRegisterViewModel {
         
         // 회원가입 성공 여부
         public var registerValidation: Driver<Void>?
+        
+        // 요양보호사 로그인 성공 여부
+        public var loginValidation: Driver<Void>?
         
         // Alert
         public var alert: Driver<DefaultAlertContentVO>?

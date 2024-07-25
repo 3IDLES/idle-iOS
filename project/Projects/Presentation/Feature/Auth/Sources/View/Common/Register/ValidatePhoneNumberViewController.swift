@@ -27,7 +27,13 @@ public protocol AuthPhoneNumberOutputable {
     var phoneNumberValidation: Driver<Bool>? { get set }
     var authNumberValidation: Driver<Bool>? { get set }
     
+    // 요양보호사 로그인에 성공한 경우(요양보호사 한정 로직)
+    var loginValidation: Driver<Void>? { get set }
+    
     var alert: Driver<DefaultAlertContentVO>? { get set }
+}
+public extension AuthPhoneNumberOutputable {
+    var loginValidation: Driver<Void>? { get { nil } set { } }
 }
 
 class ValidatePhoneNumberViewController<T: ViewModelType>: BaseViewController
@@ -267,7 +273,15 @@ where
             .authNumberValidation?
             .filter { $0 }
             .drive(onNext: { [weak self] _ in
-                self?.onAuthSuccess()
+                self?.onAuthNumberValidationSuccess()
+            })
+            .disposed(by: disposeBag)
+        
+        output
+            .loginValidation?
+            .drive(onNext: { [weak self] _ in
+                guard let self else { return }
+                (coordinator as! WorkerRegisterCoordinator).authFinished()
             })
             .disposed(by: disposeBag)
         
@@ -290,6 +304,11 @@ where
 
 extension ValidatePhoneNumberViewController {
     
+    
+}
+
+extension ValidatePhoneNumberViewController {
+    
     func activateAuthNumberField() {
         
         // 인증 텍스트 필드 활성화
@@ -298,7 +317,7 @@ extension ValidatePhoneNumberViewController {
         authNumberField.idleTextField.startTimer(minute: 5, seconds: 0)
     }
     
-    func onAuthSuccess() {
+    func onAuthNumberValidationSuccess() {
         
         // 입력과 관려된 필드와 버튼 비활성화
         phoneNumberField.idleTextField.setEnabled(false)
