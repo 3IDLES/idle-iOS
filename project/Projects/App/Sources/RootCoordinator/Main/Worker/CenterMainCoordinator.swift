@@ -1,5 +1,5 @@
 //
-//  WorkerMainCoordinator.swift
+//  CenterMainCoordinator.swift
 //  Idle-iOS
 //
 //  Created by choijunios on 7/25/24.
@@ -10,7 +10,7 @@ import DSKit
 import PresentationCore
 import RootFeature
 
-class WorkerMainCoordinator: ParentCoordinator {
+class CenterMainCoordinator: ParentCoordinator {
     var childCoordinators: [Coordinator] = []
     
     var parent: ParentCoordinator?
@@ -25,7 +25,7 @@ class WorkerMainCoordinator: ParentCoordinator {
     
     func start() {
         
-        let tabInfo = WorkerMainScreen.allCases.map { tab in
+        let tabInfo = CenterMainScreen.allCases.map { tab in
             
             TabBarInfo(
                 viewController: createNavForTab(tab: tab),
@@ -43,7 +43,7 @@ class WorkerMainCoordinator: ParentCoordinator {
     }
     
     // #1. Tab별 네비게이션 컨트롤러 생성
-    func createNavForTab(tab: WorkerMainScreen) -> UINavigationController {
+    func createNavForTab(tab: CenterMainScreen) -> UINavigationController {
         
         let tabNavController = UINavigationController()
         tabNavController.setNavigationBarHidden(false, animated: false)
@@ -56,17 +56,13 @@ class WorkerMainCoordinator: ParentCoordinator {
         return tabNavController
     }
     // #2. 생성한 컨트롤러를 각 탭별 Coordinator에 전달
-    func startTabCoordinator(tab: WorkerMainScreen, navigationController: UINavigationController) {
+    func startTabCoordinator(tab: CenterMainScreen, navigationController: UINavigationController) {
         
         var coordinator: ChildCoordinator!
         
         switch tab {
-        case .recruitmentBoard:
-            coordinator = RecruitmentBoardCoordinator(
-                navigationController: navigationController
-            )
-        case .applyManagement:
-            coordinator = ApplyManagementCoordinator(
+        case .recruitmentManage:
+            coordinator = RecruitmentManagementCoordinator(
                 navigationController: navigationController
             )
         case .setting:
@@ -81,18 +77,15 @@ class WorkerMainCoordinator: ParentCoordinator {
     }
 }
 
-// MARK: Worker 탭의 구성요소들
-enum WorkerMainScreen: Int, CaseIterable {
-    case recruitmentBoard = 0
-    case applyManagement = 1
-    case setting = 2
+// MARK: Center 탭의 구성요소들
+enum CenterMainScreen: Int, CaseIterable {
+    case recruitmentManage = 0
+    case setting = 1
     
     var name: String {
         switch self {
-        case .recruitmentBoard:
+        case .recruitmentManage:
             "채용"
-        case .applyManagement:
-            "공고관리"
         case .setting:
             "설정"
         }
