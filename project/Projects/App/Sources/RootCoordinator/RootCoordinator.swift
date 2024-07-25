@@ -26,17 +26,9 @@ class RootCoordinator: ParentCoordinator {
     }
     
     func start() {
+        navigationController.setNavigationBarHidden(true, animated: false)
         
-        navigationController.navigationBar.isHidden = true
-        
-        let coordinator = TestMainTabBarCoodinator(
-            navigationController: navigationController
-        )
-        
-        coordinator.parent = self
-        addChildCoordinator(coordinator)
-        
-        coordinator.start()
+        workerMain()
     }
     
     func popViewController() {
