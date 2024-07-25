@@ -1,5 +1,5 @@
 //
-//  IdleBigAlertController.swift
+//  IdleSmallAlertController.swift
 //  DSKit
 //
 //  Created by choijunios on 7/25/24.
@@ -10,13 +10,7 @@ import RxSwift
 import RxCocoa
 import Entity
 
-public protocol IdleAlertViewModelable {
-    
-    var button1Tapped: PublishRelay<Void> { get }
-    var button2Tapped: PublishRelay<Void> { get }
-}
-
-public class IdleBigAlertController: UIViewController {
+public class IdleSmallAlertController: UIViewController {
     
     public struct ButtonInfo {
         let text: String
@@ -32,13 +26,11 @@ public class IdleBigAlertController: UIViewController {
     
     // Init values
     let titleText: String
-    let descriptionText: String
     let button1Info: ButtonInfo
     let button2Info: ButtonInfo
     
-    public init(titleText: String, descriptionText: String, button1Info: ButtonInfo, button2Info: ButtonInfo) {
+    public init(titleText: String, button1Info: ButtonInfo, button2Info: ButtonInfo) {
         self.titleText = titleText
-        self.descriptionText = descriptionText
         self.button1Info = button1Info
         self.button2Info = button2Info
         
@@ -62,15 +54,6 @@ public class IdleBigAlertController: UIViewController {
         return label
     }()
     
-    private(set) lazy var descriptionLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Body3)
-        label.textString = descriptionText
-        label.attrTextColor = DSKitAsset.Colors.gray500.color
-        label.lineBreakMode = .byWordWrapping
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        return label
-    }()
     
     private(set) lazy var button1: TextButtonType1 = {
        let btn = TextButtonType1(
@@ -102,24 +85,6 @@ public class IdleBigAlertController: UIViewController {
     
     private func setAutoLayout() {
         
-        // 라벨 스택
-        let labels = [
-            titleLabel,
-            descriptionLabel
-        ]
-        let textStack = VStack(
-            labels,
-            spacing: 8,
-            alignment: .center
-        )
-        labels.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-        NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: textStack.topAnchor, constant: 8),
-            descriptionLabel.bottomAnchor.constraint(equalTo: textStack.bottomAnchor, constant: -8),
-            
-            descriptionLabel.leftAnchor.constraint(equalTo: textStack.leftAnchor, constant: 38),
-            descriptionLabel.rightAnchor.constraint(equalTo: textStack.rightAnchor, constant: -38),
-        ])
         
         // 버튼 스택
         let buttonStack = HStack(
@@ -135,10 +100,10 @@ public class IdleBigAlertController: UIViewController {
         // 라벨 + 버튼 스택
         let alertContentsStack = VStack(
             [
-                textStack,
+                titleLabel,
                 buttonStack
             ],
-            spacing: 16,
+            spacing: 24,
             alignment: .fill
         )
 
@@ -154,7 +119,7 @@ public class IdleBigAlertController: UIViewController {
         alertContainer.layer.cornerRadius = 12
         alertContainer.clipsToBounds = true
         
-        alertContainer.layoutMargins = .init(top: 12, left: 12, bottom: 12, right: 12)
+        alertContainer.layoutMargins = .init(top: 24, left: 12, bottom: 12, right: 12)
         
         [
             alertContentsStack
