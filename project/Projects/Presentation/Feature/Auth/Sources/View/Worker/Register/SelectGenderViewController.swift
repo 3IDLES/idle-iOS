@@ -16,8 +16,14 @@ protocol SelectGenderInputable {
     var selectingGender: BehaviorRelay<Gender> { get }
 }
 
+protocol SelectGenderOutputable {
+    var genderIsSelected: Driver<Bool>? { get set }
+}
+
 class SelectGenderViewController<T: ViewModelType>: BaseViewController
-where T.Input: SelectGenderInputable & CTAButtonEnableInputable {
+where T.Input: SelectGenderInputable & CTAButtonEnableInputable,
+      T.Output: SelectGenderOutputable
+{
     
     var coordinator: WorkerRegisterCoordinator?
     
@@ -145,12 +151,18 @@ where T.Input: SelectGenderInputable & CTAButtonEnableInputable {
         
         Observable
             .merge(femaleClicked, maleClicked)
-            .map { [weak self] in
-                self?.ctaButton.setEnabled(true)
-                return $0
-            }
             .bind(to: viewModel.input.selectingGender)
             .disposed(by: disposeBag)
+        
+        let output = viewModel.output
+        
+        output
+            .genderIsSelected?
+            .drive(onNext: { [weak self] _ in
+                self?.ctaButton.setEnabled(true)
+            })
+            .disposed(by: disposeBag)
+        
         
         // MARK: ViewController한정 로직
         // CTA버튼 클릭시 화면전환

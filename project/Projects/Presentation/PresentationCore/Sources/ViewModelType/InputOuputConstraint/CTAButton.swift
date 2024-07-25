@@ -19,5 +19,5 @@ public protocol CTAButtonEnableInputable {
 }
 
 public protocol CTAButtonEnableOutPutable {
-    var ctaButtonEnabled: BehaviorSubject<Bool>? { get }
+    var ctaButtonEnabled: Driver<Bool>? { get }
 }

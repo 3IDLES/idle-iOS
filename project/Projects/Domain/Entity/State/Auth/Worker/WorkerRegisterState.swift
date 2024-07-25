@@ -10,19 +10,23 @@ import Foundation
 public class WorkerRegisterState {
     public var name: String = ""
     public var gender: Gender = .notDetermined
+    public var birthYear: Int = 0
     public var phoneNumber: String = ""
     public var addressInformation: AddressInformation = .init(roadAddress: "", jibunAddress: "")
-    public var detailAddress: String = ""
+    public var latitude: String = ""
+    public var logitude: String = ""
     
     public init() { }
     
     public func clear() {
         name = ""
         gender = .notDetermined
+        birthYear = 0
         phoneNumber = ""
         addressInformation.roadAddress = ""
         addressInformation.jibunAddress = ""
-        detailAddress = ""
+        latitude = ""
+        logitude = ""
     }
 }
 
