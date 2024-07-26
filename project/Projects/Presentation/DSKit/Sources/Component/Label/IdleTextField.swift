@@ -75,13 +75,15 @@ public class IdleTextField: UITextField {
     
     private let disposeBag = DisposeBag()
     
+    /// 타이포그래피를 변경하면, 앞전에 설정한 속성값을 덥
     public var typography: Typography {
         get {
             currentTypography
         }
         set {
             currentTypography = newValue
-            self.setNeedsLayout()
+            defaultTextAttributes = currentTypography.attributes
+            self.updateText()
         }
     }
     
@@ -102,14 +104,14 @@ public class IdleTextField: UITextField {
             attributedPlaceholder?.string ?? ""
         }
         set {
-            attributedPlaceholder = typography.attributes.toString(
+            attributedPlaceholder = currentTypography.attributes.toString(
                 newValue,
                 with: DSKitAsset.Colors.gray200.color
             )
         }
     }
     private func updateText() {
-        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: typography.attributes))
+        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: currentTypography.attributes))
     }
 }
 
