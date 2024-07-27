@@ -8,8 +8,12 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import PresentationCore
 
 public class IdleTabBar: UIViewController {
+    
+    // Coordinator
+    public weak var coordinator: ParentCoordinator?
 
     // 탭바구성
     public private(set) var viewControllers: [UIViewController] = []

@@ -13,8 +13,6 @@ public class WorkerRegisterState {
     public var birthYear: Int = 0
     public var phoneNumber: String = ""
     public var addressInformation: AddressInformation = .init(roadAddress: "", jibunAddress: "")
-    public var latitude: String = ""
-    public var logitude: String = ""
     
     public init() { }
     
@@ -25,8 +23,6 @@ public class WorkerRegisterState {
         phoneNumber = ""
         addressInformation.roadAddress = ""
         addressInformation.jibunAddress = ""
-        latitude = ""
-        logitude = ""
     }
 }
 

@@ -11,6 +11,7 @@ import RxSwift
 import RxCocoa
 import DSKit
 import Entity
+import BaseFeature
 
 public protocol CenterProfileViewModelable where Input: CenterProfileInputable, Output: CenterProfileOutputable {
     associatedtype Input

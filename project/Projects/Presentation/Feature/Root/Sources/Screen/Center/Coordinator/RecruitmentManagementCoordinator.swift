@@ -14,17 +14,29 @@ public class RecruitmentManagementCoordinator: ChildCoordinator {
     
     public var navigationController: UINavigationController
     
-    public init(navigationController: UINavigationController) {
+    public weak var parent: CenterMainCoordinatable?
+    
+    public init(
+        parent: CenterMainCoordinatable,
+        navigationController: UINavigationController
+    ) {
+        self.parent = parent
         self.navigationController = navigationController
     }
     
     public func start() {
-        let vc = RecuitmentManagementVC()
-        
+        let vc = RecuitmentManagementVC(coordinator: self)
         navigationController.pushViewController(vc, animated: false)
     }
     
     public func coordinatorDidFinish() {
         
+    }
+}
+
+extension RecruitmentManagementCoordinator {
+    
+    func showCenterRegisterScreen() {
+        parent?.centerProfileRegister()
     }
 }

@@ -11,6 +11,7 @@ import RxCocoa
 import DSKit
 import Entity
 import PresentationCore
+import BaseFeature
 
 protocol WorkerPersonalInfoInputable: EnterNameInputable, SelectGenderInputable {
     var edtingBirthYear: PublishRelay<Int> { get }

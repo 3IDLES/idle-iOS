@@ -63,7 +63,7 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
                 return .error(error)
             }
           
-        let updateImageResult = updateImage
+        let uploadImageResult = updateImage
             .catch { error in
                 if let httpExp = error as? HTTPResponseException {
                     let newError = HTTPResponseException(
@@ -80,7 +80,63 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
         let task = Observable
             .zip(
                 updateTextResult.asObservable(),
-                updateImageResult.asObservable()
+                uploadImageResult.asObservable()
+            )
+            .map { _ in () }
+            .asSingle()
+        
+        return convert(task: task) { [unowned self] error in
+            toDomainError(error: error)
+        }
+    }
+    
+    public func registerCenterProfile(state: CenterProfileRegisterState) -> Single<Result<Void, UserInfoError>> {
+        
+        var registerImage: Single<Void>!
+        
+        let imageInfo = state.imageInfo
+        
+        if let imageInfo {
+            registerImage = repository.uploadImage(
+                .center,
+                imageInfo: imageInfo
+            )
+        } else {
+            registerImage = .just(())
+        }
+        
+        let registerTextResult = repository.registerCenterProfileForText(state: state)
+            .catch { error in
+                if let httpExp = error as? HTTPResponseException {
+                    let newError = HTTPResponseException(
+                        status: httpExp.status,
+                        rawCode: "Err-001",
+                        timeStamp: httpExp.timeStamp
+                    )
+                    
+                    return .error(newError)
+                }
+                return .error(error)
+            }
+          
+        let uploadImageResult = registerImage
+            .catch { error in
+                if let httpExp = error as? HTTPResponseException {
+                    let newError = HTTPResponseException(
+                        status: httpExp.status,
+                        rawCode: "Err-002",
+                        timeStamp: httpExp.timeStamp
+                    )
+                    
+                    return .error(newError)
+                }
+                return .error(error)
+            }
+        
+        let task = Observable
+            .zip(
+                registerTextResult.asObservable(),
+                uploadImageResult.asObservable()
             )
             .map { _ in () }
             .asSingle()

@@ -10,8 +10,8 @@ import RxSwift
 import RxCocoa
 import DSKit
 import Entity
-import PresentationCore
 import WebKit
+import PresentationCore
 
 public enum AddressDataKey: String, CaseIterable {
     case address="address"

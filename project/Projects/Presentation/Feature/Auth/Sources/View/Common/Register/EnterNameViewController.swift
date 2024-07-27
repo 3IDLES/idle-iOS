@@ -10,6 +10,7 @@ import DSKit
 import RxSwift
 import RxCocoa
 import PresentationCore
+import BaseFeature
 
 public protocol EnterNameInputable {
     var editingName: PublishRelay<String> { get }

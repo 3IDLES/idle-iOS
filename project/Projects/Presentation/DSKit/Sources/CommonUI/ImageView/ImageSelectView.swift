@@ -20,10 +20,17 @@ public class ImageSelectView: UIImageView {
     // Init
     public private(set) var state: BehaviorRelay<State>
     
+    public weak var viewController: UIViewController!
+    
+    // Optinal values
+    public var onError: (()->())?
+    
+    // image
     public private(set) var editingImage: BehaviorRelay<UIImage?> = .init(value: nil)
     
-    public init(state: State) {
+    public init(state: State, viewController: UIViewController) {
         self.state = .init(value: state)
+        self.viewController = viewController
         super.init(frame: .zero)
         
         setAppearacne()
@@ -35,8 +42,8 @@ public class ImageSelectView: UIImageView {
     
     // View
     /// PlaceHolderView(Edit)
-    let placeholderViewForEdit: UIView = {
-        let view = UIView()
+    let placeholderViewForEdit: TappableUIView = {
+        let view = TappableUIView()
         view.backgroundColor = DSKitAsset.Colors.gray100.color
         let imageView = DSKitAsset.Icons.camera.image.toView()
         view.addSubview(imageView)
@@ -79,6 +86,9 @@ public class ImageSelectView: UIImageView {
     private let disposeBag = DisposeBag()
     
     private func setAppearacne() {
+        
+        self.isUserInteractionEnabled = true
+        
         self.layer.cornerRadius = 6
         self.clipsToBounds = true
         self.contentMode = .scaleToFill
@@ -127,6 +137,7 @@ public class ImageSelectView: UIImageView {
                 guard let self else { return }
                 
                 if image != nil {
+                    self.image = image
                     placeholderViewForEdit.isHidden = true
                     placeholderViewForNormal.isHidden = true
                     centerImageEditButton.isHidden = state == .normal
@@ -137,5 +148,47 @@ public class ImageSelectView: UIImageView {
                 }
             })
             .disposed(by: disposeBag)
+        
+        Observable
+            .merge(
+                placeholderViewForEdit.rx.tap.asObservable(),
+                centerImageEditButton.rx.tap.asObservable()
+            )
+            .asDriver(onErrorJustReturn: ())
+            .drive(onNext: { [unowned self] in
+                showPhotoGalley()
+            })
+            .disposed(by: disposeBag)
     }
 }
+
+extension ImageSelectView: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    private func showPhotoGalley() {
+        
+        let imagePickerVC = UIImagePickerController()
+        imagePickerVC.delegate = self
+        
+        if !UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
+            onError?()
+            return
+        }
+        
+        imagePickerVC.sourceType = .photoLibrary
+        viewController.present(imagePickerVC, animated: true)
+    }
+        
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+     
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            
+            // image
+            editingImage.accept(image)
+            
+            picker.dismiss(animated: true)
+        }
+    }
+}
+
+
+

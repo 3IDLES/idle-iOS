@@ -11,6 +11,7 @@ import DSKit
 import RxSwift
 import RxCocoa
 import PresentationCore
+import BaseFeature
 
 public class CenterAuthMainViewController: DisposableViewController {
     

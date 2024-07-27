@@ -10,6 +10,7 @@ import RxCocoa
 import UseCaseInterface
 import Entity
 import PresentationCore
+import BaseFeature
 
 public class CenterSetNewPasswordViewModel: ViewModelType {
     

@@ -23,7 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let store = TestStore()
         
         try! store.saveAuthToken(
-            accessToken: "",
+            accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOm51bGwsInN1YiI6bnVsbCwiaXNzIjoiM2lkaW90cyIsImlhdCI6MTcyMjA1MzYzNiwibmJmIjoxNzIyMDUzNjM2LCJleHAiOjE3MjIwNTQyMzYsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiIwMTkwZjI2NS0yYmVkLTc1MTEtYjljNy1hZjEwOTNhZTUzZmIiLCJwaG9uZU51bWJlciI6IjAxMC00NDQ0LTUyMzIiLCJ1c2VyVHlwZSI6ImNlbnRlciJ9.nNSNvLmOArvSKThCUHG7liWW-mvN8cudc40mYiTWE-c",
             refreshToken: ""
         )
         
@@ -31,16 +31,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             repository: DefaultUserProfileRepository(store)
         )
         
-        let viewModel = CenterProfileViewModel(
-            useCase: useCase
+        let viewModel = RegisterCenterInfoVM(
+            profileUseCase: useCase
         )
         
-        let vc = CenterProfileViewController()
+        let navigationController = UINavigationController()
+        navigationController.setNavigationBarHidden(true, animated: false)
         
-        vc.bind(viewModel: viewModel)
+        let coordinator = RegisterCenterInfoCoordinator(
+            viewModel: viewModel,
+            navigationController: navigationController
+        )
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = vc
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
+        
+        coordinator.start()
     }
 }

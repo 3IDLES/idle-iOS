@@ -23,6 +23,9 @@ extension UserType {
 
 public enum UserInformationAPI {
     
+    // 프로필 생성
+    case registerCenterProfile(data: Data)
+    
     // 프로필 조회
     case getCenterProfile
     case updateCenterProfile(officeNumber: String, introduce: String?)
@@ -43,6 +46,8 @@ extension UserInformationAPI: BaseAPI {
     
     public var path: String {
         switch self {
+        case .registerCenterProfile:
+            "center/my/profile"
         case .getCenterProfile:
             "center/my/profile"
         case .updateCenterProfile:
@@ -56,6 +61,8 @@ extension UserInformationAPI: BaseAPI {
     
     public var method: Moya.Method {
         switch self {
+        case .registerCenterProfile:
+            .post
         case .getCenterProfile:
             .get
         case .updateCenterProfile:
@@ -76,6 +83,8 @@ extension UserInformationAPI: BaseAPI {
     
     public var task: Moya.Task {
         switch self {
+        case .registerCenterProfile(let data):
+            return .requestData(data)
         case .getCenterProfile:
             return .requestPlain
         case .updateCenterProfile(let officeNumber, let introduce):
@@ -97,5 +106,4 @@ extension UserInformationAPI: BaseAPI {
             return .requestParameters(parameters: params, encoding: parameterEncoding)
         }
     }
-    
 }

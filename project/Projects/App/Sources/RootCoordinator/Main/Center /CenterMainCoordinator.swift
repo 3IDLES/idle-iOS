@@ -10,7 +10,7 @@ import DSKit
 import PresentationCore
 import RootFeature
 
-class CenterMainCoordinator: ParentCoordinator {
+class CenterMainCoordinator: CenterMainCoordinatable {
     var childCoordinators: [Coordinator] = []
     
     var parent: ParentCoordinator?
@@ -63,8 +63,10 @@ class CenterMainCoordinator: ParentCoordinator {
         switch tab {
         case .recruitmentManage:
             coordinator = RecruitmentManagementCoordinator(
+                parent: self,
                 navigationController: navigationController
             )
+            
         case .setting:
             coordinator = SettingCoordinator(
                 navigationController: navigationController
@@ -75,6 +77,7 @@ class CenterMainCoordinator: ParentCoordinator {
         // 코디네이터들을 실행
         coordinator.start()
     }
+    
 }
 
 // MARK: Center 탭의 구성요소들
@@ -89,5 +92,19 @@ enum CenterMainScreen: Int, CaseIterable {
         case .setting:
             "설정"
         }
+    }
+}
+
+extension CenterMainCoordinator {
+    
+    /// 센터 정보등록 창을 표시합니다.
+    func centerProfileRegister() {
+        
+        let coordinator = CenterProfileRegisterCoordinator(dependency: .init(
+            navigationController: navigationController,
+            injector: injector)
+        )
+        addChildCoordinator(coordinator)
+        coordinator.start()
     }
 }

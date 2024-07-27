@@ -1,6 +1,6 @@
 //
 //  DefaultAlertOutputable.swift
-//  PresentationCore
+//  BaseFeature
 //
 //  Created by choijunios on 7/25/24.
 //
