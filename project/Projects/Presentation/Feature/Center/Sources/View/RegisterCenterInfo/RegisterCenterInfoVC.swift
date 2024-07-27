@@ -58,7 +58,7 @@ public class RegisterCenterInfoVC: BaseViewController {
         return screenWidth
     }
     
-    public weak var coordinator: CenterProfileRegisterCoordinatable?
+    public weak var coordinator: RegisterCenterInfoCoordinator?
 
     private var pageViews: [CtaButtonIncludedView] = []
     private var pagesAreSetted = false
@@ -86,7 +86,9 @@ public class RegisterCenterInfoVC: BaseViewController {
     
     let disposeBag = DisposeBag()
 
-    public init() {
+    public init(coordinator: RegisterCenterInfoCoordinator?) {
+        
+        self.coordinator = coordinator
         
         super.init(nibName: nil, bundle: nil)
         
@@ -153,13 +155,14 @@ public class RegisterCenterInfoVC: BaseViewController {
         self.pageViews = RegisterCenterInfoPage.allCases.map { page in
             switch page {
             case .nameAndPhoneNumber:
-                return NameAndPhoneNumberView()
+                NameAndPhoneNumberView()
             case .address:
-                return AddressView(viewController: self)
+                AddressView(viewController: self)
             case .imageAndIntroduction:
-                let view = ImageAndIntroductionView(viewController: self)
-                view.coordinator = coordinator
-                return view
+                ImageAndIntroductionView(
+                    coordinator: coordinator,
+                    viewController: self
+                )
             }
         }
     }
@@ -543,7 +546,7 @@ extension RegisterCenterInfoVC {
     // MARK: 센터 소개 (프로필 사진 + 센터소개)
     class ImageAndIntroductionView: UIView, CtaButtonIncludedView {
         
-        weak var coordinator: CenterProfileRegisterCoordinatable?
+        weak var coordinator: RegisterCenterInfoCoordinator?
         
         // init
         public weak var viewController: UIViewController!
@@ -579,7 +582,6 @@ extension RegisterCenterInfoVC {
         
         // 하단 버튼
         let ctaButton: CTAButtonType1 = {
-            
             let button = CTAButtonType1(labelText: "다음")
             button.setEnabled(false)
             return button
@@ -588,7 +590,8 @@ extension RegisterCenterInfoVC {
         // Observable
         private let disposeBag = DisposeBag()
         
-        init(viewController: UIViewController) {
+        init(coordinator: RegisterCenterInfoCoordinator?, viewController: UIViewController) {
+            self.coordinator = coordinator
             self.viewController = viewController
             super.init(frame: .zero)
             setAppearance()
@@ -714,7 +717,7 @@ extension RegisterCenterInfoVC {
             vm
                 .profileRegisterSuccess?
                 .drive(onNext: { [weak coordinator] _ in
-                    coordinator?.showOverViewScreen()
+                    coordinator?.showCompleteScreen()
                 })
                 .disposed(by: disposeBag)
         }
