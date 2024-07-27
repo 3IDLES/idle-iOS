@@ -26,12 +26,8 @@ class CenterProfileRegisterCoordinator: CenterProfileRegisterCoordinatable {
     
     func start() {
         
-        let viewModel = RegisterCenterInfoVM(
-            profileUseCase: injector.resolve(CenterProfileUseCase.self)
-        )
-        
         let coordinator = RegisterCenterInfoCoordinator(
-            viewModel: viewModel,
+            profileUseCase: injector.resolve(CenterProfileUseCase.self),
             navigationController: navigationController
         )
         
@@ -50,9 +46,16 @@ class CenterProfileRegisterCoordinator: CenterProfileRegisterCoordinatable {
 
 extension CenterProfileRegisterCoordinator {
     
-    func showOverViewScreen() {
-        printIfDebug("test test test")
+    func showCompleteScreen() {
+        let coordinator = ProfileRegisterCompleteCoordinator(
+            navigationController: navigationController
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
+    }
+    
+    func showCenterProfile() {
         
-        registerFinished()
     }
 }

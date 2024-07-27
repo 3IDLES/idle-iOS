@@ -9,6 +9,7 @@ import Foundation
 
 public protocol CenterProfileRegisterCoordinatable: ParentCoordinator {
     
-    func showOverViewScreen()
     func registerFinished()
+    func showCompleteScreen()
+    func showCenterProfile()
 }
