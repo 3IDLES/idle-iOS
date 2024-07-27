@@ -12,7 +12,6 @@ import PresentationCore
 import UseCaseInterface
 import Entity
 
-
 extension AuthInOutStreamManager {
     
     static func idInOut(

@@ -28,6 +28,7 @@ let project = Project(
             resources: ["Resources/**"],
             dependencies: [
                 // Presentation
+                D.Presentation.BaseFeature,
                 D.Presentation.PresentationCore,
                 D.Presentation.DSKit,
 

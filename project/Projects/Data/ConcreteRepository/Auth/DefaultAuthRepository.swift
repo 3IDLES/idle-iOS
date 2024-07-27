@@ -60,9 +60,7 @@ public extension DefaultAuthRepository {
             genderType: registerState.gender,
             phoneNumber: registerState.phoneNumber,
             roadNameAddress: registerState.addressInformation.roadAddress,
-            lotNumberAddress: registerState.addressInformation.jibunAddress,
-            longitude: registerState.latitude,
-            latitude: registerState.logitude
+            lotNumberAddress: registerState.addressInformation.jibunAddress
         )
         
         let data = (try? JSONEncoder().encode(dto)) ?? Data()

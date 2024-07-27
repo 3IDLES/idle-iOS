@@ -11,6 +11,7 @@ import RxCocoa
 import DSKit
 import Entity
 import PresentationCore
+import BaseFeature
 
 public protocol EnterAddressInputable {
     var addressInformation: PublishRelay<AddressInformation> { get }

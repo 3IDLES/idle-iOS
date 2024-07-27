@@ -11,6 +11,7 @@ import RxCocoa
 import DSKit
 import Entity
 import PresentationCore
+import BaseFeature
 
 protocol SelectGenderInputable {
     var selectingGender: BehaviorRelay<Gender> { get }

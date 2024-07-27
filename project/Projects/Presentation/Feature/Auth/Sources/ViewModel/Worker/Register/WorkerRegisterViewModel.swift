@@ -11,6 +11,7 @@ import RxCocoa
 import PresentationCore
 import UseCaseInterface
 import Entity
+import BaseFeature
 
 public class WorkerRegisterViewModel: ViewModelType {
     
@@ -85,13 +86,9 @@ public class WorkerRegisterViewModel: ViewModelType {
         // 예외적으로 ViewModel에서 구독처리
         input
             .addressInformation
-            .subscribe { [unowned self] info in
-                self.stateObject.addressInformation = info
-                
-                // TODO: 위동 경도 API 적용
-                self.stateObject.latitude = "37.5036833"
-                self.stateObject.logitude = "127.0448556"
-            }
+            .subscribe(onNext: { [stateObject] info in
+                stateObject.addressInformation = info
+            })
             .disposed(by: disposeBag)
         
         registerInOut()

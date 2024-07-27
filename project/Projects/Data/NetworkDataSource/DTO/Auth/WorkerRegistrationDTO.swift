@@ -15,18 +15,14 @@ public struct WorkerRegistrationDTO: Encodable {
     public let phoneNumber: String
     public let roadNameAddress: String
     public let lotNumberAddress: String
-    public let longitude: String
-    public let latitude: String
     
-    public init(carerName: String, birthYear: Int, genderType: Gender, phoneNumber: String, roadNameAddress: String, lotNumberAddress: String, longitude: String, latitude: String) {
+    public init(carerName: String, birthYear: Int, genderType: Gender, phoneNumber: String, roadNameAddress: String, lotNumberAddress: String) {
         self.carerName = carerName
         self.birthYear = birthYear
         self.genderType = Self.convertGenderValue(genderType)
         self.phoneNumber = phoneNumber
         self.roadNameAddress = roadNameAddress
         self.lotNumberAddress = lotNumberAddress
-        self.longitude = longitude
-        self.latitude = latitude
     }
 }
 

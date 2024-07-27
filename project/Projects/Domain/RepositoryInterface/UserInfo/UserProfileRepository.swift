@@ -11,6 +11,8 @@ import Entity
 
 public protocol UserProfileRepository: RepositoryBase {
     
+    func registerCenterProfileForText(state: CenterProfileRegisterState) -> Single<Void>
+    
     func getCenterProfile() -> Single<CenterProfileVO>
     func updateCenterProfileForText(phoneNumber: String, introduction: String?) -> Single<Void>
     

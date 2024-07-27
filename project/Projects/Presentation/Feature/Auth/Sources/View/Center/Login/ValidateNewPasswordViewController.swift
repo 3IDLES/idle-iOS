@@ -10,6 +10,7 @@ import DSKit
 import RxCocoa
 import RxSwift
 import PresentationCore
+import BaseFeature
 
 public protocol ChangePasswordSuccessInputable {
     var changePasswordButtonClicked: PublishRelay<Void> { get }

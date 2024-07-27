@@ -11,6 +11,7 @@ import RxSwift
 import RxCocoa
 import DSKit
 import Entity
+import BaseFeature
 
 
 public class EditWorkerProfileViewController: DisposableViewController {

@@ -11,6 +11,7 @@ import RxSwift
 import RxCocoa
 import DSKit
 import Entity
+import BaseFeature
 
 public protocol WorkerProfileViewModelable where Input: WorkerProfileInputable, Output: WorkerProfileOutputable {
     associatedtype Input

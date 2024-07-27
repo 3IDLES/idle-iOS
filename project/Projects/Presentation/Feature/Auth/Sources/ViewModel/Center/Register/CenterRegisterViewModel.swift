@@ -11,6 +11,7 @@ import RxCocoa
 import PresentationCore
 import UseCaseInterface
 import Entity
+import BaseFeature
 
 public class CenterRegisterViewModel: ViewModelType {
     

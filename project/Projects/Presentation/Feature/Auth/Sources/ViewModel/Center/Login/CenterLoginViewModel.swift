@@ -6,10 +6,12 @@
 //
 
 import RxSwift
+import BaseFeature
 import RxCocoa
 import UseCaseInterface
 import Entity
 import PresentationCore
+import BaseFeature
 
 public class CenterLoginViewModel: ViewModelType {
     

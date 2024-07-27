@@ -9,6 +9,7 @@ import UIKit
 import RxSwift
 import DSKit
 import PresentationCore
+import BaseFeature
 
 public class CenterLoginViewController: BaseViewController {
     

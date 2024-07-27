@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import BaseFeature
 import PresentationCore
 import RxCocoa
 import RxSwift
@@ -19,14 +20,34 @@ enum RegisterCenterInfoPage: Int, CaseIterable {
 }
 
 public protocol RegisterCenterInfoViewModelable {
+    // Input
+    var editingName: PublishRelay<String> { get }
+    var editingCenterNumber: PublishRelay<String> { get }
     
+    var editingAddress: PublishRelay<AddressInformation> { get }
+    var editingDetailAddress: PublishRelay<String> { get }
+    
+    var editingCenterIntroduction: PublishRelay<String> { get }
+    var editingCenterImage: PublishRelay<UIImage> { get }
+    
+    var completeButtonPressed: PublishRelay<Void> { get }
+    
+    // Output
+    var nameAndNumberValidation: Driver<Bool>? { get }
+    var addressValidation: Driver<Bool>? { get }
+    var imageAndIntroductionValidation: Driver<Bool>? { get }
+    var profileRegisterSuccess: Driver<Void>? { get }
+    var alert: Driver<DefaultAlertContentVO>? { get }
 }
 
+fileprivate protocol CtaButtonIncludedView: UIView {
+    var ctaButton: CTAButtonType1 { get }
+    func bind(viewModel vm: RegisterCenterInfoViewModelable)
+}
 
-public class RegisterCenterInfoVC: UIViewController {
+public class RegisterCenterInfoVC: BaseViewController {
     
     // Init
-    
     
     // Not init
     /// 현재 스크린의 넓이를 의미합니다.
@@ -36,10 +57,16 @@ public class RegisterCenterInfoVC: UIViewController {
         }
         return screenWidth
     }
-
-    private var pageViews: [UIView] = []
     
-    var currentIndex: Int = -1
+    public weak var coordinator: CenterProfileRegisterCoordinatable?
+
+    private var pageViews: [CtaButtonIncludedView] = []
+    private var pagesAreSetted = false
+    
+    var currentIndex: Int = 0
+    
+    // For RC=1
+    private var viewModel: RegisterCenterInfoViewModelable?
     
     // View
     let navigationBar: NavigationBarType1 = {
@@ -51,18 +78,10 @@ public class RegisterCenterInfoVC: UIViewController {
     lazy var statusBar: ProcessStatusBar = {
         
         let view = ProcessStatusBar(
-            processCount: 3,
+            processCount: RegisterCenterInfoPage.allCases.count,
             startIndex: 0
         )
         return view
-    }()
-    
-    // 하단 버튼
-    private let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        
-        return button
     }()
     
     let disposeBag = DisposeBag()
@@ -70,17 +89,27 @@ public class RegisterCenterInfoVC: UIViewController {
     public init() {
         
         super.init(nibName: nil, bundle: nil)
+        
+        // View를 생성
+        // View를 여기서 생성하는 이유는 bind매서드호출시(viewDidLoad이후) view들을 바인딩 시키기 위해서 입니다.
+        createPages()
+        setPagesLayoutAndObservable()
     }
     required init?(coder: NSCoder) { fatalError() }
     
     public override func viewDidLoad() {
+        // ViewController
         setAppearance()
+        setLayout()
+        setObservable()
     }
     
     /// 화면의 넓이를 안전하게 접근할 수 있는 시점, 화면 관련 속성들이 설정되어 있으므로 nil이 아닙니다.
     public override func viewDidAppear(_ animated: Bool) {
-        setLayout()
-        test()
+        if !pagesAreSetted {
+            pagesAreSetted = true
+            displayPageView()
+        }
     }
     
     private func setAppearance() {
@@ -88,12 +117,22 @@ public class RegisterCenterInfoVC: UIViewController {
         view.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
     }
     
+    private func setObservable() {
+        
+        // 뒤로가기 바인딩
+        navigationBar
+            .eventPublisher
+            .subscribe { [weak self] _ in
+                self?.prev()
+            }
+            .disposed(by: disposeBag)
+    }
+    
     private func setLayout() {
         
         [
             navigationBar,
             statusBar,
-            ctaButton,
         ].forEach {
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -107,42 +146,27 @@ public class RegisterCenterInfoVC: UIViewController {
             statusBar.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 7),
             statusBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
-            ctaButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
-            
-        setPages()
-        next(animated: false)
     }
     
-    public func test() {
-        
-        ctaButton.eventPublisher.subscribe { [weak self] _ in
-            self?.next()
-        }
-        .disposed(by: disposeBag)
-        
-        navigationBar.eventPublisher.subscribe { [weak self] _ in
-            self?.prev()
-        }
-        .disposed(by: disposeBag)
-    }
-    
-    private func setPages() {
-        
+    private func createPages() {
         self.pageViews = RegisterCenterInfoPage.allCases.map { page in
             switch page {
             case .nameAndPhoneNumber:
-                NameAndPhoneNumberView()
+                return NameAndPhoneNumberView()
             case .address:
-                AddressView()
+                return AddressView(viewController: self)
             case .imageAndIntroduction:
-                ImageAndIntroductionView()
+                let view = ImageAndIntroductionView(viewController: self)
+                view.coordinator = coordinator
+                return view
             }
         }
-        
+    }
+    
+    private func setPagesLayoutAndObservable() {
+            
+        // 레이아웃 설정
         pageViews
             .enumerated()
             .forEach { index, subView in
@@ -153,23 +177,48 @@ public class RegisterCenterInfoVC: UIViewController {
                     subView.topAnchor.constraint(equalTo: statusBar.bottomAnchor),
                     subView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                     subView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                    subView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+                    subView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
                 ])
-                
-                subView.transform = .init(translationX: screenWidth, y: 0)
             }
+        
+        // 첫번째 뷰를 최상단으로
+        view.bringSubviewToFront(pageViews.first!)
+        
+        // 옵저버블 설정
+        let observables = pageViews
+            .map { view in
+                view.ctaButton.eventPublisher
+            }
+        Observable
+            .merge(observables)
+            .subscribe(onNext: { [weak self] _ in
+                self?.next()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func displayPageView() {
+        // 뷰들을 오른쪽으로 이동
+        pageViews.forEach { view in
+            view.transform = .init(translationX: screenWidth, y: 0)
+        }
+        // 첫번째 뷰를 표시
+        pageViews.first?.transform = .identity
     }
     
     private func next(animated: Bool = true) {
         
         if let nextIndex = RegisterCenterInfoPage(rawValue: currentIndex+1)?.rawValue {
             
+            // Status바 이동
+            statusBar.moveToSignal.onNext(.next)
+            
             let prevView: UIView? = currentIndex != -1 ? pageViews[currentIndex] : nil
             let willShowView = pageViews[nextIndex]
             
             currentIndex = nextIndex
             
-            UIView.animate(withDuration: animated ? 0.5 : 0.0) { [screenWidth, prevView, willShowView] in
+            UIView.animate(withDuration: animated ? 0.35 : 0.0) { [screenWidth, prevView, willShowView] in
                 
                 prevView?.transform = .init(translationX: -screenWidth, y: 0)
                 willShowView.transform = .identity
@@ -179,6 +228,9 @@ public class RegisterCenterInfoVC: UIViewController {
     
     private func prev(animated: Bool = true) {
         if let nextIndex = RegisterCenterInfoPage(rawValue: currentIndex-1)?.rawValue {
+            
+            // Status바 이동
+            statusBar.moveToSignal.onNext(.prev)
             
             let prevView = pageViews[currentIndex]
             let willShowView = pageViews[nextIndex]
@@ -190,19 +242,38 @@ public class RegisterCenterInfoVC: UIViewController {
                 prevView.transform = .init(translationX: screenWidth, y: 0)
                 willShowView.transform = .identity
             }
+        } else {
+            
+            // 돌아가기, Coordinator호출
+            coordinator?.registerFinished()
         }
     }
     
     public func bind(viewModel vm: RegisterCenterInfoViewModelable) {
         
+        // RC=1
+        self.viewModel = vm
         
+        // Output
+        vm
+            .alert?
+            .drive { [weak self] vo in
+                self?.showAlert(vo: vo)
+            }
+            .disposed(by: disposeBag)
+        
+        // pageView에 ViewModel을 바인딩
+        pageViews
+            .forEach { pv in
+                pv.bind(viewModel: vm)
+            }
     }
 }
 
 extension RegisterCenterInfoVC {
     
     // MARK: CenterInfoView (이름 + 센터 연락처)
-    class NameAndPhoneNumberView: UIView {
+    class NameAndPhoneNumberView: UIView, CtaButtonIncludedView {
         
         // View
         private let processTitle: IdleLabel = {
@@ -229,6 +300,14 @@ extension RegisterCenterInfoVC {
             return field
         }()
         
+        // 하단 버튼
+        let ctaButton: CTAButtonType1 = {
+            
+            let button = CTAButtonType1(labelText: "다음")
+            button.setEnabled(false)
+            return button
+        }()
+        
         init() {
             super.init(frame: .zero)
             setAppearance()
@@ -237,7 +316,7 @@ extension RegisterCenterInfoVC {
         required init?(coder: NSCoder) { fatalError() }
         
         private func setAppearance() {
-            
+            self.backgroundColor = .white
             self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
         }
         
@@ -254,7 +333,8 @@ extension RegisterCenterInfoVC {
             
             [
                 processTitle,
-                inputStack
+                inputStack,
+                ctaButton
             ].forEach {
                 $0.translatesAutoresizingMaskIntoConstraints = false
                 self.addSubview($0)
@@ -269,17 +349,42 @@ extension RegisterCenterInfoVC {
                 inputStack.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
                 inputStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
                 inputStack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+                
+                ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+                ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+                ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
             ])
         }
         
+        private let disposeBag = DisposeBag()
+        
         public func bind(viewModel vm: RegisterCenterInfoViewModelable) {
+            // input
+            nameField
+                .eventPublisher
+                .bind(to: vm.editingName)
+                .disposed(by: disposeBag)
             
+            phoneNumberField
+                .eventPublisher
+                .bind(to: vm.editingCenterNumber)
+                .disposed(by: disposeBag)
             
+            // Output
+            vm
+                .nameAndNumberValidation?
+                .drive { [ctaButton] isValid in
+                    ctaButton.setEnabled(isValid)
+                }
+                .disposed(by: disposeBag)
         }
     }
     
     // MARK: 센터주소 (도로명, 지번주소 + 상세주소)
-    class AddressView: UIView {
+    class AddressView: UIView, DaumAddressSearchDelegate, CtaButtonIncludedView {
+        
+        // init
+        public weak var viewController: UIViewController?
         
         // View
         private let processTitle: IdleLabel = {
@@ -288,16 +393,15 @@ extension RegisterCenterInfoVC {
             label.textAlignment = .left
             return label
         }()
-        
-        let nameField: IFType2 = {
-            let field = IFType2(
-                titleLabelText: "도로명주소",
-                placeHolderText: "도로명 주소를 입력해주세요."
-            )
-            return field
+    
+        private let addressSearchButton: TextButtonType2 = {
+           
+            let button = TextButtonType2(labelText: "도로명 주소를 입력해주세요.")
+            
+            return button
         }()
         
-        let phoneNumberField: IFType2 = {
+        let detailAddressField: IFType2 = {
             let field = IFType2(
                 titleLabelText: "상세 주소",
                 placeHolderText: "상세 주소를 입력해주세요. (예: 2층 204호)"
@@ -305,24 +409,52 @@ extension RegisterCenterInfoVC {
             return field
         }()
         
-        init() {
+        // 하단 버튼
+        let ctaButton: CTAButtonType1 = {
+            
+            let button = CTAButtonType1(labelText: "다음")
+            button.setEnabled(false)
+            return button
+        }()
+        
+        // Observable
+        private let addressPublisher: PublishRelay<AddressInformation> = .init()
+        private let disposeBag = DisposeBag()
+        
+        init(viewController vc: UIViewController) {
+            self.viewController = vc
             super.init(frame: .zero)
             setAppearance()
             setLayout()
+            setObservable()
         }
         required init?(coder: NSCoder) { fatalError() }
         
         private func setAppearance() {
-            
+            self.backgroundColor = .white
             self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
         }
         
         private func setLayout() {
             
+            let roadAddressStack = VStack(
+                [
+                    {
+                        let label = IdleLabel(typography: .Subtitle4)
+                        label.textString = "도로명주소"
+                        label.textAlignment = .left
+                        return label
+                    }(),
+                    addressSearchButton,
+                ],
+                spacing: 6,
+                alignment: .fill
+            )
+            
             let inputStack = VStack(
                 [
-                    nameField,
-                    phoneNumberField
+                    roadAddressStack,
+                    detailAddressField
                 ],
                 spacing: 28,
                 alignment: .fill
@@ -330,7 +462,8 @@ extension RegisterCenterInfoVC {
             
             [
                 processTitle,
-                inputStack
+                inputStack,
+                ctaButton
             ].forEach {
                 $0.translatesAutoresizingMaskIntoConstraints = false
                 self.addSubview($0)
@@ -345,17 +478,75 @@ extension RegisterCenterInfoVC {
                 inputStack.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
                 inputStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
                 inputStack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+                
+                ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+                ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+                ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
             ])
+        }
+        
+        private func setObservable() {
+            
+            addressSearchButton
+                .eventPublisher
+                .subscribe { [weak self] _ in
+                    self?.showDaumSearchView()
+                }
+                .disposed(by: disposeBag)
+        }
+        
+        private func showDaumSearchView() {
+            let vc = DaumAddressSearchViewController()
+            vc.deleage = self
+            vc.modalPresentationStyle = .fullScreen
+            viewController?.navigationController?.pushViewController(vc, animated: true)
         }
         
         public func bind(viewModel vm: RegisterCenterInfoViewModelable) {
             
+            // Input
+            addressPublisher
+                .bind(to: vm.editingAddress)
+                .disposed(by: disposeBag)
             
+            detailAddressField
+                .uITextField.rx.text
+                .compactMap { $0 }
+                .bind(to: vm.editingDetailAddress)
+                .disposed(by: disposeBag)
+            
+            // output
+            vm
+                .addressValidation?
+                .drive(onNext: { [ctaButton] isValid in
+                    ctaButton.setEnabled(isValid)
+                })
+                .disposed(by: disposeBag)
+        }
+        
+        public func addressSearch(addressData: [AddressDataKey : String]) {
+            
+//            let address = addressData[.address] ?? "알 수 없는 주소"
+            let jibunAddress = addressData[.jibunAddress] ?? "알 수 없는 지번 주소"
+            let roadAddress = addressData[.roadAddress] ?? "알 수 없는 도로명 주소"
+            
+            addressSearchButton.label.textString = roadAddress
+            addressPublisher.accept(
+                AddressInformation(
+                    roadAddress: roadAddress,
+                    jibunAddress: jibunAddress
+                )
+            )
         }
     }
  
     // MARK: 센터 소개 (프로필 사진 + 센터소개)
-    class ImageAndIntroductionView: UIView {
+    class ImageAndIntroductionView: UIView, CtaButtonIncludedView {
+        
+        weak var coordinator: CenterProfileRegisterCoordinatable?
+        
+        // init
+        public weak var viewController: UIViewController!
         
         // View
         private let processTitle: IdleLabel = {
@@ -381,19 +572,33 @@ extension RegisterCenterInfoVC {
             return textView
         }()
         
-        private let centerImageView: ImageSelectView = {
-            let view = ImageSelectView(state: .editing)
+        private lazy var centerImageView: ImageSelectView = {
+            let view = ImageSelectView(state: .editing, viewController: viewController)
             return view
         }()
         
-        init() {
+        // 하단 버튼
+        let ctaButton: CTAButtonType1 = {
+            
+            let button = CTAButtonType1(labelText: "다음")
+            button.setEnabled(false)
+            return button
+        }()
+        
+        // Observable
+        private let disposeBag = DisposeBag()
+        
+        init(viewController: UIViewController) {
+            self.viewController = viewController
             super.init(frame: .zero)
             setAppearance()
             setLayout()
         }
         required init?(coder: NSCoder) { fatalError() }
         
-        private func setAppearance() { }
+        private func setAppearance() { 
+            self.backgroundColor = .white
+        }
         
         private func setLayout() {
             
@@ -431,7 +636,6 @@ extension RegisterCenterInfoVC {
                 alignment: .fill
             )
             
-            
             let scrollView = UIScrollView()
             [
                 processTitle,
@@ -460,7 +664,8 @@ extension RegisterCenterInfoVC {
             ])
             
             [
-                scrollView
+                scrollView,
+                ctaButton,
             ].forEach {
                 $0.translatesAutoresizingMaskIntoConstraints = false
                 self.addSubview($0)
@@ -469,13 +674,49 @@ extension RegisterCenterInfoVC {
                 scrollView.topAnchor.constraint(equalTo: self.topAnchor),
                 scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
                 scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-                scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+                scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+                
+                ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+                ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+                ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
             ])
         }
         
         public func bind(viewModel vm: RegisterCenterInfoViewModelable) {
             
+            // Input
+            centerIntroductionField
+                .rx.text
+                .compactMap { $0 }
+                .bind(to: vm.editingCenterIntroduction)
+                .disposed(by: disposeBag)
             
+            centerImageView
+                .editingImage
+                .compactMap { $0 }
+                .bind(to: vm.editingCenterImage)
+                .disposed(by: disposeBag)
+            
+            // 완료버튼
+            ctaButton
+                .eventPublisher
+                .bind(to: vm.completeButtonPressed)
+                .disposed(by: disposeBag)
+            
+            // Output
+            vm
+                .imageAndIntroductionValidation?
+                .drive(onNext: { [ctaButton] isValid in
+                    ctaButton.setEnabled(isValid)
+                })
+                .disposed(by: disposeBag)
+            
+            vm
+                .profileRegisterSuccess?
+                .drive(onNext: { [weak coordinator] _ in
+                    coordinator?.showOverViewScreen()
+                })
+                .disposed(by: disposeBag)
         }
     }
 }

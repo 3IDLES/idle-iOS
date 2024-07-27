@@ -10,6 +10,7 @@ import AuthFeature
 
 extension RootCoordinator {
     
+    /// 로그인및 회원가입을 실행합니다.
     func auth() {
         
         let authCoordinator = AuthCoordinator(
@@ -53,4 +54,5 @@ extension RootCoordinator {
         
         coordinator.start()
     }
+    
 }

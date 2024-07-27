@@ -52,7 +52,7 @@ public extension ParentCoordinator {
     
     func clearChildren() {
         
-        print(self, childCoordinators, navigationController.viewControllers)
+        printIfDebug(self, childCoordinators, navigationController.viewControllers)
         
         let lastCoordinator = childCoordinators.popLast()
         

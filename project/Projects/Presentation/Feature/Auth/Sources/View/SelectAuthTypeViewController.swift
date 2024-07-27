@@ -10,6 +10,7 @@ import DSKit
 import RxSwift
 import RxCocoa
 import PresentationCore
+import BaseFeature
 
 class SelectAuthTypeViewController: DisposableViewController {
     

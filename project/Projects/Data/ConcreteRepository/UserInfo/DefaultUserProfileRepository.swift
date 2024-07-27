@@ -27,6 +27,24 @@ public class DefaultUserProfileRepository: UserProfileRepository {
         }
     }
     
+    /// 센터프로필(최초 센터정보)를 등록합니다.
+    public func registerCenterProfileForText(state: CenterProfileRegisterState) -> Single<Void> {
+        
+        let dto = RegisterCenterProfileDTO(
+            centerName: state.centerName,
+            officeNumber: state.officeNumber,
+            roadNameAddress: state.roadNameAddress,
+            lotNumberAddress: state.lotNumberAddress,
+            detailedAddress: state.detailedAddress,
+            introduce: state.introduce
+        )
+        let data = try! JSONEncoder().encode(dto)
+        
+        return userInformationService
+            .request(api: .registerCenterProfile(data: data), with: .withToken)
+            .map { _ in () }
+    }
+    
     public func getCenterProfile() -> Single<CenterProfileVO> {
         
         userInformationService
@@ -45,7 +63,6 @@ public class DefaultUserProfileRepository: UserProfileRepository {
     
     /// 이미지 업로드
     public func uploadImage(_ userType: UserType, imageInfo: ImageUploadInfo) -> Single<Void> {
-        
         getPreSignedUrl(userType, ext: imageInfo.ext)
             .flatMap { [unowned self] dto in
                 self.uploadImageToPreSignedUrl(url: dto.uploadUrl, data: imageInfo.data)

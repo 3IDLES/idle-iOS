@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-        window?.rootViewController = RegisterCenterInfoVC()
+        window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
     }
 }

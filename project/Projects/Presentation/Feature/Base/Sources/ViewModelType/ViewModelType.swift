@@ -1,6 +1,6 @@
 //
 //  ViewModelType.swift
-//  PresentationCore
+//  BaseFeature
 //
 //  Created by choijunios on 7/6/24.
 //
