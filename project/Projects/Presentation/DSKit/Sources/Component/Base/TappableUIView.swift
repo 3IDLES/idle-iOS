@@ -22,7 +22,7 @@ public class TappableUIView: UIView {
     func onTouchAction(_ tapGesture: UITapGestureRecognizer) { }
 }
 
-public extension Reactive where Base == TappableUIView {
+public extension Reactive where Base: TappableUIView {
     var tap: ControlEvent<Void> {
         let source = self.methodInvoked(#selector(Base.onTouchAction)).map { _ in }
         return ControlEvent(events: source)

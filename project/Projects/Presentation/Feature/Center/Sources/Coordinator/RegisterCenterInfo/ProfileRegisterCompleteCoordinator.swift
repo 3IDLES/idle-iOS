@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Entity
 import PresentationCore
 import UseCaseInterface
 
@@ -15,10 +16,13 @@ public class ProfileRegisterCompleteCoordinator: ChildCoordinator {
     public weak var parent: CenterProfileRegisterCoordinatable?
     
     public let navigationController: UINavigationController
+    private let viewModel: ProfileRegisterCompleteViewModelable
     
     public init(
+        cardVO: CenterProfileCardVO,
         navigationController: UINavigationController
     ) {
+        self.viewModel = ProfileRegisterCompleteVM(centerCardVO: cardVO)
         self.navigationController = navigationController
     }
     
@@ -28,6 +32,7 @@ public class ProfileRegisterCompleteCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = ProfileRegisterCompleteVC(coordinator: self)
+        vc.bind(viewModel: viewModel)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
     }
@@ -40,7 +45,7 @@ public class ProfileRegisterCompleteCoordinator: ChildCoordinator {
 extension ProfileRegisterCompleteCoordinator {
     
     func showCenterProfile() {
-        parent?.showCenterProfile()
+        parent?.showMyCenterProfile()
     }
     
     func registerFinished() {

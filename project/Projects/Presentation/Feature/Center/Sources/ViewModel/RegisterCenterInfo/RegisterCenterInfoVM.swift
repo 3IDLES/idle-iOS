@@ -28,7 +28,7 @@ public class RegisterCenterInfoVM: RegisterCenterInfoViewModelable {
     public var addressValidation: Driver<Bool>? = nil
     public var introductionValidation: Driver<Bool>? = nil
     public var imageValidation: Driver<UIImage>? = nil
-    public var profileRegisterSuccess: Driver<Void>? = nil
+    public var profileRegisterSuccess: Driver<CenterProfileCardVO>? = nil
     public var alert: Driver<DefaultAlertContentVO>? = nil
     
     // StatObject
@@ -122,7 +122,14 @@ public class RegisterCenterInfoVM: RegisterCenterInfoViewModelable {
         
         profileRegisterSuccess = profileRegisterResult
             .compactMap { $0.value }
-            .asDriver(onErrorJustReturn: ())
+            .map { [stateObject] in
+                let cardVO = CenterProfileCardVO(
+                    name: stateObject.centerName,
+                    location: stateObject.roadNameAddress
+                )
+                return cardVO
+            }
+            .asDriver(onErrorJustReturn: .default)
             
         let profileRegisterFailure = profileRegisterResult
             .compactMap { $0.error }

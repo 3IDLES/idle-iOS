@@ -45,10 +45,25 @@ public class DefaultUserProfileRepository: UserProfileRepository {
             .map { _ in () }
     }
     
-    public func getCenterProfile() -> Single<CenterProfileVO> {
+    public func getCenterProfile(mode: ProfileMode) -> Single<CenterProfileVO> {
         
+        var api: UserInformationAPI!
+        
+        switch mode {
+        case .myProfile:
+            api = .getCenterProfile
+        case .otherProfile(let id):
+            api = .getOtherCenterProfile(id: id)
+        }
+        
+        return userInformationService
+            .requestDecodable(api: api, with: .withToken)
+            .map { (dto: CenterProfileDTO) in dto.toEntity() }
+    }
+    
+    public func getCenterProfile(id: String) -> Single<CenterProfileVO> {
         userInformationService
-            .requestDecodable(api: .getCenterProfile, with: .withToken)
+            .requestDecodable(api: .getOtherCenterProfile(id: id), with: .withToken)
             .map { (dto: CenterProfileDTO) in dto.toEntity() }
     }
     

@@ -13,6 +13,24 @@ import RxSwift
 import Entity
 import DSKit
 
+public protocol ProfileRegisterCompleteViewModelable {
+    // Output
+    var centerCardVO: Driver<CenterProfileCardVO> { get }
+}
+
+public class ProfileRegisterCompleteVM: ProfileRegisterCompleteViewModelable {
+    
+    public var centerCardVO: Driver<CenterProfileCardVO>
+    
+    public init(centerCardVO: CenterProfileCardVO) {
+        
+        self.centerCardVO = Single
+            .just(centerCardVO)
+            .asDriver(onErrorJustReturn: .default)
+    }
+    
+}
+
 public class ProfileRegisterCompleteVC: UIViewController {
     
     // Init
@@ -135,11 +153,28 @@ public class ProfileRegisterCompleteVC: UIViewController {
     
     private func setObservable() {
         
+        centerProfileButton
+            .rx.tap
+            .subscribe { [weak coordinator] _ in
+                coordinator?.showCenterProfile()
+            }
+            .disposed(by: disposeBag)
+        
         ctaButton
             .eventPublisher
             .subscribe { [weak coordinator] _ in
-                
                 coordinator?.registerFinished()
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    public func bind(viewModel vm: ProfileRegisterCompleteViewModelable) {
+        
+        vm
+            .centerCardVO
+            .drive { [centerProfileButton] vo in
+                centerProfileButton.nameLabel.textString = vo.name
+                centerProfileButton.addressLabel.textString = vo.location
             }
             .disposed(by: disposeBag)
     }
