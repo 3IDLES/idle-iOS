@@ -500,7 +500,7 @@ extension RegisterCenterInfoVC {
         
         private func showDaumSearchView() {
             let vc = DaumAddressSearchViewController()
-            vc.deleage = self
+            vc.delegate = self
             vc.modalPresentationStyle = .fullScreen
             viewController?.navigationController?.pushViewController(vc, animated: true)
         }
