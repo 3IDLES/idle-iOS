@@ -14,7 +14,7 @@ public struct CenterProfileDTO: Codable {
     let roadNameAddress: String
     let lotNumberAddress: String
     let detailedAddress: String
-    let introduce: String
+    let introduce: String?
     let longitude: String?
     let latitude: String?
     let profileImageUrl: String?
@@ -31,7 +31,7 @@ public extension CenterProfileDTO {
             detailedAddress: detailedAddress,
             longitude: longitude ?? "",
             latitude: latitude ?? "",
-            introduce: introduce,
+            introduce: introduce ?? "",
             profileImageURL: URL(string: profileImageUrl ?? "")
         )
     }

@@ -25,6 +25,8 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
     public var input: Input
     public var output: Output? = nil
     
+    public let isMyCenterProfile: Bool = true
+    
     private var fetchedPhoneNumber: String?
     private var fetchedIntroduction: String?
     private var fetchedImage: UIImage?
@@ -74,12 +76,14 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
             .map { $0.roadNameAddress }
             .asDriver(onErrorJustReturn: "")
         
+        // 센터 소개는 필수값이 아님, 공백일 경우 필터링
         let centerIntroductionDriver = profileRequestSuccess
             .map { [weak self] in
                 let introduce = $0.introduce
                 self?.fetchedIntroduction = introduce
                 return introduce
             }
+            .filter { !$0.isEmpty }
             .asDriver(onErrorJustReturn: "")
     
         let centerPhoneNumberDriver = profileRequestSuccess

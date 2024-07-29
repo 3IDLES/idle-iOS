@@ -18,6 +18,8 @@ public protocol CenterProfileViewModelable where Input: CenterProfileInputable, 
     associatedtype Output
     var input: Input { get }
     var output: Output? { get }
+    
+    var isMyCenterProfile: Bool { get }
 }
 
 public protocol CenterProfileInputable {
@@ -327,31 +329,35 @@ public class CenterProfileViewController: BaseViewController {
             .bind(to: input.readyToFetch)
             .disposed(by: disposeBag)
         
-        profileEditButton
-            .eventPublisher
-            .bind(to: input.editingButtonPressed)
-            .disposed(by: disposeBag)
-        
-        editingCompleteButton
-            .eventPublisher
-            .bind(to: input.editingFinishButtonPressed)
-            .disposed(by: disposeBag)
-        
-        centerPhoneNumeberField.rx.text
-            .compactMap { $0 }
-            .bind(to: input.editingPhoneNumber)
-            .disposed(by: disposeBag)
-        
-        centerIntroductionField.rx.text
-            .compactMap { $0 }
-            .bind(to: input.editingInstruction)
-            .disposed(by: disposeBag)
-        
-        centerImageView
-            .selectedImage
-            .compactMap { $0 }
-            .bind(to: input.selectedImage)
-            .disposed(by: disposeBag)
+        // 내 센터보기 상태인 경우(수정가능한 프로필 상태)
+        if viewModel.isMyCenterProfile {
+            
+            profileEditButton
+                .eventPublisher
+                .bind(to: input.editingButtonPressed)
+                .disposed(by: disposeBag)
+            
+            editingCompleteButton
+                .eventPublisher
+                .bind(to: input.editingFinishButtonPressed)
+                .disposed(by: disposeBag)
+            
+            centerPhoneNumeberField.rx.text
+                .compactMap { $0 }
+                .bind(to: input.editingPhoneNumber)
+                .disposed(by: disposeBag)
+            
+            centerIntroductionField.rx.text
+                .compactMap { $0 }
+                .bind(to: input.editingInstruction)
+                .disposed(by: disposeBag)
+            
+            centerImageView
+                .selectedImage
+                .compactMap { $0 }
+                .bind(to: input.selectedImage)
+                .disposed(by: disposeBag)
+        }
         
         // output
         guard let output = viewModel.output else { fatalError() }
@@ -390,41 +396,51 @@ public class CenterProfileViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         // MARK: Edit Mode
-        output
-            .isEditingMode
-            .map { isEditing -> ImageSelectView.State in
-                isEditing ? .editing : .normal
-            }
-            .drive(centerImageView.state)
-            .disposed(by: disposeBag)
-        
-        output
-            .isEditingMode
-            .drive { [weak self] in
-                guard let self else { return }
-                
-                centerPhoneNumeberField.isHidden = !$0
-                centerPhoneNumeberLabel.isHidden = $0
-                
-                centerIntroductionField.isHidden = !$0
-                centerIntroductionLabel.isHidden = $0
-                
-                editingCompleteButton.isHidden = !$0
-                profileEditButton.isHidden = $0
-            }
-            .disposed(by: disposeBag)
+        if viewModel.isMyCenterProfile {
+            
+            output
+                .isEditingMode
+                .map { isEditing -> ImageSelectView.State in
+                    isEditing ? .editing : .normal
+                }
+                .drive(centerImageView.state)
+                .disposed(by: disposeBag)
+            
+            output
+                .isEditingMode
+                .drive { [weak self] in
+                    guard let self else { return }
+                    
+                    centerPhoneNumeberField.isHidden = !$0
+                    centerPhoneNumeberLabel.isHidden = $0
+                    
+                    centerIntroductionField.isHidden = !$0
+                    centerIntroductionLabel.isHidden = $0
+                    
+                    editingCompleteButton.isHidden = !$0
+                    profileEditButton.isHidden = $0
+                }
+                .disposed(by: disposeBag)
+            
+            output
+                .editingValidation
+                .drive { _ in
+                    // do something when editing success
+                }
+                .disposed(by: disposeBag)
+        } else {
+            // 수정 UI을 모두 끈다.
+            centerPhoneNumeberField.isHidden = true
+            centerIntroductionField.isHidden = true
+            editingCompleteButton.isHidden = true
+            profileEditButton.isHidden = true
+            centerImageView.state.accept(.normal)
+        }
         
         output
             .alert
             .drive { [weak self] vo in
                 self?.showAlert(vo: vo)
-            }
-            .disposed(by: disposeBag)
-        
-        output
-            .editingValidation
-            .drive { _ in
-                // do something when editing success
             }
             .disposed(by: disposeBag)
         
