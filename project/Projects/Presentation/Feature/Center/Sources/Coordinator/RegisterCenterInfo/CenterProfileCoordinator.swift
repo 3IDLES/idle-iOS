@@ -1,8 +1,8 @@
 //
-//  RegisterCenterInfoCoordinator.swift
+//  CenterProfileCoordinator.swift
 //  CenterFeature
 //
-//  Created by choijunios on 7/27/24.
+//  Created by choijunios on 7/29/24.
 //
 
 import UIKit
@@ -10,48 +10,38 @@ import PresentationCore
 import UseCaseInterface
 import Entity
 
-public class RegisterCenterInfoCoordinator: ChildCoordinator {
-    
+/// 내센터, 다른 센터를 모두 불러올 수 있습니다.
+public class CenterProfileCoordinator: ChildCoordinator {
+
     public weak var viewControllerRef: UIViewController?
     public weak var parent: CenterProfileRegisterCoordinatable?
     
     public let navigationController: UINavigationController
     
-    public let viewModel: RegisterCenterInfoViewModelable
+    public let viewModel: any CenterProfileViewModelable
     
     public init(
+        mode: ProfileMode,
         profileUseCase: CenterProfileUseCase,
         navigationController: UINavigationController
     ) {
-        self.viewModel = RegisterCenterInfoVM(profileUseCase: profileUseCase)
+        self.viewModel = CenterProfileViewModel(mode: mode, useCase: profileUseCase)
         self.navigationController = navigationController
     }
     
-    deinit {
-        printIfDebug("\(String(describing: RegisterCenterInfoCoordinator.self))")
-    }
-    
     public func start() {
-        let vc = RegisterCenterInfoVC(coordinator: self)
+        let vc = CenterProfileViewController(coordinator: self)
         vc.bind(viewModel: viewModel)
-        
-        viewControllerRef = vc
-        
+        self.viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
     }
     
     public func coordinatorDidFinish() {
         parent?.removeChildCoordinator(self)
     }
-}
-
-extension RegisterCenterInfoCoordinator {
     
-    func showCompleteScreen(cardVO: CenterProfileCardVO) {
-        parent?.showCompleteScreen(cardVO: cardVO)
-    }
-    
-    func registerFinished() {
-        parent?.registerFinished()
+    func closeViewController() {
+        popViewController()
+        coordinatorDidFinish()
     }
 }

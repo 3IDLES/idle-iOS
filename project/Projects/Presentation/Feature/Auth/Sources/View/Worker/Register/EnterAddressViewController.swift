@@ -210,7 +210,7 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
     private func showDaumSearchView() {
         
         let vc = DaumAddressSearchViewController()
-        vc.deleage = self
+        vc.delegate = self
         vc.modalPresentationStyle = .fullScreen
         navigationController?.pushViewController(vc, animated: true)
     }

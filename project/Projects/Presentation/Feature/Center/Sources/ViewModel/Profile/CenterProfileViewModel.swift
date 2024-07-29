@@ -25,7 +25,7 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
     public var input: Input
     public var output: Output? = nil
     
-    public let isMyCenterProfile: Bool = true
+    public let profileMode: ProfileMode
     
     private var fetchedPhoneNumber: String?
     private var fetchedIntroduction: String?
@@ -45,8 +45,9 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         )
     }
     
-    public init(useCase: CenterProfileUseCase) {
+    public init(mode: ProfileMode, useCase: CenterProfileUseCase) {
         
+        self.profileMode = mode
         self.profileUseCase = useCase
         
         self.input = Input()
@@ -54,8 +55,8 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         // MARK: fetch from server
         let profileRequestResult = input
             .readyToFetch
-            .flatMap { [unowned self] _ in
-                self.profileUseCase.getProfile()
+            .flatMap { [profileMode, profileUseCase] _ in
+                profileUseCase.getProfile(mode: profileMode)
             }
             .share()
         

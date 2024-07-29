@@ -28,6 +28,7 @@ public enum UserInformationAPI {
     
     // 프로필 조회
     case getCenterProfile
+    case getOtherCenterProfile(id: String)
     case updateCenterProfile(officeNumber: String, introduce: String?)
     
     // 프로필 사진 업로드
@@ -50,6 +51,8 @@ extension UserInformationAPI: BaseAPI {
             "center/my/profile"
         case .getCenterProfile:
             "center/my/profile"
+        case .getOtherCenterProfile(let id):
+            "center/profile/\(id)"
         case .updateCenterProfile:
             "center/my/profile"
         case .getPreSignedUrl(let type, _):
@@ -64,6 +67,8 @@ extension UserInformationAPI: BaseAPI {
         case .registerCenterProfile:
             .post
         case .getCenterProfile:
+            .get
+        case .getOtherCenterProfile:
             .get
         case .updateCenterProfile:
             .patch
@@ -85,8 +90,6 @@ extension UserInformationAPI: BaseAPI {
         switch self {
         case .registerCenterProfile(let data):
             return .requestData(data)
-        case .getCenterProfile:
-            return .requestPlain
         case .updateCenterProfile(let officeNumber, let introduce):
             var bodyData: [String: String] = ["officeNumber": officeNumber]
             if let introduce {
@@ -104,6 +107,8 @@ extension UserInformationAPI: BaseAPI {
                 "imageFileExtension": imageExt
             ]
             return .requestParameters(parameters: params, encoding: parameterEncoding)
+        default:
+            return .requestPlain
         }
     }
 }

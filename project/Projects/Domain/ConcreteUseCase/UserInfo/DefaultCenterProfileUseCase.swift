@@ -19,11 +19,10 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
         self.repository = repository
     }
     
-    public func getProfile() -> Single<Result<CenterProfileVO, UserInfoError>> {
-        convert(task: repository
-            .getCenterProfile()) { [unowned self] error in
-                toDomainError(error: error)
-            }
+    public func getProfile(mode: ProfileMode) -> Single<Result<CenterProfileVO, UserInfoError>> {
+        convert(task: repository.getCenterProfile(mode: mode)) { [unowned self] error in
+            toDomainError(error: error)
+        }
     }
     
     public func updateProfile(phoneNumber: String?, introduction: String?, imageInfo: ImageUploadInfo?) -> Single<Result<Void, UserInfoError>> {

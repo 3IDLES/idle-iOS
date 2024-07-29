@@ -7,6 +7,7 @@
 
 import UIKit
 import CenterFeature
+import Entity
 import PresentationCore
 import UseCaseInterface
 
@@ -46,8 +47,9 @@ class CenterProfileRegisterCoordinator: CenterProfileRegisterCoordinatable {
 
 extension CenterProfileRegisterCoordinator {
     
-    func showCompleteScreen() {
+    func showCompleteScreen(cardVO: Entity.CenterProfileCardVO) {
         let coordinator = ProfileRegisterCompleteCoordinator(
+            cardVO: cardVO,
             navigationController: navigationController
         )
         addChildCoordinator(coordinator)
@@ -55,7 +57,14 @@ extension CenterProfileRegisterCoordinator {
         coordinator.start()
     }
     
-    func showCenterProfile() {
-        
+    func showMyCenterProfile() {
+        let coordinator = CenterProfileCoordinator(
+            mode: .myProfile,
+            profileUseCase: injector.resolve(CenterProfileUseCase.self),
+            navigationController: navigationController
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
     }
 }

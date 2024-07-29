@@ -19,7 +19,7 @@ public protocol CenterProfileViewModelable where Input: CenterProfileInputable, 
     var input: Input { get }
     var output: Output? { get }
     
-    var isMyCenterProfile: Bool { get }
+    var profileMode: ProfileMode { get }
 }
 
 public protocol CenterProfileInputable {
@@ -44,6 +44,8 @@ public protocol CenterProfileOutputable: DefaultAlertOutputable {
 public class CenterProfileViewController: BaseViewController {
     
     var viewModel: (any CenterProfileViewModelable)?
+    
+    weak var coordinator: CenterProfileCoordinator?
     
     let navigationBar: NavigationBarType1 = {
         let bar = NavigationBarType1(navigationTitle: "내 센터 정보")
@@ -147,14 +149,17 @@ public class CenterProfileViewController: BaseViewController {
         return view
     }()
     
-    let disposeBag = DisposeBag()
+    private let disposeBag = DisposeBag()
     
-    public init() {
+    public init(coordinator: CenterProfileCoordinator) {
+        
+        self.coordinator = coordinator
         
         super.init(nibName: nil, bundle: nil)
         
         setApearance()
         setAutoLayout()
+        setObservable()
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -316,6 +321,16 @@ public class CenterProfileViewController: BaseViewController {
         ])
     }
     
+    private func setObservable() {
+        
+        navigationBar
+            .eventPublisher
+            .subscribe { [weak coordinator] _ in
+                coordinator?.closeViewController()
+            }
+            .disposed(by: disposeBag)
+    }
+    
     public func bind(viewModel: any CenterProfileViewModelable) {
         
         self.viewModel = viewModel
@@ -330,7 +345,7 @@ public class CenterProfileViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         // 내 센터보기 상태인 경우(수정가능한 프로필 상태)
-        if viewModel.isMyCenterProfile {
+        if case .myProfile = viewModel.profileMode {
             
             profileEditButton
                 .eventPublisher
@@ -396,7 +411,7 @@ public class CenterProfileViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         // MARK: Edit Mode
-        if viewModel.isMyCenterProfile {
+        if case .myProfile = viewModel.profileMode {
             
             output
                 .isEditingMode

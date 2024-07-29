@@ -39,17 +39,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             navigationController: navigationController
         )
         
-        let vm = CenterProfileViewModel(
-            useCase: useCase
-        )
-        
-        let vc = CenterProfileViewController()
-        vc.bind(viewModel: vm)
-        
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = vc
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         
-        
+        coordinator.start()
     }
 }

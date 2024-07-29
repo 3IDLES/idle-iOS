@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import Entity
 
 public protocol CenterProfileRegisterCoordinatable: ParentCoordinator {
     
     func registerFinished()
-    func showCompleteScreen()
-    func showCenterProfile()
+    func showCompleteScreen(cardVO: CenterProfileCardVO)
+    func showMyCenterProfile()
 }

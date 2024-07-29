@@ -36,7 +36,7 @@ public protocol RegisterCenterInfoViewModelable {
     var nameAndNumberValidation: Driver<Bool>? { get }
     var addressValidation: Driver<Bool>? { get }
     var imageValidation: Driver<UIImage>? { get }
-    var profileRegisterSuccess: Driver<Void>? { get }
+    var profileRegisterSuccess: Driver<CenterProfileCardVO>? { get }
     var alert: Driver<DefaultAlertContentVO>? { get }
 }
 
@@ -713,8 +713,8 @@ extension RegisterCenterInfoVC {
             
             vm
                 .profileRegisterSuccess?
-                .drive(onNext: { [weak coordinator] _ in
-                    coordinator?.showCompleteScreen()
+                .drive(onNext: { [weak coordinator] cardVO in
+                    coordinator?.showCompleteScreen(cardVO: cardVO)
                 })
                 .disposed(by: disposeBag)
         }
