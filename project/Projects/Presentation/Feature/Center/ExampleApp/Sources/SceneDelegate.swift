@@ -40,9 +40,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = navigationController
+        window?.rootViewController = RegisterRecruitmentPostVC()
         window?.makeKeyAndVisible()
-        
-        coordinator.start()
     }
 }
