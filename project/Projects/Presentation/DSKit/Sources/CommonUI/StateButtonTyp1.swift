@@ -19,7 +19,7 @@ public class StateButtonTyp1: UIView {
     public let eventPublisher: PublishRelay<State> = .init()
     
     // View
-    let label: IdleLabel = {
+    public let label: IdleLabel = {
        
         let view = IdleLabel(typography: .Body3)
         

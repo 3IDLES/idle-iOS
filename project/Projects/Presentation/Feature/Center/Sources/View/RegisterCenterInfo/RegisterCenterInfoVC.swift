@@ -19,13 +19,10 @@ enum RegisterCenterInfoPage: Int, CaseIterable {
     case imageAndIntroduction = 2
 }
 
-public protocol RegisterCenterInfoViewModelable {
+public protocol RegisterCenterInfoViewModelable: AddressInputViewModelable {
     // Input
     var editingName: PublishRelay<String> { get }
     var editingCenterNumber: PublishRelay<String> { get }
-    
-    var editingAddress: PublishRelay<AddressInformation> { get }
-    var editingDetailAddress: PublishRelay<String> { get }
     
     var editingCenterIntroduction: PublishRelay<String> { get }
     var editingCenterImage: PublishRelay<UIImage> { get }
@@ -34,20 +31,26 @@ public protocol RegisterCenterInfoViewModelable {
     
     // Output
     var nameAndNumberValidation: Driver<Bool>? { get }
-    var addressValidation: Driver<Bool>? { get }
     var imageValidation: Driver<UIImage>? { get }
     var profileRegisterSuccess: Driver<CenterProfileCardVO>? { get }
     var alert: Driver<DefaultAlertContentVO>? { get }
 }
 
-fileprivate protocol CtaButtonIncludedView: UIView {
+fileprivate protocol RegisterCenterInfoVCViews: UIView {
     var ctaButton: CTAButtonType1 { get }
     func bind(viewModel vm: RegisterCenterInfoViewModelable)
+}
+
+extension AddressView: RegisterCenterInfoVCViews {
+    func bind(viewModel vm: any RegisterCenterInfoViewModelable) {
+        bind(viewModel: vm as AddressInputViewModelable)
+    }
 }
 
 public class RegisterCenterInfoVC: BaseViewController {
     
     // Init
+    public weak var coordinator: RegisterCenterInfoCoordinator?
     
     // Not init
     /// 현재 스크린의 넓이를 의미합니다.
@@ -57,10 +60,8 @@ public class RegisterCenterInfoVC: BaseViewController {
         }
         return screenWidth
     }
-    
-    public weak var coordinator: RegisterCenterInfoCoordinator?
 
-    private var pageViews: [CtaButtonIncludedView] = []
+    private var pageViews: [RegisterCenterInfoVCViews] = []
     private var pagesAreSetted = false
     
     var currentIndex: Int = 0
@@ -70,13 +71,10 @@ public class RegisterCenterInfoVC: BaseViewController {
     
     // View
     let navigationBar: NavigationBarType1 = {
-        let bar = NavigationBarType1(
-            navigationTitle: "센터 회원가입"
-        )
+        let bar = NavigationBarType1(navigationTitle: "센터 회원가입")
         return bar
     }()
     lazy var statusBar: ProcessStatusBar = {
-        
         let view = ProcessStatusBar(
             processCount: RegisterCenterInfoPage.allCases.count,
             startIndex: 0
@@ -84,6 +82,7 @@ public class RegisterCenterInfoVC: BaseViewController {
         return view
     }()
     
+    // Observable
     let disposeBag = DisposeBag()
 
     public init(coordinator: RegisterCenterInfoCoordinator?) {
@@ -276,7 +275,7 @@ public class RegisterCenterInfoVC: BaseViewController {
 extension RegisterCenterInfoVC {
     
     // MARK: CenterInfoView (이름 + 센터 연락처)
-    class NameAndPhoneNumberView: UIView, CtaButtonIncludedView {
+    class NameAndPhoneNumberView: UIView, RegisterCenterInfoVCViews {
         
         // View
         private let processTitle: IdleLabel = {
@@ -285,7 +284,6 @@ extension RegisterCenterInfoVC {
             label.textAlignment = .left
             return label
         }()
-        
         
         let nameField: IFType2 = {
             let field = IFType2(
@@ -381,170 +379,10 @@ extension RegisterCenterInfoVC {
                 }
                 .disposed(by: disposeBag)
         }
-    }
-    
-    // MARK: 센터주소 (도로명, 지번주소 + 상세주소)
-    class AddressView: UIView, DaumAddressSearchDelegate, CtaButtonIncludedView {
-        
-        // init
-        public weak var viewController: UIViewController?
-        
-        // View
-        private let processTitle: IdleLabel = {
-            let label = IdleLabel(typography: .Heading2)
-            label.textString = "센터 주소 정보를 입력해주세요."
-            label.textAlignment = .left
-            return label
-        }()
-    
-        private let addressSearchButton: TextButtonType2 = {
-           
-            let button = TextButtonType2(labelText: "도로명 주소를 입력해주세요.")
-            
-            return button
-        }()
-        
-        let detailAddressField: IFType2 = {
-            let field = IFType2(
-                titleLabelText: "상세 주소",
-                placeHolderText: "상세 주소를 입력해주세요. (예: 2층 204호)"
-            )
-            return field
-        }()
-        
-        // 하단 버튼
-        let ctaButton: CTAButtonType1 = {
-            
-            let button = CTAButtonType1(labelText: "다음")
-            button.setEnabled(false)
-            return button
-        }()
-        
-        // Observable
-        private let addressPublisher: PublishRelay<AddressInformation> = .init()
-        private let disposeBag = DisposeBag()
-        
-        init(viewController vc: UIViewController) {
-            self.viewController = vc
-            super.init(frame: .zero)
-            setAppearance()
-            setLayout()
-            setObservable()
-        }
-        required init?(coder: NSCoder) { fatalError() }
-        
-        private func setAppearance() {
-            self.backgroundColor = .white
-            self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
-        }
-        
-        private func setLayout() {
-            
-            let roadAddressStack = VStack(
-                [
-                    {
-                        let label = IdleLabel(typography: .Subtitle4)
-                        label.textString = "도로명주소"
-                        label.textAlignment = .left
-                        return label
-                    }(),
-                    addressSearchButton,
-                ],
-                spacing: 6,
-                alignment: .fill
-            )
-            
-            let inputStack = VStack(
-                [
-                    roadAddressStack,
-                    detailAddressField
-                ],
-                spacing: 28,
-                alignment: .fill
-            )
-            
-            [
-                processTitle,
-                inputStack,
-                ctaButton
-            ].forEach {
-                $0.translatesAutoresizingMaskIntoConstraints = false
-                self.addSubview($0)
-            }
-            
-            NSLayoutConstraint.activate([
-                
-                processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
-                processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-                processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-                
-                inputStack.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-                inputStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-                inputStack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-                
-                ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-                ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-                ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
-            ])
-        }
-        
-        private func setObservable() {
-            
-            addressSearchButton
-                .eventPublisher
-                .subscribe { [weak self] _ in
-                    self?.showDaumSearchView()
-                }
-                .disposed(by: disposeBag)
-        }
-        
-        private func showDaumSearchView() {
-            let vc = DaumAddressSearchViewController()
-            vc.delegate = self
-            vc.modalPresentationStyle = .fullScreen
-            viewController?.navigationController?.pushViewController(vc, animated: true)
-        }
-        
-        public func bind(viewModel vm: RegisterCenterInfoViewModelable) {
-            
-            // Input
-            addressPublisher
-                .bind(to: vm.editingAddress)
-                .disposed(by: disposeBag)
-            
-            detailAddressField
-                .uITextField.rx.text
-                .compactMap { $0 }
-                .bind(to: vm.editingDetailAddress)
-                .disposed(by: disposeBag)
-            
-            // output
-            vm
-                .addressValidation?
-                .drive(onNext: { [ctaButton] isValid in
-                    ctaButton.setEnabled(isValid)
-                })
-                .disposed(by: disposeBag)
-        }
-        
-        public func addressSearch(addressData: [AddressDataKey : String]) {
-            
-//            let address = addressData[.address] ?? "알 수 없는 주소"
-            let jibunAddress = addressData[.jibunAddress] ?? "알 수 없는 지번 주소"
-            let roadAddress = addressData[.roadAddress] ?? "알 수 없는 도로명 주소"
-            
-            addressSearchButton.label.textString = roadAddress
-            addressPublisher.accept(
-                AddressInformation(
-                    roadAddress: roadAddress,
-                    jibunAddress: jibunAddress
-                )
-            )
-        }
-    }
+    } 
  
     // MARK: 센터 소개 (프로필 사진 + 센터소개)
-    class ImageAndIntroductionView: UIView, CtaButtonIncludedView {
+    class ImageAndIntroductionView: UIView, RegisterCenterInfoVCViews {
         
         weak var coordinator: RegisterCenterInfoCoordinator?
         
