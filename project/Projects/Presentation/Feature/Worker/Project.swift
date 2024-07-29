@@ -27,18 +27,7 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                // Presentation
                 D.Presentation.BaseFeature,
-                D.Presentation.PresentationCore,
-                D.Presentation.DSKit,
-
-                // Domain
-                D.Domain.UseCaseInterface,
-                D.Domain.RepositoryInterface,
-
-                // ThirdParty
-                D.ThirdParty.RxSwift,
-                D.ThirdParty.RxCocoa,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -57,10 +46,6 @@ let project = Project(
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
                 .target(name: "WorkerFeature"),
-                
-                D.Domain.ConcreteUseCase,
-                D.Data.ConcreteRepository,
-                D.Data.NetworkDataSource,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
