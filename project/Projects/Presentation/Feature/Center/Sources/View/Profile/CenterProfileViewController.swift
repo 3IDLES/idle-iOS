@@ -133,33 +133,17 @@ public class CenterProfileViewController: BaseViewController {
         return textView
     }()
     
-    /// ☑️ "센토 사진" 라벨 ☑️
+    /// ☑️ "센터 사진" 라벨 ☑️
     let centerPictureLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
         label.textString = "센터 사진"
         label.textColor = DSKitAsset.Colors.gray500.color
         return label
     }()
-    let centerImageView: UIImageView = {
-        let view = UIImageView()
-        view.layer.cornerRadius = 6
-        view.clipsToBounds = true
-        view.backgroundColor = DSKitAsset.Colors.gray100.color
-        view.contentMode = .scaleAspectFill
-        
-        /// 이미지 뷰는 버튼을 자식으로 가지는데 기본적으로 isUserInteractionEnabled값이 fale라 자식 버튼에도 영향을 미친다.
-        /// 따라서 이터렉션이 필요한 자식이 있는 경우 명시적으로 아래 프로퍼티값을 true로 설정해야한다.
-        view.isUserInteractionEnabled = true
+    private lazy var centerImageView: ImageSelectView = {
+        let view = ImageSelectView(state: .editing, viewController: self)
         return view
     }()
-    let centerImageEditButton: UIButton = {
-        let btn = UIButton()
-        btn.setImage(DSKitAsset.Icons.editPhoto.image, for: .normal)
-        btn.isUserInteractionEnabled = true
-        return btn
-    }()
-    
-    let edtingImage: PublishRelay<UIImage> = .init()
     
     let disposeBag = DisposeBag()
     
@@ -169,7 +153,6 @@ public class CenterProfileViewController: BaseViewController {
         
         setApearance()
         setAutoLayout()
-        setObservable()
     }
     
     required init?(coder: NSCoder) { fatalError() }
@@ -231,10 +214,6 @@ public class CenterProfileViewController: BaseViewController {
             alignment: .fill
         )
         
-        // 센터 이미지뷰 세팅
-        centerImageView.addSubview(centerImageEditButton)
-        centerImageEditButton.translatesAutoresizingMaskIntoConstraints = false
-        
         let scrollView = UIScrollView()
         
         let divider = UIView()
@@ -288,9 +267,6 @@ public class CenterProfileViewController: BaseViewController {
             locationIcon.widthAnchor.constraint(equalToConstant: 24),
             locationIcon.heightAnchor.constraint(equalTo: locationIcon.widthAnchor),
             
-            centerImageEditButton.widthAnchor.constraint(equalToConstant: 28),
-            centerImageEditButton.heightAnchor.constraint(equalTo: centerImageEditButton.widthAnchor),
-            
             centerIntroductionField.heightAnchor.constraint(equalToConstant: 156),
         ])
         
@@ -335,20 +311,7 @@ public class CenterProfileViewController: BaseViewController {
             centerImageView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor),
             centerImageView.heightAnchor.constraint(equalToConstant: 250),
             centerImageView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -38),
-            
-            centerImageEditButton.trailingAnchor.constraint(equalTo: centerImageView.trailingAnchor, constant: -16),
-            centerImageEditButton.bottomAnchor.constraint(equalTo: centerImageView.bottomAnchor, constant: -16),
         ])
-    }
-    
-    func setObservable() {
-        
-        centerImageEditButton
-            .rx.tap
-            .subscribe { [weak self] _ in
-                self?.showPhotoGalley()
-            }
-            .disposed(by: disposeBag)
     }
     
     public func bind(viewModel: any CenterProfileViewModelable) {
@@ -384,7 +347,9 @@ public class CenterProfileViewController: BaseViewController {
             .bind(to: input.editingInstruction)
             .disposed(by: disposeBag)
         
-        edtingImage
+        centerImageView
+            .selectedImage
+            .compactMap { $0 }
             .bind(to: input.selectedImage)
             .disposed(by: disposeBag)
         
@@ -421,10 +386,18 @@ public class CenterProfileViewController: BaseViewController {
         
         output
             .displayingImage
-            .drive(centerImageView.rx.image)
+            .drive(centerImageView.displayingImage)
             .disposed(by: disposeBag)
         
         // MARK: Edit Mode
+        output
+            .isEditingMode
+            .map { isEditing -> ImageSelectView.State in
+                isEditing ? .editing : .normal
+            }
+            .drive(centerImageView.state)
+            .disposed(by: disposeBag)
+        
         output
             .isEditingMode
             .drive { [weak self] in
@@ -436,11 +409,8 @@ public class CenterProfileViewController: BaseViewController {
                 centerIntroductionField.isHidden = !$0
                 centerIntroductionLabel.isHidden = $0
                 
-                centerImageEditButton.isHidden = !$0
-                
                 editingCompleteButton.isHidden = !$0
                 profileEditButton.isHidden = $0
-                
             }
             .disposed(by: disposeBag)
         
@@ -460,41 +430,5 @@ public class CenterProfileViewController: BaseViewController {
         
         // 바인딩 종료
         bindFinished.accept(())
-    }
-}
-
-extension CenterProfileViewController {
-    
-    func showPhotoGalley() {
-        
-        let imagePickerVC = UIImagePickerController()
-        imagePickerVC.delegate = self
-        
-        if !UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
-            
-            showAlert(vo: .init(
-                title: "오류",
-                message: "사진함을 열 수 없습니다.")
-            )
-            
-            return
-        }
-        
-        imagePickerVC.sourceType = .photoLibrary
-        
-//        let modiaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary)
-        present(imagePickerVC, animated: true)
-    }
-}
-    
-extension CenterProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
-    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-     
-        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            
-            edtingImage.accept(image)
-            picker.dismiss(animated: true)
-        }
     }
 }
