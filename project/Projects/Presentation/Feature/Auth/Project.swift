@@ -27,17 +27,7 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                // Presentation
-                D.Presentation.PresentationCore,
-                D.Presentation.DSKit,
-
-                // Domain
-                D.Domain.UseCaseInterface,
-                D.Domain.RepositoryInterface,
-
-                // ThirdParty
-                D.ThirdParty.RxSwift,
-                D.ThirdParty.RxCocoa,
+                D.Presentation.BaseFeature,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -56,9 +46,6 @@ let project = Project(
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
                 .target(name: "AuthFeature"),
-                
-                D.Domain.ConcreteUseCase,
-                D.Data.ConcreteRepository,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

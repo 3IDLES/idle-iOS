@@ -29,16 +29,13 @@ let project = Project(
             dependencies: [
                 
                 // Presentation
-                D.Presentation.PresentationCore,
                 D.Presentation.RootFeature,
-                D.Presentation.AuthFeature,
                 
                 // Domain
                 D.Domain.ConcreteUseCase,
                 
                 // Data
                 D.Data.ConcreteRepository,
-                D.Data.NetworkDataSource,
                 
                 // ThirdParty
                 D.ThirdParty.Swinject

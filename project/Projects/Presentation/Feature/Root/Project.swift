@@ -27,18 +27,7 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                // Presentation
-                D.Presentation.PresentationCore,
-                D.Presentation.DSKit,
 
-                // Domain
-                D.Domain.UseCaseInterface,
-                D.Domain.RepositoryInterface,
-
-                // ThirdParty
-                D.ThirdParty.RxSwift,
-                D.ThirdParty.RxCocoa,
-                
                 // Presentation
                 D.Presentation.AuthFeature,
                 D.Presentation.WorkerFeature,
