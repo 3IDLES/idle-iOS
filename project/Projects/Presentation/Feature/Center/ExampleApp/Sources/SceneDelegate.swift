@@ -23,7 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let store = TestStore()
         
         try! store.saveAuthToken(
-            accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOm51bGwsInN1YiI6bnVsbCwiaXNzIjoiM2lkaW90cyIsImlhdCI6MTcyMjA1MzYzNiwibmJmIjoxNzIyMDUzNjM2LCJleHAiOjE3MjIwNTQyMzYsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiIwMTkwZjI2NS0yYmVkLTc1MTEtYjljNy1hZjEwOTNhZTUzZmIiLCJwaG9uZU51bWJlciI6IjAxMC00NDQ0LTUyMzIiLCJ1c2VyVHlwZSI6ImNlbnRlciJ9.nNSNvLmOArvSKThCUHG7liWW-mvN8cudc40mYiTWE-c",
+            accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOm51bGwsInN1YiI6bnVsbCwiaXNzIjoiM2lkaW90cyIsImlhdCI6MTcyMjIyNDUzNywibmJmIjoxNzIyMjI0NTM3LCJleHAiOjE3MjIyMjUxMzcsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiIwMTkwZjI2NS0yYmVkLTc1MTEtYjljNy1hZjEwOTNhZTUzZmIiLCJwaG9uZU51bWJlciI6IjAxMC00NDQ0LTUyMzIiLCJ1c2VyVHlwZSI6ImNlbnRlciJ9.VIJ9OG6VubPNYOhSfTRt1rG_mbq6ttVNHfT1-cnjZsc",
             refreshToken: ""
         )
         
@@ -31,22 +31,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             repository: DefaultUserProfileRepository(store)
         )
         
-        let viewModel = RegisterCenterInfoVM(
-            profileUseCase: useCase
-        )
-        
         let navigationController = UINavigationController()
         navigationController.setNavigationBarHidden(true, animated: false)
         
         let coordinator = RegisterCenterInfoCoordinator(
-            viewModel: viewModel,
+            profileUseCase: useCase,
             navigationController: navigationController
         )
         
+        let vc = CenterProfileViewController()
+        vc.bind(viewModel: CenterProfileViewModel(
+            useCase: useCase
+        ))
+        
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = navigationController
+        window?.rootViewController = vc
         window?.makeKeyAndVisible()
         
-        coordinator.start()
+        
     }
 }

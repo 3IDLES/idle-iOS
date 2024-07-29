@@ -26,7 +26,8 @@ public class RegisterCenterInfoVM: RegisterCenterInfoViewModelable {
     // Output
     public var nameAndNumberValidation: Driver<Bool>? = nil
     public var addressValidation: Driver<Bool>? = nil
-    public var imageAndIntroductionValidation: Driver<Bool>? = nil
+    public var introductionValidation: Driver<Bool>? = nil
+    public var imageValidation: Driver<UIImage>? = nil
     public var profileRegisterSuccess: Driver<Void>? = nil
     public var alert: Driver<DefaultAlertContentVO>? = nil
     
@@ -73,17 +74,29 @@ public class RegisterCenterInfoVM: RegisterCenterInfoViewModelable {
             }
             .asDriver(onErrorJustReturn: false)
         
+        // 소개글은 필수값임 아님으로 별도로 조건 수행X
+        self.introductionValidation = editingCenterIntroduction
+            .map { [stateObject] intro in
+                stateObject.introduce = intro
+                return true
+            }
+            .asDriver(onErrorJustReturn: false)
+        
         let imageValidation = editingCenterImage
             .map { [unowned self] image in
-                validateSelectedImage(image: image)
+                let info = validateSelectedImage(image: image)
+                return (image: image, info: info)
             }
             .share()
         
         let imageValidationSuccess = imageValidation
-            .compactMap { $0 }
+            .compactMap { (image, info) -> (UIImage, ImageUploadInfo)? in
+                if let info { return (image, info) }
+                return nil
+            }
         
         let imageValidationFailure = imageValidation
-            .filter { $0 == nil }
+            .filter { $0.info == nil }
             .map { _ in
                 DefaultAlertContentVO(
                     title: "이미지 업로드 실패",
@@ -91,21 +104,13 @@ public class RegisterCenterInfoVM: RegisterCenterInfoViewModelable {
                 )
             }
         
-        self.imageAndIntroductionValidation = Observable
-            .combineLatest(
-                editingCenterIntroduction,
-                imageValidationSuccess
-            )
-            .map { [stateObject] (intro, imageInfo) in
-                
-                printIfDebug("\(#function) 입력중인 센터소개: \(intro)")
-                
-                stateObject.introduce = intro
-                stateObject.imageInfo = imageInfo
-                
-                return !intro.isEmpty
+        self.imageValidation = imageValidationSuccess
+            .map { [stateObject] (image, info) in
+                printIfDebug("\(#function) 입력중인 센터소개")
+                stateObject.imageInfo = info
+                return image
             }
-            .asDriver(onErrorJustReturn: false)
+            .asDriver(onErrorJustReturn: .init())
         
         let profileRegisterResult = self.completeButtonPressed
             .flatMap { [useCase, stateObject] _ in

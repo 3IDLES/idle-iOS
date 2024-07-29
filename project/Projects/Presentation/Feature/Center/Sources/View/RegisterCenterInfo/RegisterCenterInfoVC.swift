@@ -35,7 +35,7 @@ public protocol RegisterCenterInfoViewModelable {
     // Output
     var nameAndNumberValidation: Driver<Bool>? { get }
     var addressValidation: Driver<Bool>? { get }
-    var imageAndIntroductionValidation: Driver<Bool>? { get }
+    var imageValidation: Driver<UIImage>? { get }
     var profileRegisterSuccess: Driver<Void>? { get }
     var alert: Driver<DefaultAlertContentVO>? { get }
 }
@@ -583,7 +583,6 @@ extension RegisterCenterInfoVC {
         // 하단 버튼
         let ctaButton: CTAButtonType1 = {
             let button = CTAButtonType1(labelText: "다음")
-            button.setEnabled(false)
             return button
         }()
         
@@ -695,7 +694,7 @@ extension RegisterCenterInfoVC {
                 .disposed(by: disposeBag)
             
             centerImageView
-                .editingImage
+                .selectedImage
                 .compactMap { $0 }
                 .bind(to: vm.editingCenterImage)
                 .disposed(by: disposeBag)
@@ -708,10 +707,8 @@ extension RegisterCenterInfoVC {
             
             // Output
             vm
-                .imageAndIntroductionValidation?
-                .drive(onNext: { [ctaButton] isValid in
-                    ctaButton.setEnabled(isValid)
-                })
+                .imageValidation?
+                .drive(centerImageView.displayingImage)
                 .disposed(by: disposeBag)
             
             vm

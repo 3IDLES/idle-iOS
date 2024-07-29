@@ -26,7 +26,8 @@ public class ImageSelectView: UIImageView {
     public var onError: (()->())?
     
     // image
-    public private(set) var editingImage: BehaviorRelay<UIImage?> = .init(value: nil)
+    public private(set) var displayingImage: BehaviorRelay<UIImage?> = .init(value: nil)
+    public private(set) var selectedImage: BehaviorRelay<UIImage?> = .init(value: nil)
     
     public init(state: State, viewController: UIViewController) {
         self.state = .init(value: state)
@@ -129,7 +130,7 @@ public class ImageSelectView: UIImageView {
         
         Observable
             .combineLatest(
-                editingImage,
+                displayingImage,
                 state
             )
             .subscribe(onNext: { [weak self] (image, state) in
@@ -183,7 +184,7 @@ extension ImageSelectView: UIImagePickerControllerDelegate, UINavigationControll
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             
             // image
-            editingImage.accept(image)
+            selectedImage.accept(image)
             
             picker.dismiss(animated: true)
         }

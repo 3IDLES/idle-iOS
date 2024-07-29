@@ -137,7 +137,7 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
             .map({ [unowned self] _ in
                 checkModification()
             })
-            .flatMap { [useCase] (inputs) in
+            .flatMap { [useCase, input] (inputs) in
                 
                 let (phoneNumber, introduction, imageInfo) = inputs
                 
@@ -146,8 +146,9 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
                 if let _ = introduction { printIfDebug("✅ 센터소개 변경되었음") }
                 if let _ = imageInfo { printIfDebug("✅ 센터 이미지 변경되었음") }
                 
+                // 전화번호는 무조건 포함시켜야 함으로 아래와 같이 포함합니다.
                 return useCase.updateProfile(
-                    phoneNumber: phoneNumber,
+                    phoneNumber: phoneNumber ?? input.editingPhoneNumber.value,
                     introduction: introduction,
                     imageInfo: imageInfo
                 )
