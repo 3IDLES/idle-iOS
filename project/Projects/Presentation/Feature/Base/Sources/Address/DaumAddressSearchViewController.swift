@@ -27,7 +27,7 @@ public typealias Conformance = UIViewController & WKUIDelegate & WKNavigationDel
 
 public class DaumAddressSearchViewController: Conformance {
     
-    public var deleage: DaumAddressSearchDelegate?
+    public var delegate: DaumAddressSearchDelegate?
     
     // View
     private let navigationBar: NavigationBarType1 = {
@@ -119,7 +119,7 @@ public extension DaumAddressSearchViewController {
                 addressData[key] = address
             }
         }
-        deleage?.addressSearch(addressData: addressData)
+        delegate?.addressSearch(addressData: addressData)
         
         navigationController?.popViewController(animated: true)
     }
