@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 
+/// 기본이 되는 텍스트 필드입니다.
 public class IdleTextField: UITextField {
     
     private var currentTypography: Typography
@@ -120,49 +121,33 @@ public extension IdleTextField {
     
     // 텍스트 영역의 프레임을 반환
     override func textRect(forBounds bounds: CGRect) -> CGRect {
-        
-        let height = (currentTypography.attributes[.font] as! UIFont).lineHeight
-        
-        let verticalInset = currentTextFieldInsets.top + currentTextFieldInsets.bottom
-        
-        let topInset = (currentTypography.lineHeight+(verticalInset) - height) * (currentTextFieldInsets.top/verticalInset)
-        let bottomInset = (currentTypography.lineHeight+(verticalInset) - height) * (currentTextFieldInsets.bottom/verticalInset)
-        
-        return bounds.inset(by: .init(
-            top: topInset,
-            left: currentTextFieldInsets.left,
-            bottom: bottomInset,
-            right: currentTextFieldInsets.right
-        ))
+        setInset(bounds: bounds)
     }
     
     // 편집 중일 때 텍스트 영역의 프레임을 반환
     override func editingRect(forBounds bounds: CGRect) -> CGRect {
-        
-        let height = (currentTypography.attributes[.font] as! UIFont).lineHeight
-        
-        let verticalInset = currentTextFieldInsets.top + currentTextFieldInsets.bottom
-        
-        let topInset = (currentTypography.lineHeight+(verticalInset) - height) * (currentTextFieldInsets.top/verticalInset)
-        let bottomInset = (currentTypography.lineHeight+(verticalInset) - height) * (currentTextFieldInsets.bottom/verticalInset)
-        
-        return bounds.inset(by: .init(
-            top: topInset,
-            left: currentTextFieldInsets.left,
-            bottom: bottomInset,
-            right: currentTextFieldInsets.right
-        ))
+        setInset(bounds: bounds)
     }
     
     // 플레이스홀더 텍스트 영역의 프레임을 반환
     override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
-        
+        setInset(bounds: bounds)
+    }
+    
+    private func setInset(bounds: CGRect) -> CGRect {
         let height = (currentTypography.attributes[.font] as! UIFont).lineHeight
         
         let verticalInset = currentTextFieldInsets.top + currentTextFieldInsets.bottom
         
-        let topInset = (currentTypography.lineHeight+(verticalInset) - height) * (currentTextFieldInsets.top/verticalInset)
-        let bottomInset = (currentTypography.lineHeight+(verticalInset) - height) * (currentTextFieldInsets.bottom/verticalInset)
+        // 실제 폰트와 attribute의 라인 Height이 상이함으로 이를 조정하는 과정입니다.
+        var topInset: CGFloat = 0
+        var bottomInset: CGFloat = 0
+        
+        if verticalInset > 0 {
+            topInset = (currentTypography.lineHeight+verticalInset - height) * (currentTextFieldInsets.top/verticalInset)
+            
+            bottomInset = (currentTypography.lineHeight+verticalInset - height) * (currentTextFieldInsets.bottom/verticalInset)
+        }
         
         return bounds.inset(by: .init(
             top: topInset,

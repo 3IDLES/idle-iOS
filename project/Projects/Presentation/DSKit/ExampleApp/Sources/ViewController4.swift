@@ -23,15 +23,29 @@ class ViewController4: UIViewController {
             isArrow: true
         )
         
-//        btn.isArrow.accept(false)
+        let textField = TextImageButtonType2()
         
-        view.addSubview(btn)
-        btn.translatesAutoresizingMaskIntoConstraints = false
+//        btn.isArrow.accept(false)
+        [
+            btn,
+            textField
+        ].forEach {
+            
+            view.addSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
         
         NSLayoutConstraint.activate([
             btn.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             btn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             btn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            textField.topAnchor.constraint(equalTo: btn.bottomAnchor, constant: 40),
+            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+  
+            
         ])
     }
     
