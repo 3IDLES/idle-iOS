@@ -28,6 +28,10 @@ public class TextButtonType3: IdleLabel {
     
     public required init?(coder: NSCoder) { fatalError() }
     
+    required public init() {
+        fatalError("init() has not been implemented")
+    }
+    
     @objc
     func onTouchAction(_ tapGesture: UITapGestureRecognizer) {
         

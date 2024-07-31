@@ -23,12 +23,15 @@ enum RegisterRecruitmentPage: Int, CaseIterable {
 
 public protocol RegisterRecruitmentPostViewModelable: AddressInputViewModelable {
     // Input
+    var customerRequirementState: PublishRelay<CustomerRequirementState> { get }
     
     // Output
+    var customerRequirementScreenNextable: Driver<Bool> { get }
+    
     var alert: Driver<DefaultAlertContentVO>? { get }
 }
 
-fileprivate protocol RegisterRecruitmentPostViews: UIView {
+protocol RegisterRecruitmentPostViews: UIView {
     var ctaButton: CTAButtonType1 { get }
     func bind(viewModel vm: RegisterRecruitmentPostViewModelable)
 }
@@ -143,9 +146,9 @@ public class RegisterRecruitmentPostVC: BaseViewController {
         self.pageViews = RegisterRecruitmentPage.allCases.map { page in
             switch page {
                 case .workTimeAndPayment:
-                    WorkTimeAndPaymentView()
+                    WorkTimeAndPayView()
                 case .workPlaceAddress:
-                    WorkTimeAndPaymentView()
+                    AddressView(viewController: self)
                 case .customerInformation:
                     CustomerInformationView()
                 case .customerRequirement:
@@ -261,220 +264,6 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     }
 }
 
-enum DayItem: CaseIterable {
-    case mon, tue, wed, thu, fri, sat, sun
-    
-    var oneWordName: String {
-        switch self {
-        case .mon:
-            "월"
-        case .tue:
-            "화"
-        case .wed:
-            "수"
-        case .thu:
-            "목"
-        case .fri:
-            "금"
-        case .sat:
-            "토"
-        case .sun:
-            "일"
-        }
-    }
-}
-
-public class TextItemCell: UICollectionViewCell {
-    
-    // Init
-    
-    // View
-    private(set) lazy var labelButtonView: StateButtonTyp1 = {
-        let btn = StateButtonTyp1(
-            text: "",
-            initial: .normal
-        )
-        btn.label.typography = .Body2
-        btn.label.attrTextColor = DSKitAsset.Colors.gray500.color
-        return btn
-    }()
-    
-    public override init(frame: CGRect) {
-        
-        super.init(frame: frame)
-        
-        contentView.addSubview(labelButtonView)
-        labelButtonView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            labelButtonView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            labelButtonView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            labelButtonView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            labelButtonView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-        ])
-    }
-    
-    required init?(coder: NSCoder) { fatalError() }
-}
-
-class DaysCollectionView: UICollectionView, UICollectionViewDelegate {
-    
-    typealias Cell = TextItemCell
-    
-    let items = DayItem.allCases
-    
-    let identifier = String(describing: Cell.self)
-    
-    public let flowLayout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
-        layout.itemSize = .init(width: 40, height: 40)
-        layout.minimumLineSpacing = 4
-        layout.minimumInteritemSpacing = 4
-        return layout
-    }()
-    
-    init() {
-        super.init(frame: .zero, collectionViewLayout: flowLayout)
-        self.dataSource = self
-        self.register(Cell.self, forCellWithReuseIdentifier: identifier)
-    }
-    
-    required init?(coder: NSCoder) { fatalError() }
-    
-}
-extension DaysCollectionView: UICollectionViewDataSource {
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        items.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        let item = items[indexPath.row]
-        
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath) as! Cell
-        
-        cell.labelButtonView.label.textString = item.oneWordName
-        return cell
-    }
-}
-
-// MARK: 근무시간및 급여
-class WorkTimeAndPaymentView: UIView, RegisterRecruitmentPostViews {
-    
-    // Init
-    
-    // View
-    private let processTitle: IdleLabel = {
-        let label = IdleLabel(typography: .Heading2)
-        label.textString = "근무 시간 및 급여를 입력해주세요."
-        label.textAlignment = .left
-        return label
-    }()
-    
-    private let workingDayButtons: DaysCollectionView = {
-        let view = DaysCollectionView()
-        view.isScrollEnabled = false
-        return view
-    }()
-    
-    
-    // 하단 버튼
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
-    }()
-    
-    public init() {
-        super.init(frame: .zero)
-        
-        setAppearance()
-        setLayout()
-        setObservable()
-    }
-    
-    public required init?(coder: NSCoder) { fatalError() }
-    
-    private func setAppearance() {
-        self.backgroundColor = .clear
-        self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
-    }
-    
-    private func setLayout() {
-        
-        let stacks = [
-            ("근무 요일", workingDayButtons)
-        ].map { (title, view) in
-            
-            VStack(
-                [
-                    {
-                        let label = IdleLabel(typography: .Subtitle4)
-                        label.textString = title
-                        label.textAlignment = .left
-                        return label
-                    }(),
-                    view
-                ],
-                spacing: 6,
-                alignment: .fill
-            )
-        }
-        
-        let cellCount = workingDayButtons.items.count
-        let flowLayout = workingDayButtons.flowLayout
-        let cellSize = flowLayout.itemSize
-        let collectionViewWidth = cellSize.width * CGFloat(cellCount) + flowLayout.minimumInteritemSpacing * CGFloat(cellCount-1)
-        let stackWidth = UIScreen.main.bounds.width - (self.layoutMargins.left+self.layoutMargins.right)
-        let lineCnt = Int(CGFloat(collectionViewWidth)/stackWidth) + 1
-        let collectionViewHeight = CGFloat(lineCnt) * cellSize.height + CGFloat(lineCnt-1) * flowLayout.minimumLineSpacing
-        
-        NSLayoutConstraint.activate([
-            workingDayButtons.heightAnchor.constraint(equalToConstant: collectionViewHeight)
-        ])
-        
-        let inputStack = VStack(
-            stacks,
-            spacing: 28,
-            alignment: .fill
-        )
-        
-        [
-            processTitle,
-            inputStack,
-            ctaButton
-        ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            self.addSubview($0)
-        }
-        
-        
-        NSLayoutConstraint.activate([
-            
-            processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
-            processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            
-            inputStack.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            inputStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            inputStack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            
-            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
-        ])
-    }
-    
-    private func setObservable() {
-        
-    }
-    
-    func bind(viewModel vm: any RegisterRecruitmentPostViewModelable) {
-        
-    }
-}
-
 
 // MARK: 근무지 주소
 
@@ -516,42 +305,8 @@ class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     }
 }
 
-// MARK: 공객 요구사항
-class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
-    
-    // Init
-    
-    
-    // View
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
-    }()
-    
-    public init() {
-        super.init(frame: .zero)
-    }
-    
-    public required init?(coder: NSCoder) { fatalError() }
-    
-    private func setAppearance() {
-        
-    }
-    
-    private func setLayout() {
-        
-    }
-    
-    private func setObservable() {
-        
-    }
-    
-    func bind(viewModel vm: any RegisterRecruitmentPostViewModelable) {
-        
-    }
-}
+// MARK: 고객 요구사항
+
 
 // MARK: 공객 요구사항
 class AdditinalInformationView: UIView, RegisterRecruitmentPostViews {

@@ -27,6 +27,10 @@ public class TagLabel: IdleLabel {
     }
     required init?(coder: NSCoder) { fatalError() }
     
+    required public init() {
+        fatalError("init() has not been implemented")
+    }
+    
     public override var intrinsicContentSize: CGSize {
         let superSize = super.intrinsicContentSize
         return .init(

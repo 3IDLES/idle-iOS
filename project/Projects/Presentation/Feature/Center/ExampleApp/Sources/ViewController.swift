@@ -6,14 +6,15 @@
 //
 
 import UIKit
+import CenterFeature
 
 class ViewController: UIViewController {
     
     override func viewDidLoad() {
         
-        let initialLabel = UILabel()
+        let initialLabel = WorkTimeAndPayView()
         
-        initialLabel.text = "Example app"
+        
         
         view.backgroundColor = .white
         
@@ -21,8 +22,10 @@ class ViewController: UIViewController {
         initialLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            initialLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            initialLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            initialLabel.topAnchor.constraint(equalTo: view.topAnchor),
+            initialLabel.leftAnchor.constraint(equalTo: view.leftAnchor),
+            initialLabel.rightAnchor.constraint(equalTo: view.rightAnchor),
+            initialLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
 }
