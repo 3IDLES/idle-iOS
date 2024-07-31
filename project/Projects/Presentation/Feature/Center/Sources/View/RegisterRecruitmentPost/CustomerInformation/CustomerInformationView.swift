@@ -1,8 +1,8 @@
 //
-//  WorkTimeAndPayView.swift
+//  CustomerInformationView.swift
 //  CenterFeature
 //
-//  Created by choijunios on 7/30/24.
+//  Created by choijunios on 7/31/24.
 //
 
 import UIKit
@@ -13,60 +13,80 @@ import RxSwift
 import Entity
 import DSKit
  
-public protocol WorkTimeAndPayViewModelable {
+public protocol CustomerInformationViewModelable {
     
     // Input
-    var selectedDay: PublishRelay<(DayItem, Bool)> { get }
-    var workStartTime: PublishRelay<String> { get }
-    var workEndTime: PublishRelay<String> { get }
-    var paymentType: PublishRelay<PaymentItem> { get }
-    var paymentAmount: PublishRelay<String> { get }
+    var gender: PublishRelay<Gender> { get }
+    var birthYear: PublishRelay<String> { get }
+    var weight: PublishRelay<String> { get }
+    var careGrade: PublishRelay<CareGrade> { get }
+    var cognitionState: PublishRelay<CognitionItem> { get }
+    var deseaseDescription: BehaviorRelay<String> { get }
     
     // Output
-    var selectedPaymentType: Driver<PaymentItem> { get }
+    var selectedGender: Driver<Gender> { get }
+    var selectedCareGrade: Driver<CareGrade> { get }
+    var selectedCognitionState: Driver<CognitionItem> { get }
     
-    var completeState: Driver<WorkTimeAndPayState> { get }
+    var completeState: Driver<CustomerInformationState> { get }
 }
 
-public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
+public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     
     // Init
         
     // Not init
-    private let viewModel: WorkTimeAndPayViewModelable = WorkTimeAndPayViewModel()
+    private let viewModel: CustomerInformationViewModelable = CustomerInformationVM()
     
     // Cell Type
     typealias TextCellType = CellWrapper<StateButtonTyp1>
-    typealias TimePickerCellType = CellWrapper<TextImageButtonType2>
-    typealias PaymentInputCellType = CellWrapper<TextFieldWithDegree>
+    typealias TextInputCellType = CellWrapper<MultiLineTextField>
+    typealias WeightInputCellType = CellWrapper<TextFieldWithDegree>
     
     // Section Data
     let sectionData: [SectionData] = [
         SectionData(
-            titleText: "근무 요일",
-            subData: DayItem.allCases.map { CellData(cellText: $0.korOneLetterText) },
-            cellSize: .init(width: 40, height: 40)
-        ),
-        SectionData(
-            titleText: "근무 시간",
-            subData: [ 
-                CellData(cellText: "시작시간"),
-                CellData(cellText: "종료시간"),
-            ],
-            cellSize: .heightOnly(44)
-        ),
-        SectionData(
-            titleText: "급여",
-            subData: PaymentItem.allCases.map { CellData(cellText: $0.korLetterText) },
+            titleText: "성별",
+            subData: [Gender.male, Gender.female].map { gender in
+                CellData(cellText: gender.twoLetterKoreanWord)
+            },
             cellSize: .init(width: 104, height: 44)
         ),
         SectionData(
-            titleText: "",
+            titleText: "출생연도",
             subData: [
-                // 급여 입력셀
+                CellData(cellText: "고객의 출생연도를 입력해주세요. (예: 1965)")
+            ],
+            cellSize: .heightOnly(44)
+        ),
+        SectionData(
+            titleText: "몸무게",
+            subData: [
                 .emptyCell
             ],
             cellSize: .heightOnly(44)
+        ),
+        SectionData(
+            titleText: "요양 등급",
+            subData: CareGrade.allCases.map { grade in
+                CellData(cellText: grade.textForCellBtn)
+            },
+            cellSize: .init(width: 40, height: 40)
+        ),
+        SectionData(
+            titleText: "인지 상태",
+            subData: CognitionItem.allCases.map { cog in
+                CellData(cellText: cog.korTextForCellBtn)
+            },
+            cellSize: .init(width: 104, height: 44)
+        ),
+        SectionData(
+            titleText: "질병",
+            subTitle: "(선택)",
+            subData: [
+                CellData(cellText: "고객이 현재 앓고 있는 질병 또는 병력을 입력해주세요.")
+            ],
+            cellSize: .init(width: 104, height: 44)
         )
     ]
     
@@ -133,8 +153,8 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
             processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             
             collectionView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            collectionView.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
             
             ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
@@ -155,8 +175,8 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         
         // Cell
         collectionView.register(TextCellType.self, forCellWithReuseIdentifier: TextCellType.identifier)
-        collectionView.register(TimePickerCellType.self, forCellWithReuseIdentifier: TimePickerCellType.identifier)
-        collectionView.register(PaymentInputCellType.self, forCellWithReuseIdentifier: PaymentInputCellType.identifier)
+        collectionView.register(TextInputCellType.self, forCellWithReuseIdentifier: TextInputCellType.identifier)
+        collectionView.register(WeightInputCellType.self, forCellWithReuseIdentifier: WeightInputCellType.identifier)
         
         collectionView.isScrollEnabled = true
         collectionView.contentInset = .init(top: 0, left: 20, bottom: 32, right: 20)
@@ -171,12 +191,12 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
                 ctaButton.setEnabled(true)
                 return state
             }
-            .bind(to: vm.workTimeAndPayState)
+            .bind(to: vm.customerInformationState)
             .disposed(by: disposeBag)
     }
 }
 
-extension WorkTimeAndPayView: UICollectionViewDataSource {
+extension CustomerInformationView: UICollectionViewDataSource {
     
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         sectionData.count
@@ -189,8 +209,8 @@ extension WorkTimeAndPayView: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         switch indexPath.section {
-        case 0:
-            // 근무 요일 선택
+        case 0, 3, 4:
+            // 성별, 요양등급, 인지상태
             let cellData = sectionData[indexPath.section].subData[indexPath.item]
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
             
@@ -198,46 +218,56 @@ extension WorkTimeAndPayView: UICollectionViewDataSource {
             cell.innerView.label.textString = cellData.cellText
             
             // binding
-            bindDay(cell: cell, itemIndex: indexPath.item)
+            let itemIndex = indexPath.item
+            switch indexPath.section {
+            case 0:
+                bindGender(cell: cell, itemIndex: itemIndex)
+            case 3:
+                bindCareGrade(cell: cell, itemIndex: itemIndex)
+            case 4:
+                bindCognition(cell: cell, itemIndex: itemIndex)
+            default:
+                fatalError()
+            }
             
             return cell
         case 1:
-            // 근무시간 선택
+            // 출생연도 선택
             let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TimePickerCellType.identifier, for: indexPath) as! TimePickerCellType
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextInputCellType.identifier, for: indexPath) as! TextInputCellType
             
             // cell appearance
-            cell.innerView.textLabel.textString = cellData.cellText
+            cell.innerView.placeholderText = cellData.cellText
             
             // binding
-            bindWorkTime(cell: cell, itemIndex: indexPath.item)
+            bindBirthYear(cell: cell)
             
             return cell
         case 2:
-            // 급여 타입 선택
+            // 몸무게
             let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WeightInputCellType.identifier, for: indexPath) as! WeightInputCellType
             
             // cell appearance
-            cell.innerView.label.textString = cellData.cellText
+            cell.innerView.textField.keyboardType = .numberPad
             
             // binding
-            bindPaymentType(cell: cell, itemIndex: indexPath.item)
+            bindWeight(cell: cell)
+            
+            return cell
+        case 5:
+            // 질병
+            let cellData = sectionData[indexPath.section].subData[indexPath.item]
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextInputCellType.identifier, for: indexPath) as! TextInputCellType
+            
+            // cell appearance
+            cell.innerView.placeholderText = cellData.cellText
+            
+            // binding
+            bindDeceaseDiscription(cell: cell)
             
             return cell
             
-        case 3:
-            // 급여 입력
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaymentInputCellType.identifier, for: indexPath) as! PaymentInputCellType
-            
-            // cell appearance
-            cell.innerView.degreeLabel.textString = "원"
-            
-            // binding
-            bindPaymentAmount(cell: cell)
-            
-            return cell
         default:
             // 구현되지 않음
             fatalError()
@@ -259,12 +289,9 @@ extension WorkTimeAndPayView: UICollectionViewDataSource {
     }
 }
 
-extension WorkTimeAndPayView: UICollectionViewDelegateFlowLayout {
+extension CustomerInformationView: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        
-        // 헤더가 없는 섹션
-        if section == 3 { return .zero }
         
         // 헤더의 크기 설정
         return CGSize(width: collectionView.bounds.width, height: 22)
@@ -272,36 +299,18 @@ extension WorkTimeAndPayView: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         
-        // 헤더가 없는 섹션
-        if section == 3 { return .zero }
-        
-        // 헤더와 섹션 간의 간격을 설정, 마지막 섹션이 아닌 경우 바텀 인셋 설정
-        switch section {
-        case 0,1:
-            let bottomInset: CGFloat = 28.0
-            return .init(top: 6, left: 0, bottom: bottomInset, right: 0)
-        case 2:
-            let bottomInset: CGFloat = 12.0
-            return .init(top: 6, left: 0, bottom: bottomInset, right: 0)
-        case 3:
-            return .zero
-        default:
-            fatalError()
-        }
+        // 헤더와 섹션 간의 간격을 설정
+        let bottomInset: CGFloat = section != (sectionData.count-1) ? 28 : 0
+        return UIEdgeInsets(top: 6, left: 0, bottom: bottomInset, right: 0)
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let size = sectionData[indexPath.section].cellSize
         
         switch indexPath.section {
-        case 0, 2:
+        case 0, 3, 4:
             return size
-        case 1:
-            // 2개의 셀이 각각 절반의 영역을 차지합니다.
-            let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-            let space = collectionView.bounds.width - flowLayout.minimumInteritemSpacing
-            return .init(width: space/2, height: size.height)
-        case 3:
+        case 1, 2, 5:
             let horizontalInset = collectionView.contentInset.left+collectionView.contentInset.right
             let width = collectionView.bounds.width - horizontalInset
             return .init(width: width, height: size.height)
@@ -311,52 +320,25 @@ extension WorkTimeAndPayView: UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension WorkTimeAndPayView {
+extension CustomerInformationView {
     
-    func bindDay(cell: TextCellType, itemIndex: Int) {
-        let day = DayItem(rawValue: itemIndex)!
+    private func bindGender(cell: TextCellType, itemIndex: Int) {
         
-        // Input
-        cell.innerView
-            .eventPublisher
-            .map { state in
-                let isActive = state == .accent
-                return (day, isActive)
-            }
-            .bind(to: viewModel.selectedDay)
-            .disposed(by: disposeBag)
-    }
-    
-    func bindWorkTime(cell: TimePickerCellType, itemIndex: Int) {
-        
-        if itemIndex == 0 {
-            // 시작시간
-            
-                
-        }
-        else if itemIndex == 1 {
-            // 종료시간
-            
-        }
-    }
-    
-    func bindPaymentType(cell: TextCellType, itemIndex: Int) {
-        
-        let payType = PaymentItem(rawValue: itemIndex)!
+        let gender = Gender(rawValue: itemIndex)!
         
         // Input
         cell.innerView
             .eventPublisher
             .map { $0 == .accent }
             .filter { $0 }
-            .map { _ in payType }
-            .bind(to: viewModel.paymentType)
+            .map { _ in gender }
+            .bind(to: viewModel.gender)
             .disposed(by: disposeBag)
         
         // Output
         viewModel
-            .selectedPaymentType
-            .map { currentItem in currentItem == payType }
+            .selectedGender
+            .map { currentItem in currentItem == gender }
             .drive { isMatched in
                 if !isMatched {
                     // 현재 버튼과 다른 번튼이 눌린 경우
@@ -366,14 +348,87 @@ extension WorkTimeAndPayView {
             .disposed(by: disposeBag)
     }
     
-    func bindPaymentAmount(cell: PaymentInputCellType) {
+    private func bindBirthYear(cell: TextInputCellType) {
         
         // Input
         cell
             .innerView
+            .rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.birthYear)
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindWeight(cell: WeightInputCellType) {
+        
+        // Input
+        cell.innerView
             .edtingText
             .asObservable()
-            .bind(to: viewModel.paymentAmount)
+            .bind(to: viewModel.weight)
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindCareGrade(cell: TextCellType, itemIndex: Int) {
+        
+        let grade = CareGrade(rawValue: itemIndex)!
+        
+        // Input
+        cell.innerView
+            .eventPublisher
+            .map { $0 == .accent }
+            .filter { $0 }
+            .map { _ in grade }
+            .bind(to: viewModel.careGrade)
+            .disposed(by: disposeBag)
+        
+        // Output
+        viewModel
+            .selectedCareGrade
+            .map { currentItem in currentItem == grade }
+            .drive { isMatched in
+                if !isMatched {
+                    // 현재 버튼과 다른 번튼이 눌린 경우
+                    cell.innerView.setState(.normal)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindCognition(cell: TextCellType, itemIndex: Int) {
+        
+        let cogItem = CognitionItem(rawValue: itemIndex)!
+        
+        // Input
+        cell.innerView
+            .eventPublisher
+            .map { $0 == .accent }
+            .filter { $0 }
+            .map { _ in cogItem }
+            .bind(to: viewModel.cognitionState)
+            .disposed(by: disposeBag)
+        
+        // Output
+        viewModel
+            .selectedCognitionState
+            .map { currentItem in currentItem == cogItem }
+            .drive { isMatched in
+                if !isMatched {
+                    // 현재 버튼과 다른 번튼이 눌린 경우
+                    cell.innerView.setState(.normal)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindDeceaseDiscription(cell: TextInputCellType) {
+        
+        // Input
+        cell.innerView
+            .rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.deseaseDescription)
             .disposed(by: disposeBag)
     }
 }
+

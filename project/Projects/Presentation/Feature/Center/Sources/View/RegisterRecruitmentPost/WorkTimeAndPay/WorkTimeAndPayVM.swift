@@ -27,6 +27,7 @@ class WorkTimeAndPayViewModel: WorkTimeAndPayViewModelable {
     init() {
         
         // Input
+        // required
         let selectedDayFinished = selectedDay
             .map { [state] (day, isActive) in
                 state.selectedDays[day] = isActive
@@ -38,6 +39,7 @@ class WorkTimeAndPayViewModel: WorkTimeAndPayViewModelable {
             }
             .filter { $0 }
         
+        // required
         let workTime = Observable
             .combineLatest(
                 selectedDayFinished,
@@ -49,6 +51,7 @@ class WorkTimeAndPayViewModel: WorkTimeAndPayViewModelable {
                 return ()
             }
         
+        // required
         let payment = Observable
             .combineLatest(
                 paymentType,

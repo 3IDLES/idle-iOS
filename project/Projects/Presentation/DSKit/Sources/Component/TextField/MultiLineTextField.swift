@@ -12,8 +12,17 @@ import RxCocoa
 public class MultiLineTextField: UITextView {
     
     private var currentText: String = ""
+    private var currentPlaceholderText: String = ""
     
-    public var placeholderText: String
+    public var placeholderText: String {
+        get {
+            currentPlaceholderText
+        }
+        set {
+            currentPlaceholderText = newValue
+            setPlaceholderText(textView: self)
+        }
+    }
     public let typography: Typography
     
     public var textString: String {
@@ -29,7 +38,7 @@ public class MultiLineTextField: UITextView {
     private let disposeBag = DisposeBag()
     
     public init(typography: Typography, placeholderText: String = "") {
-        self.placeholderText = placeholderText
+        self.currentPlaceholderText = placeholderText
         self.typography = typography
         
         super.init(frame: .zero, textContainer: nil)

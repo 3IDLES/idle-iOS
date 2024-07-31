@@ -24,6 +24,8 @@ enum RegisterRecruitmentPage: Int, CaseIterable {
 public protocol RegisterRecruitmentPostViewModelable: AddressInputViewModelable {
     // Input
     var customerRequirementState: PublishRelay<CustomerRequirementState> { get }
+    var workTimeAndPayState: PublishRelay<WorkTimeAndPayState> { get }
+    var customerInformationState: PublishRelay<CustomerInformationState> { get }
     
     // Output
     var customerRequirementScreenNextable: Driver<Bool> { get }
@@ -263,50 +265,6 @@ public class RegisterRecruitmentPostVC: BaseViewController {
             }
     }
 }
-
-
-// MARK: 근무지 주소
-
-// MARK: 고객정보
-class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
-    
-    // Init
-    
-    
-    // View
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
-    }()
-    
-    
-    public init() {
-        super.init(frame: .zero)
-    }
-    
-    public required init?(coder: NSCoder) { fatalError() }
-    
-    private func setAppearance() {
-        
-    }
-    
-    private func setLayout() {
-        
-    }
-    
-    private func setObservable() {
-        
-    }
-    
-    func bind(viewModel vm: any RegisterRecruitmentPostViewModelable) {
-        
-    }
-}
-
-// MARK: 고객 요구사항
-
 
 // MARK: 공객 요구사항
 class AdditinalInformationView: UIView, RegisterRecruitmentPostViews {
