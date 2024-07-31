@@ -147,8 +147,8 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
             processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             
             collectionView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            collectionView.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
             
             ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),

@@ -26,6 +26,7 @@ public protocol RegisterRecruitmentPostViewModelable: AddressInputViewModelable 
     var customerRequirementState: PublishRelay<CustomerRequirementState> { get }
     var workTimeAndPayState: PublishRelay<WorkTimeAndPayState> { get }
     var customerInformationState: PublishRelay<CustomerInformationState> { get }
+    var addtionalApplicationInfoState: PublishRelay<AdditinalApplicationInfoState> { get }
     
     // Output
     var customerRequirementScreenNextable: Driver<Bool> { get }
