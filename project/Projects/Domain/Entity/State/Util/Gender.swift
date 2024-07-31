@@ -7,10 +7,10 @@
 
 import Foundation
 
-public enum Gender {
-    case notDetermined
+public enum Gender: Int {
     case male
     case female
+    case notDetermined
     
     public var twoLetterKoreanWord: String {
         switch self {

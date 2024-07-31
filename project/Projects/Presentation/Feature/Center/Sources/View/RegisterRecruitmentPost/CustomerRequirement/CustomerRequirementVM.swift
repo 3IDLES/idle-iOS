@@ -40,7 +40,8 @@ class CustomerRequirementVM: CustomerRequirementViewModelable {
         isMovingSupportActvie = movingSupportNeeded
             .asDriver(onErrorJustReturn: false)
         
-        // 3가지 라디오 버튼
+        // 3가지 라디오(2옵션) 버튼
+        // required
         let first3 = Observable
             .combineLatest(
                 mealSupportNeeded,
@@ -57,18 +58,19 @@ class CustomerRequirementVM: CustomerRequirementViewModelable {
                 return state
             }
         
+        // optional
+        dailySupportTypeNeeded
+            .subscribe { [state] key, isActive in
+                printIfDebug("일상보조상태: \(state.dailySupportTypeNeeds)")
+                state.dailySupportTypeNeeds[key] = isActive
+            }
+            .disposed(by: disposeBag)
+        
+        // optional
         additionalRequirement
             .subscribe { [state] info in
                 printIfDebug("입력중인 요구사항: \(info)")
                 state.additionalRequirement = info
-            }
-            .disposed(by: disposeBag)
-        
-        dailySupportTypeNeeded
-            .subscribe { [state] key, isActive in
-                state.dailySupportTypeNeeds[key] = isActive
-                
-                printIfDebug("일상보조상태: \(state.dailySupportTypeNeeds)")
             }
             .disposed(by: disposeBag)
         

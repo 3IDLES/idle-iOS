@@ -42,7 +42,7 @@ public struct CellData {
         self.cellText = cellText
     }
     
-    public static let fullSizeCell = CellData(cellText: "FullSizeCell")
+    public static let emptyCell = CellData(cellText: "emptyCell")
 }
 
 public protocol CellRepresentable: UIView {

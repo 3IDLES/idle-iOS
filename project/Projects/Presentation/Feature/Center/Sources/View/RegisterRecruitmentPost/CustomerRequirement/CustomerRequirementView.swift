@@ -18,6 +18,7 @@ public protocol CustomerRequirementViewModelable {
     var mealSupportNeeded: PublishRelay<Bool> { get }
     var toiletSupportNeeded: PublishRelay<Bool> { get }
     var movingSupportNeeded: PublishRelay<Bool> { get }
+    
     var dailySupportTypeNeeded: PublishRelay<(DailySupportType, Bool)> { get }
     var additionalRequirement: PublishRelay<String> { get }
     
@@ -75,8 +76,10 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         SectionData(
             titleText: "이외에도 요구사항이 있다면 적어주세요.",
             subTitle: "(선택)",
-            subData: [ .fullSizeCell ],
-            cellSize: .init(width: CGFloat.infinity, height: 156)
+            subData: [ 
+                CellData(cellText: "추가적으로 요구사항이 있다면 작성해주세요.")
+            ],
+            cellSize: .heightOnly(156)
         )
     ]
     
@@ -169,6 +172,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         collectionView.register(TextInputCellType.self, forCellWithReuseIdentifier: TextInputCellType.identifier)
         
         collectionView.isScrollEnabled = true
+        collectionView.contentInset = .init(top: 0, left: 20, bottom: 32, right: 20)
     }
     
     func bind(viewModel vm: any RegisterRecruitmentPostViewModelable) {
@@ -176,6 +180,10 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         viewModel
             .completeState
             .asObservable()
+            .map { [ctaButton] state in
+                ctaButton.setEnabled(true)
+                return state
+            }
             .bind(to: vm.customerRequirementState)
             .disposed(by: disposeBag)
     }
@@ -214,7 +222,12 @@ extension CustomerRequirementView: UICollectionViewDataSource {
             
             return cell
         } else if indexPath.section == 4 {
+            let cellData = sectionData[indexPath.section].subData[indexPath.item]
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextInputCellType.identifier, for: indexPath) as! TextInputCellType
+            
+            // Apearance
+            cell.innerView.placeholderText = cellData.cellText
+            
             return cell
         } else {
             // 섹션에 대한 셀이 정의되지 않음
@@ -253,12 +266,15 @@ extension CustomerRequirementView: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let size = sectionData[indexPath.section].cellSize
         
-        if size.width == .infinity {
+        if indexPath.section == 4 {
+            let horizontalInset = collectionView.contentInset.left+collectionView.contentInset.right
+            let width = collectionView.bounds.width - horizontalInset
             return .init(
                 width: collectionView.bounds.width,
                 height: size.height
             )
         }
+        
         return size
     }
 }
@@ -329,17 +345,16 @@ extension CustomerRequirementView {
             .bind(to: viewModel.dailySupportTypeNeeded)
             .disposed(by: disposeBag)    
     }
-}
-
-// MARK: Cell extension
-extension StateButtonTyp1: CellRepresentable {
-    public static func createInstance() -> Self {
-        return StateButtonTyp1(text: "", initial: .normal) as! Self
+    
+    private func bindAdditionalInfo(cell: TextInputCellType) {
+        // Input
+        cell
+            .innerView
+            .rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.additionalRequirement)
+            .disposed(by: disposeBag)
     }
 }
 
-extension MultiLineTextField: CellRepresentable {
-    public static func createInstance() -> Self {
-        return MultiLineTextField(typography: .Body3, placeholderText: "추가적으로 요구사항이 있다면 작성해주세요") as! Self
-    }
-}
+
