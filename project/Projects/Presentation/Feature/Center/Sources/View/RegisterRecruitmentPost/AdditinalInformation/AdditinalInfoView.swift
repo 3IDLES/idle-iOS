@@ -15,9 +15,9 @@ import Entity
 import DSKit
 
 public class AdditinalApplicationInfoState {
-    public var preferenceAboutExp: PreferenceAboutExp = .beginnerPossible
-    public var applicationMethod: ApplicationMethod = .app
-    public var recruitmentDeadline: RecruitmentDeadline = .specificDate
+    public var preferenceAboutExp: PreferenceAboutExp?
+    public var applicationMethod: ApplicationMethod?
+    public var recruitmentDeadline: RecruitmentDeadline?
     public var deadlineDate: Date?
     
     public init() { }
@@ -25,17 +25,17 @@ public class AdditinalApplicationInfoState {
 
 public protocol AdditinalApplicationInfoViewModelable {
     // Input
-    var preferenceAboutExp: PublishRelay<PreferenceAboutExp> { get }
-    var applicationMethod: PublishRelay<ApplicationMethod> { get }
-    var recruitmentDeadline: PublishRelay<RecruitmentDeadline> { get }
-    var deadlineDate: BehaviorRelay<Date> { get }
+    var preferenceAboutExp: PublishRelay<PreferenceAboutExp?> { get }
+    var applicationMethod: PublishRelay<ApplicationMethod?> { get }
+    var recruitmentDeadline: PublishRelay<RecruitmentDeadline?> { get }
+    var deadlineDate: BehaviorRelay<Date?> { get }
     
     // Output
-    var selectedPreferenceAboutExp: Driver<PreferenceAboutExp> { get }
-    var selectedApplicationMethod: Driver<ApplicationMethod> { get }
-    var selectedRecruitmentDeadline: Driver<RecruitmentDeadline> { get }
+    var selectedPreferenceAboutExp: Driver<PreferenceAboutExp?> { get }
+    var selectedApplicationMethod: Driver<ApplicationMethod?> { get }
+    var selectedRecruitmentDeadline: Driver<RecruitmentDeadline?> { get }
     
-    var completeState: Driver<AdditinalApplicationInfoState> { get }
+    var completeState: Driver<AdditinalApplicationInfoState?> { get }
 }
 
 public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews {
@@ -161,7 +161,6 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
         // Cell
         collectionView.register(TextCellType.self, forCellWithReuseIdentifier: TextCellType.identifier)
         
-        collectionView.isScrollEnabled = true
         collectionView.contentInset = .init(top: 0, left: 20, bottom: 32, right: 20)
     }
     
@@ -171,9 +170,11 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
             .completeState
             .asObservable()
             .map { [ctaButton] state in
-                ctaButton.setEnabled(true)
+                // state가 유효한 경우 cta버튼을 활성화
+                ctaButton.setEnabled(state != nil)
                 return state
             }
+            .compactMap { $0 }
             .bind(to: vm.addtionalApplicationInfoState)
             .disposed(by: disposeBag)
     }
@@ -250,7 +251,7 @@ extension AdditinalApplicationInfoView: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         // 헤더의 크기 설정
-        return CGSize(width: collectionView.bounds.width, height: 22)
+        return CGSize(width: collectionView.contentSize.width, height: 22)
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -271,8 +272,8 @@ extension AdditinalApplicationInfoView {
     private func bindRadioButtons<T: RawRepresentable>(
         cell: TextCellType,
         item: T,
-        input: PublishRelay<T>,
-        output: Driver<T>
+        input: PublishRelay<T?>,
+        output: Driver<T?>
     ) where T.RawValue == Int {
         
         // Input
@@ -286,6 +287,7 @@ extension AdditinalApplicationInfoView {
         
         // Output
         output
+            .compactMap { $0 }
             .map { currentItem in currentItem == item }
             .drive { isMatched in
                 if !isMatched {

@@ -16,19 +16,19 @@ import DSKit
 public protocol CustomerInformationViewModelable {
     
     // Input
-    var gender: PublishRelay<Gender> { get }
+    var gender: PublishRelay<Gender?> { get }
     var birthYear: PublishRelay<String> { get }
     var weight: PublishRelay<String> { get }
-    var careGrade: PublishRelay<CareGrade> { get }
-    var cognitionState: PublishRelay<CognitionItem> { get }
+    var careGrade: PublishRelay<CareGrade?> { get }
+    var cognitionState: PublishRelay<CognitionItem?> { get }
     var deseaseDescription: BehaviorRelay<String> { get }
     
     // Output
-    var selectedGender: Driver<Gender> { get }
-    var selectedCareGrade: Driver<CareGrade> { get }
-    var selectedCognitionState: Driver<CognitionItem> { get }
+    var selectedGender: Driver<Gender?> { get }
+    var selectedCareGrade: Driver<CareGrade?> { get }
+    var selectedCognitionState: Driver<CognitionItem?> { get }
     
-    var completeState: Driver<CustomerInformationState> { get }
+    var completeState: Driver<CustomerInformationState?> { get }
 }
 
 public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
@@ -188,9 +188,10 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             .completeState
             .asObservable()
             .map { [ctaButton] state in
-                ctaButton.setEnabled(true)
+                ctaButton.setEnabled(state != nil)
                 return state
             }
+            .compactMap { $0 }
             .bind(to: vm.customerInformationState)
             .disposed(by: disposeBag)
     }
@@ -249,6 +250,7 @@ extension CustomerInformationView: UICollectionViewDataSource {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WeightInputCellType.identifier, for: indexPath) as! WeightInputCellType
             
             // cell appearance
+            cell.innerView.degreeLabel.textString = "kg"
             cell.innerView.textField.keyboardType = .numberPad
             
             // binding

@@ -19,13 +19,13 @@ public protocol WorkTimeAndPayViewModelable {
     var selectedDay: PublishRelay<(DayItem, Bool)> { get }
     var workStartTime: PublishRelay<String> { get }
     var workEndTime: PublishRelay<String> { get }
-    var paymentType: PublishRelay<PaymentItem> { get }
+    var paymentType: PublishRelay<PaymentItem?> { get }
     var paymentAmount: PublishRelay<String> { get }
     
     // Output
-    var selectedPaymentType: Driver<PaymentItem> { get }
+    var selectedPaymentType: Driver<PaymentItem?> { get }
     
-    var completeState: Driver<WorkTimeAndPayState> { get }
+    var completeState: Driver<WorkTimeAndPayState?> { get }
 }
 
 public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
@@ -168,9 +168,10 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
             .completeState
             .asObservable()
             .map { [ctaButton] state in
-                ctaButton.setEnabled(true)
+                ctaButton.setEnabled(state != nil)
                 return state
             }
+            .compactMap { $0 }
             .bind(to: vm.workTimeAndPayState)
             .disposed(by: disposeBag)
     }

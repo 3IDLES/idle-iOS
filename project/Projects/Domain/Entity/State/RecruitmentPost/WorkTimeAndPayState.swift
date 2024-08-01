@@ -34,11 +34,11 @@ public enum DayItem: Int, CaseIterable {
 
 public enum PaymentItem: Int, CaseIterable {
     
-    case timely, weekly, monthly
+    case hourly, weekly, monthly
     
     public var korLetterText: String {
         switch self {
-        case .timely:
+        case .hourly:
             "시급"
         case .weekly:
             "주급"
@@ -57,7 +57,7 @@ public class WorkTimeAndPayState {
     }()
     public var workStartTime: String = ""
     public var workEndTime: String = ""
-    public var paymentType: PaymentItem? = nil
+    public var paymentType: PaymentItem?
     public var paymentAmount: String = ""
     
     public init() { }

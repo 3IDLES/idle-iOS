@@ -13,15 +13,15 @@ import PresentationCore
 
 class AdditinalInfoVM: AdditinalApplicationInfoViewModelable {
     
-    var preferenceAboutExp: PublishRelay<PreferenceAboutExp> = .init()
-    var applicationMethod: PublishRelay<ApplicationMethod> = .init()
-    var recruitmentDeadline: PublishRelay<RecruitmentDeadline> = .init()
-    var deadlineDate: BehaviorRelay<Date> = .init(value: .init())
+    var preferenceAboutExp: PublishRelay<PreferenceAboutExp?> = .init()
+    var applicationMethod: PublishRelay<ApplicationMethod?> = .init()
+    var recruitmentDeadline: PublishRelay<RecruitmentDeadline?> = .init()
+    var deadlineDate: BehaviorRelay<Date?> = .init(value: nil)
     
-    var selectedPreferenceAboutExp: Driver<PreferenceAboutExp>
-    var selectedApplicationMethod: Driver<ApplicationMethod>
-    var selectedRecruitmentDeadline: Driver<RecruitmentDeadline>
-    var completeState: Driver<AdditinalApplicationInfoState>
+    var selectedPreferenceAboutExp: Driver<PreferenceAboutExp?>
+    var selectedApplicationMethod: Driver<ApplicationMethod?>
+    var selectedRecruitmentDeadline: Driver<RecruitmentDeadline?>
+    var completeState: Driver<AdditinalApplicationInfoState?>
     
     private let state = AdditinalApplicationInfoState()
     
@@ -32,10 +32,20 @@ class AdditinalInfoVM: AdditinalApplicationInfoViewModelable {
             .combineLatest(
                 recruitmentDeadline,
                 deadlineDate
-            ).map { [state] (deadline, date) in
+            ).map { [state] (deadline, date) -> Void? in
                 state.recruitmentDeadline = deadline
                 state.deadlineDate = date
-                return ()
+                
+                if state.recruitmentDeadline == .specificDate {
+                    // 마감 지정일 있는 경우
+                    return state.deadlineDate != nil ? () : nil
+                } else if state.recruitmentDeadline == .untilApplicationFinished {
+                    // 마감 지정일이 없는 경우
+                    return ()
+                } else {
+                    // 타입이 선택되지 않은 경우
+                    return nil
+                }
             }
         
         completeState = Observable
@@ -44,17 +54,31 @@ class AdditinalInfoVM: AdditinalApplicationInfoViewModelable {
                 applicationMethod,
                 deadLineInput
             )
-            .map { [state] exp, apply, _ in
+            .map { [state] exp, apply, deadlineValidation -> AdditinalApplicationInfoState? in
                 state.preferenceAboutExp = exp
                 state.applicationMethod = apply
                 
-                return state
+                // 필수값 확인
+                if state.preferenceAboutExp != nil,
+                   state.applicationMethod != nil,
+                   deadlineValidation != nil {
+                    
+                    
+                    printIfDebug("[AdditinalInfoVM] 모든 정보 등록완료")
+                    // 모든 조건이 충족된 경우
+                    return state
+                }
+                
+                return nil
             }
-            .asDriver(onErrorJustReturn: .init())
+            .asDriver(onErrorJustReturn: nil)
    
         // Output
-        selectedPreferenceAboutExp = preferenceAboutExp.asDriver(onErrorJustReturn: .beginnerPossible)
-        selectedApplicationMethod = applicationMethod.asDriver(onErrorJustReturn: .app)
-        selectedRecruitmentDeadline = recruitmentDeadline.asDriver(onErrorJustReturn: .untilApplicationFinished)
+        selectedPreferenceAboutExp = preferenceAboutExp
+            .asDriver(onErrorJustReturn: nil)
+        selectedApplicationMethod = applicationMethod
+            .asDriver(onErrorJustReturn: nil)
+        selectedRecruitmentDeadline = recruitmentDeadline
+            .asDriver(onErrorJustReturn: nil)
     }
 }
