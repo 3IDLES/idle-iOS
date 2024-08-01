@@ -37,11 +37,11 @@ public enum CognitionItem: Int, CaseIterable {
 }
 
 public class CustomerInformationState {
-    public var gender: Gender = .notDetermined
+    public var gender: Gender?
     public var birthYear: String = ""
     public var weight: String = ""
-    public var careGrade: Int = -1
-    public var cognitionState: CognitionItem = .earlyStage
+    public var careGrade: CareGrade?
+    public var cognitionState: CognitionItem?
     public var deceaseDescription: String = ""
     
     public init() { }

@@ -15,12 +15,12 @@ class WorkTimeAndPayViewModel: WorkTimeAndPayViewModelable {
     var selectedDay: PublishRelay<(DayItem, Bool)> = .init()
     var workStartTime: PublishRelay<String> = .init()
     var workEndTime: PublishRelay<String> = .init()
-    var paymentType: PublishRelay<PaymentItem> = .init()
+    var paymentType: PublishRelay<PaymentItem?> = .init()
     var paymentAmount: PublishRelay<String> = .init()
     
     // Output
-    var selectedPaymentType: Driver<PaymentItem>
-    var completeState: Driver<WorkTimeAndPayState>
+    var selectedPaymentType: Driver<PaymentItem?>
+    var completeState: Driver<WorkTimeAndPayState?>
     
     private let state = WorkTimeAndPayState()
     
@@ -64,7 +64,7 @@ class WorkTimeAndPayViewModel: WorkTimeAndPayViewModelable {
         
         // Output
         selectedPaymentType = paymentType
-            .asDriver(onErrorJustReturn: .timely)
+            .asDriver(onErrorJustReturn: .hourly)
         
         completeState = Observable
             .combineLatest(
