@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import PresentationCore
 
 public class IdleOneLineInputField: UIView {
     
@@ -71,7 +72,9 @@ public class IdleOneLineInputField: UIView {
         return stack
     }()
     
-    private let disposeBag = DisposeBag()
+    public let disposeBag = DisposeBag()
+    
+    public var movingView: UIView?
     
     public init(
         state: State = .editing,
@@ -367,3 +370,5 @@ public extension IdleOneLineInputField {
         timerLabel?.isHidden = true
     }
 }
+
+extension IdleOneLineInputField: IdleKeyboardAvoidable { }

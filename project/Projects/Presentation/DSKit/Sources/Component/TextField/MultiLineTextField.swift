@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import PresentationCore
 
 public class MultiLineTextField: UITextView {
     
@@ -35,7 +36,10 @@ public class MultiLineTextField: UITextView {
         }
     }
     
-    private let disposeBag = DisposeBag()
+    public let disposeBag = DisposeBag()
+    
+    // 키보드 어보이던스가 적용될 뷰입니다.
+    public weak var movingView: UIView?
     
     public init(typography: Typography, placeholderText: String = "") {
         self.currentPlaceholderText = placeholderText
@@ -124,3 +128,5 @@ extension MultiLineTextField: UITextViewDelegate {
     }
     
 }
+
+extension MultiLineTextField: IdleKeyboardAvoidable { }

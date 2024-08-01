@@ -26,6 +26,7 @@ let proejct = Project(
             resources: ["Resources/**",],
             dependencies: [
                 D.Domain.Entity,
+                D.Presentation.PresentationCore,
                 
                 // ThirdParty
                 D.ThirdParty.RxSwift,

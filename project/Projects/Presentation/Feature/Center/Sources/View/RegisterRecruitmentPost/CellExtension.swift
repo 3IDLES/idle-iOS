@@ -7,9 +7,9 @@
 
 import DSKit
 
-extension TextImageButtonType2: CellRepresentable {
+extension WorkTimePicker: CellRepresentable {
     public static func createInstance() -> Self {
-        TextImageButtonType2() as! Self
+        WorkTimePicker(placeholderText: "") as! Self
     }
 }
 

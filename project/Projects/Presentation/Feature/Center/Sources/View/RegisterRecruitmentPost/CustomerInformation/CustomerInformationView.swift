@@ -252,6 +252,7 @@ extension CustomerInformationView: UICollectionViewDataSource {
             // cell appearance
             cell.innerView.degreeLabel.textString = "kg"
             cell.innerView.textField.keyboardType = .numberPad
+            cell.innerView.textField.setKeyboardAvoidance(movingView: self)
             
             // binding
             bindWeight(cell: cell)
@@ -264,6 +265,7 @@ extension CustomerInformationView: UICollectionViewDataSource {
             
             // cell appearance
             cell.innerView.placeholderText = cellData.cellText
+            cell.innerView.setKeyboardAvoidance(movingView: self)
             
             // binding
             bindDeceaseDiscription(cell: cell)

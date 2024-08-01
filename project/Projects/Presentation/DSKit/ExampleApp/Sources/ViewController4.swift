@@ -23,7 +23,9 @@ class ViewController4: UIViewController {
             isArrow: true
         )
         
-        let textField = WorkTimePicker(placeholderText: "Hello")
+        let textField = MultiLineTextField(typography: .Body3, placeholderText: "Hello")
+        textField.setKeyboardAvoidance(movingView: view)
+        textField.isScrollEnabled = false
         
 //        btn.isArrow.accept(false)
         [
@@ -41,10 +43,9 @@ class ViewController4: UIViewController {
             btn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             btn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            textField.topAnchor.constraint(equalTo: btn.bottomAnchor, constant: 40),
+            textField.topAnchor.constraint(equalTo: btn.bottomAnchor, constant: 100),
             textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-  
             
         ])
     }
