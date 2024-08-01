@@ -17,7 +17,7 @@ public class DateComponent {
     var hour: String
     var minute: String
     
-    var toString: String {
+    public var toString: String {
         "\(part) \(hour):\(minute)"
     }
     
@@ -91,6 +91,15 @@ public class WorkTimePicker: TextImageButtonType2 {
         toolbar.sizeToFit()
         
         return toolbar
+    }
+    
+    public var placeholderText: String {
+        get {
+            textLabel.textString
+        }
+        set {
+            textLabel.textString = newValue
+        }
     }
     
     public override var canBecomeFirstResponder: Bool { true }

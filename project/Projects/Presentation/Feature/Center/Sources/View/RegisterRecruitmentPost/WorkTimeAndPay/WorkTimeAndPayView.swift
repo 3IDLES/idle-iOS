@@ -37,7 +37,7 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
     
     // Cell Type
     typealias TextCellType = CellWrapper<StateButtonTyp1>
-    typealias TimePickerCellType = CellWrapper<TextImageButtonType2>
+    typealias TimePickerCellType = CellWrapper<WorkTimePicker>
     typealias PaymentInputCellType = CellWrapper<TextFieldWithDegree>
     
     // Section Data
@@ -208,7 +208,7 @@ extension WorkTimeAndPayView: UICollectionViewDataSource {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TimePickerCellType.identifier, for: indexPath) as! TimePickerCellType
             
             // cell appearance
-            cell.innerView.textLabel.textString = cellData.cellText
+            cell.innerView.placeholderText = cellData.cellText
             
             // binding
             bindWorkTime(cell: cell, itemIndex: indexPath.item)
@@ -332,12 +332,17 @@ extension WorkTimeAndPayView {
         
         if itemIndex == 0 {
             // 시작시간
-            
-                
+            cell.innerView.pickedDateString
+                .map { $0.toString }
+                .bind(to: viewModel.workStartTime)
+                .disposed(by: disposeBag)
         }
         else if itemIndex == 1 {
             // 종료시간
-            
+            cell.innerView.pickedDateString
+                .map { $0.toString }
+                .bind(to: viewModel.workEndTime)
+                .disposed(by: disposeBag)
         }
     }
     

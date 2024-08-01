@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import PresentationCore
 
 /// 기본이 되는 텍스트 필드입니다.
 public class IdleTextField: UITextField {
@@ -74,7 +75,10 @@ public class IdleTextField: UITextField {
         .disposed(by: disposeBag)
     }
     
-    private let disposeBag = DisposeBag()
+    public let disposeBag = DisposeBag()
+    
+    // 키보드 어보이던스가 적용될 뷰입니다.
+    public weak var movingView: UIView?
     
     /// 타이포그래피를 변경하면, 앞전에 설정한 속성값을 덥
     public var typography: Typography {
@@ -157,3 +161,5 @@ public extension IdleTextField {
         ))
     }
 }
+
+extension IdleTextField: IdleKeyboardAvoidable { }
