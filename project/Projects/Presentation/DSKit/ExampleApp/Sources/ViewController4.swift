@@ -23,7 +23,7 @@ class ViewController4: UIViewController {
             isArrow: true
         )
         
-        let textField = TextImageButtonType2()
+        let textField = WorkTimePicker(placeholderText: "Hello")
         
 //        btn.isArrow.accept(false)
         [
