@@ -21,6 +21,8 @@ class AdditinalInfoVM: AdditinalApplicationInfoViewModelable {
     var selectedPreferenceAboutExp: Driver<PreferenceAboutExp?>
     var selectedApplicationMethod: Driver<ApplicationMethod?>
     var selectedRecruitmentDeadline: Driver<RecruitmentDeadline?>
+    var selectedDateString: Driver<String?>
+    
     var completeState: Driver<AdditinalApplicationInfoState?>
     
     private let state = AdditinalApplicationInfoState()
@@ -79,6 +81,17 @@ class AdditinalInfoVM: AdditinalApplicationInfoViewModelable {
         selectedApplicationMethod = applicationMethod
             .asDriver(onErrorJustReturn: nil)
         selectedRecruitmentDeadline = recruitmentDeadline
+            .asDriver(onErrorJustReturn: nil)
+        selectedDateString = deadlineDate
+            .compactMap { $0 }
+            .map { date in
+                
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy년 MM월 dd일"
+                
+                let str = dateFormatter.string(from: date)
+                return str
+            }
             .asDriver(onErrorJustReturn: nil)
     }
 }

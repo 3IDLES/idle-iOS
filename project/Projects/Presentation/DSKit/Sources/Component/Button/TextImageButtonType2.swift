@@ -18,6 +18,10 @@ public class TextImageButtonType2: TappableUIView {
         return label
     }()
     
+    public let imageView: UIImageView = {
+        DSKitAsset.Icons.chevronDown.image.toView()
+    }()
+    
     private let disposeBag = DisposeBag()
     
     public override init() {
@@ -39,7 +43,7 @@ public class TextImageButtonType2: TappableUIView {
     }
     
     private func setLayout() {
-        let imageView = DSKitAsset.Icons.chevronDown.image.toView()
+        
         let stack = HStack(
             [
                 textLabel,

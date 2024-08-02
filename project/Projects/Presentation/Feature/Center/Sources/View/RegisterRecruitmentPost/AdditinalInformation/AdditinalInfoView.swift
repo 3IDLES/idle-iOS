@@ -34,6 +34,7 @@ public protocol AdditinalApplicationInfoViewModelable {
     var selectedPreferenceAboutExp: Driver<PreferenceAboutExp?> { get }
     var selectedApplicationMethod: Driver<ApplicationMethod?> { get }
     var selectedRecruitmentDeadline: Driver<RecruitmentDeadline?> { get }
+    var selectedDateString: Driver<String?> { get }
     
     var completeState: Driver<AdditinalApplicationInfoState?> { get }
 }
@@ -44,9 +45,11 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
         
     // Not init
     private let viewModel: AdditinalApplicationInfoViewModelable = AdditinalInfoVM()
+    public weak var viewController: UIViewController?
     
     // Cell type
     typealias TextCellType = CellWrapper<StateButtonTyp1>
+    typealias DateCellType = CellWrapper<CalendarOpenButton>
     
     // Section Data
     let sectionData: [SectionData] = [
@@ -71,6 +74,11 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
                 CellData(cellText: exp.korTextForBtn)
             },
             cellSize: .init(width: 104, height: 44)
+        ),
+        SectionData(
+            titleText: "접수마감 날짜 선택",
+            subData: [ .emptyCell ],
+            cellSize: .heightOnly(44)
         ),
     ]
     
@@ -102,7 +110,9 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
     
     private let disposeBag = DisposeBag()
     
-    public init() {
+    public init(viewController: UIViewController) {
+        
+        self.viewController = viewController
         
         super.init(frame: .zero)
         
@@ -160,6 +170,7 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
         
         // Cell
         collectionView.register(TextCellType.self, forCellWithReuseIdentifier: TextCellType.identifier)
+        collectionView.register(DateCellType.self, forCellWithReuseIdentifier: DateCellType.identifier)
         
         collectionView.contentInset = .init(top: 0, left: 20, bottom: 32, right: 20)
     }
@@ -192,16 +203,16 @@ extension AdditinalApplicationInfoView: UICollectionViewDataSource {
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cellData = sectionData[indexPath.section].subData[indexPath.item]
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
-        
-        // cell appearance
-        cell.innerView.label.textString = cellData.cellText
         
         // binding
         let itemIndex = indexPath.item
     
         switch indexPath.section {
         case 0:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
+            // cell appearance
+            cell.innerView.label.textString = cellData.cellText
+            
             let item = PreferenceAboutExp(rawValue: itemIndex)!
             bindRadioButtons(
                 cell: cell,
@@ -209,7 +220,12 @@ extension AdditinalApplicationInfoView: UICollectionViewDataSource {
                 input: viewModel.preferenceAboutExp,
                 output: viewModel.selectedPreferenceAboutExp
                 )
+            return cell
         case 1:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
+            // cell appearance
+            cell.innerView.label.textString = cellData.cellText
+            
             let item = ApplicationMethod(rawValue: itemIndex)!
             bindRadioButtons(
                 cell: cell,
@@ -217,7 +233,12 @@ extension AdditinalApplicationInfoView: UICollectionViewDataSource {
                 input: viewModel.applicationMethod,
                 output: viewModel.selectedApplicationMethod
                 )
+            return cell
         case 2:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
+            // cell appearance
+            cell.innerView.label.textString = cellData.cellText
+            
             let item = RecruitmentDeadline(rawValue: itemIndex)!
             bindRadioButtons(
                 cell: cell,
@@ -225,11 +246,16 @@ extension AdditinalApplicationInfoView: UICollectionViewDataSource {
                 input: viewModel.recruitmentDeadline,
                 output: viewModel.selectedRecruitmentDeadline
                 )
+            return cell
+        case 3:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DateCellType.identifier, for: indexPath) as! DateCellType
+            
+            bindDateSelect(cell: cell)
+            
+            return cell
         default:
             fatalError()
         }
-        
-        return cell
     }
     
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -251,18 +277,46 @@ extension AdditinalApplicationInfoView: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         // 헤더의 크기 설정
-        return CGSize(width: collectionView.contentSize.width, height: 22)
+        switch section {
+        case 0, 1, 2:
+            return CGSize(width: collectionView.contentSize.width, height: 22)
+        case 3:
+            return .zero
+        default:
+            fatalError()
+        }
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         // 헤더와 섹션 간의 간격을 설정
-        let bottomInset: CGFloat = section != (sectionData.count-1) ? 28 : 0
+        var bottomInset: CGFloat!
+        
+        switch section {
+        case 0,1:
+            bottomInset = 28
+        case 2:
+            bottomInset = 12
+        default:
+            bottomInset = 0
+        }
+        
         return UIEdgeInsets(top: 6, left: 0, bottom: bottomInset, right: 0)
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 
-        sectionData[indexPath.section].cellSize
+        let size = sectionData[indexPath.section].cellSize
+        
+        switch indexPath.section {
+        case 0, 1, 2:
+            return size
+        case 3:
+            let horizontalInset = collectionView.contentInset.left+collectionView.contentInset.right
+            let width = collectionView.bounds.width - horizontalInset
+            return .init(width: width, height: size.height)
+        default:
+            fatalError()
+        }
     }
 }
 
@@ -297,6 +351,41 @@ extension AdditinalApplicationInfoView {
             }
             .disposed(by: disposeBag)
     }
+    
+    private func bindDateSelect(cell: DateCellType) {
+                
+        // Input
+        cell
+            .innerView
+            .rx
+            .tap
+            .subscribe { [weak self] _ in
+                guard let self else { return }
+                
+                let dataPickerVC = OneDayPickerViewController()
+                dataPickerVC.modalPresentationStyle = .overFullScreen
+                dataPickerVC.delegate = self
+                viewController?.present(dataPickerVC, animated: false)
+            }
+            .disposed(by: disposeBag)
+        
+        // Output
+        viewModel
+            .selectedDateString
+            .compactMap { $0 }
+            .map { [cell] dateStr in
+                cell.innerView.textLabel.attrTextColor = DSKitAsset.Colors.gray900.color
+                return dateStr
+            }
+            .drive(cell.innerView.textLabel.rx.textString)
+            .disposed(by: disposeBag)
+    }
 }
 
 
+extension AdditinalApplicationInfoView: OneDayPickerDelegate {
+    public func oneDayPicker(selectedDate: Date) {
+        // 위임자 패턴으로 데이터를 수신
+        viewModel.deadlineDate.accept(selectedDate)
+    }
+}
