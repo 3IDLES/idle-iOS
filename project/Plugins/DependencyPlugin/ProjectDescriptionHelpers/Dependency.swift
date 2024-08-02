@@ -41,6 +41,7 @@ public extension ModuleDependency {
         public static let KeyChainAccess: TargetDependency = .external(name: "KeychainAccess")
         public static let Moya: TargetDependency = .external(name: "Moya")
         public static let RxMoya: TargetDependency = .external(name: "RxMoya")
+        public static let FSCalendar: TargetDependency = .external(name: "FSCalendar")
     }
 }
 

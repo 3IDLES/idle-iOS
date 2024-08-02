@@ -13,6 +13,12 @@ extension WorkTimePicker: CellRepresentable {
     }
 }
 
+extension CalendarOpenButton: CellRepresentable {
+    public static func createInstance() -> Self {
+        CalendarOpenButton() as! Self
+    }
+}
+
 extension TextFieldWithDegree: CellRepresentable {
     public static func createInstance() -> Self {
         let field = TextFieldWithDegree(degreeText: "", initialText: "")

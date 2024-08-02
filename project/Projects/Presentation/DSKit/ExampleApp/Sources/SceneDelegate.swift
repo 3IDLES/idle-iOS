@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-        let vc = ViewController4()
+        let vc = OneDayPickerViewController()
         
         window?.rootViewController = vc
         window?.makeKeyAndVisible()

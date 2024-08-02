@@ -36,5 +36,7 @@ let package = Package(
         .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: "4.2.2"),
         // Moya
         .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3"),
+        // FSCalendar
+        .package(url: "https://github.com/WenchaoD/FSCalendar.git", from: "2.8.4")
     ]
 )
