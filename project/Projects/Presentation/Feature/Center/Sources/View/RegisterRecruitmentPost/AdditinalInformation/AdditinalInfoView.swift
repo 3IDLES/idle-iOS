@@ -249,6 +249,7 @@ extension AdditinalApplicationInfoView: UICollectionViewDataSource {
             return cell
         case 3:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DateCellType.identifier, for: indexPath) as! DateCellType
+            cell.isHidden = true
             
             bindDateSelect(cell: cell)
             
@@ -370,6 +371,16 @@ extension AdditinalApplicationInfoView {
             .disposed(by: disposeBag)
         
         // Output
+        viewModel
+            .selectedRecruitmentDeadline
+            .compactMap { $0 }
+            .map { type in
+                let isSpecific = type == .specificDate
+                return !isSpecific
+            }
+            .drive(cell.rx.isHidden)
+            .disposed(by: disposeBag)
+        
         viewModel
             .selectedDateString
             .compactMap { $0 }

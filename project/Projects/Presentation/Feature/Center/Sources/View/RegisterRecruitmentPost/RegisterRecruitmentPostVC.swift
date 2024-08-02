@@ -29,20 +29,7 @@ public protocol RegisterRecruitmentPostViewModelable: AddressInputViewModelable 
     var addtionalApplicationInfoState: PublishRelay<AdditinalApplicationInfoState> { get }
     
     // Output
-    var customerRequirementScreenNextable: Driver<Bool> { get }
-    
     var alert: Driver<DefaultAlertContentVO>? { get }
-}
-
-protocol RegisterRecruitmentPostViews: UIView {
-    var ctaButton: CTAButtonType1 { get }
-    func bind(viewModel vm: RegisterRecruitmentPostViewModelable)
-}
-
-extension AddressView: RegisterRecruitmentPostViews {
-    func bind(viewModel vm: any RegisterRecruitmentPostViewModelable) {
-        bind(viewModel: vm as AddressInputViewModelable)
-    }
 }
 
 public class RegisterRecruitmentPostVC: BaseViewController {
@@ -73,7 +60,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     }()
     lazy var statusBar: ProcessStatusBar = {
         let view = ProcessStatusBar(
-            processCount: RegisterCenterInfoPage.allCases.count,
+            processCount: RegisterRecruitmentPage.allCases.count,
             startIndex: 0
         )
         return view
@@ -157,7 +144,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
                 case .customerRequirement:
                     CustomerRequirementView()
                 case .additionalInfo:
-                    AdditinalInformationView()
+                    AdditinalApplicationInfoView(viewController: self)
             }
         }
     }
@@ -166,16 +153,15 @@ public class RegisterRecruitmentPostVC: BaseViewController {
             
         // 레이아웃 설정
         pageViews
-            .enumerated()
-            .forEach { index, subView in
-                view.addSubview(subView)
-                subView.translatesAutoresizingMaskIntoConstraints = false
+            .forEach { page in
+                view.addSubview(page)
+                page.translatesAutoresizingMaskIntoConstraints = false
                 
                 NSLayoutConstraint.activate([
-                    subView.topAnchor.constraint(equalTo: statusBar.bottomAnchor),
-                    subView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                    subView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                    subView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+                    page.topAnchor.constraint(equalTo: statusBar.bottomAnchor),
+                    page.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                    page.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                    page.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
                 ])
             }
         
@@ -206,7 +192,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     
     private func next(animated: Bool = true) {
         
-        if let nextIndex = RegisterCenterInfoPage(rawValue: currentIndex+1)?.rawValue {
+        if let nextIndex = RegisterRecruitmentPage(rawValue: currentIndex+1)?.rawValue {
             
             // Status바 이동
             statusBar.moveToSignal.onNext(.next)
@@ -225,7 +211,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     }
     
     private func prev(animated: Bool = true) {
-        if let nextIndex = RegisterCenterInfoPage(rawValue: currentIndex-1)?.rawValue {
+        if let nextIndex = RegisterRecruitmentPage(rawValue: currentIndex-1)?.rawValue {
             
             // Status바 이동
             statusBar.moveToSignal.onNext(.prev)
@@ -267,39 +253,13 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     }
 }
 
-// MARK: 공객 요구사항
-class AdditinalInformationView: UIView, RegisterRecruitmentPostViews {
-    
-    // Init
-    
-    
-    // View
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
-    }()
-    
-    public init() {
-        super.init(frame: .zero)
-    }
-    
-    public required init?(coder: NSCoder) { fatalError() }
-    
-    private func setAppearance() {
-        
-    }
-    
-    private func setLayout() {
-        
-    }
-    
-    private func setObservable() {
-        
-    }
-    
+protocol RegisterRecruitmentPostViews: UIView {
+    var ctaButton: CTAButtonType1 { get }
+    func bind(viewModel vm: RegisterRecruitmentPostViewModelable)
+}
+
+extension AddressView: RegisterRecruitmentPostViews {
     func bind(viewModel vm: any RegisterRecruitmentPostViewModelable) {
-        
+        bind(viewModel: vm as AddressInputViewModelable)
     }
 }

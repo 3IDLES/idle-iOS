@@ -8,6 +8,7 @@
 import UIKit
 import RxCocoa
 import RxSwift
+import PresentationCore
 
 public class TextFieldWithDegree: UIView {
         
@@ -35,6 +36,16 @@ public class TextFieldWithDegree: UIView {
         field.textString = initialText
         return field
     }()
+    
+    public override var isFirstResponder: Bool {
+        textField.isFirstResponder
+    }
+    
+    // 키보드 어보이던스가 적용될 뷰입니다.
+    public let disposeBag = DisposeBag()
+    public weak var movingView: UIView?
+    public var prevRect: CGRect = .zero
+    public var isPushed: Bool = false
     
     public init(degreeText: String, initialText: String) {
         self.degreeText = degreeText
@@ -85,3 +96,5 @@ public class TextFieldWithDegree: UIView {
         
     }
 }
+
+extension TextFieldWithDegree: IdleKeyboardAvoidable { }

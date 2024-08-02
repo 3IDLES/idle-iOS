@@ -93,7 +93,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     // View
     private let processTitle: IdleLabel = {
         let label = IdleLabel(typography: .Heading2)
-        label.textString = "근무 시간 및 급여를 입력해주세요."
+        label.textString = "고객 정보를 입력해주세요."
         label.textAlignment = .left
         return label
     }()

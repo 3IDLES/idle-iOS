@@ -227,6 +227,7 @@ extension CustomerRequirementView: UICollectionViewDataSource {
             
             // Apearance
             cell.innerView.placeholderText = cellData.cellText
+            cell.innerView.setKeyboardAvoidance(movingView: self)
             
             return cell
         } else {

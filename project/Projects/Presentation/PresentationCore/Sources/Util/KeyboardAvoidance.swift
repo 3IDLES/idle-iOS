@@ -12,6 +12,8 @@ public protocol IdleKeyboardAvoidable where Self: UIView {
     
     var movingView: UIView? { get set }
     var disposeBag: DisposeBag { get }
+    var prevRect: CGRect { get set }
+    var isPushed: Bool { get set }
 }
 
 public extension IdleKeyboardAvoidable {
@@ -67,11 +69,17 @@ public extension IdleKeyboardAvoidable {
             
             UIView.animate(withDuration: duration) {
                 movingView.transform = CGAffineTransform(translationX: 0, y: -diff)
+            } completion: { [weak self] _ in
+                self?.isPushed = true
             }
         }
     }
     
     private func onKeyboardActionFinished(_ notification: Notification) {
+        
+        if !isPushed { return }
+        
+        isPushed = false
         
         let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as! TimeInterval
         

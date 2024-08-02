@@ -55,7 +55,7 @@ class WorkTimeAndPayViewModel: WorkTimeAndPayViewModelable {
         let payment = Observable
             .combineLatest(
                 paymentType,
-                paymentAmount
+                paymentAmount.filter { !$0.isEmpty }
             ).map { [state] (type, amount) in
                 state.paymentType = type
                 state.paymentAmount = amount

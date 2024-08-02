@@ -79,6 +79,8 @@ public class IdleTextField: UITextField {
     
     // 키보드 어보이던스가 적용될 뷰입니다.
     public weak var movingView: UIView?
+    public var prevRect: CGRect = .zero
+    public var isPushed: Bool = false
     
     /// 타이포그래피를 변경하면, 앞전에 설정한 속성값을 덥
     public var typography: Typography {
