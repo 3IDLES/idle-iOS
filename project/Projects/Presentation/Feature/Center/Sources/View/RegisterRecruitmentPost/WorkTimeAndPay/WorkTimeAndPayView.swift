@@ -234,6 +234,7 @@ extension WorkTimeAndPayView: UICollectionViewDataSource {
             
             // cell appearance
             cell.innerView.degreeLabel.textString = "원"
+            cell.innerView.setKeyboardAvoidance(movingView: self)
             
             // binding
             bindPaymentAmount(cell: cell)

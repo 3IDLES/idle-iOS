@@ -34,13 +34,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let navigationController = UINavigationController()
         navigationController.setNavigationBarHidden(true, animated: false)
         
-        let coordinator = RegisterCenterInfoCoordinator(
-            profileUseCase: useCase,
+        let coordinator = RegisterRecruitmentCoordinator(
             navigationController: navigationController
         )
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = ViewController()
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
+        
+        coordinator.start()
     }
 }

@@ -74,7 +74,10 @@ public class IdleOneLineInputField: UIView {
     
     public let disposeBag = DisposeBag()
     
+    // For keyboard avoidance
     public var movingView: UIView?
+    public var prevRect: CGRect = .zero
+    public var isPushed: Bool = false
     
     public init(
         state: State = .editing,

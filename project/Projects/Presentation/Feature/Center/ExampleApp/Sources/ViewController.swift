@@ -12,7 +12,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         
-        let initialLabel = AdditinalApplicationInfoView(viewController: self)
+        let initialLabel = WorkTimeAndPayView()
         
         view.backgroundColor = .white
         

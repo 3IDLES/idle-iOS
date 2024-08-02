@@ -40,6 +40,8 @@ public class MultiLineTextField: UITextView {
     
     // 키보드 어보이던스가 적용될 뷰입니다.
     public weak var movingView: UIView?
+    public var prevRect: CGRect = .zero
+    public var isPushed: Bool = false
     
     public init(typography: Typography, placeholderText: String = "") {
         self.currentPlaceholderText = placeholderText
