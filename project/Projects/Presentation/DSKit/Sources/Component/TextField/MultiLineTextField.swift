@@ -13,15 +13,20 @@ import PresentationCore
 public class MultiLineTextField: UITextView {
     
     private var currentText: String = ""
-    private var currentPlaceholderText: String = ""
+    
+    lazy var placeHolderLabel: IdleLabel = {
+        let label = IdleLabel(typography: typography)
+        label.attrTextColor = DSKitAsset.Colors.gray200.color
+        label.textAlignment = .left
+        return label
+    }()
     
     public var placeholderText: String {
         get {
-            currentPlaceholderText
+            placeHolderLabel.textString
         }
         set {
-            currentPlaceholderText = newValue
-            setPlaceholderText(textView: self)
+            placeHolderLabel.textString = newValue
         }
     }
     public let typography: Typography
@@ -44,13 +49,15 @@ public class MultiLineTextField: UITextView {
     public var isPushed: Bool = false
     
     public init(typography: Typography, placeholderText: String = "") {
-        self.currentPlaceholderText = placeholderText
+        
         self.typography = typography
         
         super.init(frame: .zero, textContainer: nil)
         
+        self.placeholderText = placeholderText
+        
         setAppearance()
-        setPlaceholderText(textView: self)
+        setPlacholderLabel()
         addToolbar()
     }
     
@@ -76,6 +83,18 @@ public class MultiLineTextField: UITextView {
         self.isScrollEnabled = true
     }
     
+    private func setPlacholderLabel() {
+        
+        self.addSubview(placeHolderLabel)
+        placeHolderLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            placeHolderLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: self.textContainerInset.top),
+            placeHolderLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: self.textContainerInset.left),
+            placeHolderLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: self.textContainerInset.right),
+        ])
+    }
+    
     public func addToolbar() {
         // TextField toolbar
         let toolbar = UIToolbar()
@@ -96,13 +115,13 @@ public class MultiLineTextField: UITextView {
         self.inputAccessoryView = toolbar
         
         closeButton.rx.tap.subscribe { [weak self] _ in
-            
             self?.resignFirstResponder()
         }
         .disposed(by: disposeBag)
     }
     
     private func updateText() {
+        
         self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: typography.attributes))
     }
 }
@@ -111,24 +130,15 @@ extension MultiLineTextField: UITextViewDelegate {
     
     // UITextViewDelegate 메서드: 텍스트 뷰가 편집을 시작할 때 호출
     public func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.text == placeholderText {
-            textView.attributedText = .none
-            textView.textColor = DSKitAsset.Colors.gray900.color
-        }
+        placeHolderLabel.isHidden = true
     }
     
     // UITextViewDelegate 메서드: 텍스트 뷰가 편집을 끝낼 때 호출
     public func textViewDidEndEditing(_ textView: UITextView) {
-        setPlaceholderText(textView: textView)
-    }
-    
-    private func setPlaceholderText(textView: UITextView) {
         if textView.attributedText.string.isEmpty {
-            textView.attributedText = self.typography.attributes.toString(placeholderText)
-            textView.textColor = DSKitAsset.Colors.gray200.color
+            placeHolderLabel.isHidden = false
         }
     }
-    
 }
 
 extension MultiLineTextField: IdleKeyboardAvoidable { }

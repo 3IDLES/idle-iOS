@@ -8,11 +8,12 @@
 import Foundation
 
 /// 공고등록화면중 고객요구사항 입력창에 사용됩니다.
-public class CustomerRequirementState {
+public class CustomerRequirementStateObject {
     
-    public var mealSupportNeeded: Bool? = nil
-    public var toiletSupportNeeded: Bool? = nil
-    public var movingSupportNeeded: Bool? = nil
+    public var mealSupportNeeded: Bool?
+    public var toiletSupportNeeded: Bool?
+    public var movingSupportNeeded: Bool?
+    public var additionalRequirement: String = ""
     public var dailySupportTypeNeeds: [DailySupportType: Bool] = {
         var dict: [DailySupportType: Bool] = [:]
         DailySupportType.allCases.forEach { type in
@@ -20,7 +21,6 @@ public class CustomerRequirementState {
         }
         return dict
     }()
-    public var additionalRequirement: String? = nil
     
     public init() { }
 }

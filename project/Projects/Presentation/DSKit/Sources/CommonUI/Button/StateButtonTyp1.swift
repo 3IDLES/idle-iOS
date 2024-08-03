@@ -46,7 +46,7 @@ public class StateButtonTyp1: UIView {
         self.layer.cornerRadius = 6.0
         self.clipsToBounds = true
         
-        setState(.normal)
+        applySetting(setting: self.state == .accent ? .accentDefault : .normalDefault)
     }
     
     private func setAutoLayout() {
@@ -82,6 +82,8 @@ public class StateButtonTyp1: UIView {
     
     public func setState(_ state: State, withAnimation: Bool = true) {
         
+        if self.state == state { return }
+        
         self.state = state
         
         eventPublisher.accept(state)
@@ -91,12 +93,16 @@ public class StateButtonTyp1: UIView {
         setting = state == .normal ? normalAppearance : accentAppearance
         
         UIView.animate(withDuration: withAnimation ? 0.1 : 0.0) { [unowned self] in
-            self.layer.borderColor = setting.borderColor.cgColor
-            self.backgroundColor = setting.backgroundColor
-            
-            label.typography = setting.typography
-            label.attrTextColor = setting.textColor
+            applySetting(setting: setting)
         }
+    }
+    
+    private func applySetting(setting: StateSetting) {
+        self.layer.borderColor = setting.borderColor.cgColor
+        self.backgroundColor = setting.backgroundColor
+        
+        label.typography = setting.typography
+        label.attrTextColor = setting.textColor
     }
 }
 

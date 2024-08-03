@@ -31,10 +31,7 @@ public class DateComponent {
 public class WorkTimePicker: TextImageButtonType2 {
     
     private let pickerData: [Int: [String]] = [
-        0: [
-            "오전",
-            "오후"
-        ],
+        0: ["오전", "오후"],
         1: (1...12).map { $0 < 10 ? "0\($0)" : "\($0)" },
         2: (0...5).map { $0 == 0 ? "00" : "\($0 * 10)" }
     ]
@@ -161,6 +158,7 @@ extension WorkTimePicker : UIPickerViewDataSource, UIPickerViewDelegate {
     
     //data 선택시 동작할 event
     public func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        
         let currentComponent = pickedDateString.value
         
         switch component {

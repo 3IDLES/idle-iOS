@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  CustomerInformationStateObject.swift
 //  Entity
 //
 //  Created by choijunios on 7/31/24.
@@ -19,7 +19,7 @@ public enum CareGrade: Int, CaseIterable {
     }
 }
 
-public enum CognitionItem: Int, CaseIterable {
+public enum CognitionDegree: Int, CaseIterable {
     case stable
     case earlyStage
     case overEarlyStage
@@ -36,12 +36,13 @@ public enum CognitionItem: Int, CaseIterable {
     }
 }
 
-public class CustomerInformationState {
+public class CustomerInformationStateObject {
+    public var name: String = ""
     public var gender: Gender?
     public var birthYear: String = ""
     public var weight: String = ""
     public var careGrade: CareGrade?
-    public var cognitionState: CognitionItem?
+    public var cognitionState: CognitionDegree?
     public var deceaseDescription: String = ""
     
     public init() { }

@@ -21,12 +21,13 @@ enum RegisterRecruitmentPage: Int, CaseIterable {
     case additionalInfo = 4
 }
 
-public protocol RegisterRecruitmentPostViewModelable: AddressInputViewModelable {
-    // Input
-    var customerRequirementState: PublishRelay<CustomerRequirementState> { get }
-    var workTimeAndPayState: PublishRelay<WorkTimeAndPayState> { get }
-    var customerInformationState: PublishRelay<CustomerInformationState> { get }
-    var addtionalApplicationInfoState: PublishRelay<AdditinalApplicationInfoState> { get }
+public protocol RegisterRecruitmentPostViewModelable: 
+    ApplicationDetailViewModelable,
+    CustomerInformationViewModelable,
+    CustomerRequirementViewModelable,
+    WorkTimeAndPayViewModelable,
+    AddressInputViewModelableVer2
+{
     
     // Output
     var alert: Driver<DefaultAlertContentVO>? { get }
@@ -51,7 +52,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     var currentIndex: Int = 0
     
     // For RC=1
-    private var viewModel: RegisterRecruitmentPostViewModelable?
+    private var viewModel: RegisterRecruitmentPostViewModelable
     
     // View
     let navigationBar: NavigationBarType1 = {
@@ -69,7 +70,10 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     // Observable
     private let disposeBag = DisposeBag()
     
-    public init() {
+    public init(viewModel: RegisterRecruitmentPostViewModelable) {
+        
+        self.viewModel = viewModel
+        
         super.init(nibName: nil, bundle: nil)
         
         // View를 생성
@@ -130,21 +134,31 @@ public class RegisterRecruitmentPostVC: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        viewModel
+            .alert?
+            .drive { [weak self] vo in
+                self?.showAlert(vo: vo)
+            }
+            .disposed(by: disposeBag)
     }
     
     private func createPages() {
         self.pageViews = RegisterRecruitmentPage.allCases.map { page in
             switch page {
                 case .workTimeAndPayment:
-                    WorkTimeAndPayView()
+                    return WorkTimeAndPayView(viewModel: viewModel)
                 case .workPlaceAddress:
-                    AddressView(viewController: self)
+                    let view = AddressView(viewController: self)
+                    view.bind(viewModel: viewModel)
+                    return view
                 case .customerInformation:
-                    CustomerInformationView()
+                    return CustomerInformationView(viewModel: viewModel)
                 case .customerRequirement:
-                    CustomerRequirementView()
+                    let view = CustomerRequirementView()
+                    view.bind(viewModel: viewModel)
+                    return view
                 case .additionalInfo:
-                    AdditinalApplicationInfoView(viewController: self)
+                    return ApplicationDetailView(viewModel: viewModel, viewController: self)
             }
         }
     }
@@ -231,35 +245,15 @@ public class RegisterRecruitmentPostVC: BaseViewController {
             // 돌아가기, Coordinator호출
         }
     }
-    
-    public func bind(viewModel vm: RegisterRecruitmentPostViewModelable) {
-        
-        // RC=1
-        self.viewModel = vm
-        
-        // Output
-        vm
-            .alert?
-            .drive { [weak self] vo in
-                self?.showAlert(vo: vo)
-            }
-            .disposed(by: disposeBag)
-        
-        // pageView에 ViewModel을 바인딩
-        pageViews
-            .forEach { pv in
-                pv.bind(viewModel: vm)
-            }
-    }
 }
 
 protocol RegisterRecruitmentPostViews: UIView {
     var ctaButton: CTAButtonType1 { get }
-    func bind(viewModel vm: RegisterRecruitmentPostViewModelable)
+    func bind(viewModel: RegisterRecruitmentPostViewModelable)
 }
 
-extension AddressView: RegisterRecruitmentPostViews {
-    func bind(viewModel vm: any RegisterRecruitmentPostViewModelable) {
-        bind(viewModel: vm as AddressInputViewModelable)
-    }
+extension RegisterRecruitmentPostViews {
+    func bind(viewModel: RegisterRecruitmentPostViewModelable) { }
 }
+
+extension AddressView: RegisterRecruitmentPostViews { }

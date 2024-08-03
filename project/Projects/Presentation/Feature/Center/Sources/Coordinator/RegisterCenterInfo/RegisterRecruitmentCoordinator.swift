@@ -31,8 +31,7 @@ public class RegisterRecruitmentCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        let vc = RegisterRecruitmentPostVC()
-        vc.bind(viewModel: viewModel)
+        let vc = RegisterRecruitmentPostVC(viewModel: viewModel)
         
         viewControllerRef = vc
         
@@ -46,4 +45,8 @@ public class RegisterRecruitmentCoordinator: ChildCoordinator {
 
 extension RegisterRecruitmentCoordinator {
     
+    func showOverViewScreen() {
+        
+        
+    }
 }
