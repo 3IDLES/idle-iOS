@@ -14,26 +14,22 @@ import Entity
 import DSKit
  
 public protocol WorkTimeAndPayViewModelable {
-    
-    // Input
-    var selectedDay: PublishRelay<(DayItem, Bool)> { get }
+    var selectedDay: PublishRelay<(WorkDay, Bool)> { get }
     var workStartTime: PublishRelay<String> { get }
     var workEndTime: PublishRelay<String> { get }
-    var paymentType: PublishRelay<PaymentItem?> { get }
+    var paymentType: PublishRelay<PaymentType> { get }
     var paymentAmount: PublishRelay<String> { get }
     
-    // Output
-    var selectedPaymentType: Driver<PaymentItem?> { get }
-    
-    var completeState: Driver<WorkTimeAndPayState?> { get }
+    var workTimeAndPayStateObject: Driver<WorkTimeAndPayStateObject> { get }
+    var workTimeAndPayNextable: Driver<Bool> { get }
 }
 
 public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
     
     // Init
+    public var viewModel: WorkTimeAndPayViewModelable
         
     // Not init
-    private let viewModel: WorkTimeAndPayViewModelable = WorkTimeAndPayViewModel()
     
     // Cell Type
     typealias TextCellType = CellWrapper<StateButtonTyp1>
@@ -44,7 +40,7 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
     let sectionData: [SectionData] = [
         SectionData(
             titleText: "근무 요일",
-            subData: DayItem.allCases.map { CellData(cellText: $0.korOneLetterText) },
+            subData: WorkDay.allCases.map { CellData(cellText: $0.korOneLetterText) },
             cellSize: .init(width: 40, height: 40)
         ),
         SectionData(
@@ -57,7 +53,7 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         ),
         SectionData(
             titleText: "급여",
-            subData: PaymentItem.allCases.map { CellData(cellText: $0.korLetterText) },
+            subData: PaymentType.allCases.map { CellData(cellText: $0.korLetterText) },
             cellSize: .init(width: 104, height: 44)
         ),
         SectionData(
@@ -96,9 +92,13 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         return button
     }()
     
+    private let selectedPaymentType: PublishRelay<PaymentType> = .init()
+    
     private let disposeBag = DisposeBag()
     
-    public init() {
+    public init(viewModel: WorkTimeAndPayViewModelable) {
+        
+        self.viewModel = viewModel
         
         super.init(frame: .zero)
         
@@ -143,8 +143,6 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         ])
     }
     
-    private func setObservable() { }
-    
     private func setCollectionView() {
         
         collectionView.dataSource = self
@@ -162,17 +160,13 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         collectionView.contentInset = .init(top: 0, left: 20, bottom: 32, right: 20)
     }
     
-    func bind(viewModel vm: any RegisterRecruitmentPostViewModelable) {
+    private func setObservable() {
         
         viewModel
-            .completeState
-            .asObservable()
-            .map { [ctaButton] state in
-                ctaButton.setEnabled(state != nil)
-                return state
-            }
-            .compactMap { $0 }
-            .bind(to: vm.workTimeAndPayState)
+            .workTimeAndPayNextable
+            .drive(onNext: { [ctaButton] isNextable in
+                ctaButton.setEnabled(isNextable)
+            })
             .disposed(by: disposeBag)
     }
 }
@@ -201,6 +195,16 @@ extension WorkTimeAndPayView: UICollectionViewDataSource {
             // binding
             bindDay(cell: cell, itemIndex: indexPath.item)
             
+            let item = WorkDay(rawValue: indexPath.item)!
+            
+            // 초기값 설정
+            viewModel
+                .workTimeAndPayStateObject
+                .drive(onNext: { [weak cell] state in
+                    cell?.innerView.setState(state.selectedDays[item] == true ? .accent : .normal)
+                })
+                .disposed(by: disposeBag)
+            
             return cell
         case 1:
             // 근무시간 선택
@@ -212,6 +216,18 @@ extension WorkTimeAndPayView: UICollectionViewDataSource {
             
             // binding
             bindWorkTime(cell: cell, itemIndex: indexPath.item)
+
+            // 초기값 설정
+            viewModel
+                .workTimeAndPayStateObject
+                .drive(onNext: { [weak cell] state in
+                    let timeString = indexPath.item == 0 ? state.workStartTime : state.workEndTime
+                    
+                    if !timeString.isEmpty {
+                        cell?.innerView.textLabel.textString = timeString
+                    }
+                })
+                .disposed(by: disposeBag)
             
             return cell
         case 2:
@@ -226,6 +242,16 @@ extension WorkTimeAndPayView: UICollectionViewDataSource {
             // binding
             bindPaymentType(cell: cell, itemIndex: indexPath.item)
             
+            let item = PaymentType(rawValue: indexPath.item)!
+            
+            // 초기값 설정
+            viewModel
+                .workTimeAndPayStateObject
+                .drive(onNext: { [weak cell] state in
+                    cell?.innerView.setState(state.paymentType == item ? .accent : .normal)
+                })
+                .disposed(by: disposeBag)
+            
             return cell
             
         case 3:
@@ -238,6 +264,15 @@ extension WorkTimeAndPayView: UICollectionViewDataSource {
             
             // binding
             bindPaymentAmount(cell: cell)
+            
+            // 초기값 설정
+            viewModel
+                .workTimeAndPayStateObject
+                .drive(onNext: { [weak cell] state in
+                    cell?.innerView.textField.textString = state.paymentAmount
+                })
+                .disposed(by: disposeBag)
+            
             
             return cell
         default:
@@ -316,7 +351,7 @@ extension WorkTimeAndPayView: UICollectionViewDelegateFlowLayout {
 extension WorkTimeAndPayView {
     
     func bindDay(cell: TextCellType, itemIndex: Int) {
-        let day = DayItem(rawValue: itemIndex)!
+        let day = WorkDay(rawValue: itemIndex)!
         
         // Input
         cell.innerView
@@ -347,26 +382,35 @@ extension WorkTimeAndPayView {
         }
     }
     
-    func bindPaymentType(cell: TextCellType, itemIndex: Int) {
+    func bindPaymentType(
+        cell: TextCellType,
+        itemIndex: Int) {
         
-        let payType = PaymentItem(rawValue: itemIndex)!
+        let payType = PaymentType(rawValue: itemIndex)!
         
         // Input
-        cell.innerView
+        let selectedItem = cell.innerView
             .eventPublisher
             .map { $0 == .accent }
             .filter { $0 }
             .map { _ in payType }
+            .share()
+        
+        selectedItem
             .bind(to: viewModel.paymentType)
+            .disposed(by: disposeBag)
+            
+        selectedItem
+            .bind(to: selectedPaymentType)
             .disposed(by: disposeBag)
         
         // Output
-        viewModel
-            .selectedPaymentType
+        selectedPaymentType
             .map { currentItem in currentItem == payType }
-            .drive { isMatched in
+            .observe(on: MainScheduler.instance)
+            .subscribe { isMatched in
                 if !isMatched {
-                    // 현재 버튼과 다른 번튼이 눌린 경우
+                    // 현재 버튼과 다른 버튼이 눌린 경우
                     cell.innerView.setState(.normal)
                 }
             }

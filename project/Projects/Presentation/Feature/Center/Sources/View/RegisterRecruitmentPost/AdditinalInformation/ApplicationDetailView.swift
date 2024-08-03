@@ -1,5 +1,5 @@
 //
-//  AdditinalApplicationInfoView.swift
+//  ApplicationDetailView.swift
 //  CenterFeature
 //
 //  Created by choijunios on 7/31/24.
@@ -14,37 +14,24 @@ import RxSwift
 import Entity
 import DSKit
 
-public class AdditinalApplicationInfoState {
-    public var preferenceAboutExp: PreferenceAboutExp?
-    public var applicationMethod: ApplicationMethod?
-    public var recruitmentDeadline: RecruitmentDeadline?
-    public var deadlineDate: Date?
+public protocol ApplicationDetailViewModelable {
     
-    public init() { }
-}
-
-public protocol AdditinalApplicationInfoViewModelable {
     // Input
-    var preferenceAboutExp: PublishRelay<PreferenceAboutExp?> { get }
-    var applicationMethod: PublishRelay<ApplicationMethod?> { get }
-    var recruitmentDeadline: PublishRelay<RecruitmentDeadline?> { get }
-    var deadlineDate: BehaviorRelay<Date?> { get }
+    var experiencePreferenceType: PublishRelay<ExperiencePreferenceType> { get }
+    var applyType: PublishRelay<ApplyType> { get }
+    var applyDeadlineType: PublishRelay<ApplyDeadlineType> { get }
+    var deadlineDate: PublishRelay<Date> { get }
     
     // Output
-    var selectedPreferenceAboutExp: Driver<PreferenceAboutExp?> { get }
-    var selectedApplicationMethod: Driver<ApplicationMethod?> { get }
-    var selectedRecruitmentDeadline: Driver<RecruitmentDeadline?> { get }
-    var selectedDateString: Driver<String?> { get }
-    
-    var completeState: Driver<AdditinalApplicationInfoState?> { get }
+    var deadlineString: Driver<String> { get }
+    var applicationDetailViewNextable: Driver<Bool> { get }
+    var applicationDetailStateObject: Driver<ApplicationDetailStateObject> { get }
 }
 
-public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews {
+public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
     
     // Init
-        
-    // Not init
-    private let viewModel: AdditinalApplicationInfoViewModelable = AdditinalInfoVM()
+    public var viewModel: ApplicationDetailViewModelable
     public weak var viewController: UIViewController?
     
     // Cell type
@@ -55,7 +42,7 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
     let sectionData: [SectionData] = [
         SectionData(
             titleText: "경력 우대 여부",
-            subData: PreferenceAboutExp.allCases.map { exp in
+            subData: ExperiencePreferenceType.allCases.map { exp in
                 CellData(cellText: exp.korTextForBtn)
             },
             cellSize: .init(width: 104, height: 44)
@@ -63,14 +50,14 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
         SectionData(
             titleText: "지원 방법",
             subTitle: "(다중 선택 가능)",
-            subData: ApplicationMethod.allCases.map { exp in
+            subData: ApplyType.allCases.map { exp in
                 CellData(cellText: exp.korTextForBtn)
             },
             cellSize: .init(width: 104, height: 44)
         ),
         SectionData(
             titleText: "접수 마감일",
-            subData: RecruitmentDeadline.allCases.map { exp in
+            subData: ApplyDeadlineType.allCases.map { exp in
                 CellData(cellText: exp.korTextForBtn)
             },
             cellSize: .init(width: 104, height: 44)
@@ -108,17 +95,26 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
         return button
     }()
     
+    // Rx
+    
+    // Radio Btn을 위한 처리
+    private let selectedExperiencePreferenceType: PublishRelay<ExperiencePreferenceType> = .init()
+    private let selectedApplyType: PublishRelay<ApplyType> = .init()
+    private let selectedApplyDeadlineType: PublishRelay<ApplyDeadlineType> = .init()
+    
     private let disposeBag = DisposeBag()
     
-    public init(viewController: UIViewController) {
-        
+    public init(
+        viewModel: ApplicationDetailViewModelable,
+        viewController: UIViewController
+    ) {
+        self.viewModel = viewModel
         self.viewController = viewController
         
         super.init(frame: .zero)
         
         setAppearance()
         setLayout()
-        setObservable()
         
         setCollectionView()
     }
@@ -158,8 +154,6 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
         ])
     }
     
-    private func setObservable() { }
-    
     private func setCollectionView() {
         
         collectionView.dataSource = self
@@ -175,23 +169,18 @@ public class AdditinalApplicationInfoView: UIView, RegisterRecruitmentPostViews 
         collectionView.contentInset = .init(top: 0, left: 20, bottom: 32, right: 20)
     }
     
-    func bind(viewModel vm: any RegisterRecruitmentPostViewModelable) {
+    private func setObservable() {
         
         viewModel
-            .completeState
-            .asObservable()
-            .map { [ctaButton] state in
-                // state가 유효한 경우 cta버튼을 활성화
-                ctaButton.setEnabled(state != nil)
-                return state
-            }
-            .compactMap { $0 }
-            .bind(to: vm.addtionalApplicationInfoState)
+            .applicationDetailViewNextable
+            .drive(onNext: { [ctaButton] isNextable in
+                ctaButton.setEnabled(isNextable)
+            })
             .disposed(by: disposeBag)
     }
 }
 
-extension AdditinalApplicationInfoView: UICollectionViewDataSource {
+extension ApplicationDetailView: UICollectionViewDataSource {
     
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         sectionData.count
@@ -213,39 +202,72 @@ extension AdditinalApplicationInfoView: UICollectionViewDataSource {
             // cell appearance
             cell.innerView.label.textString = cellData.cellText
             
-            let item = PreferenceAboutExp(rawValue: itemIndex)!
+            let item = ExperiencePreferenceType(rawValue: itemIndex)!
+            
+            // 바인딩
             bindRadioButtons(
                 cell: cell,
                 item: item,
-                input: viewModel.preferenceAboutExp,
-                output: viewModel.selectedPreferenceAboutExp
-                )
+                viewInput: selectedExperiencePreferenceType,
+                vmInput: viewModel.experiencePreferenceType
+            )
+            
+            // 초기값 설정
+            viewModel
+                .applicationDetailStateObject
+                .drive(onNext: { [weak cell] state in
+                    cell?.innerView.setState(state.experiencePreferenceType == item ? .accent : .normal)
+                })
+                .disposed(by: disposeBag)
+            
             return cell
         case 1:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
             // cell appearance
             cell.innerView.label.textString = cellData.cellText
             
-            let item = ApplicationMethod(rawValue: itemIndex)!
+            let item = ApplyType(rawValue: itemIndex)!
+            
+            // 바인딩
             bindRadioButtons(
                 cell: cell,
                 item: item,
-                input: viewModel.applicationMethod,
-                output: viewModel.selectedApplicationMethod
-                )
+                viewInput: selectedApplyType,
+                vmInput: viewModel.applyType
+            )
+            
+            // 초기값 설정
+            viewModel
+                .applicationDetailStateObject
+                .drive(onNext: { [weak cell] state in
+                    cell?.innerView.setState(state.applyType == item ? .accent : .normal)
+                })
+                .disposed(by: disposeBag)
+            
             return cell
         case 2:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
             // cell appearance
             cell.innerView.label.textString = cellData.cellText
             
-            let item = RecruitmentDeadline(rawValue: itemIndex)!
+            let item = ApplyDeadlineType(rawValue: itemIndex)!
+            
+            // 바인딩
             bindRadioButtons(
                 cell: cell,
                 item: item,
-                input: viewModel.recruitmentDeadline,
-                output: viewModel.selectedRecruitmentDeadline
-                )
+                viewInput: selectedApplyDeadlineType,
+                vmInput: viewModel.applyDeadlineType
+            )
+            
+            // 초기값 설정
+            viewModel
+                .applicationDetailStateObject
+                .drive(onNext: { [weak cell] state in
+                    cell?.innerView.setState(state.applyDeadlineType == item ? .accent : .normal)
+                })
+                .disposed(by: disposeBag)
+            
             return cell
         case 3:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DateCellType.identifier, for: indexPath) as! DateCellType
@@ -274,7 +296,7 @@ extension AdditinalApplicationInfoView: UICollectionViewDataSource {
     }
 }
 
-extension AdditinalApplicationInfoView: UICollectionViewDelegateFlowLayout {
+extension ApplicationDetailView: UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         // 헤더의 크기 설정
@@ -322,31 +344,38 @@ extension AdditinalApplicationInfoView: UICollectionViewDelegateFlowLayout {
 }
 
 // MARK: Bind Cells
-extension AdditinalApplicationInfoView {
+extension ApplicationDetailView {
     
     private func bindRadioButtons<T: RawRepresentable>(
         cell: TextCellType,
         item: T,
-        input: PublishRelay<T?>,
-        output: Driver<T?>
+        viewInput: PublishRelay<T>,
+        vmInput: PublishRelay<T>
     ) where T.RawValue == Int {
         
         // Input
-        cell.innerView
+        let selectedItem = cell.innerView
             .eventPublisher
             .map { $0 == .accent }
             .filter { $0 }
             .map { _ in item }
-            .bind(to: input)
+            .share()
+        
+        selectedItem
+            .bind(to: vmInput)
+            .disposed(by: disposeBag)
+        
+        selectedItem
+            .bind(to: viewInput)
             .disposed(by: disposeBag)
         
         // Output
-        output
-            .compactMap { $0 }
+        viewInput
+            .observe(on: MainScheduler.instance)
             .map { currentItem in currentItem == item }
-            .drive { isMatched in
+            .subscribe { isMatched in
                 if !isMatched {
-                    // 현재 버튼과 다른 번튼이 눌린 경우
+                    // 현재 버튼과 다른 버튼이 눌린 경우
                     cell.innerView.setState(.normal)
                 }
             }
@@ -357,9 +386,7 @@ extension AdditinalApplicationInfoView {
                 
         // Input
         cell
-            .innerView
-            .rx
-            .tap
+            .innerView.rx.tap
             .subscribe { [weak self] _ in
                 guard let self else { return }
                 
@@ -371,18 +398,17 @@ extension AdditinalApplicationInfoView {
             .disposed(by: disposeBag)
         
         // Output
-        viewModel
-            .selectedRecruitmentDeadline
-            .compactMap { $0 }
+        selectedApplyDeadlineType
             .map { type in
                 let isSpecific = type == .specificDate
                 return !isSpecific
             }
+            .asDriver(onErrorJustReturn: true)
             .drive(cell.rx.isHidden)
             .disposed(by: disposeBag)
         
         viewModel
-            .selectedDateString
+            .deadlineString
             .compactMap { $0 }
             .map { [cell] dateStr in
                 cell.innerView.textLabel.attrTextColor = DSKitAsset.Colors.gray900.color
@@ -394,7 +420,7 @@ extension AdditinalApplicationInfoView {
 }
 
 
-extension AdditinalApplicationInfoView: OneDayPickerDelegate {
+extension ApplicationDetailView: OneDayPickerDelegate {
     public func oneDayPicker(selectedDate: Date) {
         // 위임자 패턴으로 데이터를 수신
         viewModel.deadlineDate.accept(selectedDate)

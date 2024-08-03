@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum PreferenceAboutExp: Int, CaseIterable {
+public enum ExperiencePreferenceType: Int, CaseIterable {
     case beginnerPossible
     case experiencedFirst
     
@@ -21,7 +21,7 @@ public enum PreferenceAboutExp: Int, CaseIterable {
     }
 }
 
-public enum ApplicationMethod: Int, CaseIterable {
+public enum ApplyType: Int, CaseIterable {
     case phoneCall
     case message
     case app
@@ -38,7 +38,7 @@ public enum ApplicationMethod: Int, CaseIterable {
     }
 }
 
-public enum RecruitmentDeadline: Int, CaseIterable {
+public enum ApplyDeadlineType: Int, CaseIterable {
     case untilApplicationFinished
     case specificDate
     

@@ -1,5 +1,5 @@
 //
-//  WorkTimeAndPayState.swift
+//  WorkTimeAndPayStateObject.swift
 //  Entity
 //
 //  Created by choijunios on 7/31/24.
@@ -8,7 +8,7 @@
 import Foundation
 
 /// 요일에 대한 정보
-public enum DayItem: Int, CaseIterable {
+public enum WorkDay: Int, CaseIterable {
     
     case mon, tue, wed, thu, fri, sat, sun
     
@@ -32,7 +32,7 @@ public enum DayItem: Int, CaseIterable {
     }
 }
 
-public enum PaymentItem: Int, CaseIterable {
+public enum PaymentType: Int, CaseIterable {
     
     case hourly, weekly, monthly
     
@@ -48,16 +48,16 @@ public enum PaymentItem: Int, CaseIterable {
     }
 }
 
-public class WorkTimeAndPayState {
+public class WorkTimeAndPayStateObject {
     
-    public var selectedDays: [DayItem:Bool] = {
-        var dict: [DayItem:Bool] = [:]
-        DayItem.allCases.forEach { dict[$0] = false }
+    public var selectedDays: [WorkDay: Bool] = {
+        var dict: [WorkDay:Bool] = [:]
+        WorkDay.allCases.forEach { dict[$0] = false }
         return dict
     }()
     public var workStartTime: String = ""
     public var workEndTime: String = ""
-    public var paymentType: PaymentItem?
+    public var paymentType: PaymentType?
     public var paymentAmount: String = ""
     
     public init() { }

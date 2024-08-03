@@ -13,6 +13,23 @@ import RxSwift
 import Entity
 import DSKit
 
+public class AddressInputStateObject {
+    
+    public var addressInfo: AddressInformation?
+    public var detailAddress: String = ""
+    
+    public init() { }
+}
+
+public protocol AddressInputViewModelableVer2 {
+    
+    var addressInformation: PublishRelay<AddressInformation> { get }
+    var detailAddress: PublishRelay<String> { get }
+    
+    var addressInputStateObject: Driver<AddressInputStateObject> { get }
+    var addressInputNextable: Driver<Bool> { get }
+}
+
 public protocol AddressInputViewModelable {
     
     // Input
@@ -136,6 +153,16 @@ class AddressView: UIView, DaumAddressSearchDelegate {
                 self?.showDaumSearchView()
             }
             .disposed(by: disposeBag)
+        
+        addressPublisher
+            .subscribe(onNext: { [addressSearchButton] info in
+                
+                if !info.roadAddress.isEmpty {
+                    
+                    addressSearchButton.label.textString = info.roadAddress
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     private func showDaumSearchView() {
@@ -167,13 +194,49 @@ class AddressView: UIView, DaumAddressSearchDelegate {
             .disposed(by: disposeBag)
     }
     
+    public func bind(viewModel vm: RegisterRecruitmentPostViewModelable) {
+        
+        // Input
+        addressPublisher
+            .bind(to: vm.addressInformation)
+            .disposed(by: disposeBag)
+        
+        detailAddressField
+            .uITextField.rx.text
+            .compactMap { $0 }
+            .bind(to: vm.detailAddress)
+            .disposed(by: disposeBag)
+        
+        // Output
+        vm
+            .addressInputNextable
+            .drive(onNext: { [ctaButton] isNextable in
+                ctaButton.setEnabled(isNextable)
+            })
+            .disposed(by: disposeBag)
+        
+        // 초기값 설정
+        vm
+            .addressInputStateObject
+            .drive(onNext: { [addressSearchButton, detailAddressField] state in
+                
+                if let info = state.addressInfo {
+                    addressSearchButton.label.textString = info.roadAddress
+                }
+                 
+                if !state.detailAddress.isEmpty {
+                    detailAddressField.uITextField.text = state.detailAddress
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
     public func addressSearch(addressData: [AddressDataKey : String]) {
         
 //            let address = addressData[.address] ?? "알 수 없는 주소"
         let jibunAddress = addressData[.jibunAddress] ?? "알 수 없는 지번 주소"
         let roadAddress = addressData[.roadAddress] ?? "알 수 없는 도로명 주소"
         
-        addressSearchButton.label.textString = roadAddress
         addressPublisher.accept(
             AddressInformation(
                 roadAddress: roadAddress,
