@@ -42,8 +42,9 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     }()
     
     // 이름 입력
-    lazy var nameField: IdleOneLineInputField = {
-        let field = IdleOneLineInputField(placeHolderText: "고객의 이름을 입력해 주세요.")
+    lazy var nameField: MultiLineTextField = {
+        let field = MultiLineTextField(typography: .Body3, placeholderText: "고객의 이름을 입력해 주세요.")
+        field.isScrollEnabled = false
         field.setKeyboardAvoidance(movingView: self)
         return field
     }()
@@ -61,10 +62,10 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     }()
     
     // 출생연도
-    lazy var birthYearField: IdleOneLineInputField = {
-        let field = IdleOneLineInputField(placeHolderText: "고객의 출생연도를 입력해주세요. (예: 1965)")
+    lazy var birthYearField: MultiLineTextField = {
+        let field = MultiLineTextField(typography: .Body3, placeholderText: "고객의 출생연도를 입력해주세요. (예: 1965)")
+        field.isScrollEnabled = false
         field.setKeyboardAvoidance(movingView: self)
-        field.textField.keyboardType = .numberPad
         return field
     }()
     
@@ -100,8 +101,9 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     }()
     
     // 질병
-    lazy var deceaseField: IdleOneLineInputField = {
-        let field = IdleOneLineInputField(placeHolderText: "고객이 현재 앓고 있는 질병 또는 병력을 입력해주세요.")
+    lazy var deceaseField: MultiLineTextField = {
+        let field = MultiLineTextField(typography: .Body3, placeholderText: "고객이 현재 앓고 있는 질병 또는 병력을 입력해주세요.")
+        field.isScrollEnabled = false
         field.setKeyboardAvoidance(movingView: self)
         return field
     }()
@@ -112,11 +114,6 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
         button.setEnabled(false)
         return button
     }()
-    
-    // Radio Btn을 위한 처리
-    private let selectedGender: PublishRelay<Gender> = .init()
-    private let selectedCareGrade: PublishRelay<CareGrade> = .init()
-    private let selectedCognitionState: PublishRelay<CognitionDegree> = .init()
     
     private let disposeBag = DisposeBag()
     
@@ -200,7 +197,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             
             VStack(
                 [
-                    IdleContentTitleLabel(titleText: "출생연도"),
+                    IdleContentTitleLabel(titleText: "요양 등급"),
                     HStack([
                         careGradeButtons as [UIView],
                         [UIView()]
@@ -225,7 +222,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             VStack(
                 [
                     IdleContentTitleLabel(titleText: "질병", subTitleText: "(선택)"),
-                    weightField
+                    deceaseField
                 ],
                 spacing: 6,
                 alignment: .fill
@@ -291,7 +288,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
         // Input
-        nameField.textField.rx.text
+        nameField.rx.text
             .compactMap { $0 }
             .bind(to: viewModel.name)
             .disposed(by: disposeBag)
@@ -315,7 +312,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             .bind(to: viewModel.gender)
             .disposed(by: disposeBag)
         
-        birthYearField.textField.rx.text
+        birthYearField.rx.text
             .compactMap { $0 }
             .bind(to: viewModel.birthYear)
             .disposed(by: disposeBag)
@@ -380,7 +377,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             .disposed(by: disposeBag)
         
         
-        deceaseField.textField.rx.text
+        deceaseField.rx.text
             .compactMap { $0 }
             .bind(to: viewModel.deceaseDescription)
             .disposed(by: disposeBag)
@@ -394,7 +391,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
                 
                 // 이름
                 if !stateFromVM.name.isEmpty {
-                    nameField.textField.textString = stateFromVM.name
+                    nameField.textString = stateFromVM.name
                 }
                 
                 // 성별
@@ -408,7 +405,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
                 
                 // 출생년도
                 if !stateFromVM.birthYear.isEmpty {
-                    birthYearField.textField.textString = stateFromVM.birthYear
+                    birthYearField.textString = stateFromVM.birthYear
                 }
                 
                 // 몸무게
@@ -446,7 +443,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
                 
                 // 질병
                 if !stateFromVM.deceaseDescription.isEmpty {
-                    deceaseField.textField.textString = stateFromVM.deceaseDescription
+                    deceaseField.textString = stateFromVM.deceaseDescription
                 }
             })
             .disposed(by: disposeBag)

@@ -172,7 +172,7 @@ extension WorkTimePicker : UIPickerViewDataSource, UIPickerViewDelegate {
             fatalError()
         }
         
-        print(currentComponent.toString)
+        printIfDebug(currentComponent.toString)
         
         pickedDateString.accept(currentComponent)
     }

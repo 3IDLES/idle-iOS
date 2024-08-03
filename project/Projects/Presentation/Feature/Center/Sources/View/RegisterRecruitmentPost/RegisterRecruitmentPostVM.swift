@@ -66,7 +66,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var experiencePreferenceType: PublishRelay<ExperiencePreferenceType> = .init()
     public var applyType: PublishRelay<ApplyType> = .init()
     public var applyDeadlineType: PublishRelay<ApplyDeadlineType> = .init()
-    public var deadlineDate: PublishRelay<Date> = .init()
+    public var deadlineDate: BehaviorRelay<Date?> = .init(value: nil)
     
     public var deadlineString: Driver<String>
     public var applicationDetailStateObject: Driver<ApplicationDetailStateObject>
@@ -301,24 +301,21 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 applicationDetail.value.applyDeadlineType = newValue
             }
         
-        deadlineDate
-            .subscribe { [applicationDetail] newValue in
+        let deadlineDate_changed = deadlineDate
+            .map { [applicationDetail] newValue in
                 applicationDetail.value.deadlineDate = newValue
             }
-            .disposed(by: disposeBag)
         
         deadlineString = deadlineDate
-            .map { date in
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy년 MM월 dd일"
-                return dateFormatter.string(from: date)
-            }
+            .compactMap { $0 }
+            .map { $0.convertDateToString() }
             .asDriver(onErrorJustReturn: "")
         
         applicationDetailViewNextable = Observable.combineLatest(
             experiencePreferenceType_changed,
             applyType_changed,
-            applyDeadlineType_changed
+            applyDeadlineType_changed,
+            deadlineDate_changed
         )
         .map { [applicationDetail] _ in
             
@@ -326,7 +323,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             
             if state.applyDeadlineType != nil,
                state.applyType != nil,
-               state.deadlineDate != nil,
                state.experiencePreferenceType != nil {
                 
                 if state.applyDeadlineType == .specificDate {
@@ -338,5 +334,15 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             return false
         }
         .asDriver(onErrorJustReturn: false)
+    }
+    
+    
+}
+
+extension Date {
+    func convertDateToString() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy년 MM월 dd일"
+        return dateFormatter.string(from: self)
     }
 }

@@ -31,8 +31,8 @@ public class RegisterRecruitmentCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        let vc = RegisterRecruitmentPostVC(viewModel: viewModel)
-        
+        let vc = RegisterRecruitmentPostVC()
+        vc.bind(viewModel: viewModel)
         viewControllerRef = vc
         
         navigationController.pushViewController(vc, animated: true)

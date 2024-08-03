@@ -127,10 +127,6 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         return button
     }()
     
-    private let isMealSupportNeeded: PublishRelay<Bool> = .init()
-    private let isToiletSupportNeeded: PublishRelay<Bool> = .init()
-    private let isMovingSupportNeeded: PublishRelay<Bool> = .init()
-    
     private let disposeBag = DisposeBag()
     
     public init() {
@@ -406,6 +402,6 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
                 ctaButton.setEnabled(nextable)
             })
             .disposed(by: disposeBag)
-        
+            
     }
 }

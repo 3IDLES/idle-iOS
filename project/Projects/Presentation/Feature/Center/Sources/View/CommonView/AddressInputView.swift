@@ -194,21 +194,21 @@ class AddressView: UIView, DaumAddressSearchDelegate {
             .disposed(by: disposeBag)
     }
     
-    public func bind(viewModel vm: RegisterRecruitmentPostViewModelable) {
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
         // Input
         addressPublisher
-            .bind(to: vm.addressInformation)
+            .bind(to: viewModel.addressInformation)
             .disposed(by: disposeBag)
         
         detailAddressField
             .uITextField.rx.text
             .compactMap { $0 }
-            .bind(to: vm.detailAddress)
+            .bind(to: viewModel.detailAddress)
             .disposed(by: disposeBag)
         
         // Output
-        vm
+        viewModel
             .addressInputNextable
             .drive(onNext: { [ctaButton] isNextable in
                 ctaButton.setEnabled(isNextable)
@@ -216,7 +216,7 @@ class AddressView: UIView, DaumAddressSearchDelegate {
             .disposed(by: disposeBag)
         
         // 초기값 설정
-        vm
+        viewModel
             .addressInputStateObject
             .drive(onNext: { [addressSearchButton, detailAddressField] state in
                 
