@@ -12,7 +12,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         
-        let initialLabel = CustomerRequirementView()
+        let initialLabel = ApplicationDetailView(viewController: self)
         
         view.backgroundColor = .white
         

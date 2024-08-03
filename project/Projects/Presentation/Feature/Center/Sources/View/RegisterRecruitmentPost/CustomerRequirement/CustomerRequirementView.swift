@@ -288,7 +288,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
     
     private func setObservable() { }
     
-    public func bind(viewModel: CustomerRequirementViewModelable) {
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
         // Input
         Observable

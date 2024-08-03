@@ -31,43 +31,8 @@ public protocol ApplicationDetailViewModelable {
 public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
     
     // Init
-    public var viewModel: ApplicationDetailViewModelable
     public weak var viewController: UIViewController?
     
-    // Cell type
-    typealias TextCellType = CellWrapper<StateButtonTyp1>
-    typealias DateCellType = CellWrapper<CalendarOpenButton>
-    
-    // Section Data
-    let sectionData: [SectionData] = [
-        SectionData(
-            titleText: "경력 우대 여부",
-            subData: ExperiencePreferenceType.allCases.map { exp in
-                CellData(cellText: exp.korTextForBtn)
-            },
-            cellSize: .init(width: 104, height: 44)
-        ),
-        SectionData(
-            titleText: "지원 방법",
-            subTitle: "(다중 선택 가능)",
-            subData: ApplyType.allCases.map { exp in
-                CellData(cellText: exp.korTextForBtn)
-            },
-            cellSize: .init(width: 104, height: 44)
-        ),
-        SectionData(
-            titleText: "접수 마감일",
-            subData: ApplyDeadlineType.allCases.map { exp in
-                CellData(cellText: exp.korTextForBtn)
-            },
-            cellSize: .init(width: 104, height: 44)
-        ),
-        SectionData(
-            titleText: "접수마감 날짜 선택",
-            subData: [ .emptyCell ],
-            cellSize: .heightOnly(44)
-        ),
-    ]
     
     // View
     private let processTitle: IdleLabel = {
@@ -77,14 +42,40 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
         return label
     }()
     
-    private let collectionView: UICollectionView = {
-        
-        let layout = LeftAlignedFlowLayout()
-        layout.minimumLineSpacing = 4
-        layout.minimumInteritemSpacing = 4
-        
-        let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
-
+    // 경력우대 여부
+    let expButtons: [StateButtonTyp1] = {
+        ExperiencePreferenceType.allCases.map { type in
+            StateButtonTyp1(
+                text: type.korTextForBtn,
+                initial: .normal
+            )
+        }
+    }()
+    
+    // 지원 방법
+    let applyTypeButtons: [StateButtonTyp1] = {
+        ApplyType.allCases.map { type in
+            StateButtonTyp1(
+                text: type.korTextForBtn,
+                initial: .normal
+            )
+        }
+    }()
+    
+    // 접수 마감 타입
+    let deadlineTypeButtons: [StateButtonTyp1] = {
+        ApplyDeadlineType.allCases.map { type in
+            StateButtonTyp1(
+                text: type.korTextForBtn,
+                initial: .normal
+            )
+        }
+    }()
+    
+    // 날짜 선택 버튼
+    let calendarOpenButton: CalendarOpenButton = {
+        let view = CalendarOpenButton()
+        view.isHidden = true
         return view
     }()
     
@@ -95,28 +86,19 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
         return button
     }()
     
-    // Rx
-    
-    // Radio Btn을 위한 처리
-    private let selectedExperiencePreferenceType: PublishRelay<ExperiencePreferenceType> = .init()
-    private let selectedApplyType: PublishRelay<ApplyType> = .init()
-    private let selectedApplyDeadlineType: PublishRelay<ApplyDeadlineType> = .init()
-    
     private let disposeBag = DisposeBag()
+    private let deadlineDate: PublishRelay<Date> = .init()
     
     public init(
-        viewModel: ApplicationDetailViewModelable,
         viewController: UIViewController
     ) {
-        self.viewModel = viewModel
         self.viewController = viewController
         
         super.init(frame: .zero)
         
         setAppearance()
         setLayout()
-        
-        setCollectionView()
+        setObservable()
     }
     
     public required init?(coder: NSCoder) { fatalError() }
@@ -128,9 +110,101 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
     
     private func setLayout() {
         
+        // 정적 크기
+        [
+            expButtons,
+            applyTypeButtons,
+            deadlineTypeButtons
+        ]
+        .flatMap { $0 }
+        .forEach { view in
+            view.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                view.widthAnchor.constraint(equalToConstant: 104),
+                view.heightAnchor.constraint(equalToConstant: 44),
+            ])
+        }
+        
+        let stackList: [VStack] = [
+        
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "경력 우대 여부"),
+                    HStack([
+                        expButtons as [UIView],
+                        [UIView()]
+                    ].flatMap({ $0 }), spacing: 4),
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "지원 방법", subTitleText: "(다중 선택 가능)"),
+                    HStack([
+                        applyTypeButtons as [UIView],
+                        [UIView()]
+                    ].flatMap({ $0 }), spacing: 4),
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "접수 마감일"),
+                    HStack([
+                        deadlineTypeButtons as [UIView],
+                        [UIView()]
+                    ].flatMap({ $0 }), spacing: 4),
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+        ]
+        
+        let scrollView = UIScrollView()
+        scrollView.delaysContentTouches = false
+        scrollView.contentInset = .init(
+            top: 0,
+            left: 20,
+            bottom: 24,
+            right: 20
+        )
+        
+        let scrollViewContentStack = VStack(
+            stackList,
+            spacing: 28,
+            alignment: .fill
+        )
+        
+        [
+            scrollViewContentStack,
+            calendarOpenButton
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            scrollView.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            scrollViewContentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollViewContentStack.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollViewContentStack.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            
+            calendarOpenButton.heightAnchor.constraint(equalToConstant: 44),
+            calendarOpenButton.topAnchor.constraint(equalTo: scrollViewContentStack.bottomAnchor, constant: 12),
+            calendarOpenButton.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            calendarOpenButton.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            calendarOpenButton.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+        ])
+        
+        
         [
             processTitle,
-            collectionView,
+            
+            scrollView,
+            
             ctaButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -143,10 +217,10 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
             processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             
-            collectionView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
+            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
             
             ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
@@ -154,275 +228,128 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
         ])
     }
     
-    private func setCollectionView() {
-        
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        
-        // Header
-        collectionView.register(TitleHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleHeaderView.identifier)
-        
-        // Cell
-        collectionView.register(TextCellType.self, forCellWithReuseIdentifier: TextCellType.identifier)
-        collectionView.register(DateCellType.self, forCellWithReuseIdentifier: DateCellType.identifier)
-        
-        collectionView.contentInset = .init(top: 0, left: 20, bottom: 32, right: 20)
-    }
-    
     private func setObservable() {
         
+        deadlineTypeButtons[1]
+            .eventPublisher
+            .map({ !($0 == .accent) })
+            .bind(to: calendarOpenButton.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        calendarOpenButton
+            .rx.tap
+            .subscribe { [weak viewController] _ in
+                
+                let vc = OneDayPickerViewController()
+                vc.delegate = self
+                vc.modalPresentationStyle = .overFullScreen
+                viewController?.present(vc, animated: false)
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+        
+        Observable
+            .merge(
+                expButtons
+                    .enumerated()
+                    .map { (index, button) in
+                        let item = ExperiencePreferenceType(rawValue: index)!
+                        return button.eventPublisher
+                            .compactMap { state -> ExperiencePreferenceType? in state == .accent ? item : nil }
+                            .asObservable()
+                    }
+            )
+            .map { [expButtons] (type) in
+                
+                expButtons
+                    .enumerated()
+                    .forEach { (index, button) in
+                        let item = ExperiencePreferenceType(rawValue: index)!
+                        if item != type {
+                            button.setState(.normal)
+                        }
+                    }
+                
+                return type
+            }
+            .bind(to: viewModel.experiencePreferenceType)
+            .disposed(by: disposeBag)
+        
+        
+        Observable
+            .merge(
+                applyTypeButtons
+                    .enumerated()
+                    .map { (index, button) in
+                        let item = ApplyType(rawValue: index)!
+                        return button.eventPublisher
+                            .compactMap { state -> ApplyType? in state == .accent ? item : nil }
+                            .asObservable()
+                    }
+            )
+            .map { [applyTypeButtons] (type) in
+                
+                applyTypeButtons
+                    .enumerated()
+                    .forEach { (index, button) in
+                        let item = ApplyType(rawValue: index)!
+                        if item != type {
+                            button.setState(.normal)
+                        }
+                    }
+                
+                return type
+            }
+            .bind(to: viewModel.applyType)
+            .disposed(by: disposeBag)
+        
+        Observable
+            .merge(
+                deadlineTypeButtons
+                    .enumerated()
+                    .map { (index, button) in
+                        let item = ApplyDeadlineType(rawValue: index)!
+                        return button.eventPublisher
+                            .compactMap { state -> ApplyDeadlineType? in state == .accent ? item : nil }
+                            .asObservable()
+                    }
+            )
+            .map { [deadlineTypeButtons] (type) in
+                
+                deadlineTypeButtons
+                    .enumerated()
+                    .forEach { (index, button) in
+                        let item = ApplyDeadlineType(rawValue: index)!
+                        if item != type {
+                            button.setState(.normal)
+                        }
+                    }
+                
+                return type
+            }
+            .bind(to: viewModel.applyDeadlineType)
+            .disposed(by: disposeBag)
+        
+        deadlineDate
+            .bind(to: viewModel.deadlineDate)
+            .disposed(by: disposeBag)
+        
         viewModel
-            .applicationDetailViewNextable
-            .drive(onNext: { [ctaButton] isNextable in
-                ctaButton.setEnabled(isNextable)
+            .deadlineString
+            .drive(onNext: { [calendarOpenButton] str in
+                calendarOpenButton.textLabel.textString = str
             })
             .disposed(by: disposeBag)
     }
 }
 
-extension ApplicationDetailView: UICollectionViewDataSource {
-    
-    public func numberOfSections(in collectionView: UICollectionView) -> Int {
-        sectionData.count
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        sectionData[section].subData.count
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cellData = sectionData[indexPath.section].subData[indexPath.item]
-        
-        // binding
-        let itemIndex = indexPath.item
-    
-        switch indexPath.section {
-        case 0:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
-            // cell appearance
-            cell.innerView.label.textString = cellData.cellText
-            
-            let item = ExperiencePreferenceType(rawValue: itemIndex)!
-            
-            // 바인딩
-            bindRadioButtons(
-                cell: cell,
-                item: item,
-                viewInput: selectedExperiencePreferenceType,
-                vmInput: viewModel.experiencePreferenceType
-            )
-            
-            // 초기값 설정
-            viewModel
-                .applicationDetailStateObject
-                .drive(onNext: { [weak cell] state in
-                    cell?.innerView.setState(state.experiencePreferenceType == item ? .accent : .normal)
-                })
-                .disposed(by: disposeBag)
-            
-            return cell
-        case 1:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
-            // cell appearance
-            cell.innerView.label.textString = cellData.cellText
-            
-            let item = ApplyType(rawValue: itemIndex)!
-            
-            // 바인딩
-            bindRadioButtons(
-                cell: cell,
-                item: item,
-                viewInput: selectedApplyType,
-                vmInput: viewModel.applyType
-            )
-            
-            // 초기값 설정
-            viewModel
-                .applicationDetailStateObject
-                .drive(onNext: { [weak cell] state in
-                    cell?.innerView.setState(state.applyType == item ? .accent : .normal)
-                })
-                .disposed(by: disposeBag)
-            
-            return cell
-        case 2:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
-            // cell appearance
-            cell.innerView.label.textString = cellData.cellText
-            
-            let item = ApplyDeadlineType(rawValue: itemIndex)!
-            
-            // 바인딩
-            bindRadioButtons(
-                cell: cell,
-                item: item,
-                viewInput: selectedApplyDeadlineType,
-                vmInput: viewModel.applyDeadlineType
-            )
-            
-            // 초기값 설정
-            viewModel
-                .applicationDetailStateObject
-                .drive(onNext: { [weak cell] state in
-                    cell?.innerView.setState(state.applyDeadlineType == item ? .accent : .normal)
-                })
-                .disposed(by: disposeBag)
-            
-            return cell
-        case 3:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DateCellType.identifier, for: indexPath) as! DateCellType
-            cell.isHidden = true
-            
-            bindDateSelect(cell: cell)
-            
-            return cell
-        default:
-            fatalError()
-        }
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        
-        if kind == UICollectionView.elementKindSectionHeader {
-            
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TitleHeaderView.identifier, for: indexPath) as! TitleHeaderView
-            
-            header.titleLabel.textString = sectionData[indexPath.section].titleText
-            header.subTitleLabel.textString = sectionData[indexPath.section].subTitle ?? ""
-            
-            return header
-        }
-        return UICollectionReusableView()
-    }
-}
-
-extension ApplicationDetailView: UICollectionViewDelegateFlowLayout {
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        // 헤더의 크기 설정
-        switch section {
-        case 0, 1, 2:
-            return CGSize(width: collectionView.contentSize.width, height: 22)
-        case 3:
-            return .zero
-        default:
-            fatalError()
-        }
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        // 헤더와 섹션 간의 간격을 설정
-        var bottomInset: CGFloat!
-        
-        switch section {
-        case 0,1:
-            bottomInset = 28
-        case 2:
-            bottomInset = 12
-        default:
-            bottomInset = 0
-        }
-        
-        return UIEdgeInsets(top: 6, left: 0, bottom: bottomInset, right: 0)
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-
-        let size = sectionData[indexPath.section].cellSize
-        
-        switch indexPath.section {
-        case 0, 1, 2:
-            return size
-        case 3:
-            let horizontalInset = collectionView.contentInset.left+collectionView.contentInset.right
-            let width = collectionView.bounds.width - horizontalInset
-            return .init(width: width, height: size.height)
-        default:
-            fatalError()
-        }
-    }
-}
-
-// MARK: Bind Cells
-extension ApplicationDetailView {
-    
-    private func bindRadioButtons<T: RawRepresentable>(
-        cell: TextCellType,
-        item: T,
-        viewInput: PublishRelay<T>,
-        vmInput: PublishRelay<T>
-    ) where T.RawValue == Int {
-        
-        // Input
-        let selectedItem = cell.innerView
-            .eventPublisher
-            .map { $0 == .accent }
-            .filter { $0 }
-            .map { _ in item }
-            .share()
-        
-        selectedItem
-            .bind(to: vmInput)
-            .disposed(by: disposeBag)
-        
-        selectedItem
-            .bind(to: viewInput)
-            .disposed(by: disposeBag)
-        
-        // Output
-        viewInput
-            .observe(on: MainScheduler.instance)
-            .map { currentItem in currentItem == item }
-            .subscribe { isMatched in
-                if !isMatched {
-                    // 현재 버튼과 다른 버튼이 눌린 경우
-                    cell.innerView.setState(.normal)
-                }
-            }
-            .disposed(by: disposeBag)
-    }
-    
-    private func bindDateSelect(cell: DateCellType) {
-                
-        // Input
-        cell
-            .innerView.rx.tap
-            .subscribe { [weak self] _ in
-                guard let self else { return }
-                
-                let dataPickerVC = OneDayPickerViewController()
-                dataPickerVC.modalPresentationStyle = .overFullScreen
-                dataPickerVC.delegate = self
-                viewController?.present(dataPickerVC, animated: false)
-            }
-            .disposed(by: disposeBag)
-        
-        // Output
-        selectedApplyDeadlineType
-            .map { type in
-                let isSpecific = type == .specificDate
-                return !isSpecific
-            }
-            .asDriver(onErrorJustReturn: true)
-            .drive(cell.rx.isHidden)
-            .disposed(by: disposeBag)
-        
-        viewModel
-            .deadlineString
-            .compactMap { $0 }
-            .map { [cell] dateStr in
-                cell.innerView.textLabel.attrTextColor = DSKitAsset.Colors.gray900.color
-                return dateStr
-            }
-            .drive(cell.innerView.textLabel.rx.textString)
-            .disposed(by: disposeBag)
-    }
-}
 
 
 extension ApplicationDetailView: OneDayPickerDelegate {
     public func oneDayPicker(selectedDate: Date) {
         // 위임자 패턴으로 데이터를 수신
-        viewModel.deadlineDate.accept(selectedDate)
+        deadlineDate.accept(selectedDate)
     }
 }
