@@ -56,7 +56,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var weight: PublishRelay<String> = .init()
     public var careGrade: PublishRelay<CareGrade> = .init()
     public var cognitionState: PublishRelay<CognitionDegree> = .init()
-    public var deseaseDescription: PublishRelay<String> = .init()
+    public var deceaseDescription: PublishRelay<String> = .init()
     
     public var customerInformationStateObject: Driver<CustomerInformationStateObject>
     public var customerInformationNextable: Driver<Bool>
@@ -79,8 +79,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         // MARK: Work time and pay
         workTimeAndPayStateObject = workTimeAndPay
-            .map { _ in
-                let object = WorkTimeAndPayStateObject()
+            .map { object in
+                
                 return object
             }
             .asDriver { _ in fatalError() }
@@ -135,8 +135,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         // MARK: Address input
         addressInputStateObject = addressInfo
-            .map { _ in
-                let object = AddressInputStateObject()
+            .map { object in
+                
                 return object
             }
             .asDriver { _ in fatalError() }
@@ -166,8 +166,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         // MARK: Customer requirement
         customerRequirementStateObject = customerRequirement
-            .map { _ in
-                let object = CustomerRequirementStateObject()
+            .map { object in
+                
                 return object
             }
             .asDriver { _ in fatalError() }
@@ -217,8 +217,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         // MARK: Customer information
         customerInformationStateObject = customerInformation
-            .map { _ in
-                let object = CustomerInformationStateObject()
+            .map { object in
+                
                 return object
             }
             .asDriver { _ in fatalError() }
@@ -253,7 +253,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 customerInformation.value.cognitionState = newValue
             }
         
-        deseaseDescription
+        deceaseDescription
             .subscribe { [customerInformation] newValue in
                 customerInformation.value.deceaseDescription = newValue
             }
@@ -280,8 +280,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         // MARK: Application detail
         applicationDetailStateObject = applicationDetail
-            .map { _ in
-                let object = ApplicationDetailStateObject()
+            .map { object in
+                
                 return object
             }
             .asDriver { _ in fatalError() }

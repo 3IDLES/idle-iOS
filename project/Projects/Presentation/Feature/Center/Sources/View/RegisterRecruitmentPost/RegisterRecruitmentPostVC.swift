@@ -152,13 +152,13 @@ public class RegisterRecruitmentPostVC: BaseViewController {
                     view.bind(viewModel: viewModel)
                     return view
                 case .customerInformation:
-                    return CustomerInformationView(viewModel: viewModel)
+                    return CustomerInformationView()
                 case .customerRequirement:
                     let view = CustomerRequirementView()
                     view.bind(viewModel: viewModel)
                     return view
                 case .additionalInfo:
-                    return ApplicationDetailView(viewModel: viewModel, viewController: self)
+                    return ApplicationDetailView(viewController: self)
             }
         }
     }

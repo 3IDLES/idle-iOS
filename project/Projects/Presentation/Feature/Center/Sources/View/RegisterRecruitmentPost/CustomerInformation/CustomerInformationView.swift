@@ -21,7 +21,7 @@ public protocol CustomerInformationViewModelable {
     var weight: PublishRelay<String> { get }
     var careGrade: PublishRelay<CareGrade> { get }
     var cognitionState: PublishRelay<CognitionDegree> { get }
-    var deseaseDescription: PublishRelay<String> { get }
+    var deceaseDescription: PublishRelay<String> { get }
     
     var customerInformationStateObject: Driver<CustomerInformationStateObject> { get }
     var customerInformationNextable: Driver<Bool> { get }
@@ -30,69 +30,8 @@ public protocol CustomerInformationViewModelable {
 public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     
     // Init
-    public var viewModel: CustomerInformationViewModelable
         
     // Not init
-    
-    
-    // Cell Type
-    typealias TextCellType = CellWrapper<StateButtonTyp1>
-    typealias TextInputCellType = CellWrapper<MultiLineTextField>
-    typealias WeightInputCellType = CellWrapper<TextFieldWithDegree>
-    
-    // Section Data
-    let sectionData: [SectionData] = [
-        SectionData(
-            titleText: "이름",
-            subData: [
-                CellData(cellText: "고객의 이름을 입력해주세요.")
-            ],
-            cellSize: .heightOnly(44)
-        ),
-        SectionData(
-            titleText: "성별",
-            subData: [Gender.male, Gender.female].map { gender in
-                CellData(cellText: gender.twoLetterKoreanWord)
-            },
-            cellSize: .init(width: 104, height: 44)
-        ),
-        SectionData(
-            titleText: "출생연도",
-            subData: [
-                CellData(cellText: "고객의 출생연도를 입력해주세요. (예: 1965)")
-            ],
-            cellSize: .heightOnly(44)
-        ),
-        SectionData(
-            titleText: "몸무게",
-            subData: [
-                .emptyCell
-            ],
-            cellSize: .heightOnly(44)
-        ),
-        SectionData(
-            titleText: "요양 등급",
-            subData: CareGrade.allCases.map { grade in
-                CellData(cellText: grade.textForCellBtn)
-            },
-            cellSize: .init(width: 40, height: 40)
-        ),
-        SectionData(
-            titleText: "인지 상태",
-            subData: CognitionDegree.allCases.map { cog in
-                CellData(cellText: cog.korTextForCellBtn)
-            },
-            cellSize: .init(width: 104, height: 44)
-        ),
-        SectionData(
-            titleText: "질병",
-            subTitle: "(선택)",
-            subData: [
-                CellData(cellText: "고객이 현재 앓고 있는 질병 또는 병력을 입력해주세요.")
-            ],
-            cellSize: .init(width: 104, height: 44)
-        )
-    ]
     
     // View
     private let processTitle: IdleLabel = {
@@ -102,15 +41,69 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
         return label
     }()
     
-    private let collectionView: UICollectionView = {
-        
-        let layout = LeftAlignedFlowLayout()
-        layout.minimumInteritemSpacing = 4
-        layout.minimumLineSpacing = 4
-        
-        let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
-
-        return view
+    // 이름 입력
+    lazy var nameField: IdleOneLineInputField = {
+        let field = IdleOneLineInputField(placeHolderText: "고객의 이름을 입력해 주세요.")
+        field.setKeyboardAvoidance(movingView: self)
+        return field
+    }()
+    
+    // 성별 선택
+    let maleBtn: StateButtonTyp1 = {
+        let btn = StateButtonTyp1(text: "남성", initial: .normal)
+        btn.label.typography = .Body3
+        return btn
+    }()
+    let femaleBtn: StateButtonTyp1 = {
+        let btn = StateButtonTyp1(text: "여성", initial: .normal)
+        btn.label.typography = .Body3
+        return btn
+    }()
+    
+    // 출생연도
+    lazy var birthYearField: IdleOneLineInputField = {
+        let field = IdleOneLineInputField(placeHolderText: "고객의 출생연도를 입력해주세요. (예: 1965)")
+        field.setKeyboardAvoidance(movingView: self)
+        field.textField.keyboardType = .numberPad
+        return field
+    }()
+    
+    // 몸무게
+    lazy var weightField: TextFieldWithDegree = {
+        let field = TextFieldWithDegree(
+            degreeText: "kg",
+            initialText: ""
+        )
+        field.setKeyboardAvoidance(movingView: self)
+        field.textField.keyboardType = .numberPad
+        return field
+    }()
+    
+    // 요양등급
+    let careGradeButtons: [StateButtonTyp1] = {
+        CareGrade.allCases.map { grade in
+            StateButtonTyp1(
+                text: grade.textForCellBtn,
+                initial: .normal
+            )
+        }
+    }()
+    
+    // 인지상태
+    let cognitionButtons: [StateButtonTyp1] = {
+        CognitionDegree.allCases.map { cognition in
+            StateButtonTyp1(
+                text: cognition.korTextForCellBtn,
+                initial: .normal
+            )
+        }
+    }()
+    
+    // 질병
+    lazy var deceaseField: IdleOneLineInputField = {
+        let field = IdleOneLineInputField(placeHolderText: "고객이 현재 앓고 있는 질병 또는 병력을 입력해주세요.")
+        field.setKeyboardAvoidance(movingView: self)
+        return field
     }()
     
     let ctaButton: CTAButtonType1 = {
@@ -127,16 +120,13 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     
     private let disposeBag = DisposeBag()
     
-    public init(viewModel: CustomerInformationViewModelable) {
-        self.viewModel = viewModel
+    public init() {
         
         super.init(frame: .zero)
         
         setAppearance()
         setLayout()
         setObservable()
-        
-        setCollectionView()
     }
     public required init?(coder: NSCoder) { fatalError() }
     
@@ -147,9 +137,131 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     
     private func setLayout() {
         
+        // 정적 크기
+        [
+            [maleBtn, femaleBtn],
+            cognitionButtons
+        ]
+        .flatMap { $0 }
+        .forEach { view in
+            view.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                view.widthAnchor.constraint(equalToConstant: 104),
+                view.heightAnchor.constraint(equalToConstant: 44),
+            ])
+        }
+        
+        careGradeButtons
+            .forEach { view in
+                view.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    view.widthAnchor.constraint(equalToConstant: 40),
+                    view.heightAnchor.constraint(equalToConstant: 40),
+                ])
+            }
+        
+        let stackList: [VStack] = [
+        
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "이름"),
+                    nameField
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "성별"),
+                    HStack([maleBtn, femaleBtn, UIView()], spacing: 4),
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "출생연도"),
+                    birthYearField
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "몸무게"),
+                    weightField
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "출생연도"),
+                    HStack([
+                        careGradeButtons as [UIView],
+                        [UIView()]
+                    ].flatMap({ $0 }), spacing: 4),
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "인지상태"),
+                    HStack([
+                        cognitionButtons as [UIView],
+                        [UIView()]
+                    ].flatMap({ $0 }), spacing: 4),
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "질병", subTitleText: "(선택)"),
+                    weightField
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+        ]
+        
+        let scrollView = UIScrollView()
+        scrollView.contentInset = .init(
+            top: 0,
+            left: 20,
+            bottom: 24,
+            right: 20
+        )
+        
+        let scrollViewContentStack = VStack(
+            stackList,
+            spacing: 28,
+            alignment: .fill
+        )
+        
+        scrollView.delaysContentTouches = false
+        scrollView.addSubview(scrollViewContentStack)
+        scrollViewContentStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            scrollViewContentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollViewContentStack.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollViewContentStack.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollViewContentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+        ])
+        
         [
             processTitle,
-            collectionView,
+            
+            scrollView,
+            
             ctaButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -162,351 +274,189 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             
-            collectionView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
+            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
             
             ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
         ])
     }
+
     
-    private func setCollectionView() {
-        
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        
-        // Header
-        collectionView.register(TitleHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleHeaderView.identifier)
-        
-        // Cell
-        collectionView.register(TextCellType.self, forCellWithReuseIdentifier: TextCellType.identifier)
-        collectionView.register(TextInputCellType.self, forCellWithReuseIdentifier: TextInputCellType.identifier)
-        collectionView.register(WeightInputCellType.self, forCellWithReuseIdentifier: WeightInputCellType.identifier)
-        
-        collectionView.isScrollEnabled = true
-        collectionView.contentInset = .init(top: 0, left: 20, bottom: 32, right: 20)
-    }
+    private func setObservable() { }
     
-    private func setObservable() {
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+        
+        // Input
+        nameField.textField.rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.name)
+            .disposed(by: disposeBag)
+        
+        Observable
+            .merge(
+                maleBtn.eventPublisher
+                    .compactMap { state -> Gender? in state == .accent ? .male : nil },
+                femaleBtn.eventPublisher
+                    .compactMap { state -> Gender? in state == .accent ? .female : nil }
+            ).map { [maleBtn, femaleBtn] (selectedGender) in
+                
+                if selectedGender == .male {
+                    femaleBtn.setState(.normal)
+                } else {
+                    maleBtn.setState(.normal)
+                }
+                
+                return selectedGender
+            }
+            .bind(to: viewModel.gender)
+            .disposed(by: disposeBag)
+        
+        birthYearField.textField.rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.birthYear)
+            .disposed(by: disposeBag)
+        
+        weightField.textField.rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.weight)
+            .disposed(by: disposeBag)
+        
+        Observable
+            .merge(
+                careGradeButtons
+                    .enumerated()
+                    .map { (index, button) in
+                        let item = CareGrade(rawValue: index)!
+                        return button.eventPublisher
+                            .compactMap { state -> CareGrade? in state == .accent ? item : nil }
+                            .asObservable()
+                    }
+            )
+            .map { [careGradeButtons] (grade) in
+                
+                careGradeButtons
+                    .enumerated()
+                    .forEach { (index, button) in
+                        let item = CareGrade(rawValue: index)!
+                        if item != grade {
+                            button.setState(.normal)
+                        }
+                    }
+                
+                return grade
+            }
+            .bind(to: viewModel.careGrade)
+            .disposed(by: disposeBag)
+        
+        Observable
+            .merge(
+                cognitionButtons
+                    .enumerated()
+                    .map { (index, button) in
+                        let item = CognitionDegree(rawValue: index)!
+                        return button.eventPublisher
+                            .compactMap { state -> CognitionDegree? in state == .accent ? item : nil }
+                            .asObservable()
+                    }
+            )
+            .map { [cognitionButtons] (grade) in
+                
+                cognitionButtons
+                    .enumerated()
+                    .forEach { (index, button) in
+                        let item = CognitionDegree(rawValue: index)!
+                        if item != grade {
+                            button.setState(.normal)
+                        }
+                    }
+                
+                return grade
+            }
+            .bind(to: viewModel.cognitionState)
+            .disposed(by: disposeBag)
+        
+        
+        deceaseField.textField.rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.deceaseDescription)
+            .disposed(by: disposeBag)
+        
+        // output
+        viewModel
+            .customerInformationStateObject
+            .drive(onNext: { [weak self] stateFromVM in
+              
+                guard let self else { return }
+                
+                // 이름
+                if !stateFromVM.name.isEmpty {
+                    nameField.textField.textString = stateFromVM.name
+                }
+                
+                // 성별
+                if let gender = stateFromVM.gender {
+                    if gender == .male {
+                        maleBtn.setState(.accent)
+                    } else {
+                        femaleBtn.setState(.accent)
+                    }
+                }
+                
+                // 출생년도
+                if !stateFromVM.birthYear.isEmpty {
+                    birthYearField.textField.textString = stateFromVM.birthYear
+                }
+                
+                // 몸무게
+                if !stateFromVM.weight.isEmpty {
+                    weightField.textField.textString = stateFromVM.weight
+                }
+                
+                // 요양등급
+                if let state = stateFromVM.careGrade {
+                    
+                    careGradeButtons
+                        .enumerated()
+                        .forEach { (index, button) in
+                            let item = CareGrade(rawValue: index)!
+                            
+                            if item == state {
+                                button.setState(.accent)
+                            }
+                        }
+                }
+                
+                // 인지상태
+                if let state = stateFromVM.cognitionState {
+                    
+                    cognitionButtons
+                        .enumerated()
+                        .forEach { (index, button) in
+                            let item = CognitionDegree(rawValue: index)!
+                            
+                            if item == state {
+                                button.setState(.accent)
+                            }
+                        }
+                }
+                
+                // 질병
+                if !stateFromVM.deceaseDescription.isEmpty {
+                    deceaseField.textField.textString = stateFromVM.deceaseDescription
+                }
+            })
+            .disposed(by: disposeBag)
+        
         
         viewModel
             .customerInformationNextable
-            .drive(onNext: { [ctaButton] isNextable in
-                ctaButton.setEnabled(isNextable)
+            .drive(onNext: { [ctaButton] nextable in
+                ctaButton.setEnabled(nextable)
             })
             .disposed(by: disposeBag)
     }
 }
-
-extension CustomerInformationView: UICollectionViewDataSource {
-    
-    public func numberOfSections(in collectionView: UICollectionView) -> Int {
-        sectionData.count
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        sectionData[section].subData.count
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        switch indexPath.section {
-        case 0:
-            // 이름 입력
-            let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextInputCellType.identifier, for: indexPath) as! TextInputCellType
-            
-            // cell appearance
-            cell.innerView.placeholderText = cellData.cellText
-            
-            // binding
-            bindName(cell: cell)
-                
-            // 초기값 설정
-            viewModel
-                .customerInformationStateObject
-                .drive(onNext: { [weak cell] state in
-                    let name = state.name
-                    if !name.isEmpty {
-                        cell?.innerView.textString = name
-                    }
-                })
-                .disposed(by: disposeBag)
-            
-            return cell
-        case 1, 4, 5:
-            // 성별, 요양등급, 인지상태
-            let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
-            
-            // cell appearance
-            cell.innerView.label.textString = cellData.cellText
-            
-            // binding
-            let itemIndex = indexPath.item
-            switch indexPath.section {
-            case 1:
-                let item = Gender(rawValue: itemIndex)!
-                bindRadioButtons(
-                    cell: cell,
-                    item: item,
-                    viewInput: selectedGender,
-                    vmInput: viewModel.gender
-                )
-                
-                // 초기값 설정
-                viewModel
-                    .customerInformationStateObject
-                    .drive(onNext: { [weak cell] state in
-                        cell?.innerView.setState(state.gender == item ? .accent : .normal)
-                    })
-                    .disposed(by: disposeBag)
-            case 4:
-                let item = CareGrade(rawValue: itemIndex)!
-                bindRadioButtons(
-                    cell: cell,
-                    item: item,
-                    viewInput: selectedCareGrade,
-                    vmInput: viewModel.careGrade
-                )
-                
-                // 초기값 설정
-                viewModel
-                    .customerInformationStateObject
-                    .drive(onNext: { [weak cell] state in
-                        cell?.innerView.setState(state.careGrade == item ? .accent : .normal)
-                    })
-                    .disposed(by: disposeBag)
-            case 5:
-                let item = CognitionDegree(rawValue: itemIndex)!
-                bindRadioButtons(
-                    cell: cell,
-                    item: item,
-                    viewInput: selectedCognitionState,
-                    vmInput: viewModel.cognitionState
-                )
-                
-                // 초기값 설정
-                viewModel
-                    .customerInformationStateObject
-                    .drive(onNext: { [weak cell] state in
-                        cell?.innerView.setState(state.cognitionState == item ? .accent : .normal)
-                    })
-                    .disposed(by: disposeBag)
-            default:
-                fatalError()
-            }
-            
-            return cell
-        case 2:
-            // 출생연도 선택
-            let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextInputCellType.identifier, for: indexPath) as! TextInputCellType
-            
-            // cell appearance
-            cell.innerView.placeholderText = cellData.cellText
-            cell.innerView.keyboardType = .numberPad
-            cell.innerView.isScrollEnabled = false
-            cell.innerView.setKeyboardAvoidance(movingView: self)
-            
-            // binding
-            bindBirthYear(cell: cell)
-            
-            // 초기값 설정
-            viewModel
-                .customerInformationStateObject
-                .drive(onNext: { [weak cell] state in
-                    let birthYear = state.birthYear
-                    if !birthYear.isEmpty {
-                        cell?.innerView.textString = birthYear
-                    }
-                })
-                .disposed(by: disposeBag)
-            
-            return cell
-        case 3:
-            // 몸무게
-            let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WeightInputCellType.identifier, for: indexPath) as! WeightInputCellType
-            
-            // cell appearance
-            cell.innerView.degreeLabel.textString = "kg"
-            cell.innerView.textField.keyboardType = .numberPad
-            cell.innerView.setKeyboardAvoidance(movingView: self)
-            
-            // binding
-            bindWeight(cell: cell)
-            
-            // 초기값 설정
-            viewModel
-                .customerInformationStateObject
-                .drive(onNext: { [weak cell] state in
-                    let weight = state.weight
-                    if !weight.isEmpty {
-                        cell?.innerView.textField.textString = weight
-                    }
-                })
-                .disposed(by: disposeBag)
-            
-            return cell
-        case 6:
-            // 질병
-            let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextInputCellType.identifier, for: indexPath) as! TextInputCellType
-            
-            // cell appearance
-            cell.innerView.placeholderText = cellData.cellText
-            cell.innerView.setKeyboardAvoidance(movingView: self)
-            
-            // binding
-            bindDeceaseDiscription(cell: cell)
-            
-            // 초기값 설정
-            viewModel
-                .customerInformationStateObject
-                .drive(onNext: { [weak cell] state in
-                    let decease = state.deceaseDescription
-                    if !decease.isEmpty {
-                        cell?.innerView.textString = decease
-                    }
-                })
-                .disposed(by: disposeBag)
-            
-            return cell
-            
-        default:
-            // 구현되지 않음
-            fatalError()
-        }
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        
-        if kind == UICollectionView.elementKindSectionHeader {
-            
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TitleHeaderView.identifier, for: indexPath) as! TitleHeaderView
-            
-            header.titleLabel.textString = sectionData[indexPath.section].titleText
-            header.subTitleLabel.textString = sectionData[indexPath.section].subTitle ?? ""
-            
-            return header
-        }
-        return UICollectionReusableView()
-    }
-}
-
-extension CustomerInformationView: UICollectionViewDelegateFlowLayout {
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        
-        // 헤더의 크기 설정
-        return CGSize(width: collectionView.bounds.width, height: 22)
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        
-        // 헤더와 섹션 간의 간격을 설정
-        let bottomInset: CGFloat = section != (sectionData.count-1) ? 28 : 0
-        return UIEdgeInsets(top: 6, left: 0, bottom: bottomInset, right: 0)
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let size = sectionData[indexPath.section].cellSize
-        
-        switch indexPath.section {
-        case 1, 4, 5:
-            return size
-        case 0, 2, 3, 6:
-            let horizontalInset = collectionView.contentInset.left+collectionView.contentInset.right
-            let width = collectionView.bounds.width - horizontalInset
-            return .init(width: width, height: size.height)
-        default:
-            fatalError()
-        }
-    }
-}
-
-extension CustomerInformationView {
-    
-    private func bindName(cell: TextInputCellType) {
-        
-        // Input
-        cell
-            .innerView
-            .rx.text
-            .compactMap { $0 }
-            .bind(to: viewModel.name)
-            .disposed(by: disposeBag)
-    }
-    
-    private func bindRadioButtons<T: RawRepresentable>(
-        cell: TextCellType,
-        item: T,
-        viewInput: PublishRelay<T>,
-        vmInput: PublishRelay<T>
-    ) where T.RawValue == Int {
-        
-        // Input
-        let selectedItem = cell.innerView
-            .eventPublisher
-            .map { $0 == .accent }
-            .filter { $0 }
-            .map { _ in item }
-            .share()
-        
-        selectedItem
-            .bind(to: vmInput)
-            .disposed(by: disposeBag)
-        
-        selectedItem
-            .bind(to: viewInput)
-            .disposed(by: disposeBag)
-        
-        // Output
-        viewInput
-            .observe(on: MainScheduler.instance)
-            .map { currentItem in currentItem == item }
-            .subscribe { isMatched in
-                if !isMatched {
-                    // 현재 버튼과 다른 버튼이 눌린 경우
-                    cell.innerView.setState(.normal)
-                }
-            }
-            .disposed(by: disposeBag)
-    }
-    
-    private func bindBirthYear(cell: TextInputCellType) {
-        
-        // Input
-        cell
-            .innerView
-            .rx.text
-            .compactMap { $0 }
-            .bind(to: viewModel.birthYear)
-            .disposed(by: disposeBag)
-    }
-    
-    private func bindWeight(cell: WeightInputCellType) {
-        
-        // Input
-        cell.innerView
-            .edtingText
-            .asObservable()
-            .bind(to: viewModel.weight)
-            .disposed(by: disposeBag)
-    }
-    
-    private func bindDeceaseDiscription(cell: TextInputCellType) {
-        
-        // Input
-        cell.innerView
-            .rx.text
-            .compactMap { $0 }
-            .bind(to: viewModel.deseaseDescription)
-            .disposed(by: disposeBag)
-    }
-}
-
