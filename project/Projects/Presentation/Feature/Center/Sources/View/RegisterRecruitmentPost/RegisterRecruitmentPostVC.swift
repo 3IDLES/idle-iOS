@@ -52,7 +52,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     var currentIndex: Int = 0
     
     // For RC=1
-    private var viewModel: RegisterRecruitmentPostViewModelable
+    private var viewModel: RegisterRecruitmentPostViewModelable?
     
     // View
     let navigationBar: NavigationBarType1 = {
@@ -70,9 +70,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     // Observable
     private let disposeBag = DisposeBag()
     
-    public init(viewModel: RegisterRecruitmentPostViewModelable) {
-        
-        self.viewModel = viewModel
+    public init() {
         
         super.init(nibName: nil, bundle: nil)
         
@@ -133,32 +131,21 @@ public class RegisterRecruitmentPostVC: BaseViewController {
                 self?.prev()
             }
             .disposed(by: disposeBag)
-        
-        viewModel
-            .alert?
-            .drive { [weak self] vo in
-                self?.showAlert(vo: vo)
-            }
-            .disposed(by: disposeBag)
     }
     
     private func createPages() {
         self.pageViews = RegisterRecruitmentPage.allCases.map { page in
             switch page {
                 case .workTimeAndPayment:
-                    return WorkTimeAndPayView(viewModel: viewModel)
+                    WorkTimeAndPayView()
                 case .workPlaceAddress:
-                    let view = AddressView(viewController: self)
-                    view.bind(viewModel: viewModel)
-                    return view
+                    AddressView(viewController: self)
                 case .customerInformation:
-                    return CustomerInformationView()
+                    CustomerInformationView()
                 case .customerRequirement:
-                    let view = CustomerRequirementView()
-                    view.bind(viewModel: viewModel)
-                    return view
+                    CustomerRequirementView()
                 case .additionalInfo:
-                    return ApplicationDetailView(viewController: self)
+                    ApplicationDetailView(viewController: self)
             }
         }
     }
@@ -245,15 +232,28 @@ public class RegisterRecruitmentPostVC: BaseViewController {
             // 돌아가기, Coordinator호출
         }
     }
+    
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+        
+        self.viewModel = viewModel
+        
+        viewModel
+            .alert?
+            .drive { [weak self] vo in
+                self?.showAlert(vo: vo)
+            }
+            .disposed(by: disposeBag)
+        
+        pageViews
+            .forEach { view in
+                view.bind(viewModel: viewModel)
+            }
+    }
 }
 
 protocol RegisterRecruitmentPostViews: UIView {
     var ctaButton: CTAButtonType1 { get }
     func bind(viewModel: RegisterRecruitmentPostViewModelable)
-}
-
-extension RegisterRecruitmentPostViews {
-    func bind(viewModel: RegisterRecruitmentPostViewModelable) { }
 }
 
 extension AddressView: RegisterRecruitmentPostViews { }

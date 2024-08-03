@@ -27,44 +27,9 @@ public protocol WorkTimeAndPayViewModelable {
 public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
     
     // Init
-    public var viewModel: WorkTimeAndPayViewModelable
-        
+    
     // Not init
     
-    // Cell Type
-    typealias TextCellType = CellWrapper<StateButtonTyp1>
-    typealias TimePickerCellType = CellWrapper<WorkTimePicker>
-    typealias PaymentInputCellType = CellWrapper<TextFieldWithDegree>
-    
-    // Section Data
-    let sectionData: [SectionData] = [
-        SectionData(
-            titleText: "근무 요일",
-            subData: WorkDay.allCases.map { CellData(cellText: $0.korOneLetterText) },
-            cellSize: .init(width: 40, height: 40)
-        ),
-        SectionData(
-            titleText: "근무 시간",
-            subData: [ 
-                CellData(cellText: "시작시간"),
-                CellData(cellText: "종료시간"),
-            ],
-            cellSize: .heightOnly(44)
-        ),
-        SectionData(
-            titleText: "급여",
-            subData: PaymentType.allCases.map { CellData(cellText: $0.korLetterText) },
-            cellSize: .init(width: 104, height: 44)
-        ),
-        SectionData(
-            titleText: "",
-            subData: [
-                // 급여 입력셀
-                .emptyCell
-            ],
-            cellSize: .heightOnly(44)
-        )
-    ]
     
     // View
     private let processTitle: IdleLabel = {
@@ -74,16 +39,47 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         return label
     }()
     
-    private let collectionView: UICollectionView = {
-        
-        let layout = LeftAlignedFlowLayout()
-        layout.minimumInteritemSpacing = 4
-        layout.minimumLineSpacing = 4
-        
-        let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
-
-        return view
+    // 근무 요일
+    let workDayButtons: [StateButtonTyp1] = {
+        WorkDay.allCases.map { day in
+            StateButtonTyp1(
+                text: day.korOneLetterText,
+                initial: .normal
+            )
+        }
     }()
+    
+    // 근무 시간
+    let workStartTimePicker: WorkTimePicker = {
+        let picker = WorkTimePicker(placeholderText: "시작 시간")
+        return picker
+    }()
+    let workEndTimePicker: WorkTimePicker = {
+        let picker = WorkTimePicker(placeholderText: "종료 시간")
+        return picker
+    }()
+    
+    // 급여 타입
+    let paymentTypeButtons: [StateButtonTyp1] = {
+        PaymentType.allCases.map { type in
+            StateButtonTyp1(
+                text: type.korLetterText,
+                initial: .normal
+            )
+        }
+    }()
+    
+    // 급여
+    lazy var paymentField: TextFieldWithDegree = {
+        let field = TextFieldWithDegree(
+            degreeText: "원",
+            initialText: ""
+        )
+        field.setKeyboardAvoidance(movingView: self)
+        field.textField.keyboardType = .numberPad
+        return field
+    }()
+    
     
     let ctaButton: CTAButtonType1 = {
         
@@ -92,21 +88,15 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         return button
     }()
     
-    private let selectedPaymentType: PublishRelay<PaymentType> = .init()
-    
     private let disposeBag = DisposeBag()
     
-    public init(viewModel: WorkTimeAndPayViewModelable) {
-        
-        self.viewModel = viewModel
+    public init() {
         
         super.init(frame: .zero)
         
         setAppearance()
         setLayout()
         setObservable()
-        
-        setCollectionView()
     }
     public required init?(coder: NSCoder) { fatalError() }
     
@@ -117,9 +107,105 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
     
     private func setLayout() {
         
+        // 정적 크기
+        workDayButtons
+            .forEach { view in
+                view.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    view.widthAnchor.constraint(equalToConstant: 40),
+                    view.heightAnchor.constraint(equalToConstant: 40),
+                ])
+            }
+        
+        paymentTypeButtons
+            .forEach { view in
+                view.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    view.widthAnchor.constraint(equalToConstant: 104),
+                    view.heightAnchor.constraint(equalToConstant: 44),
+                ])
+            }
+        
+        
+        let stackList: [VStack] = [
+        
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "근무 요일"),
+                    HStack([
+                        workDayButtons as [UIView],
+                        [UIView()]
+                    ].flatMap({ $0 }), spacing: 4),
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "근무 시간"),
+                    HStack([
+                        workStartTimePicker,
+                        workEndTimePicker
+                    ], spacing: 4, distribution: .fillEqually),
+                ],
+                spacing: 6,
+                alignment: .fill
+            ),
+            
+            VStack(
+                [
+                    IdleContentTitleLabel(titleText: "급여"),
+                    HStack([
+                        paymentTypeButtons as [UIView],
+                        [UIView()]
+                    ].flatMap({ $0 }), spacing: 4),
+                ],
+                spacing: 6,
+                alignment: .fill
+            )
+        ]
+        
+        let scrollView = UIScrollView()
+        scrollView.delaysContentTouches = false
+        scrollView.contentInset = .init(
+            top: 0,
+            left: 20,
+            bottom: 24,
+            right: 20
+        )
+        
+        let scrollViewContentStack = VStack(
+            stackList,
+            spacing: 28,
+            alignment: .fill
+        )
+        
+        [
+            scrollViewContentStack,
+            paymentField
+        ].forEach {
+                
+            scrollView.addSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        NSLayoutConstraint.activate([
+            scrollViewContentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollViewContentStack.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollViewContentStack.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            
+            paymentField.topAnchor.constraint(equalTo: scrollViewContentStack.bottomAnchor, constant: 12),
+            paymentField.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            paymentField.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            paymentField.bottomAnchor.constraint(equalTo:  scrollView.contentLayoutGuide.bottomAnchor),
+        ])
+        
         [
             processTitle,
-            collectionView,
+            
+            scrollView,
+            
             ctaButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -132,10 +218,10 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
             processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             
-            collectionView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
+            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
             
             ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
@@ -143,288 +229,121 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         ])
     }
     
-    private func setCollectionView() {
-        
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        
-        // Header
-        collectionView.register(TitleHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleHeaderView.identifier)
-        
-        // Cell
-        collectionView.register(TextCellType.self, forCellWithReuseIdentifier: TextCellType.identifier)
-        collectionView.register(TimePickerCellType.self, forCellWithReuseIdentifier: TimePickerCellType.identifier)
-        collectionView.register(PaymentInputCellType.self, forCellWithReuseIdentifier: PaymentInputCellType.identifier)
-        
-        collectionView.isScrollEnabled = true
-        collectionView.contentInset = .init(top: 0, left: 20, bottom: 32, right: 20)
-    }
+    private func setObservable() { }
     
-    private func setObservable() {
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
-        viewModel
-            .workTimeAndPayNextable
-            .drive(onNext: { [ctaButton] isNextable in
-                ctaButton.setEnabled(isNextable)
-            })
-            .disposed(by: disposeBag)
-    }
-}
-
-extension WorkTimeAndPayView: UICollectionViewDataSource {
-    
-    public func numberOfSections(in collectionView: UICollectionView) -> Int {
-        sectionData.count
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        sectionData[section].subData.count
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        // Input
+        let workDayButtonWithItem = workDayButtons.enumerated().map { (index, button) in
+            let item = WorkDay(rawValue: index)!
+            return (item, button)
+        }
         
-        switch indexPath.section {
-        case 0:
-            // 근무 요일 선택
-            let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
+        for (dayType, button) in workDayButtonWithItem {
             
-            // cell appearance
-            cell.innerView.label.textString = cellData.cellText
-            
-            // binding
-            bindDay(cell: cell, itemIndex: indexPath.item)
-            
-            let item = WorkDay(rawValue: indexPath.item)!
-            
-            // 초기값 설정
-            viewModel
-                .workTimeAndPayStateObject
-                .drive(onNext: { [weak cell] state in
-                    cell?.innerView.setState(state.selectedDays[item] == true ? .accent : .normal)
-                })
+            button
+                .eventPublisher
+                .map { state in
+                    (dayType, state == .accent)
+                }
+                .bind(to: viewModel.selectedDay)
                 .disposed(by: disposeBag)
+        }
+        
+        workStartTimePicker
+            .pickedDateString
+            .map { $0.toString }
+            .bind(to: viewModel.workStartTime)
+            .disposed(by: disposeBag)
+        
+        workEndTimePicker
+            .pickedDateString
+            .map { $0.toString }
+            .bind(to: viewModel.workEndTime)
+            .disposed(by: disposeBag)
             
-            return cell
-        case 1:
-            // 근무시간 선택
-            let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TimePickerCellType.identifier, for: indexPath) as! TimePickerCellType
-            
-            // cell appearance
-            cell.innerView.placeholderText = cellData.cellText
-            
-            // binding
-            bindWorkTime(cell: cell, itemIndex: indexPath.item)
-
-            // 초기값 설정
-            viewModel
-                .workTimeAndPayStateObject
-                .drive(onNext: { [weak cell] state in
-                    let timeString = indexPath.item == 0 ? state.workStartTime : state.workEndTime
-                    
-                    if !timeString.isEmpty {
-                        cell?.innerView.textLabel.textString = timeString
+        Observable
+            .merge(
+                paymentTypeButtons
+                    .enumerated()
+                    .map { (index, button) in
+                        let item = PaymentType(rawValue: index)!
+                        return button.eventPublisher
+                            .compactMap { state -> PaymentType? in state == .accent ? item : nil }
+                            .asObservable()
                     }
-                })
-                .disposed(by: disposeBag)
-            
-            return cell
-        case 2:
-            // 급여 타입 선택
-            let cellData = sectionData[indexPath.section].subData[indexPath.item]
-            
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextCellType.identifier, for: indexPath) as! TextCellType
-            
-            // cell appearance
-            cell.innerView.label.textString = cellData.cellText
-            
-            // binding
-            bindPaymentType(cell: cell, itemIndex: indexPath.item)
-            
-            let item = PaymentType(rawValue: indexPath.item)!
-            
-            // 초기값 설정
-            viewModel
-                .workTimeAndPayStateObject
-                .drive(onNext: { [weak cell] state in
-                    cell?.innerView.setState(state.paymentType == item ? .accent : .normal)
-                })
-                .disposed(by: disposeBag)
-            
-            return cell
-            
-        case 3:
-            // 급여 입력
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaymentInputCellType.identifier, for: indexPath) as! PaymentInputCellType
-            
-            // cell appearance
-            cell.innerView.degreeLabel.textString = "원"
-            cell.innerView.setKeyboardAvoidance(movingView: self)
-            
-            // binding
-            bindPaymentAmount(cell: cell)
-            
-            // 초기값 설정
-            viewModel
-                .workTimeAndPayStateObject
-                .drive(onNext: { [weak cell] state in
-                    cell?.innerView.textField.textString = state.paymentAmount
-                })
-                .disposed(by: disposeBag)
-            
-            
-            return cell
-        default:
-            // 구현되지 않음
-            fatalError()
-        }
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        
-        if kind == UICollectionView.elementKindSectionHeader {
-            
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TitleHeaderView.identifier, for: indexPath) as! TitleHeaderView
-            
-            header.titleLabel.textString = sectionData[indexPath.section].titleText
-            header.subTitleLabel.textString = sectionData[indexPath.section].subTitle ?? ""
-            
-            return header
-        }
-        return UICollectionReusableView()
-    }
-}
-
-extension WorkTimeAndPayView: UICollectionViewDelegateFlowLayout {
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        
-        // 헤더가 없는 섹션
-        if section == 3 { return .zero }
-        
-        // 헤더의 크기 설정
-        return CGSize(width: collectionView.bounds.width, height: 22)
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        
-        // 헤더가 없는 섹션
-        if section == 3 { return .zero }
-        
-        // 헤더와 섹션 간의 간격을 설정, 마지막 섹션이 아닌 경우 바텀 인셋 설정
-        switch section {
-        case 0,1:
-            let bottomInset: CGFloat = 28.0
-            return .init(top: 6, left: 0, bottom: bottomInset, right: 0)
-        case 2:
-            let bottomInset: CGFloat = 12.0
-            return .init(top: 6, left: 0, bottom: bottomInset, right: 0)
-        case 3:
-            return .zero
-        default:
-            fatalError()
-        }
-    }
-    
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let size = sectionData[indexPath.section].cellSize
-        
-        switch indexPath.section {
-        case 0, 2:
-            return size
-        case 1:
-            // 2개의 셀이 각각 절반의 영역을 차지합니다.
-            let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-            let space = collectionView.bounds.width - flowLayout.minimumInteritemSpacing
-            return .init(width: space/2, height: size.height)
-        case 3:
-            let horizontalInset = collectionView.contentInset.left+collectionView.contentInset.right
-            let width = collectionView.bounds.width - horizontalInset
-            return .init(width: width, height: size.height)
-        default:
-            fatalError()
-        }
-    }
-}
-
-extension WorkTimeAndPayView {
-    
-    func bindDay(cell: TextCellType, itemIndex: Int) {
-        let day = WorkDay(rawValue: itemIndex)!
-        
-        // Input
-        cell.innerView
-            .eventPublisher
-            .map { state in
-                let isActive = state == .accent
-                return (day, isActive)
+            )
+            .map { [paymentTypeButtons] (grade) in
+                
+                paymentTypeButtons
+                    .enumerated()
+                    .forEach { (index, button) in
+                        let item = PaymentType(rawValue: index)!
+                        if item != grade {
+                            button.setState(.normal)
+                        }
+                    }
+                
+                return grade
             }
-            .bind(to: viewModel.selectedDay)
-            .disposed(by: disposeBag)
-    }
-    
-    func bindWorkTime(cell: TimePickerCellType, itemIndex: Int) {
-        
-        if itemIndex == 0 {
-            // 시작시간
-            cell.innerView.pickedDateString
-                .map { $0.toString }
-                .bind(to: viewModel.workStartTime)
-                .disposed(by: disposeBag)
-        }
-        else if itemIndex == 1 {
-            // 종료시간
-            cell.innerView.pickedDateString
-                .map { $0.toString }
-                .bind(to: viewModel.workEndTime)
-                .disposed(by: disposeBag)
-        }
-    }
-    
-    func bindPaymentType(
-        cell: TextCellType,
-        itemIndex: Int) {
-        
-        let payType = PaymentType(rawValue: itemIndex)!
-        
-        // Input
-        let selectedItem = cell.innerView
-            .eventPublisher
-            .map { $0 == .accent }
-            .filter { $0 }
-            .map { _ in payType }
-            .share()
-        
-        selectedItem
             .bind(to: viewModel.paymentType)
             .disposed(by: disposeBag)
-            
-        selectedItem
-            .bind(to: selectedPaymentType)
+        
+        paymentField.textField.rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.paymentAmount)
             .disposed(by: disposeBag)
         
         // Output
-        selectedPaymentType
-            .map { currentItem in currentItem == payType }
-            .observe(on: MainScheduler.instance)
-            .subscribe { isMatched in
-                if !isMatched {
-                    // 현재 버튼과 다른 버튼이 눌린 경우
-                    cell.innerView.setState(.normal)
+        viewModel
+            .workTimeAndPayNextable
+            .drive(onNext: { [ctaButton] nextable in
+                ctaButton.setEnabled(nextable)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .workTimeAndPayStateObject
+            .drive(onNext: { [weak self] stateFromVM in
+                
+                guard let self else { return }
+                
+                // 근무 요일
+                for (workDay, isActive) in stateFromVM.selectedDays {
+                    workDayButtons[workDay.rawValue].setState(isActive ? .accent : .normal)
                 }
-            }
+                
+                // 시작시간
+                if !stateFromVM.workStartTime.isEmpty {
+                    workStartTimePicker.textLabel.textString = stateFromVM.workStartTime
+                }
+                
+                // 종료 시간
+                if !stateFromVM.workEndTime.isEmpty {
+                    workEndTimePicker.textLabel.textString = stateFromVM.workEndTime
+                }
+                
+                // 급여타입
+                if let state = stateFromVM.paymentType {
+                    
+                    paymentTypeButtons
+                        .enumerated()
+                        .forEach { (index, button) in
+                            let item = PaymentType(rawValue: index)!
+                            
+                            if item == state {
+                                button.setState(.accent)
+                            }
+                        }
+                }
+                
+                // 급여
+                if !stateFromVM.paymentAmount.isEmpty {
+                    paymentField.textField.textString = stateFromVM.paymentAmount
+                }
+                
+            })
             .disposed(by: disposeBag)
     }
     
-    func bindPaymentAmount(cell: PaymentInputCellType) {
-        
-        // Input
-        cell
-            .innerView
-            .edtingText
-            .asObservable()
-            .bind(to: viewModel.paymentAmount)
-            .disposed(by: disposeBag)
-    }
 }

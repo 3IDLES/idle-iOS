@@ -20,7 +20,7 @@ public protocol ApplicationDetailViewModelable {
     var experiencePreferenceType: PublishRelay<ExperiencePreferenceType> { get }
     var applyType: PublishRelay<ApplyType> { get }
     var applyDeadlineType: PublishRelay<ApplyDeadlineType> { get }
-    var deadlineDate: PublishRelay<Date> { get }
+    var deadlineDate: BehaviorRelay<Date?> { get }
     
     // Output
     var deadlineString: Driver<String> { get }
@@ -250,6 +250,8 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
+        // Input
+        
         Observable
             .merge(
                 expButtons
@@ -336,10 +338,77 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
             .bind(to: viewModel.deadlineDate)
             .disposed(by: disposeBag)
         
+        // Output
+        
+        viewModel
+            .applicationDetailStateObject
+            .drive(onNext: { [weak self] stateFromVM in
+                
+                guard let self else { return }
+                
+                // 경력 우대 여부
+                if let state = stateFromVM.experiencePreferenceType {
+                    
+                    expButtons
+                        .enumerated()
+                        .forEach { (index, button) in
+                            let item = ExperiencePreferenceType(rawValue: index)!
+                            
+                            if item == state {
+                                button.setState(.accent)
+                            }
+                        }
+                }
+                
+                // 지원 방법
+                if let state = stateFromVM.applyType {
+                    
+                    applyTypeButtons
+                        .enumerated()
+                        .forEach { (index, button) in
+                            let item = ApplyType(rawValue: index)!
+                            
+                            if item == state {
+                                button.setState(.accent)
+                            }
+                        }
+                }
+                
+                // 마감기한 방법
+                if let state = stateFromVM.applyDeadlineType {
+                    
+                    deadlineTypeButtons
+                        .enumerated()
+                        .forEach { (index, button) in
+                            let item = ApplyDeadlineType(rawValue: index)!
+                            
+                            if item == state {
+                                button.setState(.accent)
+                            }
+                        }
+                }
+                
+                // 마감기간
+                if let state = stateFromVM.deadlineDate {
+                    
+                    calendarOpenButton
+                        .textLabel.textString = state.convertDateToString()
+                }
+                
+            })
+            .disposed(by: disposeBag)
+        
         viewModel
             .deadlineString
             .drive(onNext: { [calendarOpenButton] str in
                 calendarOpenButton.textLabel.textString = str
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .applicationDetailViewNextable
+            .drive(onNext: { [ctaButton] nextable in
+                ctaButton.setEnabled(nextable)
             })
             .disposed(by: disposeBag)
     }
