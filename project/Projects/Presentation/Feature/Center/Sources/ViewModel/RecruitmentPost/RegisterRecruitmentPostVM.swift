@@ -16,11 +16,11 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var alert: Driver<DefaultAlertContentVO>?
     
     // MARK: State
-    let workTimeAndPay: BehaviorRelay<WorkTimeAndPayStateObject> = .init(value: .init())
-    let customerRequirement: BehaviorRelay<CustomerRequirementStateObject> = .init(value: .init())
-    let customerInformation: BehaviorRelay<CustomerInformationStateObject> = .init(value: .init())
-    let applicationDetail: BehaviorRelay<ApplicationDetailStateObject> = .init(value: .init())
-    let addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .init())
+    let workTimeAndPay: BehaviorRelay<WorkTimeAndPayStateObject> = .init(value: .mock)
+    let customerRequirement: BehaviorRelay<CustomerRequirementStateObject> = .init(value: .mock)
+    let customerInformation: BehaviorRelay<CustomerInformationStateObject> = .init(value: .mock)
+    let applicationDetail: BehaviorRelay<ApplicationDetailStateObject> = .init(value: .mock)
+    let addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .mock)
     
     // MARK: Address input
     public var detailAddress: PublishRelay<String> = .init()

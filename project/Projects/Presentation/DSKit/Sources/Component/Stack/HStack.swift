@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class HStack: UIStackView {
+open class HStack: UIStackView {
     
     public init(_ elements: [UIView], spacing: CGFloat = 0.0, alignment: UIStackView.Alignment = .center, distribution: UIStackView.Distribution = .fill) {
         
@@ -24,6 +24,6 @@ public class HStack: UIStackView {
             }
     }
     
-    required init(coder: NSCoder) { fatalError() }
+    required public init(coder: NSCoder) { fatalError() }
 }
 

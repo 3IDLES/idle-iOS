@@ -54,7 +54,7 @@ extension ViewController3: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: WorkerEmployCard.self), for: indexPath) as? WorkerEmployCard else {
             fatalError("Unable to dequeue WorkerEmployCard")
         }
-        cell.bind()
+        cell.bind(vo: .mock)
         return cell
     }
     

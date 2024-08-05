@@ -38,6 +38,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             navigationController: navigationController
         )
         
+        let vc = PostOverviewVC()
+        let vm = RegisterRecruitmentPostVM()
+        vc.bind(viewModel: vm)
+        
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()

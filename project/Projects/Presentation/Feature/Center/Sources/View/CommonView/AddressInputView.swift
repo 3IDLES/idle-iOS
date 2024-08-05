@@ -19,6 +19,14 @@ public class AddressInputStateObject {
     public var detailAddress: String = ""
     
     public init() { }
+    
+    public static let mock: AddressInputStateObject = {
+       
+        let data = AddressInputStateObject()
+        data.addressInfo = .init(roadAddress: "서울특별시 중구 순화동 151", jibunAddress: "서울특별시 중구 순화동 151")
+        data.detailAddress = "굴화아파트 309동"
+        return data
+    }()
 }
 
 public protocol AddressInputViewModelableVer2 {

@@ -21,6 +21,10 @@ enum RegisterRecruitmentPage: Int, CaseIterable {
     case additionalInfo = 4
 }
 
+public protocol RegisterRecruitmentPostVMBindable {
+    func bind(viewModel: RegisterRecruitmentPostViewModelable)
+}
+
 public protocol RegisterRecruitmentPostViewModelable: 
     ApplicationDetailViewModelable,
     CustomerInformationViewModelable,
@@ -251,9 +255,8 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     }
 }
 
-protocol RegisterRecruitmentPostViews: UIView {
+protocol RegisterRecruitmentPostViews: UIView, RegisterRecruitmentPostVMBindable {
     var ctaButton: CTAButtonType1 { get }
-    func bind(viewModel: RegisterRecruitmentPostViewModelable)
 }
 
 extension AddressView: RegisterRecruitmentPostViews { }

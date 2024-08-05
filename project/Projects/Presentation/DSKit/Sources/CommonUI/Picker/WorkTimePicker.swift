@@ -12,7 +12,7 @@ import Entity
 import PresentationCore
 
 /// 오전/오후, 시, 분을 나타냅니다.
-public class DateComponent {
+public struct DateComponent {
     var part: String
     var hour: String
     var minute: String
@@ -36,13 +36,8 @@ public class WorkTimePicker: TextImageButtonType2 {
         2: (0...5).map { $0 == 0 ? "00" : "\($0 * 10)" }
     ]
     
-    public lazy var pickedDateString: BehaviorRelay<DateComponent> = .init(
-        value: .init(
-            part: pickerData[0]!.first!,
-            hour: pickerData[1]!.first!,
-            minute: pickerData[2]!.first!
-        )
-    )
+    public lazy var pickedDateString: PublishRelay<DateComponent> = .init()
+    public private(set) var currentDateComponent: DateComponent?
     
     // View
     public lazy var pickerView: UIPickerView = {
@@ -106,6 +101,13 @@ public class WorkTimePicker: TextImageButtonType2 {
         
         textLabel.textString = placeholderText
         
+        // 초기값 설정
+        currentDateComponent = .init(
+            part: pickerData[0]!.first!,
+            hour: pickerData[1]!.first!,
+            minute: pickerData[2]!.first!
+        )
+        
         setObservable()
     }
     
@@ -130,7 +132,10 @@ extension WorkTimePicker {
     private func didTapDone(_ button: UIBarButtonItem) {
         
         // 라벨 변경
-        textLabel.textString = pickedDateString.value.toString
+        if let component = currentDateComponent {
+            textLabel.textString = component.toString
+            pickedDateString.accept(component)
+        }
         
         resignFirstResponder()
     }
@@ -159,22 +164,15 @@ extension WorkTimePicker : UIPickerViewDataSource, UIPickerViewDelegate {
     //data 선택시 동작할 event
     public func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         
-        let currentComponent = pickedDateString.value
-        
         switch component {
         case 0:
-            currentComponent.part = pickerData[component]![row]
+            currentDateComponent?.part = pickerData[component]![row]
         case 1:
-            currentComponent.hour = pickerData[component]![row]
+            currentDateComponent?.hour = pickerData[component]![row]
         case 2:
-            currentComponent.minute = pickerData[component]![row]
+            currentDateComponent?.minute = pickerData[component]![row]
         default:
             fatalError()
         }
-        
-        printIfDebug(currentComponent.toString)
-        
-        pickedDateString.accept(currentComponent)
     }
-    
 }

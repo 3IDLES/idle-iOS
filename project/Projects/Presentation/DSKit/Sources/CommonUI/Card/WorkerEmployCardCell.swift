@@ -10,30 +10,10 @@ import RxSwift
 import RxCocoa
 import Entity
 
-public class Spacer: UIView {
-    
-    let width: CGFloat?
-    let height: CGFloat?
-    
-    public override var intrinsicContentSize: CGSize {
-        .init(
-            width: width ?? super.intrinsicContentSize.width,
-            height: height ?? super.intrinsicContentSize.height
-        )
-    }
-    
-    public init(width: CGFloat? = nil, height: CGFloat? = nil) {
-        self.width = width
-        self.height = height
-        super.init(frame: .zero)
-    }
-    required init?(coder: NSCoder) { fatalError() }
-}
-
-public class WorkerEmployCard: UIView {
+public class WorkerEmployCardCell: UITableViewCell {
     
     // View
-    public let starButton: IconWithColorStateButton = {
+    let starButton: IconWithColorStateButton = {
         let button = IconWithColorStateButton(
             representImage: DSKitAsset.Icons.subscribeStar.image,
             normalColor: DSKitAsset.Colors.gray200.color,
@@ -94,8 +74,17 @@ public class WorkerEmployCard: UIView {
         return label
     }()
     
-    public init() {
-        super.init(frame: .zero)
+    // apply button
+    let applyButton: TextButtonType1 = {
+       
+        let btn = TextButtonType1(
+            labelText: "지원하기"
+        )
+        return btn
+    }()
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         setAppearance()
         setLayout()
     }
@@ -103,16 +92,16 @@ public class WorkerEmployCard: UIView {
     public required init?(coder: NSCoder) { fatalError() }
     
     func setAppearance() {
-        self.layoutMargins = .init(
+        contentView.layoutMargins = .init(
             top: 16,
             left: 16,
             bottom: 16,
             right: 16
         )
         
-        self.layer.borderWidth = 1
-        self.layer.cornerRadius = 12
-        self.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
+        contentView.layer.borderWidth = 1
+        contentView.layer.cornerRadius = 12
+        contentView.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
     }
     
     func setLayout() {
@@ -132,14 +121,14 @@ public class WorkerEmployCard: UIView {
                 starButton
             ],
             alignment: .center,
-            distribution: .equalSpacing
+            distribution: .equalCentering
         )
         tagStack.setContentHuggingPriority(.defaultLow, for: .horizontal)
         starButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         NSLayoutConstraint.activate([
             starButton.widthAnchor.constraint(equalToConstant: 24),
             starButton.heightAnchor.constraint(equalTo: starButton.widthAnchor),
-        ])
+        ])    
         
         // MARK: Title & takenTimesForWalk
         let titleStack = HStack(
@@ -218,40 +207,42 @@ public class WorkerEmployCard: UIView {
         ])
         
         
-        let stackList = [
-            tagStarStack,
-            Spacer(height: 8),
-            VStack(
-                [titleStack,serviceTargetInfoLabel],
-                spacing: 2,
-                alignment: .leading
-            ),
-            Spacer(height: 4),
-            VStack(
-                [workDayAndTimeView, payView],
-                spacing: 2,
-                alignment: .leading
-            )
-        ]
-            
-        
-        let mainStack = VStack(
-            stackList,
-            alignment: .fill
-        )
-        
         [
-            mainStack
+            tagStarStack,
+            titleStack,
+            serviceTargetInfoLabel,
+            workDayAndTimeView,
+            payView,
+            applyButton,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            self.addSubview($0)
+            contentView.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            mainStack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
-            mainStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            mainStack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            mainStack.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
+            
+            tagStarStack.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            tagStarStack.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            tagStarStack.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            
+            titleStack.topAnchor.constraint(equalTo: tagStarStack.bottomAnchor, constant: 8),
+            titleStack.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            
+            serviceTargetInfoLabel.topAnchor.constraint(equalTo: titleStack.bottomAnchor, constant: 2),
+            serviceTargetInfoLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            
+            workDayAndTimeView.topAnchor.constraint(equalTo: serviceTargetInfoLabel.bottomAnchor, constant: 4),
+            workDayAndTimeView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            
+            payView.topAnchor.constraint(equalTo: workDayAndTimeView.bottomAnchor, constant: 2),
+            payView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            
+            applyButton.heightAnchor.constraint(equalToConstant: 44),
+
+            applyButton.topAnchor.constraint(equalTo: payView.bottomAnchor, constant: 8),
+            applyButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            applyButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            applyButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
         ])
     }
     
