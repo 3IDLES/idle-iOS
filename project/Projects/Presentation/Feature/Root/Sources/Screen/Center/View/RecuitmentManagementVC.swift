@@ -31,19 +31,31 @@ public class RecuitmentManagementVC: UIViewController {
         let label = UILabel()
         label.text = "공고 관리"
         
-        let button = UIButton()
-        button.setTitle("센터정보 등록", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        button.isUserInteractionEnabled = true
+        let button1 = UIButton()
+        button1.setTitle("센터정보 등록", for: .normal)
+        button1.setTitleColor(.black, for: .normal)
+        button1.isUserInteractionEnabled = true
         
-        button.rx.tap
+        let button2 = UIButton()
+        button2.setTitle("공고 등록", for: .normal)
+        button2.setTitleColor(.black, for: .normal)
+        button2.isUserInteractionEnabled = true
+        
+        button1.rx.tap
             .subscribe { [weak coordinator] _ in
                 coordinator?.showCenterRegisterScreen()
             }
             .disposed(by: dispoesBag)
+        
+        button2.rx.tap
+            .subscribe { [weak coordinator] _ in
+                coordinator?.showRegisterRecruitmentPostScreen()
+            }
+            .disposed(by: dispoesBag)
         [
             label,
-            button,
+            button1,
+            button2,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -53,8 +65,11 @@ public class RecuitmentManagementVC: UIViewController {
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 15),
+            button1.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            button1.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 15),
+            
+            button2.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            button2.topAnchor.constraint(equalTo: button1.bottomAnchor, constant: 15),
         ])
     }
 }

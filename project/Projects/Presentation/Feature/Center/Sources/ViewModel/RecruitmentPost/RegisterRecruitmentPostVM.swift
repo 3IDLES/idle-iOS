@@ -16,11 +16,11 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var alert: Driver<DefaultAlertContentVO>?
     
     // MARK: State
-    let workTimeAndPay: BehaviorRelay<WorkTimeAndPayStateObject> = .init(value: .mock)
-    let customerRequirement: BehaviorRelay<CustomerRequirementStateObject> = .init(value: .mock)
-    let customerInformation: BehaviorRelay<CustomerInformationStateObject> = .init(value: .mock)
-    let applicationDetail: BehaviorRelay<ApplicationDetailStateObject> = .init(value: .mock)
-    let addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .mock)
+    let workTimeAndPay: BehaviorRelay<WorkTimeAndPayStateObject> = .init(value: .init())
+    let customerRequirement: BehaviorRelay<CustomerRequirementStateObject> = .init(value: .init())
+    let customerInformation: BehaviorRelay<CustomerInformationStateObject> = .init(value: .init())
+    let applicationDetail: BehaviorRelay<ApplicationDetailStateObject> = .init(value: .init())
+    let addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .init())
     
     // MARK: Address input
     public var detailAddress: PublishRelay<String> = .init()
@@ -31,8 +31,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     
     // MARK: Work time and pay
     public var selectedDay: PublishRelay<(WorkDay, Bool)> = .init()
-    public var workStartTime: PublishRelay<String> = .init()
-    public var workEndTime: PublishRelay<String> = .init()
+    public var workStartTime: PublishRelay<IdleDateComponent> = .init()
+    public var workEndTime: PublishRelay<IdleDateComponent> = .init()
     public var paymentType: PublishRelay<PaymentType> = .init()
     public var paymentAmount: PublishRelay<String> = .init()
     
@@ -71,6 +71,9 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var deadlineString: Driver<String>
     public var applicationDetailStateObject: Driver<ApplicationDetailStateObject>
     public var applicationDetailViewNextable: Driver<Bool>
+    
+    // MARK: PostCard
+    public let workerEmployCardVO: Driver<WorkerEmployCardVO>
     
     // 옵셔널한 입력을 유지합니다.
     let disposeBag = DisposeBag()
@@ -125,8 +128,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             }
             
             return activeDayCnt > 0 &&
-            !object.workStartTime.isEmpty &&
-            !object.workEndTime.isEmpty &&
+            object.workStartTime != nil &&
+            object.workEndTime != nil &&
             object.paymentType != nil &&
             !object.paymentAmount.isEmpty
         }
@@ -334,9 +337,83 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             return false
         }
         .asDriver(onErrorJustReturn: false)
+        
+        // MARK: PostCard
+        workerEmployCardVO = Observable<WorkerEmployCardVO>
+            .create { [
+                workTimeAndPay,
+                customerInformation,
+                applicationDetail,
+                addressInfo
+            ] emitter in
+                
+                // 남은 일수
+                var leftDay: Int? = nil
+                let calendar = Calendar.current
+                let currentDate = Date()
+                
+                if applicationDetail.value.applyDeadlineType == .specificDate, let deadlineDate = applicationDetail.value.deadlineDate {
+                    
+                    let component = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
+                    leftDay = component.day
+                }
+                
+                // 초보가능 여부
+                let isBeginnerPossible = applicationDetail.value.experiencePreferenceType == .beginnerPossible
+                
+                // 제목(=도로명주소)
+                let title = addressInfo.value.addressInfo?.roadAddress ?? "위치정보 표기 오류"
+                
+                // 도보시간
+                let timeTakenForWalk = "도보 n분"
+                
+                // 생년
+                let birthYear = Int(customerInformation.value.birthYear) ?? 1970
+                let currentYear = calendar.component(.year, from: currentDate)
+                let targetAge = currentYear - birthYear + 1
+                
+                // 요양등급
+                let targetLavel: Int = (customerInformation.value.careGrade?.rawValue ?? 0)+1
+                
+                // 성별
+                let targetGender = customerInformation.value.gender
+                
+                // 근무 요일
+                let days = workTimeAndPay.value.selectedDays.filter { (_, value) in
+                    value
+                }.map { (key, _) in
+                    key
+                }
+                
+                // 근무 시작, 종료시간
+                let startTime = workTimeAndPay.value.workStartTime?.convertToStringForButton() ?? "00:00"
+                let workEndTime = workTimeAndPay.value.workEndTime?.convertToStringForButton() ?? "00:00"
+                
+                // 급여타입및 양
+                let paymentType = workTimeAndPay.value.paymentType ?? .hourly
+                let paymentAmount = workTimeAndPay.value.paymentAmount
+                
+                let vo = WorkerEmployCardVO(
+                    dayLeft: leftDay ?? 0,
+                    isBeginnerPossible: isBeginnerPossible,
+                    title: title,
+                    timeTakenForWalk: timeTakenForWalk,
+                    targetAge: targetAge,
+                    targetLevel: targetLavel,
+                    targetGender: targetGender ?? .notDetermined,
+                    days: days,
+                    startTime: startTime,
+                    endTime: workEndTime,
+                    paymentType: paymentType,
+                    paymentAmount: paymentAmount
+                )
+                
+                emitter.onNext(vo)
+                
+                return Disposables.create { }
+            }
+            .asDriver(onErrorJustReturn: .mock)
     }
-    
-    
 }
 
 extension Date {

@@ -39,4 +39,8 @@ extension RecruitmentManagementCoordinator {
     func showCenterRegisterScreen() {
         parent?.centerProfileRegister()
     }
+    
+    func showRegisterRecruitmentPostScreen() {
+        parent?.registerRecruitmentPost()
+    }
 }

@@ -249,12 +249,20 @@ public class WorkerEmployCardCell: UITableViewCell {
     public func bind(vo: WorkerEmployCardVO) {
         
         beginnerTag.isHidden = !vo.isBeginnerPossible
-        dayLeftTag.textString = "D-\(vo.dayLeft)"
+        if vo.dayLeft <= 0 {
+            if vo.dayLeft == 0 {
+                dayLeftTag.textString = "D-Day"
+            } else {
+                dayLeftTag.isHidden = true
+            }
+        } else {
+            dayLeftTag.textString = "D-\(vo.dayLeft)"
+        }
         titleLabel.textString = vo.title
         timeTakenForWalkLabel.textString = vo.timeTakenForWalk
         serviceTargetInfoLabel.textString = "\(vo.targetLevel)등급 \(vo.targetAge)세 \(vo.targetGender.twoLetterKoreanWord)"
-        workDaysLabel.textString = vo.days.map({ $0.rawValue }).joined(separator: ",")
+        workDaysLabel.textString = vo.days.map({ $0.korOneLetterText }).joined(separator: ",")
         workTimeLabel.textString = "\(vo.startTime) - \(vo.endTime)"
-        payPerHourLabel.textString = "시급 \(vo.payPerHour) 원"
+        payPerHourLabel.textString = "\(vo.paymentType.korLetterText) \(vo.paymentAmount) 원"
     }
 }

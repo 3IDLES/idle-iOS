@@ -110,7 +110,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
     ]
     
     // 추가 요구사항
-    lazy var additionalText: MultiLineTextField = {
+    lazy var additionalRequirmentField: MultiLineTextField = {
         let field = MultiLineTextField(
             typography: .Body3,
             placeholderText: "추가적으로 요구사항이 있다면 작성해주세요."
@@ -141,7 +141,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
     public required init?(coder: NSCoder) { fatalError() }
     
     private func setAppearance() {
-        self.backgroundColor = .clear
+        self.backgroundColor = .white
         self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
     }
     
@@ -170,7 +170,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         }
         
         NSLayoutConstraint.activate([
-            additionalText.heightAnchor.constraint(equalToConstant: 156)
+            additionalRequirmentField.heightAnchor.constraint(equalToConstant: 156)
         ])
         
         // 스크롤뷰에 들어갈 뷰 레아이웃 설정
@@ -222,7 +222,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
             VStack(
                 [
                     IdleContentTitleLabel(titleText: "이외에도 요구사항이 있다면 적어주세요.", subTitleText: "(선택)"),
-                    additionalText
+                    additionalRequirmentField
                 ],
                 spacing: 6,
                 alignment: .fill
@@ -289,8 +289,8 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         // Input
         Observable
             .merge(
-                mealSupportBtn1.eventPublisher.map { _ in true },
-                mealSupportBtn2.eventPublisher.map { _ in false }
+                mealSupportBtn1.eventPublisher.compactMap { state -> Bool? in state == .accent ? true : nil },
+                mealSupportBtn2.eventPublisher.compactMap { state -> Bool? in state == .accent ? false : nil }
             ).map { [mealSupportBtn1, mealSupportBtn2] isActive in
                 
                 if isActive {
@@ -306,8 +306,8 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         
         Observable
             .merge(
-                toiletSupportBtn1.eventPublisher.map { _ in true },
-                toiletSupportBtn2.eventPublisher.map { _ in false }
+                toiletSupportBtn1.eventPublisher.compactMap { state -> Bool? in state == .accent ? true : nil },
+                toiletSupportBtn2.eventPublisher.compactMap { state -> Bool? in state == .accent ? false : nil }
             ).map { [toiletSupportBtn1, toiletSupportBtn2] isActive in
                 
                 if isActive {
@@ -323,8 +323,8 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         
         Observable
                 .merge(
-                    movingSupportBtn1.eventPublisher.map { _ in true },
-                    movingSupportBtn2.eventPublisher.map { _ in false }
+                    movingSupportBtn1.eventPublisher.compactMap { state -> Bool? in state == .accent ? true : nil },
+                    movingSupportBtn2.eventPublisher.compactMap { state -> Bool? in state == .accent ? false : nil }
                 )
                 .map { [movingSupportBtn1, movingSupportBtn2] isActive in
                     
@@ -351,6 +351,12 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
                 .bind(to: viewModel.dailySupportTypes)
                 .disposed(by: disposeBag)
         }
+        
+        additionalRequirmentField
+            .rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.additionalRequirement)
+            .disposed(by: disposeBag)
         
         // Output, viewModel로 부터 전달받는 상태
         viewModel
@@ -390,7 +396,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
                 // 추가요구사항
                 let additionalRequirementText = stateFromVM.additionalRequirement
                 if !additionalRequirementText.isEmpty {
-                    additionalText.textString = additionalRequirementText
+                    additionalRequirmentField.textString = additionalRequirementText
                 }
                 
             })

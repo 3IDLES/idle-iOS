@@ -7,24 +7,6 @@
 
 import Foundation
 
-public enum Day: String {
-    case mon = "월"
-    case tue = "화"
-    case wed = "수"
-    case thu = "목"
-    case fri = "금"
-    case sat = "터"
-    case sun = "일"
-    
-    static let days: [Day] = [
-        mon,
-        tue,
-        wed,
-        thu,
-        fri,
-    ]
-}
-
 public struct WorkerEmployCardVO {
     
     public let dayLeft: Int
@@ -34,10 +16,26 @@ public struct WorkerEmployCardVO {
     public let targetAge: Int
     public let targetLevel: Int
     public let targetGender: Gender
-    public let days: [Day]
+    public let days: [WorkDay]
     public let startTime: String
     public let endTime: String
-    public let payPerHour: String
+    public let paymentType: PaymentType
+    public let paymentAmount: String
+    
+    public init(dayLeft: Int, isBeginnerPossible: Bool, title: String, timeTakenForWalk: String, targetAge: Int, targetLevel: Int, targetGender: Gender, days: [WorkDay], startTime: String, endTime: String, paymentType: PaymentType, paymentAmount: String) {
+        self.dayLeft = dayLeft
+        self.isBeginnerPossible = isBeginnerPossible
+        self.title = title
+        self.timeTakenForWalk = timeTakenForWalk
+        self.targetAge = targetAge
+        self.targetLevel = targetLevel
+        self.targetGender = targetGender
+        self.days = days
+        self.startTime = startTime
+        self.endTime = endTime
+        self.paymentType = paymentType
+        self.paymentAmount = paymentAmount
+    }
 }
 
 public extension WorkerEmployCardVO {
@@ -50,9 +48,10 @@ public extension WorkerEmployCardVO {
         targetAge: 78,
         targetLevel: 1,
         targetGender: .female,
-        days: Day.days,
+        days: WorkDay.allCases,
         startTime: "09:00",
         endTime: "15:00",
-        payPerHour: "12,500"
+        paymentType: .monthly,
+        paymentAmount: "12,500"
     )
 }

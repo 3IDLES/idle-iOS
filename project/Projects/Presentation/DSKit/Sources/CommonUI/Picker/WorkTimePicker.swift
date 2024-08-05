@@ -11,33 +11,16 @@ import RxCocoa
 import Entity
 import PresentationCore
 
-/// 오전/오후, 시, 분을 나타냅니다.
-public struct DateComponent {
-    var part: String
-    var hour: String
-    var minute: String
-    
-    public var toString: String {
-        "\(part) \(hour):\(minute)"
-    }
-    
-    init(part: String, hour: String, minute: String) {
-        self.part = part
-        self.hour = hour
-        self.minute = minute
-    }
-}
-
 public class WorkTimePicker: TextImageButtonType2 {
     
     private let pickerData: [Int: [String]] = [
-        0: ["오전", "오후"],
+        0: IdleDateComponent.Part.allCases.map { $0.rawValue },
         1: (1...12).map { $0 < 10 ? "0\($0)" : "\($0)" },
         2: (0...5).map { $0 == 0 ? "00" : "\($0 * 10)" }
     ]
     
-    public lazy var pickedDateString: PublishRelay<DateComponent> = .init()
-    public private(set) var currentDateComponent: DateComponent?
+    public lazy var pickedDateComponent: PublishRelay<IdleDateComponent> = .init()
+    public private(set) var currentDateComponent: IdleDateComponent?
     
     // View
     public lazy var pickerView: UIPickerView = {
@@ -103,7 +86,7 @@ public class WorkTimePicker: TextImageButtonType2 {
         
         // 초기값 설정
         currentDateComponent = .init(
-            part: pickerData[0]!.first!,
+            part: .AM,
             hour: pickerData[1]!.first!,
             minute: pickerData[2]!.first!
         )
@@ -133,8 +116,8 @@ extension WorkTimePicker {
         
         // 라벨 변경
         if let component = currentDateComponent {
-            textLabel.textString = component.toString
-            pickedDateString.accept(component)
+            textLabel.textString = component.convertToStringForButton()
+            pickedDateComponent.accept(component)
         }
         
         resignFirstResponder()
@@ -166,7 +149,8 @@ extension WorkTimePicker : UIPickerViewDataSource, UIPickerViewDelegate {
         
         switch component {
         case 0:
-            currentDateComponent?.part = pickerData[component]![row]
+            let rawValue = pickerData[component]![row]
+            currentDateComponent?.part = IdleDateComponent.Part(rawValue: rawValue)!
         case 1:
             currentDateComponent?.hour = pickerData[component]![row]
         case 2:

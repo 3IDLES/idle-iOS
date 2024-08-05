@@ -35,6 +35,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         navigationController.setNavigationBarHidden(true, animated: false)
         
         let coordinator = RegisterRecruitmentCoordinator(
+            viewModel: RegisterRecruitmentPostVM(),
             navigationController: navigationController
         )
         
@@ -43,7 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         vc.bind(viewModel: vm)
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = vc
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         
         coordinator.start()

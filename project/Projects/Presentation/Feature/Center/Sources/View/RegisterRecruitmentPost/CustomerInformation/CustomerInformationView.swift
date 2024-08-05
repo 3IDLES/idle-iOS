@@ -128,7 +128,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     public required init?(coder: NSCoder) { fatalError() }
     
     private func setAppearance() {
-        self.backgroundColor = .clear
+        self.backgroundColor = .white
         self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
     }
     

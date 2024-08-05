@@ -15,8 +15,8 @@ import DSKit
  
 public protocol WorkTimeAndPayViewModelable {
     var selectedDay: PublishRelay<(WorkDay, Bool)> { get }
-    var workStartTime: PublishRelay<String> { get }
-    var workEndTime: PublishRelay<String> { get }
+    var workStartTime: PublishRelay<IdleDateComponent> { get }
+    var workEndTime: PublishRelay<IdleDateComponent> { get }
     var paymentType: PublishRelay<PaymentType> { get }
     var paymentAmount: PublishRelay<String> { get }
     
@@ -101,7 +101,7 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
     public required init?(coder: NSCoder) { fatalError() }
     
     private func setAppearance() {
-        self.backgroundColor = .clear
+        self.backgroundColor = .white
         self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
     }
     
@@ -251,14 +251,12 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         }
         
         workStartTimePicker
-            .pickedDateString
-            .map { $0.toString }
+            .pickedDateComponent
             .bind(to: viewModel.workStartTime)
             .disposed(by: disposeBag)
         
         workEndTimePicker
-            .pickedDateString
-            .map { $0.toString }
+            .pickedDateComponent
             .bind(to: viewModel.workEndTime)
             .disposed(by: disposeBag)
             
@@ -314,13 +312,13 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
                 }
                 
                 // 시작시간
-                if !stateFromVM.workStartTime.isEmpty {
-                    workStartTimePicker.textLabel.textString = stateFromVM.workStartTime
+                if let dateComponent = stateFromVM.workStartTime {
+                    workStartTimePicker.textLabel.textString = dateComponent.convertToStringForButton()
                 }
                 
                 // 종료 시간
-                if !stateFromVM.workEndTime.isEmpty {
-                    workEndTimePicker.textLabel.textString = stateFromVM.workEndTime
+                if let dateComponent = stateFromVM.workEndTime {
+                    workEndTimePicker.textLabel.textString = dateComponent.convertToStringForButton()
                 }
                 
                 // 급여타입
