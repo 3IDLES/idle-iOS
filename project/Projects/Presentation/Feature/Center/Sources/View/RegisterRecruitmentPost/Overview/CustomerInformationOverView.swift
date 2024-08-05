@@ -220,10 +220,14 @@ class CustomerInformationOverView: VStack, RegisterRecruitmentPostVMBindable {
                 if let careGrade = object.careGrade {
                     let text: String = careGrade.textForCellBtn + "등급"
                     careGradeLabel.textString = text
+                } else {
+                    careGradeLabel.textString = "오류"
                 }
                 
                 if let cognitionState = object.cognitionState {
                     cognitionStateLabel.textString = cognitionState.korTextForCellBtn
+                } else {
+                    cognitionStateLabel.textString = "오류"
                 }
                 
                 deceaseLabel.textString = object.deceaseDescription.isEmpty ? "-" : object.deceaseDescription
