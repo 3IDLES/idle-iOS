@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-/// 이미지어ㅏ 텍스트가 수직으로 배치되는 버튼입니다.
+/// 이미지와 텍스트가 수직으로 배치되는 버튼입니다.
 public class TextImageButtonType1: UIView {
     
     private var tapGesture: UITapGestureRecognizer!

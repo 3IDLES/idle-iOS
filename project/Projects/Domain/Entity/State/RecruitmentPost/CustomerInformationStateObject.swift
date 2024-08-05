@@ -46,4 +46,16 @@ public class CustomerInformationStateObject {
     public var deceaseDescription: String = ""
     
     public init() { }
+    
+    public static let mock: CustomerInformationStateObject = {
+        let mockObject = CustomerInformationStateObject()
+        mockObject.name = "John Doe"
+        mockObject.gender = .male
+        mockObject.birthYear = "1950"
+        mockObject.weight = "70"
+        mockObject.careGrade = .four
+        mockObject.cognitionState = .earlyStage
+        mockObject.deceaseDescription = "질병 없음"
+        return mockObject
+    }()
 }

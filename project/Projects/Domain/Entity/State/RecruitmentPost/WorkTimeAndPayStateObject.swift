@@ -61,4 +61,14 @@ public class WorkTimeAndPayStateObject {
     public var paymentAmount: String = ""
     
     public init() { }
+    
+    public static var mock: WorkTimeAndPayStateObject {
+        let mockObject = WorkTimeAndPayStateObject()
+        mockObject.selectedDays = [.mon: true, .tue: true, .wed: false, .thu: true, .fri: true, .sat: false, .sun: false]
+        mockObject.workStartTime = "오전 09:00"
+        mockObject.workEndTime = "오후 05:00"
+        mockObject.paymentType = .hourly
+        mockObject.paymentAmount = "15000"
+        return mockObject
+    }
 }

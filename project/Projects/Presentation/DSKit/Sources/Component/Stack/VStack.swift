@@ -8,7 +8,7 @@
 import UIKit
 
 
-public class VStack: UIStackView {
+open class VStack: UIStackView {
     
     public init(_ elements: [UIView], spacing: CGFloat = 0.0, alignment: UIStackView.Alignment = .center, distribution: UIStackView.Distribution = .fill) {
         
@@ -25,6 +25,6 @@ public class VStack: UIStackView {
             }
     }
     
-    required init(coder: NSCoder) { fatalError() }
+    public required init(coder: NSCoder) { fatalError() }
 }
 

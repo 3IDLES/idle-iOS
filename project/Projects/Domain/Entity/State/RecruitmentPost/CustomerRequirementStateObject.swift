@@ -23,6 +23,16 @@ public class CustomerRequirementStateObject {
     }()
     
     public init() { }
+    
+    public static var mock: CustomerRequirementStateObject {
+        let mockObject = CustomerRequirementStateObject()
+        mockObject.mealSupportNeeded = true
+        mockObject.toiletSupportNeeded = false
+        mockObject.movingSupportNeeded = true
+        mockObject.additionalRequirement = "Additional help with medication."
+        mockObject.dailySupportTypeNeeds = [.cleaning: true, .exerciseSupport: false, .laundry: true, .listener: false, .walking: true]
+        return mockObject
+    }
 }
 
 public enum DailySupportType: Int, CaseIterable {
