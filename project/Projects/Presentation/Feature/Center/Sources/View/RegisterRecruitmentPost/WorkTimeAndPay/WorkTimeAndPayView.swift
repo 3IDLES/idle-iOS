@@ -39,6 +39,112 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         return label
     }()
     
+    
+    let contentView: WorkTimeAndPayContentView = .init()
+    
+    let ctaButton: CTAButtonType1 = {
+        
+        let button = CTAButtonType1(labelText: "다음")
+        button.setEnabled(false)
+        return button
+    }()
+    
+    private let disposeBag = DisposeBag()
+    
+    public init() {
+        
+        super.init(frame: .zero)
+        
+        setAppearance()
+        setLayout()
+        setObservable()
+    }
+    public required init?(coder: NSCoder) { fatalError() }
+    
+    private func setAppearance() {
+        self.backgroundColor = .white
+        self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
+    }
+    
+    private func setLayout() {
+        
+        let scrollView = UIScrollView()
+        scrollView.delaysContentTouches = false
+        scrollView.contentInset = .init(
+            top: 0,
+            left: 20,
+            bottom: 24,
+            right: 20
+        )
+        
+        [
+            contentView
+        ].forEach {
+                
+            scrollView.addSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        let horizontalInset = scrollView.contentInset.left + scrollView.contentInset.right
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor, constant: -horizontalInset),
+        ])
+        
+        [
+            processTitle,
+            
+            scrollView,
+            
+            ctaButton
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            
+            processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
+            processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            
+            scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
+            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+            
+            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+        ])
+    }
+    
+    private func setObservable() { }
+    
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+        
+        // Input
+        contentView.bind(viewModel: viewModel)
+        
+        // Output
+        viewModel
+            .workTimeAndPayNextable
+            .drive(onNext: { [ctaButton] nextable in
+                ctaButton.setEnabled(nextable)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+}
+
+// MARK: Inner view
+public class WorkTimeAndPayContentView: UIView {
+    
     // 근무 요일
     let workDayButtons: [StateButtonTyp1] = {
         WorkDay.allCases.map { day in
@@ -80,32 +186,17 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         return field
     }()
     
-    
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
-    }()
-    
     private let disposeBag = DisposeBag()
     
     public init() {
-        
         super.init(frame: .zero)
-        
-        setAppearance()
         setLayout()
-        setObservable()
-    }
-    public required init?(coder: NSCoder) { fatalError() }
-    
-    private func setAppearance() {
-        self.backgroundColor = .white
-        self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
     }
     
-    private func setLayout() {
+    public required init(coder: NSCoder) { fatalError() }
+    
+    
+    func setLayout() {
         
         // 정적 크기
         workDayButtons
@@ -126,8 +217,7 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
                 ])
             }
         
-        
-        let stackList: [VStack] = [
+        let stackList: [UIView] = [
         
             VStack(
                 [
@@ -163,17 +253,8 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
                 ],
                 spacing: 6,
                 alignment: .fill
-            )
+            ),
         ]
-        
-        let scrollView = UIScrollView()
-        scrollView.delaysContentTouches = false
-        scrollView.contentInset = .init(
-            top: 0,
-            left: 20,
-            bottom: 24,
-            right: 20
-        )
         
         let scrollViewContentStack = VStack(
             stackList,
@@ -185,51 +266,21 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
             scrollViewContentStack,
             paymentField
         ].forEach {
-                
-            scrollView.addSubview($0)
-            $0.translatesAutoresizingMaskIntoConstraints = false
-        }
-        
-        NSLayoutConstraint.activate([
-            scrollViewContentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
-            scrollViewContentStack.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
-            scrollViewContentStack.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            
-            paymentField.topAnchor.constraint(equalTo: scrollViewContentStack.bottomAnchor, constant: 12),
-            paymentField.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            paymentField.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
-            paymentField.bottomAnchor.constraint(equalTo:  scrollView.contentLayoutGuide.bottomAnchor),
-        ])
-        
-        [
-            processTitle,
-            
-            scrollView,
-            
-            ctaButton
-        ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
+            scrollViewContentStack.topAnchor.constraint(equalTo: self.topAnchor),
+            scrollViewContentStack.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollViewContentStack.rightAnchor.constraint(equalTo: self.rightAnchor),
             
-            processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
-            processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            
-            scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
-            
-            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+            paymentField.topAnchor.constraint(equalTo: scrollViewContentStack.bottomAnchor, constant: 12),
+            paymentField.rightAnchor.constraint(equalTo: self.rightAnchor),
+            paymentField.leftAnchor.constraint(equalTo: self.leftAnchor),
+            paymentField.bottomAnchor.constraint(equalTo: self.bottomAnchor)
         ])
     }
-    
-    private func setObservable() { }
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
@@ -293,12 +344,6 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
             .disposed(by: disposeBag)
         
         // Output
-        viewModel
-            .workTimeAndPayNextable
-            .drive(onNext: { [ctaButton] nextable in
-                ctaButton.setEnabled(nextable)
-            })
-            .disposed(by: disposeBag)
         
         viewModel
             .workTimeAndPayStateObject
@@ -343,5 +388,4 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
             })
             .disposed(by: disposeBag)
     }
-    
 }

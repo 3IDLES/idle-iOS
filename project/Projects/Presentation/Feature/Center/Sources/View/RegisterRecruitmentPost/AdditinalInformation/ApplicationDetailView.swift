@@ -33,7 +33,6 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
     // Init
     public weak var viewController: UIViewController?
     
-    
     // View
     private let processTitle: IdleLabel = {
         let label = IdleLabel(typography: .Heading2)
@@ -41,6 +40,109 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
         label.textAlignment = .left
         return label
     }()
+    
+    let contentView: ApplicationDetailViewContentView
+    
+    let ctaButton: CTAButtonType1 = {
+        
+        let button = CTAButtonType1(labelText: "다음")
+        button.setEnabled(false)
+        return button
+    }()
+    
+    private let disposeBag = DisposeBag()
+    
+    public init(
+        viewController: UIViewController
+    ) {
+        self.contentView = ApplicationDetailViewContentView(
+            viewController: viewController
+        )
+        
+        super.init(frame: .zero)
+        
+        setAppearance()
+        setLayout()
+    }
+    
+    public required init?(coder: NSCoder) { fatalError() }
+    
+    private func setAppearance() {
+        self.backgroundColor = .white
+        self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
+    }
+    
+    private func setLayout() {
+        
+        let scrollView = UIScrollView()
+        scrollView.delaysContentTouches = false
+        scrollView.contentInset = .init(
+            top: 0,
+            left: 20,
+            bottom: 24,
+            right: 20
+        )
+
+        scrollView.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let horizontalInset = scrollView.contentInset.left + scrollView.contentInset.right
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor, constant: -horizontalInset)
+        ])
+        
+        [
+            processTitle,
+            
+            scrollView,
+            
+            ctaButton
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            
+            processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
+            processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            
+            scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
+            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+            
+            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+        ])
+    }
+    
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+        
+        contentView.bind(viewModel: viewModel)
+        
+        viewModel
+            .applicationDetailViewNextable
+            .drive(onNext: { [ctaButton] nextable in
+                ctaButton.setEnabled(nextable)
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
+
+public class ApplicationDetailViewContentView: UIView {
+    
+    // Init
+    public weak var viewController: UIViewController?
     
     // 경력우대 여부
     let expButtons: [StateButtonTyp1] = {
@@ -79,36 +181,22 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
         return view
     }()
     
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
-    }()
     
-    private let disposeBag = DisposeBag()
     private let deadlineDate: PublishRelay<Date> = .init()
     
-    public init(
-        viewController: UIViewController
-    ) {
+    private let disposeBag = DisposeBag()
+    
+    public init(viewController: UIViewController) {
         self.viewController = viewController
-        
         super.init(frame: .zero)
-        
-        setAppearance()
         setLayout()
         setObservable()
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    public required init(coder: NSCoder) { fatalError() }
     
-    private func setAppearance() {
-        self.backgroundColor = .white
-        self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
-    }
     
-    private func setLayout() {
+    func setLayout() {
         
         // 정적 크기
         [
@@ -164,15 +252,6 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
             ),
         ]
         
-        let scrollView = UIScrollView()
-        scrollView.delaysContentTouches = false
-        scrollView.contentInset = .init(
-            top: 0,
-            left: 20,
-            bottom: 24,
-            right: 20
-        )
-        
         let scrollViewContentStack = VStack(
             stackList,
             spacing: 28,
@@ -184,47 +263,18 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
             calendarOpenButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            scrollView.addSubview($0)
-        }
-        
-        NSLayoutConstraint.activate([
-            scrollViewContentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
-            scrollViewContentStack.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
-            scrollViewContentStack.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            
-            calendarOpenButton.heightAnchor.constraint(equalToConstant: 44),
-            calendarOpenButton.topAnchor.constraint(equalTo: scrollViewContentStack.bottomAnchor, constant: 12),
-            calendarOpenButton.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
-            calendarOpenButton.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            calendarOpenButton.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-        ])
-        
-        
-        [
-            processTitle,
-            
-            scrollView,
-            
-            ctaButton
-        ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
+            scrollViewContentStack.topAnchor.constraint(equalTo: self.topAnchor),
+            scrollViewContentStack.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollViewContentStack.rightAnchor.constraint(equalTo: self.rightAnchor),
             
-            processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
-            processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            
-            scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
-            
-            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+            calendarOpenButton.topAnchor.constraint(equalTo: scrollViewContentStack.bottomAnchor, constant: 12),
+            calendarOpenButton.rightAnchor.constraint(equalTo: self.rightAnchor),
+            calendarOpenButton.leftAnchor.constraint(equalTo: self.leftAnchor),
+            calendarOpenButton.bottomAnchor.constraint(equalTo: self.bottomAnchor)
         ])
     }
     
@@ -404,19 +454,10 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
                 calendarOpenButton.textLabel.textString = str
             })
             .disposed(by: disposeBag)
-        
-        viewModel
-            .applicationDetailViewNextable
-            .drive(onNext: { [ctaButton] nextable in
-                ctaButton.setEnabled(nextable)
-            })
-            .disposed(by: disposeBag)
     }
 }
 
-
-
-extension ApplicationDetailView: OneDayPickerDelegate {
+extension ApplicationDetailViewContentView: OneDayPickerDelegate {
     public func oneDayPicker(selectedDate: Date) {
         // 위임자 패턴으로 데이터를 수신
         deadlineDate.accept(selectedDate)

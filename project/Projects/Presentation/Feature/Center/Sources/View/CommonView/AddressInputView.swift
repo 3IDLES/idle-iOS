@@ -49,10 +49,9 @@ public protocol AddressInputViewModelable {
 }
 
 // MARK: 센터주소 (도로명, 지번주소 + 상세주소)
-class AddressView: UIView, DaumAddressSearchDelegate {
+class AddressView: UIView {
     
     // init
-    public weak var viewController: UIViewController?
     
     // View
     private let processTitle: IdleLabel = {
@@ -62,6 +61,98 @@ class AddressView: UIView, DaumAddressSearchDelegate {
         return label
     }()
 
+    let contentView: AddressContentView
+    
+    // 하단 버튼
+    let ctaButton: CTAButtonType1 = {
+        
+        let button = CTAButtonType1(labelText: "다음")
+        button.setEnabled(false)
+        return button
+    }()
+    
+    // Observable
+    private let disposeBag = DisposeBag()
+    
+    init(viewController vc: UIViewController) {
+        
+        self.contentView = AddressContentView(viewController: vc)
+        super.init(frame: .zero)
+        setAppearance()
+        setLayout()
+    }
+    required init?(coder: NSCoder) { fatalError() }
+    
+    private func setAppearance() {
+        self.backgroundColor = .white
+        self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
+    }
+    
+    private func setLayout() {
+        
+        [
+            processTitle,
+            contentView,
+            ctaButton
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            
+            processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
+            processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
+            contentView.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            
+            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+        ])
+    }
+    
+    
+    public func bind(viewModel vm: AddressInputViewModelable) {
+        
+        contentView.bind(viewModel: vm)
+        
+        // output
+        vm
+            .addressValidation?
+            .drive(onNext: { [ctaButton] isValid in
+                ctaButton.setEnabled(isValid)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+        
+        contentView.bind(viewModel: viewModel)
+        
+        // Output
+        viewModel
+            .addressInputNextable
+            .drive(onNext: { [ctaButton] isNextable in
+                ctaButton.setEnabled(isNextable)
+            })
+            .disposed(by: disposeBag)
+        
+        
+    }
+    
+    
+}
+
+class AddressContentView: VStack, DaumAddressSearchDelegate {
+    
+    // Init
+    public weak var viewController: UIViewController?
+    
+    // View
     private let addressSearchButton: TextButtonType2 = {
        
         let button = TextButtonType2(labelText: "도로명 주소를 입력해주세요.")
@@ -77,33 +168,22 @@ class AddressView: UIView, DaumAddressSearchDelegate {
         return field
     }()
     
-    // 하단 버튼
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
-    }()
-    
-    // Observable
+    let disposeBag = DisposeBag()
     private let addressPublisher: PublishRelay<AddressInformation> = .init()
-    private let disposeBag = DisposeBag()
     
-    init(viewController vc: UIViewController) {
-        self.viewController = vc
-        super.init(frame: .zero)
-        setAppearance()
+    init(viewController: UIViewController) {
+        self.viewController = viewController
+        
+        super.init([], spacing: 28,
+                   alignment: .fill)
+        
         setLayout()
         setObservable()
     }
-    required init?(coder: NSCoder) { fatalError() }
     
-    private func setAppearance() {
-        self.backgroundColor = .white
-        self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
-    }
+    required init(coder: NSCoder) { fatalError() }
     
-    private func setLayout() {
+    func setLayout() {
         
         let roadAddressStack = VStack(
             [
@@ -119,38 +199,12 @@ class AddressView: UIView, DaumAddressSearchDelegate {
             alignment: .fill
         )
         
-        let inputStack = VStack(
-            [
-                roadAddressStack,
-                detailAddressField
-            ],
-            spacing: 28,
-            alignment: .fill
-        )
-        
         [
-            processTitle,
-            inputStack,
-            ctaButton
+            roadAddressStack,
+            detailAddressField
         ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            self.addSubview($0)
+            self.addArrangedSubview($0)
         }
-        
-        NSLayoutConstraint.activate([
-            
-            processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
-            processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            
-            inputStack.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            inputStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            inputStack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            
-            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
-        ])
     }
     
     private func setObservable() {
@@ -173,13 +227,6 @@ class AddressView: UIView, DaumAddressSearchDelegate {
             .disposed(by: disposeBag)
     }
     
-    private func showDaumSearchView() {
-        let vc = DaumAddressSearchViewController()
-        vc.delegate = self
-        vc.modalPresentationStyle = .fullScreen
-        viewController?.navigationController?.pushViewController(vc, animated: true)
-    }
-    
     public func bind(viewModel vm: AddressInputViewModelable) {
         
         // Input
@@ -191,14 +238,6 @@ class AddressView: UIView, DaumAddressSearchDelegate {
             .uITextField.rx.text
             .compactMap { $0 }
             .bind(to: vm.editingDetailAddress)
-            .disposed(by: disposeBag)
-        
-        // output
-        vm
-            .addressValidation?
-            .drive(onNext: { [ctaButton] isValid in
-                ctaButton.setEnabled(isValid)
-            })
             .disposed(by: disposeBag)
     }
     
@@ -215,14 +254,6 @@ class AddressView: UIView, DaumAddressSearchDelegate {
             .bind(to: viewModel.detailAddress)
             .disposed(by: disposeBag)
         
-        // Output
-        viewModel
-            .addressInputNextable
-            .drive(onNext: { [ctaButton] isNextable in
-                ctaButton.setEnabled(isNextable)
-            })
-            .disposed(by: disposeBag)
-        
         // 초기값 설정
         viewModel
             .addressInputStateObject
@@ -231,12 +262,20 @@ class AddressView: UIView, DaumAddressSearchDelegate {
                 if let info = state.addressInfo {
                     addressSearchButton.label.textString = info.roadAddress
                 }
-                 
+                
                 if !state.detailAddress.isEmpty {
                     detailAddressField.uITextField.text = state.detailAddress
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    
+    private func showDaumSearchView() {
+        let vc = DaumAddressSearchViewController()
+        vc.delegate = self
+        vc.modalPresentationStyle = .fullScreen
+        viewController?.navigationController?.pushViewController(vc, animated: true)
     }
     
     public func addressSearch(addressData: [AddressDataKey : String]) {

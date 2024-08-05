@@ -41,6 +41,105 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
         return label
     }()
     
+    let contentView = CustomerInformationContentView()
+    
+    let ctaButton: CTAButtonType1 = {
+        
+        let button = CTAButtonType1(labelText: "다음")
+        button.setEnabled(false)
+        return button
+    }()
+    
+    private let disposeBag = DisposeBag()
+    
+    public init() {
+        
+        super.init(frame: .zero)
+        
+        setAppearance()
+        setLayout()
+        setObservable()
+    }
+    public required init?(coder: NSCoder) { fatalError() }
+    
+    private func setAppearance() {
+        self.backgroundColor = .white
+        self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
+    }
+    
+    private func setLayout() {
+        
+        let scrollView = UIScrollView()
+        scrollView.contentInset = .init(
+            top: 0,
+            left: 20,
+            bottom: 24,
+            right: 20
+        )
+        
+        scrollView.delaysContentTouches = false
+        scrollView.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let horizontalInset = scrollView.contentInset.left + scrollView.contentInset.right
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor, constant: -horizontalInset)
+        ])
+        
+        [
+            processTitle,
+            
+            scrollView,
+            
+            ctaButton
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            
+            processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
+            processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            
+            scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
+            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+            
+            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+        ])
+    }
+
+    
+    private func setObservable() { }
+    
+    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+      
+        // Input
+        contentView.bind(viewModel: viewModel)
+        
+        // Output
+        viewModel
+            .customerInformationNextable
+            .drive(onNext: { [ctaButton] nextable in
+                ctaButton.setEnabled(nextable)
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
+class CustomerInformationContentView: UIView {
+    
     // 이름 입력
     lazy var nameField: MultiLineTextField = {
         let field = MultiLineTextField(typography: .Body3, placeholderText: "고객의 이름을 입력해 주세요.")
@@ -108,31 +207,17 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
         return field
     }()
     
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
-    }()
-    
     private let disposeBag = DisposeBag()
     
     public init() {
-        
         super.init(frame: .zero)
-        
-        setAppearance()
         setLayout()
-        setObservable()
-    }
-    public required init?(coder: NSCoder) { fatalError() }
-    
-    private func setAppearance() {
-        self.backgroundColor = .white
-        self.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
     }
     
-    private func setLayout() {
+    public required init(coder: NSCoder) { fatalError() }
+    
+    
+    func setLayout() {
         
         // 정적 크기
         [
@@ -229,61 +314,26 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             ),
         ]
         
-        let scrollView = UIScrollView()
-        scrollView.contentInset = .init(
-            top: 0,
-            left: 20,
-            bottom: 24,
-            right: 20
-        )
-        
         let scrollViewContentStack = VStack(
             stackList,
             spacing: 28,
             alignment: .fill
         )
         
-        scrollView.delaysContentTouches = false
-        scrollView.addSubview(scrollViewContentStack)
-        scrollViewContentStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            scrollViewContentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
-            scrollViewContentStack.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
-            scrollViewContentStack.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            scrollViewContentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-        ])
-        
         [
-            processTitle,
-            
-            scrollView,
-            
-            ctaButton
+            scrollViewContentStack
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            
-            processTitle.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
-            processTitle.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            processTitle.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            
-            scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
-            scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
-            
-            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+            scrollViewContentStack.topAnchor.constraint(equalTo: self.topAnchor),
+            scrollViewContentStack.leftAnchor.constraint(equalTo: self.leftAnchor),
+            scrollViewContentStack.rightAnchor.constraint(equalTo: self.rightAnchor),
+            scrollViewContentStack.bottomAnchor.constraint(equalTo: self.bottomAnchor),
         ])
     }
-
-    
-    private func setObservable() { }
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
@@ -445,14 +495,6 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
                 if !stateFromVM.deceaseDescription.isEmpty {
                     deceaseField.textString = stateFromVM.deceaseDescription
                 }
-            })
-            .disposed(by: disposeBag)
-        
-        
-        viewModel
-            .customerInformationNextable
-            .drive(onNext: { [ctaButton] nextable in
-                ctaButton.setEnabled(nextable)
             })
             .disposed(by: disposeBag)
     }
