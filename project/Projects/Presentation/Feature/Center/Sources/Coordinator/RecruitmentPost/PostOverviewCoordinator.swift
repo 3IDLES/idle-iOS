@@ -13,16 +13,17 @@ import Entity
 public class PostOverviewCoordinator: ChildCoordinator {
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: CenterProfileRegisterCoordinatable?
+    public weak var parent: RegisterRecruitmentPostCoordinatable?
     
     public let navigationController: UINavigationController
     
     public let viewModel: RegisterRecruitmentPostViewModelable
     
     public init(
+        viewModel: RegisterRecruitmentPostViewModelable,
         navigationController: UINavigationController
     ) {
-        self.viewModel = RegisterRecruitmentPostVM()
+        self.viewModel = viewModel
         self.navigationController = navigationController
     }
     
@@ -32,7 +33,9 @@ public class PostOverviewCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = PostOverviewVC()
-        
+        vc.coordinator = self
+        vc.bind(viewModel: viewModel)
+        viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
     }
     
@@ -44,7 +47,11 @@ public class PostOverviewCoordinator: ChildCoordinator {
 extension PostOverviewCoordinator {
     
     func showCompleteScreen() {
-        
-        
+            
+    }
+    
+    func backToEditScreen() {
+        popViewController()
+        coordinatorDidFinish()
     }
 }

@@ -7,6 +7,32 @@
 
 import Foundation
 
+/// 오전/오후, 시, 분을 나타냅니다.
+public struct IdleDateComponent {
+    public var part: Part
+    public var hour: String
+    public var minute: String
+    
+    public func convertToStringForButton() -> String {
+        if part == .AM {
+            return "\(hour):\(minute)"
+        } else {
+            return "\(Int(hour)! + 12):\(minute)"
+        }
+    }
+    
+    public init(part: Part, hour: String, minute: String) {
+        self.part = part
+        self.hour = hour
+        self.minute = minute
+    }
+    
+    public enum Part: String, CaseIterable {
+        case AM="오전"
+        case PM="오후"
+    }
+}
+
 /// 요일에 대한 정보
 public enum WorkDay: Int, CaseIterable {
     
@@ -55,8 +81,8 @@ public class WorkTimeAndPayStateObject {
         WorkDay.allCases.forEach { dict[$0] = false }
         return dict
     }()
-    public var workStartTime: String = ""
-    public var workEndTime: String = ""
+    public var workStartTime: IdleDateComponent?
+    public var workEndTime: IdleDateComponent?
     public var paymentType: PaymentType?
     public var paymentAmount: String = ""
     
@@ -65,8 +91,16 @@ public class WorkTimeAndPayStateObject {
     public static var mock: WorkTimeAndPayStateObject {
         let mockObject = WorkTimeAndPayStateObject()
         mockObject.selectedDays = [.mon: true, .tue: true, .wed: false, .thu: true, .fri: true, .sat: false, .sun: false]
-        mockObject.workStartTime = "오전 09:00"
-        mockObject.workEndTime = "오후 05:00"
+        mockObject.workStartTime = .init(
+            part: .AM,
+            hour: "06",
+            minute: "24"
+        )
+        mockObject.workEndTime = .init(
+            part: .PM,
+            hour: "05",
+            minute: "30"
+        )
         mockObject.paymentType = .hourly
         mockObject.paymentAmount = "15000"
         return mockObject

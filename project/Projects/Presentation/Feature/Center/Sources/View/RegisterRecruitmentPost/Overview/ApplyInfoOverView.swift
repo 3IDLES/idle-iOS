@@ -100,6 +100,8 @@ class ApplyInfoOverView: HStack, RegisterRecruitmentPostVMBindable {
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
+        
+        
         viewModel
             .applicationDetailStateObject
             .drive(onNext: { [weak self] object in
@@ -109,12 +111,20 @@ class ApplyInfoOverView: HStack, RegisterRecruitmentPostVMBindable {
                 
                 applTypeLabel.textString = object.applyType?.korTextForBtn ?? "오류"
                 
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy. MM. dd"
-                
-                if let date = object.deadlineDate {
-                    let deadLineText = dateFormatter.string(from: date)
-                    deadlineLabel.textString = deadLineText
+                if let type = object.applyDeadlineType {
+                    if type == .specificDate {
+                        if let date = object.deadlineDate {
+                            let dateFormatter = DateFormatter()
+                            dateFormatter.dateFormat = "yyyy. MM. dd"
+                            let deadLineText = dateFormatter.string(from: date)
+                            deadlineLabel.textString = deadLineText
+                        } else {
+                            deadlineLabel.textString = "오류"
+                        }
+                    } else {
+                        deadlineLabel.textString = type.korTextForBtn
+                    }
+                    
                 } else {
                     deadlineLabel.textString = "오류"
                 }

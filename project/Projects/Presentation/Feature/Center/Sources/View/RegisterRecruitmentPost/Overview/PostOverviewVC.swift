@@ -13,20 +13,16 @@ import RxSwift
 import Entity
 import DSKit
 
-class SampleTableView: UITableView {
-    override var intrinsicContentSize: CGSize {
-        .init(width: super.intrinsicContentSize.width, height: contentSize.height)
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        invalidateIntrinsicContentSize()
-    }
+public protocol WorkerCardViewModelable {
+    var workerEmployCardVO: Driver<WorkerEmployCardVO> { get }
 }
 
 public class PostOverviewVC: BaseViewController {
     
     // Init
+    
+    // Not init
+    weak var coordinator: PostOverviewCoordinator?
     
     // View
     let backButton: UIButton = {
@@ -98,6 +94,7 @@ public class PostOverviewVC: BaseViewController {
     public override func viewDidLoad() {
         setAppearance()
         setLayout()
+        setObservable()
     }
     
     private func setAppearance() {
@@ -253,12 +250,24 @@ public class PostOverviewVC: BaseViewController {
     }
     
     private func setObservable() {
-        
+        backButton.rx.tap
+            .subscribe(onNext: { [coordinator] _ in
+                
+                coordinator?.backToEditScreen()
+            })
+            .disposed(by: disposeBag)
     }
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
-        sampleCard.bind(vo: .mock)
+        // 예시카드 바인딩
+        viewModel
+            .workerEmployCardVO
+            .drive(onNext: { [sampleCard] vo in
+                sampleCard.bind(vo: vo)
+            })
+            .disposed(by: disposeBag)
+
         
         let bindableViews: [RegisterRecruitmentPostVMBindable] = [
             workConditionOV,

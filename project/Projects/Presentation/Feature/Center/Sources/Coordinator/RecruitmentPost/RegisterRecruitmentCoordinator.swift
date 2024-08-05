@@ -10,19 +10,21 @@ import PresentationCore
 import UseCaseInterface
 import Entity
 
+
 public class RegisterRecruitmentCoordinator: ChildCoordinator {
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: CenterProfileRegisterCoordinatable?
+    public weak var parent: RegisterRecruitmentPostCoordinatable?
     
     public let navigationController: UINavigationController
     
     public let viewModel: RegisterRecruitmentPostViewModelable
     
     public init(
+        viewModel: RegisterRecruitmentPostViewModelable,
         navigationController: UINavigationController
     ) {
-        self.viewModel = RegisterRecruitmentPostVM()
+        self.viewModel = viewModel
         self.navigationController = navigationController
     }
     
@@ -33,8 +35,8 @@ public class RegisterRecruitmentCoordinator: ChildCoordinator {
     public func start() {
         let vc = RegisterRecruitmentPostVC()
         vc.bind(viewModel: viewModel)
+        vc.coordinator = self
         viewControllerRef = vc
-        
         navigationController.pushViewController(vc, animated: true)
     }
     
@@ -46,7 +48,10 @@ public class RegisterRecruitmentCoordinator: ChildCoordinator {
 extension RegisterRecruitmentCoordinator {
     
     func showOverViewScreen() {
-        
-        
+        parent?.showOverViewScreen()
+    }
+    
+    func registerFinished() {
+        parent?.registerFinished()
     }
 }

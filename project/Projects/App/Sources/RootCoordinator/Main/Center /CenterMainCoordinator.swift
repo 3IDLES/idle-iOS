@@ -107,4 +107,15 @@ extension CenterMainCoordinator {
         addChildCoordinator(coordinator)
         coordinator.start()
     }
+    
+    /// 공고등록창을 표시합니다.
+    func registerRecruitmentPost() {
+        
+        let coordinator = RegisterRecruitmentPostCoordinator(dependency: .init(
+            navigationController: navigationController,
+            injector: injector)
+        )
+        addChildCoordinator(coordinator)
+        coordinator.start()
+    }
 }

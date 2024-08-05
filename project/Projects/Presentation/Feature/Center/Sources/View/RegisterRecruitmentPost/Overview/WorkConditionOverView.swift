@@ -114,8 +114,8 @@ class WorkConditionOverView: HStack, RegisterRecruitmentPostVMBindable {
                 workDaysLabel.textString = daysText
                 
                 let workTimeText = [
-                    object.workStartTime,
-                    object.workEndTime
+                    object.workStartTime?.convertToStringForButton() ?? "00:00",
+                    object.workEndTime?.convertToStringForButton() ?? "00:00"
                 ].joined(separator: " - ")
                 
                 workTimeLabel.textString = workTimeText

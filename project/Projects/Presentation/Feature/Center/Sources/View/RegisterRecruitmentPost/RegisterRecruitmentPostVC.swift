@@ -30,7 +30,8 @@ public protocol RegisterRecruitmentPostViewModelable:
     CustomerInformationViewModelable,
     CustomerRequirementViewModelable,
     WorkTimeAndPayViewModelable,
-    AddressInputViewModelableVer2
+    AddressInputViewModelableVer2,
+    WorkerCardViewModelable
 {
     
     // Output
@@ -42,6 +43,8 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     // Init
     
     // Not Init
+    weak var coordinator: RegisterRecruitmentCoordinator?
+    
     /// 현재 스크린의 넓이를 의미합니다.
     private var screenWidth: CGFloat {
         guard let screenWidth = view.window?.windowScene?.screen.bounds.width else {
@@ -212,6 +215,10 @@ public class RegisterRecruitmentPostVC: BaseViewController {
                 prevView?.transform = .init(translationX: -screenWidth, y: 0)
                 willShowView.transform = .identity
             }
+        } else {
+            
+            // 오버뷰화면으로 이동
+            coordinator?.showOverViewScreen()
         }
     }
     
@@ -234,6 +241,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
         } else {
             
             // 돌아가기, Coordinator호출
+            coordinator?.registerFinished()
         }
     }
     
