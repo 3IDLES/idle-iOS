@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class ApplicationDetailStateObject {
+public class ApplicationDetailStateObject: NSCopying {
     public var experiencePreferenceType: ExperiencePreferenceType?
     public var applyType: ApplyType?
     public var applyDeadlineType: ApplyDeadlineType?
@@ -22,5 +22,14 @@ public class ApplicationDetailStateObject {
         mockObject.applyDeadlineType = .untilApplicationFinished
         mockObject.deadlineDate = Date(timeIntervalSinceNow: 86400 * 7) // 7 days from now
         return mockObject
+    }
+    
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = ApplicationDetailStateObject()
+        copy.experiencePreferenceType = self.experiencePreferenceType
+        copy.applyType = self.applyType
+        copy.applyDeadlineType = self.applyDeadlineType
+        copy.deadlineDate = self.deadlineDate
+        return copy
     }
 }

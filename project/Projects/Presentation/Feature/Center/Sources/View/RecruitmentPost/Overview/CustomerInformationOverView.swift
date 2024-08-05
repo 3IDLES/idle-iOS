@@ -208,7 +208,7 @@ class CustomerInformationOverView: VStack, RegisterRecruitmentPostVMBindable {
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
         viewModel
-            .customerInformationStateObject
+            .casting_customerInformation
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 
@@ -235,7 +235,7 @@ class CustomerInformationOverView: VStack, RegisterRecruitmentPostVMBindable {
             .disposed(by: disposeBag)
         
         viewModel
-            .customerRequirementStateObject
+            .casting_customerRequirement
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 

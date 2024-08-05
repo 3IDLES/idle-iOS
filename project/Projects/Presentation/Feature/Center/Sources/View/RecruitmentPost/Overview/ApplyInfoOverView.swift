@@ -103,7 +103,7 @@ class ApplyInfoOverView: HStack, RegisterRecruitmentPostVMBindable {
         
         
         viewModel
-            .applicationDetailStateObject
+            .casting_applicationDetail
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 

@@ -103,7 +103,7 @@ class WorkConditionOverView: HStack, RegisterRecruitmentPostVMBindable {
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
         viewModel
-            .workTimeAndPayStateObject
+            .casting_workTimeAndPay
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 
@@ -128,7 +128,7 @@ class WorkConditionOverView: HStack, RegisterRecruitmentPostVMBindable {
             .disposed(by: disposeBag)
         
         viewModel
-            .addressInputStateObject
+            .casting_addressInput
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 

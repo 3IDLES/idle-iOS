@@ -106,3 +106,15 @@ public class WorkTimeAndPayStateObject {
         return mockObject
     }
 }
+
+extension WorkTimeAndPayStateObject: NSCopying {
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = WorkTimeAndPayStateObject()
+        copy.selectedDays = self.selectedDays
+        copy.workStartTime = self.workStartTime
+        copy.workEndTime = self.workEndTime
+        copy.paymentType = self.paymentType
+        copy.paymentAmount = self.paymentAmount
+        return copy
+    }
+}

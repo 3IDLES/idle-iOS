@@ -20,7 +20,7 @@ public protocol WorkTimeAndPayViewModelable {
     var paymentType: PublishRelay<PaymentType> { get }
     var paymentAmount: PublishRelay<String> { get }
     
-    var workTimeAndPayStateObject: Driver<WorkTimeAndPayStateObject> { get }
+    var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject> { get }
     var workTimeAndPayNextable: Driver<Bool> { get }
 }
 
@@ -293,6 +293,51 @@ public class WorkTimeAndPayContentView: UIView {
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
+        // Output
+        
+        viewModel
+            .casting_workTimeAndPay
+            .drive(onNext: { [weak self] stateFromVM in
+                
+                guard let self else { return }
+                
+                // 근무 요일
+                for (workDay, isActive) in stateFromVM.selectedDays {
+                    workDayButtons[workDay.rawValue].setState(isActive ? .accent : .normal)
+                }
+                
+                // 시작시간
+                if let dateComponent = stateFromVM.workStartTime {
+                    workStartTimePicker.textLabel.textString = dateComponent.convertToStringForButton()
+                }
+                
+                // 종료 시간
+                if let dateComponent = stateFromVM.workEndTime {
+                    workEndTimePicker.textLabel.textString = dateComponent.convertToStringForButton()
+                }
+                
+                // 급여타입
+                if let state = stateFromVM.paymentType {
+                    
+                    paymentTypeButtons
+                        .enumerated()
+                        .forEach { (index, button) in
+                            let item = PaymentType(rawValue: index)!
+                            
+                            if item == state {
+                                button.setState(.accent)
+                            }
+                        }
+                }
+                
+                // 급여
+                if !stateFromVM.paymentAmount.isEmpty {
+                    paymentField.textField.textString = stateFromVM.paymentAmount
+                }
+                
+            })
+            .disposed(by: disposeBag)
+        
         // Input
         let workDayButtonWithItem = workDayButtons.enumerated().map { (index, button) in
             let item = WorkDay(rawValue: index)!
@@ -350,51 +395,6 @@ public class WorkTimeAndPayContentView: UIView {
         paymentField.textField.rx.text
             .compactMap { $0 }
             .bind(to: viewModel.paymentAmount)
-            .disposed(by: disposeBag)
-        
-        // Output
-        
-        viewModel
-            .workTimeAndPayStateObject
-            .drive(onNext: { [weak self] stateFromVM in
-                
-                guard let self else { return }
-                
-                // 근무 요일
-                for (workDay, isActive) in stateFromVM.selectedDays {
-                    workDayButtons[workDay.rawValue].setState(isActive ? .accent : .normal)
-                }
-                
-                // 시작시간
-                if let dateComponent = stateFromVM.workStartTime {
-                    workStartTimePicker.textLabel.textString = dateComponent.convertToStringForButton()
-                }
-                
-                // 종료 시간
-                if let dateComponent = stateFromVM.workEndTime {
-                    workEndTimePicker.textLabel.textString = dateComponent.convertToStringForButton()
-                }
-                
-                // 급여타입
-                if let state = stateFromVM.paymentType {
-                    
-                    paymentTypeButtons
-                        .enumerated()
-                        .forEach { (index, button) in
-                            let item = PaymentType(rawValue: index)!
-                            
-                            if item == state {
-                                button.setState(.accent)
-                            }
-                        }
-                }
-                
-                // 급여
-                if !stateFromVM.paymentAmount.isEmpty {
-                    paymentField.textField.textString = stateFromVM.paymentAmount
-                }
-                
-            })
             .disposed(by: disposeBag)
     }
 }

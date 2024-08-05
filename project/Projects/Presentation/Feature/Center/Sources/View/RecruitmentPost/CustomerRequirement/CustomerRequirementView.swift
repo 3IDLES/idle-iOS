@@ -20,7 +20,7 @@ public protocol CustomerRequirementViewModelable {
     var dailySupportTypes: PublishRelay<(DailySupportType, Bool)> { get }
     var additionalRequirement: PublishRelay<String> { get }
     
-    var customerRequirementStateObject: Driver<CustomerRequirementStateObject> { get }
+    var casting_customerRequirement: Driver<CustomerRequirementStateObject> { get }
     var customerRequirementNextable: Driver<Bool> { get }
 }
 
@@ -347,6 +347,50 @@ class CustomerRequirementContentView: UIView {
     }
             
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+        
+        // Output, viewModel로 부터 전달받는 상태
+        viewModel
+            .casting_customerRequirement
+            .drive(onNext: { [weak self] stateFromVM in
+                
+                guard let self else { return }
+                
+                
+                // 식사보조
+                if let isEnabled = stateFromVM.mealSupportNeeded {
+                    mealSupportBtn1.setState(isEnabled ? .accent : .normal)
+                    mealSupportBtn2.setState(!isEnabled ? .accent : .normal)
+                }
+                
+                
+                // 배변보조
+                if let isEnabled = stateFromVM.toiletSupportNeeded {
+                    toiletSupportBtn1.setState(isEnabled ? .accent : .normal)
+                    toiletSupportBtn2.setState(!isEnabled ? .accent : .normal)
+                }
+                
+                
+                // 이동보조
+                if let isEnabled = stateFromVM.movingSupportNeeded {
+                    movingSupportBtn1.setState(isEnabled ? .accent : .normal)
+                    movingSupportBtn2.setState(!isEnabled ? .accent : .normal)
+                }
+                
+                
+                // 일상보조
+                for (supportType, isActive) in stateFromVM.dailySupportTypeNeeds {
+                    dailySupportViews[supportType]?.setState(isActive ? .accent : .normal)
+                }
+                    
+                
+                // 추가요구사항
+                let additionalRequirementText = stateFromVM.additionalRequirement
+                if !additionalRequirementText.isEmpty {
+                    additionalRequirmentField.textString = additionalRequirementText
+                }
+                
+            })
+            .disposed(by: disposeBag)
                 
         // Input
         Observable
@@ -420,48 +464,5 @@ class CustomerRequirementContentView: UIView {
             .bind(to: viewModel.additionalRequirement)
             .disposed(by: disposeBag)
         
-        // Output, viewModel로 부터 전달받는 상태
-        viewModel
-            .customerRequirementStateObject
-            .drive(onNext: { [weak self] stateFromVM in
-                
-                guard let self else { return }
-                
-                
-                // 식사보조
-                if let isEnabled = stateFromVM.mealSupportNeeded {
-                    mealSupportBtn1.setState(isEnabled ? .accent : .normal)
-                    mealSupportBtn2.setState(!isEnabled ? .accent : .normal)
-                }
-                
-                
-                // 배변보조
-                if let isEnabled = stateFromVM.toiletSupportNeeded {
-                    toiletSupportBtn1.setState(isEnabled ? .accent : .normal)
-                    toiletSupportBtn2.setState(!isEnabled ? .accent : .normal)
-                }
-                
-                
-                // 이동보조
-                if let isEnabled = stateFromVM.movingSupportNeeded {
-                    movingSupportBtn1.setState(isEnabled ? .accent : .normal)
-                    movingSupportBtn2.setState(!isEnabled ? .accent : .normal)
-                }
-                
-                
-                // 일상보조
-                for (supportType, isActive) in stateFromVM.dailySupportTypeNeeds {
-                    dailySupportViews[supportType]?.setState(isActive ? .accent : .normal)
-                }
-                    
-                
-                // 추가요구사항
-                let additionalRequirementText = stateFromVM.additionalRequirement
-                if !additionalRequirementText.isEmpty {
-                    additionalRequirmentField.textString = additionalRequirementText
-                }
-                
-            })
-            .disposed(by: disposeBag)
     }
 }
