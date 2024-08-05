@@ -36,6 +36,10 @@ public protocol RegisterRecruitmentPostViewModelable:
     
     // Output
     var alert: Driver<DefaultAlertContentVO>? { get }
+    /// 유효한 값을 가져옵니다.
+    func fetchFromState()
+    /// 수정중인 값을 API를 사용하여 전송할 값(State)에 반영합니다.
+    func updateToState()
 }
 
 public class RegisterRecruitmentPostVC: BaseViewController {

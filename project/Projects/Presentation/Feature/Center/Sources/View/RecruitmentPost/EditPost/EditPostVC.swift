@@ -267,6 +267,18 @@ public class EditPostVC: BaseViewController {
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
+        editingCompleteButton
+            .eventPublisher
+            .subscribe { [weak self] _ in
+                
+                guard let self else { return }
+                
+                /// 저장하기 버튼을 누른 경우 값을 업데이트 합니다.
+                viewModel.updateToState()
+                navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         workTimeAndPaymentEditView.bind(viewModel: viewModel)
         addressInputEditView.bind(viewModel: viewModel)
         customerInfoEditView.bind(viewModel: viewModel)

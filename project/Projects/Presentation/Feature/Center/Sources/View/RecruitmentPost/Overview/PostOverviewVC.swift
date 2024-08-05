@@ -24,6 +24,8 @@ public class PostOverviewVC: BaseViewController {
     // Not init
     weak var coordinator: PostOverviewCoordinator?
     
+    var viewModel: RegisterRecruitmentPostViewModelable?
+    
     // View
     let backButton: UIButton = {
         let btn = UIButton()
@@ -77,12 +79,11 @@ public class PostOverviewVC: BaseViewController {
         return button
     }()
     
-    let editPostViewController = EditPostVC()
-    
     // Overviews
     let workConditionOV = WorkConditionOverView()
     let customerInfoOV = CustomerInformationOverView()
     let applyInfoOverView = ApplyInfoOverView()
+    
     
     // Observable
     private let disposeBag = DisposeBag()
@@ -262,10 +263,12 @@ public class PostOverviewVC: BaseViewController {
         postEditButton.eventPublisher
             .subscribe(onNext: { [weak self] _ in
                 
-                guard let self else { return }
+                guard let self, let vm = viewModel else { return }
                 
+                let vc = EditPostVC()
+                vc.bind(viewModel: vm)
                 self.navigationController?.pushViewController(
-                    editPostViewController,
+                    vc,
                     animated: true)
             })
             .disposed(by: disposeBag)
@@ -274,18 +277,27 @@ public class PostOverviewVC: BaseViewController {
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
-        // 예시카드 바인딩
-        viewModel
-            .workerEmployCardVO
-            .drive(onNext: { [sampleCard] vo in
-                sampleCard.bind(vo: vo)
-            })
+        self.viewModel = viewModel
+        
+        // 앞전가지 입력한 정보를 저장합니다.
+        viewModel.updateToState()
+        
+        // 화면이 등장할 때마다 유효한 상태를 불러옵니다.
+        self.rx.viewWillAppear
+            .subscribe { [viewModel, sampleCard] _ in
+                viewModel.fetchFromState()
+                
+                // 예시카드 바인딩
+                let disposable = viewModel
+                    .workerEmployCardVO
+                    .drive(onNext: { [sampleCard] vo in
+                        sampleCard.bind(vo: vo)
+                    })
+                disposable.dispose()
+            }
             .disposed(by: disposeBag)
         
-        // 수정화면 바인딩
-        editPostViewController
-            .bind(viewModel: viewModel)
-
+        
         
         let bindableViews: [RegisterRecruitmentPostVMBindable] = [
             workConditionOV,

@@ -16,17 +16,30 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var alert: Driver<DefaultAlertContentVO>?
     
     // MARK: State
-    let workTimeAndPay: BehaviorRelay<WorkTimeAndPayStateObject> = .init(value: .init())
-    let customerRequirement: BehaviorRelay<CustomerRequirementStateObject> = .init(value: .init())
-    let customerInformation: BehaviorRelay<CustomerInformationStateObject> = .init(value: .init())
-    let applicationDetail: BehaviorRelay<ApplicationDetailStateObject> = .init(value: .init())
-    let addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .init())
+    var state_workTimeAndPay: WorkTimeAndPayStateObject = .init()
+    var state_customerRequirement: CustomerRequirementStateObject = .init()
+    var state_customerInformation: CustomerInformationStateObject = .init()
+    var state_applicationDetail: ApplicationDetailStateObject = .init()
+    var state_addressInfo: AddressInputStateObject = .init()
+    
+    // MARK: Editing
+    let editing_workTimeAndPay: BehaviorRelay<WorkTimeAndPayStateObject> = .init(value: .init())
+    let editing_customerRequirement: BehaviorRelay<CustomerRequirementStateObject> = .init(value: .init())
+    let editing_customerInformation: BehaviorRelay<CustomerInformationStateObject> = .init(value: .init())
+    let editing_applicationDetail: BehaviorRelay<ApplicationDetailStateObject> = .init(value: .init())
+    let editing_addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .init())
+    
+    // MARK: Casting
+    public var casting_addressInput: Driver<AddressInputStateObject>
+    public var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>
+    public var casting_customerRequirement: Driver<CustomerRequirementStateObject>
+    public var casting_customerInformation: Driver<CustomerInformationStateObject>
+    public var casting_applicationDetail: Driver<ApplicationDetailStateObject>
     
     // MARK: Address input
     public var detailAddress: PublishRelay<String> = .init()
     public var addressInformation: PublishRelay<AddressInformation> = .init()
     
-    public var addressInputStateObject: Driver<AddressInputStateObject>
     public var addressInputNextable: Driver<Bool>
     
     // MARK: Work time and pay
@@ -36,7 +49,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var paymentType: PublishRelay<PaymentType> = .init()
     public var paymentAmount: PublishRelay<String> = .init()
     
-    public var workTimeAndPayStateObject: Driver<WorkTimeAndPayStateObject>
+    
     public var workTimeAndPayNextable: Driver<Bool>
     
     // MARK: Customer requirement
@@ -46,7 +59,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var dailySupportTypes: PublishRelay<(DailySupportType, Bool)> = .init()
     public var additionalRequirement: PublishRelay<String> = .init()
     
-    public var customerRequirementStateObject: Driver<CustomerRequirementStateObject>
     public var customerRequirementNextable: Driver<Bool>
     
     // MARK: Customer information
@@ -58,7 +70,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var cognitionState: PublishRelay<CognitionDegree> = .init()
     public var deceaseDescription: PublishRelay<String> = .init()
     
-    public var customerInformationStateObject: Driver<CustomerInformationStateObject>
     public var customerInformationNextable: Driver<Bool>
     
     
@@ -69,7 +80,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var deadlineDate: BehaviorRelay<Date?> = .init(value: nil)
     
     public var deadlineString: Driver<String>
-    public var applicationDetailStateObject: Driver<ApplicationDetailStateObject>
     public var applicationDetailViewNextable: Driver<Bool>
     
     // MARK: PostCard
@@ -81,36 +91,31 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public init() {
         
         // MARK: Work time and pay
-        workTimeAndPayStateObject = workTimeAndPay
-            .map { object in
-                
-                return object
-            }
-            .asDriver { _ in fatalError() }
+        casting_workTimeAndPay = editing_workTimeAndPay.asDriver { _ in fatalError() }
         
         let selectedDay_changed = selectedDay
-            .map { [workTimeAndPay] (day, isActive) in
-                workTimeAndPay.value.selectedDays[day] = isActive
+            .map { [editing_workTimeAndPay] (day, isActive) in
+                editing_workTimeAndPay.value.selectedDays[day] = isActive
             }
 
         let workStartTime_changed = workStartTime
-            .map { [workTimeAndPay] newValue in
-                workTimeAndPay.value.workStartTime = newValue
+            .map { [editing_workTimeAndPay] newValue in
+                editing_workTimeAndPay.value.workStartTime = newValue
             }
 
         let workEndTime_changed = workEndTime
-            .map { [workTimeAndPay] newValue in
-                workTimeAndPay.value.workEndTime = newValue
+            .map { [editing_workTimeAndPay] newValue in
+                editing_workTimeAndPay.value.workEndTime = newValue
             }
 
         let paymentType_changed = paymentType
-            .map { [workTimeAndPay] newValue in
-                workTimeAndPay.value.paymentType = newValue
+            .map { [editing_workTimeAndPay] newValue in
+                editing_workTimeAndPay.value.paymentType = newValue
             }
 
         let paymentAmount_changed = paymentAmount
-            .map { [workTimeAndPay] newValue in
-                workTimeAndPay.value.paymentAmount = newValue
+            .map { [editing_workTimeAndPay] newValue in
+                editing_workTimeAndPay.value.paymentAmount = newValue
             }
         
         workTimeAndPayNextable = Observable.combineLatest(
@@ -120,8 +125,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             paymentType_changed,
             paymentAmount_changed
         )
-        .map { [workTimeAndPay] _ in
-            let object = workTimeAndPay.value
+        .map { [editing_workTimeAndPay] _ in
+            let object = editing_workTimeAndPay.value
             
             let activeDayCnt = object.selectedDays.keys.reduce(0) { partialResult, key in
                 partialResult + (object.selectedDays[key] == true ? 1 : 0)
@@ -137,30 +142,25 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         
         // MARK: Address input
-        addressInputStateObject = addressInfo
-            .map { object in
-                
-                return object
-            }
-            .asDriver { _ in fatalError() }
+        casting_addressInput = editing_addressInfo.asDriver { _ in fatalError() }
         
         let addressInformation_changed = addressInformation
-            .map { [addressInfo] newValue in
-                addressInfo.value.addressInfo = newValue
+            .map { [editing_addressInfo] newValue in
+                editing_addressInfo.value.addressInfo = newValue
             }
         
         let detailAddress_changed = detailAddress
-            .map { [addressInfo] newValue in
+            .map { [editing_addressInfo] newValue in
                 print(newValue)
-                return addressInfo.value.detailAddress = newValue
+                return editing_addressInfo.value.detailAddress = newValue
             }
         
         addressInputNextable = Observable.combineLatest(
             addressInformation_changed,
             detailAddress_changed
         )
-        .map { [addressInfo] _ in
-            let object = addressInfo.value
+        .map { [editing_addressInfo] _ in
+            let object = editing_addressInfo.value
             
             return object.addressInfo != nil && !object.detailAddress.isEmpty
         }
@@ -168,37 +168,32 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         
         // MARK: Customer requirement
-        customerRequirementStateObject = customerRequirement
-            .map { object in
-                
-                return object
-            }
-            .asDriver { _ in fatalError() }
+        casting_customerRequirement = editing_customerRequirement.asDriver { _ in fatalError() }
         
         let mealSupportNeeded_changed = mealSupportNeeded
-            .map { [customerRequirement] newValue in
-                customerRequirement.value.mealSupportNeeded = newValue
+            .map { [editing_customerRequirement] newValue in
+                editing_customerRequirement.value.mealSupportNeeded = newValue
             }
         
         let toiletSupportNeeded_changed = toiletSupportNeeded
-            .map { [customerRequirement] newValue in
-                customerRequirement.value.toiletSupportNeeded = newValue
+            .map { [editing_customerRequirement] newValue in
+                editing_customerRequirement.value.toiletSupportNeeded = newValue
             }
         
         let movingSupportNeeded_changed = movingSupportNeeded
-            .map { [customerRequirement] newValue in
-                customerRequirement.value.movingSupportNeeded = newValue
+            .map { [editing_customerRequirement] newValue in
+                editing_customerRequirement.value.movingSupportNeeded = newValue
             }
         
         dailySupportTypes
-            .subscribe { [customerRequirement] (type, isAtive) in
-                customerRequirement.value.dailySupportTypeNeeds[type] = isAtive
+            .subscribe { [editing_customerRequirement] (type, isAtive) in
+                editing_customerRequirement.value.dailySupportTypeNeeds[type] = isAtive
             }
             .disposed(by: disposeBag)
         
         additionalRequirement
-            .subscribe { [customerRequirement] newValue in
-                customerRequirement.value.additionalRequirement = newValue
+            .subscribe { [editing_customerRequirement] newValue in
+                editing_customerRequirement.value.additionalRequirement = newValue
             }
             .disposed(by: disposeBag)
         
@@ -207,8 +202,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             toiletSupportNeeded_changed,
             movingSupportNeeded_changed
         )
-        .map { [customerRequirement] _ in
-            let requirement = customerRequirement.value
+        .map { [editing_customerRequirement] _ in
+            let requirement = editing_customerRequirement.value
             
             return requirement.mealSupportNeeded != nil &&
                    requirement.toiletSupportNeeded != nil &&
@@ -219,46 +214,41 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         
         // MARK: Customer information
-        customerInformationStateObject = customerInformation
-            .map { object in
-                
-                return object
-            }
-            .asDriver { _ in fatalError() }
+        casting_customerInformation = editing_customerInformation.asDriver { _ in fatalError() }
         
         let name_changed = name
-            .map { [customerInformation] newValue in
-                customerInformation.value.name = newValue
+            .map { [editing_customerInformation] newValue in
+                editing_customerInformation.value.name = newValue
             }
         
         let gender_changed = gender
-            .map { [customerInformation] newValue in
-                customerInformation.value.gender = newValue
+            .map { [editing_customerInformation] newValue in
+                editing_customerInformation.value.gender = newValue
             }
         
         let birthYear_changed = birthYear
-            .map { [customerInformation] newValue in
-                customerInformation.value.birthYear = newValue
+            .map { [editing_customerInformation] newValue in
+                editing_customerInformation.value.birthYear = newValue
             }
             
         let weight_changed = weight
-            .map { [customerInformation] newValue in
-                customerInformation.value.weight = newValue
+            .map { [editing_customerInformation] newValue in
+                editing_customerInformation.value.weight = newValue
             }
         
         let careGrade_changed = careGrade
-            .map { [customerInformation] newValue in
-                customerInformation.value.careGrade = newValue
+            .map { [editing_customerInformation] newValue in
+                editing_customerInformation.value.careGrade = newValue
             }
         
         let cognitionState_changed = cognitionState
-            .map { [customerInformation] newValue in
-                customerInformation.value.cognitionState = newValue
+            .map { [editing_customerInformation] newValue in
+                editing_customerInformation.value.cognitionState = newValue
             }
         
         deceaseDescription
-            .subscribe { [customerInformation] newValue in
-                customerInformation.value.deceaseDescription = newValue
+            .subscribe { [editing_customerInformation] newValue in
+                editing_customerInformation.value.deceaseDescription = newValue
             }
             .disposed(by: disposeBag)
         
@@ -270,8 +260,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             careGrade_changed,
             cognitionState_changed
         )
-        .map { [customerInformation] _ in
-            let customerInfo = customerInformation.value
+        .map { [editing_customerInformation] _ in
+            let customerInfo = editing_customerInformation.value
             
             return !customerInfo.name.isEmpty && 
                    !customerInfo.birthYear.isEmpty &&
@@ -282,31 +272,26 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         .asDriver(onErrorJustReturn: false)
         
         // MARK: Application detail
-        applicationDetailStateObject = applicationDetail
-            .map { object in
-                
-                return object
-            }
-            .asDriver { _ in fatalError() }
+        casting_applicationDetail = editing_applicationDetail.asDriver { _ in fatalError() }
         
         let experiencePreferenceType_changed = experiencePreferenceType
-            .map { [applicationDetail] newValue in
-                applicationDetail.value.experiencePreferenceType = newValue
+            .map { [editing_applicationDetail] newValue in
+                editing_applicationDetail.value.experiencePreferenceType = newValue
             }
         
         let applyType_changed = applyType
-            .map { [applicationDetail] newValue in
-                applicationDetail.value.applyType = newValue
+            .map { [editing_applicationDetail] newValue in
+                editing_applicationDetail.value.applyType = newValue
             }
         
         let applyDeadlineType_changed = applyDeadlineType
-            .map { [applicationDetail] newValue in
-                applicationDetail.value.applyDeadlineType = newValue
+            .map { [editing_applicationDetail] newValue in
+                editing_applicationDetail.value.applyDeadlineType = newValue
             }
         
         let deadlineDate_changed = deadlineDate
-            .map { [applicationDetail] newValue in
-                applicationDetail.value.deadlineDate = newValue
+            .map { [editing_applicationDetail] newValue in
+                editing_applicationDetail.value.deadlineDate = newValue
             }
         
         deadlineString = deadlineDate
@@ -320,9 +305,9 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             applyDeadlineType_changed,
             deadlineDate_changed
         )
-        .map { [applicationDetail] _ in
+        .map { [editing_applicationDetail] _ in
             
-            let state = applicationDetail.value
+            let state = editing_applicationDetail.value
             
             if state.applyDeadlineType != nil,
                state.applyType != nil,
@@ -341,10 +326,10 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         // MARK: PostCard
         workerEmployCardVO = Observable<WorkerEmployCardVO>
             .create { [
-                workTimeAndPay,
-                customerInformation,
-                applicationDetail,
-                addressInfo
+                editing_workTimeAndPay,
+                editing_customerInformation,
+                editing_applicationDetail,
+                editing_addressInfo
             ] emitter in
                 
                 // 남은 일수
@@ -352,46 +337,46 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 let calendar = Calendar.current
                 let currentDate = Date()
                 
-                if applicationDetail.value.applyDeadlineType == .specificDate, let deadlineDate = applicationDetail.value.deadlineDate {
+                if editing_applicationDetail.value.applyDeadlineType == .specificDate, let deadlineDate = editing_applicationDetail.value.deadlineDate {
                     
                     let component = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
                     leftDay = component.day
                 }
                 
                 // 초보가능 여부
-                let isBeginnerPossible = applicationDetail.value.experiencePreferenceType == .beginnerPossible
+                let isBeginnerPossible = editing_applicationDetail.value.experiencePreferenceType == .beginnerPossible
                 
                 // 제목(=도로명주소)
-                let title = addressInfo.value.addressInfo?.roadAddress ?? "위치정보 표기 오류"
+                let title = editing_addressInfo.value.addressInfo?.roadAddress ?? "위치정보 표기 오류"
                 
                 // 도보시간
                 let timeTakenForWalk = "도보 n분"
                 
                 // 생년
-                let birthYear = Int(customerInformation.value.birthYear) ?? 1970
+                let birthYear = Int(editing_customerInformation.value.birthYear) ?? 1970
                 let currentYear = calendar.component(.year, from: currentDate)
                 let targetAge = currentYear - birthYear + 1
                 
                 // 요양등급
-                let targetLavel: Int = (customerInformation.value.careGrade?.rawValue ?? 0)+1
+                let targetLavel: Int = (editing_customerInformation.value.careGrade?.rawValue ?? 0)+1
                 
                 // 성별
-                let targetGender = customerInformation.value.gender
+                let targetGender = editing_customerInformation.value.gender
                 
                 // 근무 요일
-                let days = workTimeAndPay.value.selectedDays.filter { (_, value) in
+                let days = editing_workTimeAndPay.value.selectedDays.filter { (_, value) in
                     value
                 }.map { (key, _) in
                     key
                 }
                 
                 // 근무 시작, 종료시간
-                let startTime = workTimeAndPay.value.workStartTime?.convertToStringForButton() ?? "00:00"
-                let workEndTime = workTimeAndPay.value.workEndTime?.convertToStringForButton() ?? "00:00"
+                let startTime = editing_workTimeAndPay.value.workStartTime?.convertToStringForButton() ?? "00:00"
+                let workEndTime = editing_workTimeAndPay.value.workEndTime?.convertToStringForButton() ?? "00:00"
                 
                 // 급여타입및 양
-                let paymentType = workTimeAndPay.value.paymentType ?? .hourly
-                let paymentAmount = workTimeAndPay.value.paymentAmount
+                let paymentType = editing_workTimeAndPay.value.paymentType ?? .hourly
+                let paymentAmount = editing_workTimeAndPay.value.paymentAmount
                 
                 let vo = WorkerEmployCardVO(
                     dayLeft: leftDay ?? 0,
@@ -413,6 +398,29 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 return Disposables.create { }
             }
             .asDriver(onErrorJustReturn: .mock)
+        
+        
+            // 최초로 데이터를 가져옵니다.
+            fetchFromState()
+    }
+    
+    
+    public func fetchFromState() {
+        
+        editing_workTimeAndPay.accept(state_workTimeAndPay.copy() as! WorkTimeAndPayStateObject)
+        editing_customerRequirement.accept(state_customerRequirement.copy() as! CustomerRequirementStateObject)
+        editing_customerInformation.accept(state_customerInformation.copy() as! CustomerInformationStateObject)
+        editing_applicationDetail.accept(state_applicationDetail.copy() as! ApplicationDetailStateObject)
+        editing_addressInfo.accept(state_addressInfo.copy() as! AddressInputStateObject)
+    }
+    
+    public func updateToState() {
+        
+        state_workTimeAndPay = editing_workTimeAndPay.value.copy() as! WorkTimeAndPayStateObject
+        state_customerRequirement = editing_customerRequirement.value.copy() as! CustomerRequirementStateObject
+        state_customerInformation = editing_customerInformation.value.copy() as! CustomerInformationStateObject
+        state_applicationDetail = editing_applicationDetail.value.copy() as! ApplicationDetailStateObject
+        state_addressInfo = editing_addressInfo.value.copy() as! AddressInputStateObject
     }
 }
 

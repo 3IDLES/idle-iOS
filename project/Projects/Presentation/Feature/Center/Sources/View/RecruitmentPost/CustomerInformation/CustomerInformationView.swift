@@ -23,7 +23,7 @@ public protocol CustomerInformationViewModelable {
     var cognitionState: PublishRelay<CognitionDegree> { get }
     var deceaseDescription: PublishRelay<String> { get }
     
-    var customerInformationStateObject: Driver<CustomerInformationStateObject> { get }
+    var casting_customerInformation: Driver<CustomerInformationStateObject> { get }
     var customerInformationNextable: Driver<Bool> { get }
 }
 
@@ -347,6 +347,72 @@ class CustomerInformationContentView: UIView {
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
+        // output
+        viewModel
+            .casting_customerInformation
+            .drive(onNext: { [weak self] stateFromVM in
+              
+                guard let self else { return }
+                
+                // 이름
+                if !stateFromVM.name.isEmpty {
+                    nameField.textString = stateFromVM.name
+                }
+                
+                // 성별
+                if let gender = stateFromVM.gender {
+                    if gender == .male {
+                        maleBtn.setState(.accent)
+                    } else {
+                        femaleBtn.setState(.accent)
+                    }
+                }
+                
+                // 출생년도
+                if !stateFromVM.birthYear.isEmpty {
+                    birthYearField.textString = stateFromVM.birthYear
+                }
+                
+                // 몸무게
+                if !stateFromVM.weight.isEmpty {
+                    weightField.textField.textString = stateFromVM.weight
+                }
+                
+                // 요양등급
+                if let state = stateFromVM.careGrade {
+                    
+                    careGradeButtons
+                        .enumerated()
+                        .forEach { (index, button) in
+                            let item = CareGrade(rawValue: index)!
+                            
+                            if item == state {
+                                button.setState(.accent)
+                            }
+                        }
+                }
+                
+                // 인지상태
+                if let state = stateFromVM.cognitionState {
+                    
+                    cognitionButtons
+                        .enumerated()
+                        .forEach { (index, button) in
+                            let item = CognitionDegree(rawValue: index)!
+                            
+                            if item == state {
+                                button.setState(.accent)
+                            }
+                        }
+                }
+                
+                // 질병
+                if !stateFromVM.deceaseDescription.isEmpty {
+                    deceaseField.textString = stateFromVM.deceaseDescription
+                }
+            })
+            .disposed(by: disposeBag)
+        
         // Input
         nameField.rx.text
             .compactMap { $0 }
@@ -440,72 +506,6 @@ class CustomerInformationContentView: UIView {
         deceaseField.rx.text
             .compactMap { $0 }
             .bind(to: viewModel.deceaseDescription)
-            .disposed(by: disposeBag)
-        
-        // output
-        viewModel
-            .customerInformationStateObject
-            .drive(onNext: { [weak self] stateFromVM in
-              
-                guard let self else { return }
-                
-                // 이름
-                if !stateFromVM.name.isEmpty {
-                    nameField.textString = stateFromVM.name
-                }
-                
-                // 성별
-                if let gender = stateFromVM.gender {
-                    if gender == .male {
-                        maleBtn.setState(.accent)
-                    } else {
-                        femaleBtn.setState(.accent)
-                    }
-                }
-                
-                // 출생년도
-                if !stateFromVM.birthYear.isEmpty {
-                    birthYearField.textString = stateFromVM.birthYear
-                }
-                
-                // 몸무게
-                if !stateFromVM.weight.isEmpty {
-                    weightField.textField.textString = stateFromVM.weight
-                }
-                
-                // 요양등급
-                if let state = stateFromVM.careGrade {
-                    
-                    careGradeButtons
-                        .enumerated()
-                        .forEach { (index, button) in
-                            let item = CareGrade(rawValue: index)!
-                            
-                            if item == state {
-                                button.setState(.accent)
-                            }
-                        }
-                }
-                
-                // 인지상태
-                if let state = stateFromVM.cognitionState {
-                    
-                    cognitionButtons
-                        .enumerated()
-                        .forEach { (index, button) in
-                            let item = CognitionDegree(rawValue: index)!
-                            
-                            if item == state {
-                                button.setState(.accent)
-                            }
-                        }
-                }
-                
-                // 질병
-                if !stateFromVM.deceaseDescription.isEmpty {
-                    deceaseField.textString = stateFromVM.deceaseDescription
-                }
-            })
             .disposed(by: disposeBag)
     }
 }

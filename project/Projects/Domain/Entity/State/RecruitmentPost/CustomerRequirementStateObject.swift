@@ -8,7 +8,7 @@
 import Foundation
 
 /// 공고등록화면중 고객요구사항 입력창에 사용됩니다.
-public class CustomerRequirementStateObject {
+public class CustomerRequirementStateObject: NSCopying {
     
     public var mealSupportNeeded: Bool?
     public var toiletSupportNeeded: Bool?
@@ -33,6 +33,16 @@ public class CustomerRequirementStateObject {
         mockObject.dailySupportTypeNeeds = [.cleaning: true, .exerciseSupport: false, .laundry: true, .listener: false, .walking: true]
         return mockObject
     }
+    
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = CustomerRequirementStateObject()
+        copy.mealSupportNeeded = self.mealSupportNeeded
+        copy.toiletSupportNeeded = self.toiletSupportNeeded
+        copy.movingSupportNeeded = self.movingSupportNeeded
+        copy.additionalRequirement = self.additionalRequirement
+        copy.dailySupportTypeNeeds = self.dailySupportTypeNeeds
+        return copy
+    }    
 }
 
 public enum DailySupportType: Int, CaseIterable {

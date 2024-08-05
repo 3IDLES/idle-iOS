@@ -13,7 +13,7 @@ import RxSwift
 import Entity
 import DSKit
 
-public class AddressInputStateObject {
+public class AddressInputStateObject: NSCopying {
     
     public var addressInfo: AddressInformation?
     public var detailAddress: String = ""
@@ -27,6 +27,13 @@ public class AddressInputStateObject {
         data.detailAddress = "굴화아파트 309동"
         return data
     }()
+    
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = AddressInputStateObject()
+        copy.addressInfo = self.addressInfo
+        copy.detailAddress = self.detailAddress
+        return copy
+    }
 }
 
 public protocol AddressInputViewModelableVer2 {
@@ -34,7 +41,7 @@ public protocol AddressInputViewModelableVer2 {
     var addressInformation: PublishRelay<AddressInformation> { get }
     var detailAddress: PublishRelay<String> { get }
     
-    var addressInputStateObject: Driver<AddressInputStateObject> { get }
+    var casting_addressInput: Driver<AddressInputStateObject> { get }
     var addressInputNextable: Driver<Bool> { get }
 }
 
@@ -252,20 +259,9 @@ class AddressContentView: VStack, DaumAddressSearchDelegate {
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
-        // Input
-        addressPublisher
-            .bind(to: viewModel.addressInformation)
-            .disposed(by: disposeBag)
-        
-        detailAddressField
-            .uITextField.rx.text
-            .compactMap { $0 }
-            .bind(to: viewModel.detailAddress)
-            .disposed(by: disposeBag)
-        
         // 초기값 설정
         viewModel
-            .addressInputStateObject
+            .casting_addressInput
             .drive(onNext: { [addressSearchButton, detailAddressField] state in
                 
                 if let info = state.addressInfo {
@@ -276,6 +272,17 @@ class AddressContentView: VStack, DaumAddressSearchDelegate {
                     detailAddressField.uITextField.text = state.detailAddress
                 }
             })
+            .disposed(by: disposeBag)
+        
+        // Input
+        addressPublisher
+            .bind(to: viewModel.addressInformation)
+            .disposed(by: disposeBag)
+        
+        detailAddressField
+            .uITextField.rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.detailAddress)
             .disposed(by: disposeBag)
     }
     

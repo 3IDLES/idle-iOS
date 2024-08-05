@@ -36,7 +36,7 @@ public enum CognitionDegree: Int, CaseIterable {
     }
 }
 
-public class CustomerInformationStateObject {
+public class CustomerInformationStateObject: NSCopying {
     public var name: String = ""
     public var gender: Gender?
     public var birthYear: String = ""
@@ -58,4 +58,16 @@ public class CustomerInformationStateObject {
         mockObject.deceaseDescription = "질병 없음"
         return mockObject
     }()
+    
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = CustomerInformationStateObject()
+        copy.name = self.name
+        copy.gender = self.gender
+        copy.birthYear = self.birthYear
+        copy.weight = self.weight
+        copy.careGrade = self.careGrade
+        copy.cognitionState = self.cognitionState
+        copy.deceaseDescription = self.deceaseDescription
+        return copy
+    }
 }
