@@ -77,6 +77,8 @@ public class PostOverviewVC: BaseViewController {
         return button
     }()
     
+    let editPostViewController = EditPostVC()
+    
     // Overviews
     let workConditionOV = WorkConditionOverView()
     let customerInfoOV = CustomerInformationOverView()
@@ -256,6 +258,18 @@ public class PostOverviewVC: BaseViewController {
                 coordinator?.backToEditScreen()
             })
             .disposed(by: disposeBag)
+        
+        postEditButton.eventPublisher
+            .subscribe(onNext: { [weak self] _ in
+                
+                guard let self else { return }
+                
+                self.navigationController?.pushViewController(
+                    editPostViewController,
+                    animated: true)
+            })
+            .disposed(by: disposeBag)
+        
     }
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
@@ -267,6 +281,10 @@ public class PostOverviewVC: BaseViewController {
                 sampleCard.bind(vo: vo)
             })
             .disposed(by: disposeBag)
+        
+        // 수정화면 바인딩
+        editPostViewController
+            .bind(viewModel: viewModel)
 
         
         let bindableViews: [RegisterRecruitmentPostVMBindable] = [

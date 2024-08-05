@@ -54,6 +54,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         setAppearance()
         setLayout()
         setObservable()
+        setKeyboardAvoidance()
     }
     
     public required init?(coder: NSCoder) { fatalError() }
@@ -130,6 +131,16 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
                 ctaButton.setEnabled(nextable)
             })
             .disposed(by: disposeBag)
+    }
+    
+    func setKeyboardAvoidance() {
+        
+        [
+            contentView.additionalRequirmentField
+        ].forEach { (view: IdleKeyboardAvoidable) in
+            
+            view.setKeyboardAvoidance(movingView: self)
+        }
     }
 }
 

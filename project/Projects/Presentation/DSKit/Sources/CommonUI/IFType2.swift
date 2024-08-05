@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import PresentationCore
 
 public class IFType2: UIStackView {
     
@@ -35,6 +36,15 @@ public class IFType2: UIStackView {
     )
     
     public var uITextField: UITextField { idleTextField.textField }
+    
+    public override var isFirstResponder: Bool {
+        uITextField.isFirstResponder
+    }
+    
+    public var movingView: UIView?
+    public var disposeBag = DisposeBag()
+    public var prevRect: CGRect = .zero
+    public var isPushed: Bool = false
     
     public init(
         titleLabelText: String,
@@ -83,3 +93,5 @@ public class IFType2: UIStackView {
         return super.resignFirstResponder()
     }
 }
+
+extension IFType2: IdleKeyboardAvoidable { }

@@ -59,6 +59,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
         setAppearance()
         setLayout()
         setObservable()
+        setKeyboardAvoidance()
     }
     public required init?(coder: NSCoder) { fatalError() }
     
@@ -136,6 +137,19 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             })
             .disposed(by: disposeBag)
     }
+    
+    func setKeyboardAvoidance() {
+        
+        [
+            contentView.nameField,
+            contentView.birthYearField,
+            contentView.weightField,
+            contentView.deceaseField,
+        ].forEach { (view: IdleKeyboardAvoidable) in
+            
+            view.setKeyboardAvoidance(movingView: self)
+        }
+    }
 }
 
 class CustomerInformationContentView: UIView {
@@ -144,7 +158,6 @@ class CustomerInformationContentView: UIView {
     lazy var nameField: MultiLineTextField = {
         let field = MultiLineTextField(typography: .Body3, placeholderText: "고객의 이름을 입력해 주세요.")
         field.isScrollEnabled = false
-        field.setKeyboardAvoidance(movingView: self)
         return field
     }()
     
@@ -164,7 +177,6 @@ class CustomerInformationContentView: UIView {
     lazy var birthYearField: MultiLineTextField = {
         let field = MultiLineTextField(typography: .Body3, placeholderText: "고객의 출생연도를 입력해주세요. (예: 1965)")
         field.isScrollEnabled = false
-        field.setKeyboardAvoidance(movingView: self)
         return field
     }()
     
@@ -174,7 +186,6 @@ class CustomerInformationContentView: UIView {
             degreeText: "kg",
             initialText: ""
         )
-        field.setKeyboardAvoidance(movingView: self)
         field.textField.keyboardType = .numberPad
         return field
     }()
@@ -203,7 +214,6 @@ class CustomerInformationContentView: UIView {
     lazy var deceaseField: MultiLineTextField = {
         let field = MultiLineTextField(typography: .Body3, placeholderText: "고객이 현재 앓고 있는 질병 또는 병력을 입력해주세요.")
         field.isScrollEnabled = false
-        field.setKeyboardAvoidance(movingView: self)
         return field
     }()
     

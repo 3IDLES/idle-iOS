@@ -80,6 +80,7 @@ class AddressView: UIView {
         super.init(frame: .zero)
         setAppearance()
         setLayout()
+        setKeyboardAvoidance()
     }
     required init?(coder: NSCoder) { fatalError() }
     
@@ -144,7 +145,15 @@ class AddressView: UIView {
         
     }
     
-    
+    func setKeyboardAvoidance() {
+        
+        [
+            contentView.detailAddressField
+        ].forEach { (view: IdleKeyboardAvoidable) in
+            
+            view.setKeyboardAvoidance(movingView: self)
+        }
+    }
 }
 
 class AddressContentView: VStack, DaumAddressSearchDelegate {
@@ -160,7 +169,7 @@ class AddressContentView: VStack, DaumAddressSearchDelegate {
         return button
     }()
     
-    let detailAddressField: IFType2 = {
+    lazy var detailAddressField: IFType2 = {
         let field = IFType2(
             titleLabelText: "상세 주소",
             placeHolderText: "상세 주소를 입력해주세요. (예: 2층 204호)"
@@ -274,7 +283,6 @@ class AddressContentView: VStack, DaumAddressSearchDelegate {
     private func showDaumSearchView() {
         let vc = DaumAddressSearchViewController()
         vc.delegate = self
-        vc.modalPresentationStyle = .fullScreen
         viewController?.navigationController?.pushViewController(vc, animated: true)
     }
     
