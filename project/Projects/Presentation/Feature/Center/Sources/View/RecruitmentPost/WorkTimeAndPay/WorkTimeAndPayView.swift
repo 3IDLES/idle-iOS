@@ -58,6 +58,7 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         setAppearance()
         setLayout()
         setObservable()
+        setKeyboardAvoidance()
     }
     public required init?(coder: NSCoder) { fatalError() }
     
@@ -140,6 +141,15 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
             .disposed(by: disposeBag)
     }
     
+    func setKeyboardAvoidance() {
+        
+        [
+            contentView.paymentField
+        ].forEach { (view: IdleKeyboardAvoidable) in
+            
+            view.setKeyboardAvoidance(movingView: self)
+        }
+    }
 }
 
 // MARK: Inner view
@@ -181,7 +191,6 @@ public class WorkTimeAndPayContentView: UIView {
             degreeText: "원",
             initialText: ""
         )
-        field.setKeyboardAvoidance(movingView: self)
         field.textField.keyboardType = .numberPad
         return field
     }()
