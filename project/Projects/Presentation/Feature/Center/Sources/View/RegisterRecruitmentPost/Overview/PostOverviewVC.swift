@@ -75,10 +75,16 @@ public class PostOverviewVC: BaseViewController {
         return button
     }()
     
+    let ctaButton: CTAButtonType1 = {
+        
+        let button = CTAButtonType1(labelText: "확인했어요")
+        return button
+    }()
+    
     // Overviews
     let workConditionOV = WorkConditionOverView()
     let customerInfoOV = CustomerInformationOverView()
-    
+    let applyInfoOverView = ApplyInfoOverView()
     
     // Observable
     private let disposeBag = DisposeBag()
@@ -128,7 +134,8 @@ public class PostOverviewVC: BaseViewController {
         
         let overviewData: [(title: String, view: UIView)] = [
             ("근무 조건", workConditionOV),
-            ("고객 정보", customerInfoOV)
+            ("고객 정보", customerInfoOV),
+            ("추가 지원 정보", applyInfoOverView),
         ]
         
         let overViews = overviewData.map { (title, view) in
@@ -175,6 +182,11 @@ public class PostOverviewVC: BaseViewController {
         )
         overViewContentView.backgroundColor = DSKitAsset.Colors.gray050.color
         
+        // 확인했어요
+        let canEditRemiderLabel: IdleLabel = .init(typography: .Body3)
+        canEditRemiderLabel.attrTextColor = DSKitAsset.Colors.gray300.color
+        canEditRemiderLabel.textString = "공고 등록 후에도 공고 내용을 수정할 수 있어요. "
+        
         // scroll view
         [
             titleLabel,
@@ -182,6 +194,8 @@ public class PostOverviewVC: BaseViewController {
             sampleCard,
             screenFoWorkerButton,
             overViewContentView,
+            canEditRemiderLabel,
+            ctaButton
             
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -206,7 +220,14 @@ public class PostOverviewVC: BaseViewController {
             overViewContentView.topAnchor.constraint(equalTo: screenFoWorkerButton.bottomAnchor, constant: 24),
             overViewContentView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
             overViewContentView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            overViewContentView.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            
+            canEditRemiderLabel.topAnchor.constraint(equalTo: overViewContentView.bottomAnchor, constant: 32),
+            canEditRemiderLabel.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
+            
+            ctaButton.topAnchor.constraint(equalTo: canEditRemiderLabel.bottomAnchor, constant: 12),
+            ctaButton.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
+            ctaButton.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
+            ctaButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
         ])
         
         // main view
@@ -242,6 +263,7 @@ public class PostOverviewVC: BaseViewController {
         let bindableViews: [RegisterRecruitmentPostVMBindable] = [
             workConditionOV,
             customerInfoOV,
+            applyInfoOverView,
         ]
         
         bindableViews.forEach { subView in
