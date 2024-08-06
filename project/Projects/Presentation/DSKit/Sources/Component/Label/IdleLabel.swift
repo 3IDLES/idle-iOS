@@ -75,7 +75,6 @@ public class IdleLabel: UILabel {
         set {
             super.numberOfLines = newValue
             currentLineCount = newValue
-            self.invalidateIntrinsicContentSize()
         }
     }
     
@@ -87,7 +86,17 @@ public class IdleLabel: UILabel {
     }
     
     private func updateText() {
-        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: currentAttributes))
+        let attributedStr = NSMutableAttributedString(string: textString, attributes: currentAttributes)
+        
+        if let fontHeight = (currentTypography.attributes[.font] as? UIFont)?.lineHeight {
+            
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineSpacing = currentTypography.lineHeight-fontHeight
+            
+            attributedStr.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedStr.length))
+        }
+        
+        self.rx.attributedText.onNext(attributedStr)
         invalidateIntrinsicContentSize()
     }
 }

@@ -104,6 +104,7 @@ extension CenterMainCoordinator {
             navigationController: navigationController,
             injector: injector)
         )
+        coordinator.parent = self
         addChildCoordinator(coordinator)
         coordinator.start()
     }
@@ -115,6 +116,7 @@ extension CenterMainCoordinator {
             navigationController: navigationController,
             injector: injector)
         )
+        coordinator.parent = self
         addChildCoordinator(coordinator)
         coordinator.start()
     }

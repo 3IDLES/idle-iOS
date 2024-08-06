@@ -151,8 +151,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         let detailAddress_changed = detailAddress
             .map { [editing_addressInfo] newValue in
-                print(newValue)
-                return editing_addressInfo.value.detailAddress = newValue
+                editing_addressInfo.value.detailAddress = newValue
             }
         
         addressInputNextable = Observable.combineLatest(

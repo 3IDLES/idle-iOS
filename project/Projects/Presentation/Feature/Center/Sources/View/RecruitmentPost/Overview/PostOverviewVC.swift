@@ -273,6 +273,13 @@ public class PostOverviewVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        ctaButton
+            .eventPublisher
+            .subscribe(onNext: { [coordinator] _ in
+                
+                coordinator?.showCompleteScreen()
+            })
+            .disposed(by: disposeBag)
     }
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {

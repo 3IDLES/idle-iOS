@@ -36,7 +36,7 @@ public enum Typography {
     var lineHeight: CGFloat {
         switch self {
         case .Heading1:
-            34
+            34.8
         case .Heading2:
             28
         case .Heading3:

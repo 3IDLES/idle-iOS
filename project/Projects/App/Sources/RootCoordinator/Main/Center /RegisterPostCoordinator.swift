@@ -53,8 +53,12 @@ extension RegisterRecruitmentPostCoordinator {
     }
     
     func showRegisterCompleteScreen() {
-        
-        
+        let coordinator = RegisterCompleteCoordinator(
+            navigationController: navigationController
+        )
+        coordinator.parent = self
+        addChildCoordinator(coordinator)
+        coordinator.start()
     }
     
     func registerFinished() {
