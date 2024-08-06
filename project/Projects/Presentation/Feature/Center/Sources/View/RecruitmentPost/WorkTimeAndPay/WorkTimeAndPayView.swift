@@ -147,7 +147,7 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
             contentView.paymentField
         ].forEach { (view: IdleKeyboardAvoidable) in
             
-            view.setKeyboardAvoidance(movingView: self)
+            view.setKeyboardAvoidance(movingView: contentView)
         }
     }
 }

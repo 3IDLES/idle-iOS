@@ -122,6 +122,12 @@ public class MultiLineTextField: UITextView {
     
     private func updateText() {
         
+        if !textString.isEmpty {
+            placeHolderLabel.isHidden = true
+        } else {
+            placeHolderLabel.isHidden = false
+        }
+        
         self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: typography.attributes))
     }
 }

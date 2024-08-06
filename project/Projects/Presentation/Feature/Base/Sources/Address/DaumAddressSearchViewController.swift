@@ -103,7 +103,7 @@ public class DaumAddressSearchViewController: UIViewController & WKUIDelegate & 
         }
         
         NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+            navigationBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor, constant: 21),
             navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
             

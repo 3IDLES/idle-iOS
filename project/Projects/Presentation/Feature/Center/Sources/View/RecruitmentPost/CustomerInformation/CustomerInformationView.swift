@@ -147,7 +147,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             contentView.deceaseField,
         ].forEach { (view: IdleKeyboardAvoidable) in
             
-            view.setKeyboardAvoidance(movingView: self)
+            view.setKeyboardAvoidance(movingView: contentView)
         }
     }
 }
