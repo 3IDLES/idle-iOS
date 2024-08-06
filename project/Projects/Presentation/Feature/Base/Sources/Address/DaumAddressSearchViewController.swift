@@ -1,6 +1,6 @@
 //
 //  DaumAddressSearchViewController.swift
-//  AuthFeature
+//  BaseFeature
 //
 //  Created by choijunios on 7/15/24.
 //
@@ -54,39 +54,37 @@ public class DaumAddressSearchViewController: UIViewController & WKUIDelegate & 
         return request
     }()
     
-    private lazy var searchView: WKWebView = {
-        
-        let webConfiguration = WKWebViewConfiguration()
-        let contentController = WKUserContentController()
-        contentController.add(LeakAvoider(delegate: self), name: "getAddress_IOS")
-        webConfiguration.userContentController = contentController
-        
-        let webView = WKWebView(frame: view.bounds, configuration: webConfiguration)
-        webView.uiDelegate = self
-        webView.navigationDelegate = self
-        
-        return webView
-    }()
+    private var searchView: WKWebView!
     
     private let disposeBag = DisposeBag()
 
     public init() {
         super.init(nibName: nil, bundle: nil)
-        setAppearance()
-        setAutoLayout()
-        setObservable()
     }
     
     public required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewWillAppear(_ animated: Bool) {
-        searchView.load(webRequest)
+    public override func viewDidLoad() {
+        
+        setAppearance()
+        setWebView()
+        setAutoLayout()
+        setObservable()
     }
     
-    public override func viewWillDisappear(_ animated: Bool) {
-        searchView.stopLoading()
-        searchView.uiDelegate = nil
+    private func setWebView() {
+        let webConfiguration = WKWebViewConfiguration()
+        let contentController = WKUserContentController()
+        contentController.add(LeakAvoider(delegate: self), name: "getAddress_IOS")
+        webConfiguration.userContentController = contentController
         
+        self.searchView = WKWebView(frame: .zero, configuration: webConfiguration)
+        searchView.uiDelegate = self
+        searchView.navigationDelegate = self
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        searchView.load(webRequest)
     }
     
     private func setAppearance() {

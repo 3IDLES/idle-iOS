@@ -177,6 +177,7 @@ class CustomerInformationContentView: UIView {
     lazy var birthYearField: MultiLineTextField = {
         let field = MultiLineTextField(typography: .Body3, placeholderText: "고객의 출생연도를 입력해주세요. (예: 1965)")
         field.isScrollEnabled = false
+        field.keyboardType = .numberPad
         return field
     }()
     
