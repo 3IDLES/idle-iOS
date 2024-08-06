@@ -139,7 +139,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
             contentView.additionalRequirmentField
         ].forEach { (view: IdleKeyboardAvoidable) in
             
-            view.setKeyboardAvoidance(movingView: self)
+            view.setKeyboardAvoidance(movingView: contentView)
         }
     }
 }
@@ -226,7 +226,6 @@ class CustomerRequirementContentView: UIView {
             typography: .Body3,
             placeholderText: "추가적으로 요구사항이 있다면 작성해주세요."
         )
-        field.setKeyboardAvoidance(movingView: self)
         return field
     }()
     
