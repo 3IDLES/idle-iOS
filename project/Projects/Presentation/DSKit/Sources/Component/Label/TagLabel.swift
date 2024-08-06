@@ -18,8 +18,7 @@ public class TagLabel: IdleLabel {
         super.init(typography: typography)
         
         self.textString = text
-        
-        self.textAlignment = .center
+        textAlignment = .center
         self.backgroundColor = backgroundColor
         self.attrTextColor = textColor
         self.layer.cornerRadius = 4
@@ -33,21 +32,13 @@ public class TagLabel: IdleLabel {
     
     public override var intrinsicContentSize: CGSize {
         let superSize = super.intrinsicContentSize
+        defer {
+            textAlignment = .center
+        }
         return .init(
             width: superSize.width + 8,
             height: superSize.height + 1
         )
-    }
-    
-    public override var textString: String {
-     
-        get {
-            super.textString
-        }
-        set {
-            super.textString = newValue
-            invalidateIntrinsicContentSize()
-        }
     }
 }
 

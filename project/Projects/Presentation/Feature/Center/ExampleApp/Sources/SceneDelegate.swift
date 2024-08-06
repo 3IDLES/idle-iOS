@@ -44,7 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         vc.bind(viewModel: vm)
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = RegisterCompleteVC()
+        window?.rootViewController = vc
         window?.makeKeyAndVisible()
         
         coordinator.start()

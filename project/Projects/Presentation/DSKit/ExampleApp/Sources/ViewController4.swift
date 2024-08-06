@@ -17,11 +17,9 @@ class ViewController4: UIViewController {
         
         view.backgroundColor = .white
         
-        let btn = CenterProfileButton(
-            nameString: "세얼간이 요양보호소",
-            locatonString: "용인시 어쩌고 저쩌고",
-            isArrow: true
-        )
+        let label = TagLabel(text: "Hello", typography: .Body3, textColor: .black, backgroundColor: .cyan)
+        
+        
         
         let textField = MultiLineTextField(typography: .Body3, placeholderText: "Hello")
         textField.setKeyboardAvoidance(movingView: view)
@@ -29,8 +27,7 @@ class ViewController4: UIViewController {
         
 //        btn.isArrow.accept(false)
         [
-            btn,
-            textField
+            label,
         ].forEach {
             
             view.addSubview($0)
@@ -39,13 +36,17 @@ class ViewController4: UIViewController {
         
         
         NSLayoutConstraint.activate([
-            btn.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            btn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            btn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            textField.topAnchor.constraint(equalTo: btn.bottomAnchor, constant: 100),
-            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+//            btn.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+//            btn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+//            btn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+//            
+//            textField.topAnchor.constraint(equalTo: btn.bottomAnchor, constant: 100),
+//            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+//            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
         ])
     }

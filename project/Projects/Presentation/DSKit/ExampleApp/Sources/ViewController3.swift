@@ -26,7 +26,7 @@ class ViewController3: UIViewController {
         
         tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(WorkerEmployCard.self, forCellReuseIdentifier: String(describing: WorkerEmployCard.self))
+        tableView.register(WorkerEmployCardCell.self, forCellReuseIdentifier: String(describing: WorkerEmployCardCell.self))
         [
             tableView
         ]
@@ -51,7 +51,7 @@ extension ViewController3: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: WorkerEmployCard.self), for: indexPath) as? WorkerEmployCard else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: WorkerEmployCardCell.self), for: indexPath) as? WorkerEmployCardCell else {
             fatalError("Unable to dequeue WorkerEmployCard")
         }
         cell.bind(vo: .mock)
