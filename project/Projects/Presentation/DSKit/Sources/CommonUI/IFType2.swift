@@ -41,7 +41,7 @@ public class IFType2: UIStackView {
         uITextField.isFirstResponder
     }
     
-    public var movingView: UIView?
+    public weak var movingView: UIView?
     public var disposeBag = DisposeBag()
     public var prevRect: CGRect = .zero
     public var isPushed: Bool = false

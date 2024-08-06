@@ -12,7 +12,7 @@ import Entity
 import PresentationCore
 import FSCalendar
 
-public protocol OneDayPickerDelegate {
+public protocol OneDayPickerDelegate: NSObject {
     
     func oneDayPicker(selectedDate: Date)
 }
@@ -49,7 +49,7 @@ public class OneDayPickerViewController: UIViewController {
         return space
     }()
     
-    public var delegate: OneDayPickerDelegate?
+    public weak var delegate: OneDayPickerDelegate?
     
     public init() {
         

@@ -1,8 +1,8 @@
 //
-//  PostOverviewCoordinator.swift
+//  RegisterCompleteCoordinator.swift
 //  CenterFeature
 //
-//  Created by choijunios on 8/5/24.
+//  Created by choijunios on 8/6/24.
 //
 
 import UIKit
@@ -10,20 +10,17 @@ import PresentationCore
 import UseCaseInterface
 import Entity
 
-public class PostOverviewCoordinator: ChildCoordinator {
+public class RegisterCompleteCoordinator: ChildCoordinator {
     
     public weak var viewControllerRef: UIViewController?
     public weak var parent: RegisterRecruitmentPostCoordinatable?
     
     public let navigationController: UINavigationController
     
-    public let viewModel: RegisterRecruitmentPostViewModelable
     
     public init(
-        viewModel: RegisterRecruitmentPostViewModelable,
         navigationController: UINavigationController
     ) {
-        self.viewModel = viewModel
         self.navigationController = navigationController
     }
     
@@ -32,9 +29,8 @@ public class PostOverviewCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        let vc = PostOverviewVC()
+        let vc = RegisterCompleteVC()
         vc.coordinator = self
-        vc.bind(viewModel: viewModel)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
     }
@@ -42,16 +38,9 @@ public class PostOverviewCoordinator: ChildCoordinator {
     public func coordinatorDidFinish() {
         parent?.removeChildCoordinator(self)
     }
+    
+    func registerFinished() {
+        parent?.registerFinished()
+    }
 }
 
-extension PostOverviewCoordinator {
-    
-    func showCompleteScreen() {
-        parent?.showRegisterCompleteScreen()
-    }
-    
-    func backToEditScreen() {
-        popViewController()
-        coordinatorDidFinish()
-    }
-}

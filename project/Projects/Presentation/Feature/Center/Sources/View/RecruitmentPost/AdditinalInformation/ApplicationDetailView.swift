@@ -288,7 +288,7 @@ public class ApplicationDetailViewContentView: UIView {
         
         calendarOpenButton
             .rx.tap
-            .subscribe { [weak viewController] _ in
+            .subscribe { [weak self, weak viewController] _ in
                 
                 let vc = OneDayPickerViewController()
                 vc.delegate = self

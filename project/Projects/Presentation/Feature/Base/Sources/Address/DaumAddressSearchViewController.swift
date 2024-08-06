@@ -19,15 +19,25 @@ public enum AddressDataKey: String, CaseIterable {
     case roadAddress="roadAddress"
 }
 
-public protocol DaumAddressSearchDelegate {
+public protocol DaumAddressSearchDelegate: AnyObject {
     func addressSearch(addressData: [AddressDataKey: String])
 }
 
-public typealias Conformance = UIViewController & WKUIDelegate & WKNavigationDelegate & WKScriptMessageHandler
+class LeakAvoider: NSObject, WKScriptMessageHandler {
+    weak var delegate: WKScriptMessageHandler?
+    init(delegate: WKScriptMessageHandler) {
+        self.delegate = delegate
+        super.init()
+    }
 
-public class DaumAddressSearchViewController: Conformance {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        self.delegate?.userContentController(userContentController, didReceive: message)
+    }
+}
+
+public class DaumAddressSearchViewController: UIViewController & WKUIDelegate & WKNavigationDelegate & WKScriptMessageHandler {
     
-    public var delegate: DaumAddressSearchDelegate?
+    public weak var delegate: DaumAddressSearchDelegate?
     
     // View
     private let navigationBar: NavigationBarType1 = {
@@ -38,19 +48,22 @@ public class DaumAddressSearchViewController: Conformance {
         return bar
     }()
     
-    private lazy var searchView: WKWebView = {
+    private let webRequest: URLRequest = {
         let gitURL = URL(string: "https://j0onyeong.github.io/DaumAddressApiPage")!
         let request = URLRequest(url: gitURL)
+        return request
+    }()
+    
+    private lazy var searchView: WKWebView = {
         
         let webConfiguration = WKWebViewConfiguration()
         let contentController = WKUserContentController()
-        contentController.add(self as WKScriptMessageHandler, name: "getAddress_IOS")
+        contentController.add(LeakAvoider(delegate: self), name: "getAddress_IOS")
         webConfiguration.userContentController = contentController
         
         let webView = WKWebView(frame: view.bounds, configuration: webConfiguration)
         webView.uiDelegate = self
         webView.navigationDelegate = self
-        webView.load(request)
         
         return webView
     }()
@@ -65,6 +78,16 @@ public class DaumAddressSearchViewController: Conformance {
     }
     
     public required init?(coder: NSCoder) { fatalError() }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        searchView.load(webRequest)
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        searchView.stopLoading()
+        searchView.uiDelegate = nil
+        
+    }
     
     private func setAppearance() {
         view.layoutMargins = .init(top: 0, left: 0, bottom: 0, right: 0)
@@ -97,8 +120,11 @@ public class DaumAddressSearchViewController: Conformance {
         
         navigationBar
             .eventPublisher
-            .subscribe { [unowned self] _ in
-                self.navigationController?.popViewController(animated: true)
+            .subscribe { [weak self] _ in
+                
+                guard let self else { return }
+                
+                navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
     }
