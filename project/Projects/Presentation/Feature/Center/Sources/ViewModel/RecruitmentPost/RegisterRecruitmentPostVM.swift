@@ -422,11 +422,3 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         state_addressInfo = editing_addressInfo.value.copy() as! AddressInputStateObject
     }
 }
-
-extension Date {
-    func convertDateToString() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy년 MM월 dd일"
-        return dateFormatter.string(from: self)
-    }
-}

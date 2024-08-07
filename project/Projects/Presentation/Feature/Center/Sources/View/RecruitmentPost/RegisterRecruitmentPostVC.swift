@@ -26,11 +26,11 @@ public protocol RegisterRecruitmentPostVMBindable {
 }
 
 public protocol RegisterRecruitmentPostViewModelable: 
-    ApplicationDetailViewModelable,
-    CustomerInformationViewModelable,
-    CustomerRequirementViewModelable,
-    WorkTimeAndPayViewModelable,
-    AddressInputViewModelableVer2,
+    ApplicationDetailContentVMable,
+    CustomerInformationContentVMable,
+    CustomerRequirementContentVMable,
+    WorkTimeAndPayContentVMable,
+    AddressInputViewContentVMable,
     WorkerCardViewModelable
 {
     
