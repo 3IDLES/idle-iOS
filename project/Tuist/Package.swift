@@ -37,6 +37,8 @@ let package = Package(
         // Moya
         .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3"),
         // FSCalendar
-        .package(url: "https://github.com/WenchaoD/FSCalendar.git", from: "2.8.4")
+        .package(url: "https://github.com/WenchaoD/FSCalendar.git", from: "2.8.4"),
+        // Naver map
+        .package(url: "https://github.com/J0onYEong/NaverMapSDKForSPM.git", from: "1.0.0"),
     ]
 )

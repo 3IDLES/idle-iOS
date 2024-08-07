@@ -25,7 +25,9 @@ public enum IdleInfoPlist {
                     ]
                 ]
             ]
-        ]
+        ],
+        
+        "NMFClientId": "$(NAVER_API_CLIENT_ID)"
     ])
     
     public static let exampleAppDefault: InfoPlist = .extendingDefault(with: [
@@ -45,7 +47,9 @@ public enum IdleInfoPlist {
                     ]
                 ]
             ]
-        ]
+        ],
+        
+        "NMFClientId": "$(NAVER_API_CLIENT_ID)"
     ])
 }
 

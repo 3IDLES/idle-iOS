@@ -24,6 +24,7 @@ public class PostDetailVC: BaseViewController {
     
     let cardView: WorkerEmployCard = .init()
     
+    let workLocationView = WorkLocationView()
     let workConditionView = WorkConditionDisplayingView()
     let customerInfoView = CustomerInformationDisplayingView()
     let applicationDetailView = ApplicationDetailDisplayingView()
@@ -72,7 +73,7 @@ public class PostDetailVC: BaseViewController {
         ])
         
         let titleViewData: [(title: String, view: UIView)] = [
-            ("근무 장소", WorkLocationView()),
+            ("근무 장소", workLocationView),
             ("근무 조건", workConditionView),
             ("고객 정보", customerInfoView),
             ("추가 지원 정보", applicationDetailView),
@@ -174,6 +175,7 @@ public class PostDetailVC: BaseViewController {
     public func bind() {
         
         cardView.bind(vo: .mock)
+        workLocationView.bind()
     }
 }
 

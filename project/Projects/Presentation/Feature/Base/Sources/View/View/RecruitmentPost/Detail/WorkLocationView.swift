@@ -11,6 +11,7 @@ import RxCocoa
 import RxSwift
 import Entity
 import DSKit
+import NMapsMap
 
 public class WorkLocationView: VStack {
     
@@ -28,6 +29,14 @@ public class WorkLocationView: VStack {
         label.textString = "걸어서 ~ 소요"
         label.textAlignment = .left
         return label
+    }()
+    
+    let mapView: NMFNaverMapView = {
+       
+        let view = NMFNaverMapView(frame: .zero)
+        view.layer.cornerRadius = 8
+        view.clipsToBounds = true
+        return view
     }()
     
     // Observable
@@ -52,9 +61,6 @@ public class WorkLocationView: VStack {
         
         let labelStack = VStack([walkToLocationLabel, timeCostStack], spacing: 4, alignment: .leading)
         
-        let mapView = UIView()
-        mapView.backgroundColor = .green
-        
         [
             labelStack,
             mapView
@@ -75,7 +81,7 @@ public class WorkLocationView: VStack {
         
         let attrText = NSMutableAttributedString(string: text, attributes: normalAttr)
         
-        var roadTextFont = Typography.Subtitle3.attributes[.font]!
+        let roadTextFont = Typography.Subtitle3.attributes[.font]!
         
         let range = NSRange(text.range(of: roadAddress)!, in: text)
         attrText.addAttribute(.font, value: roadTextFont, range: range)
@@ -83,8 +89,29 @@ public class WorkLocationView: VStack {
         walkToLocationLabel.attributedText = attrText
     }
     
+    private func configureMapAppearance() {
+        
+        mapView.mapView.touchDelegate = self
+        
+        let initialCoordinate = NMGLatLng(lat: 37.5666102, lng: 126.9783881)
+        let cameraPosition = NMFCameraPosition(initialCoordinate, zoom: 1.0)
+        
+        mapView.mapView.moveCamera(NMFCameraUpdate(position: cameraPosition))
+        mapView.showZoomControls = false
+    }
+    
     private func setObservable() {
         
     }
+    
+    public func bind() {
+        configureMapAppearance()
+    }
 }
 
+extension WorkLocationView: NMFMapViewTouchDelegate {
+    public func mapView(_ mapView: NMFMapView, didTapMap latlng: NMGLatLng, point: CGPoint) {
+        
+        printIfDebug("\(latlng.lat), \(latlng.lng)")
+    }
+}
