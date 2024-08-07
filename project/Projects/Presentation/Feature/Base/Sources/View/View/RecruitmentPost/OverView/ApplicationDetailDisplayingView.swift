@@ -1,20 +1,19 @@
 //
-//  ApplyInfoOverView.swift
-//  CenterFeature
+//  ApplicationDetailDisplayingView.swift
+//  BaseFeature
 //
-//  Created by choijunios on 8/5/24.
+//  Created by choijunios on 8/7/24.
 //
 
 import Foundation
 import UIKit
-import BaseFeature
 import PresentationCore
 import RxCocoa
 import RxSwift
 import Entity
 import DSKit
 
-class ApplyInfoOverView: HStack, RegisterRecruitmentPostVMBindable {
+public class ApplicationDetailDisplayingView: HStack {
     
     // Init
     
@@ -97,10 +96,12 @@ class ApplyInfoOverView: HStack, RegisterRecruitmentPostVMBindable {
     }
     
     private func setObservable() { }
+}
+
+public extension ApplicationDetailDisplayingView {
     
-    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
-        
-        
+    /// ViewModelType: ApplicationDetailContentVMable
+    func bind(viewModel: ApplicationDetailContentVMable) {
         
         viewModel
             .casting_applicationDetail

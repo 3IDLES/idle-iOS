@@ -1,20 +1,19 @@
 //
-//  WorkConditionOverView.swift
-//  CenterFeature
+//  WorkConditionDisplayingView.swift
+//  BaseFeature
 //
-//  Created by choijunios on 8/5/24.
+//  Created by choijunios on 8/7/24.
 //
 
 import Foundation
 import UIKit
-import BaseFeature
 import PresentationCore
 import RxCocoa
 import RxSwift
 import Entity
 import DSKit
 
-class WorkConditionOverView: HStack, RegisterRecruitmentPostVMBindable {
+public class WorkConditionDisplayingView: HStack {
     
     // Init
     
@@ -99,8 +98,11 @@ class WorkConditionOverView: HStack, RegisterRecruitmentPostVMBindable {
     }
     
     private func setObservable() { }
+}
+
+public extension WorkConditionOverView {
     
-    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+    func bind(viewModel: WorkTimeAndPayContentVMable & AddressInputViewContentVMable) {
         
         viewModel
             .casting_workTimeAndPay

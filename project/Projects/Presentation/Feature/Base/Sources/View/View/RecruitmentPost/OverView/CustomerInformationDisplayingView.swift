@@ -1,13 +1,12 @@
 //
-//  CustomerInformationOverView.swift
-//  CenterFeature
+//  CustomerInformationDisplayingView.swift
+//  BaseFeature
 //
-//  Created by choijunios on 8/5/24.
+//  Created by choijunios on 8/7/24.
 //
 
 import Foundation
 import UIKit
-import BaseFeature
 import PresentationCore
 import RxCocoa
 import RxSwift
@@ -26,7 +25,7 @@ public struct KeyValueListViewComponent {
     }
 }
 
-class CustomerInformationOverView: VStack, RegisterRecruitmentPostVMBindable {
+public class CustomerInformationDisplayingView: VStack {
     
     // Init
     
@@ -204,8 +203,11 @@ class CustomerInformationOverView: VStack, RegisterRecruitmentPostVMBindable {
     }
     
     private func setObservable() { }
+}
+
+public extension CustomerInformationOverView {
     
-    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+    func bind(viewModel: CustomerInformationContentVMable & CustomerRequirementContentVMable) {
         
         viewModel
             .casting_customerInformation
@@ -254,4 +256,3 @@ class CustomerInformationOverView: VStack, RegisterRecruitmentPostVMBindable {
             .disposed(by: disposeBag)
     }
 }
-

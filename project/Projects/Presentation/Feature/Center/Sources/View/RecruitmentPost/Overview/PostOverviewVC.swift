@@ -80,9 +80,9 @@ public class PostOverviewVC: BaseViewController {
     }()
     
     // Overviews
-    let workConditionOV = WorkConditionOverView()
-    let customerInfoOV = CustomerInformationOverView()
-    let applyInfoOverView = ApplyInfoOverView()
+    let workConditionOV = WorkConditionDisplayingView()
+    let customerInfoOV = CustomerInformationDisplayingView()
+    let applyInfoOverView = ApplicationDetailDisplayingView()
     
     
     // Observable
@@ -304,17 +304,9 @@ public class PostOverviewVC: BaseViewController {
             }
             .disposed(by: disposeBag)
         
-        
-        
-        let bindableViews: [RegisterRecruitmentPostVMBindable] = [
-            workConditionOV,
-            customerInfoOV,
-            applyInfoOverView,
-        ]
-        
-        bindableViews.forEach { subView in
-            subView.bind(viewModel: viewModel)
-        }
+        workConditionOV.bind(viewModel: viewModel)
+        customerInfoOV.bind(viewModel: viewModel)
+        applyInfoOverView.bind(viewModel: viewModel)
     }
 }
 
