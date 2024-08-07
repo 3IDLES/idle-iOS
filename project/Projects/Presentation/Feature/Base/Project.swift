@@ -42,6 +42,7 @@ let project = Project(
                 // ThirdParty
                 D.ThirdParty.RxSwift,
                 D.ThirdParty.RxCocoa,
+                D.ThirdParty.NaverMapSDKForSPM,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
