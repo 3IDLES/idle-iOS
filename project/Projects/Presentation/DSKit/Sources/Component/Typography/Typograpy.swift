@@ -9,7 +9,7 @@ import UIKit
 
 public enum Typography {
     
-    typealias Attrubutes = [NSAttributedString.Key : Any]
+    public typealias Attrubutes = [NSAttributedString.Key : Any]
     
     enum FontWeight: Int {
         case Bold=700
@@ -62,7 +62,7 @@ public enum Typography {
         }
     }
     
-    var attributes: Attrubutes {
+    public var attributes: Attrubutes {
         
         switch self {
         case .Heading1:

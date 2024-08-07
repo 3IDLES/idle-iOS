@@ -72,7 +72,7 @@ public class PostDetailVC: BaseViewController {
         ])
         
         let titleViewData: [(title: String, view: UIView)] = [
-            ("근무 장소", UIView()),
+            ("근무 장소", WorkLocationView()),
             ("근무 조건", workConditionView),
             ("고객 정보", customerInfoView),
             ("추가 지원 정보", applicationDetailView),
