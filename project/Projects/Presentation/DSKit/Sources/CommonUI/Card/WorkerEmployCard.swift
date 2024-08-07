@@ -10,26 +10,6 @@ import RxSwift
 import RxCocoa
 import Entity
 
-public class Spacer: UIView {
-    
-    let width: CGFloat?
-    let height: CGFloat?
-    
-    public override var intrinsicContentSize: CGSize {
-        .init(
-            width: width ?? super.intrinsicContentSize.width,
-            height: height ?? super.intrinsicContentSize.height
-        )
-    }
-    
-    public init(width: CGFloat? = nil, height: CGFloat? = nil) {
-        self.width = width
-        self.height = height
-        super.init(frame: .zero)
-    }
-    required init?(coder: NSCoder) { fatalError() }
-}
-
 public class WorkerEmployCard: UIView {
     
     // View
@@ -102,18 +82,7 @@ public class WorkerEmployCard: UIView {
     
     public required init?(coder: NSCoder) { fatalError() }
     
-    func setAppearance() {
-        self.layoutMargins = .init(
-            top: 16,
-            left: 16,
-            bottom: 16,
-            right: 16
-        )
-        
-        self.layer.borderWidth = 1
-        self.layer.cornerRadius = 12
-        self.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
-    }
+    func setAppearance() { }
     
     func setLayout() {
         
@@ -248,10 +217,10 @@ public class WorkerEmployCard: UIView {
         }
         
         NSLayoutConstraint.activate([
-            mainStack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
-            mainStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            mainStack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            mainStack.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
+            mainStack.topAnchor.constraint(equalTo: self.topAnchor),
+            mainStack.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            mainStack.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            mainStack.bottomAnchor.constraint(equalTo: self.bottomAnchor),
         ])
     }
     
