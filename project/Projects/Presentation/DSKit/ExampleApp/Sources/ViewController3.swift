@@ -24,7 +24,7 @@ class ViewController3: UIViewController {
         tableView.dataSource = self
         
         
-        tableView.estimatedRowHeight = 44.0
+//        tableView.estimatedRowHeight = 44.0
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(WorkerEmployCardCell.self, forCellReuseIdentifier: String(describing: WorkerEmployCardCell.self))
         [

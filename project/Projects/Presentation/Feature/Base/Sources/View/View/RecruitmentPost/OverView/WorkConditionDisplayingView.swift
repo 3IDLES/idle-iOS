@@ -100,7 +100,7 @@ public class WorkConditionDisplayingView: HStack {
     private func setObservable() { }
 }
 
-public extension WorkConditionOverView {
+public extension WorkConditionDisplayingView {
     
     func bind(viewModel: WorkTimeAndPayContentVMable & AddressInputViewContentVMable) {
         

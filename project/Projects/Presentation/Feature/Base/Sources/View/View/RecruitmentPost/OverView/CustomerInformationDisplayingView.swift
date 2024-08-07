@@ -205,7 +205,7 @@ public class CustomerInformationDisplayingView: VStack {
     private func setObservable() { }
 }
 
-public extension CustomerInformationOverView {
+public extension CustomerInformationDisplayingView {
     
     func bind(viewModel: CustomerInformationContentVMable & CustomerRequirementContentVMable) {
         

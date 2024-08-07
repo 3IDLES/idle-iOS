@@ -187,11 +187,32 @@ public class PostOverviewVC: BaseViewController {
         canEditRemiderLabel.attrTextColor = DSKitAsset.Colors.gray300.color
         canEditRemiderLabel.textString = "공고 등록 후에도 공고 내용을 수정할 수 있어요. "
         
+        // 카드 모양 조정
+        let cardBackgroundView = UIView()
+        cardBackgroundView.layer.borderWidth = 1
+        cardBackgroundView.layer.cornerRadius = 12
+        cardBackgroundView.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
+        cardBackgroundView.layoutMargins = .init(
+            top: 16,
+            left: 16,
+            bottom: 16,
+            right: 16
+        )
+        cardBackgroundView.addSubview(sampleCard)
+        sampleCard.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            sampleCard.topAnchor.constraint(equalTo: cardBackgroundView.layoutMarginsGuide.topAnchor),
+            sampleCard.leftAnchor.constraint(equalTo: cardBackgroundView.layoutMarginsGuide.leftAnchor),
+            sampleCard.rightAnchor.constraint(equalTo: cardBackgroundView.layoutMarginsGuide.rightAnchor),
+            sampleCard.bottomAnchor.constraint(equalTo: cardBackgroundView.layoutMarginsGuide.bottomAnchor),
+        ])
+        
         // scroll view
         [
             titleLabel,
             subtitleLabel,
-            sampleCard,
+            cardBackgroundView,
             screenFoWorkerButton,
             overViewContentView,
             canEditRemiderLabel,
@@ -210,11 +231,11 @@ public class PostOverviewVC: BaseViewController {
             subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 32),
             subtitleLabel.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
                 
-            sampleCard.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 20),
-            sampleCard.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
-            sampleCard.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
+            cardBackgroundView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 20),
+            cardBackgroundView.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
+            cardBackgroundView.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
             
-            screenFoWorkerButton.topAnchor.constraint(equalTo: sampleCard.bottomAnchor, constant: 12),
+            screenFoWorkerButton.topAnchor.constraint(equalTo: cardBackgroundView.bottomAnchor, constant: 12),
             screenFoWorkerButton.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
             
             overViewContentView.topAnchor.constraint(equalTo: screenFoWorkerButton.bottomAnchor, constant: 24),
