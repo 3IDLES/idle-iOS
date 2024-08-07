@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import BaseFeature
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -15,9 +16,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         guard let windowScene = scene as? UIWindowScene else { return }
         
+        let vc = PostDetailVC()
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = ViewController()
+        window?.rootViewController = vc
+        
+        vc.bind()
+        
         window?.makeKeyAndVisible()
     }
 }
