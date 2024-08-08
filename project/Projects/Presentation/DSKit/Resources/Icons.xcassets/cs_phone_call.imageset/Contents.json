@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "cs_phone_call.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
