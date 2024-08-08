@@ -94,7 +94,7 @@ public class WorkLocationView: VStack {
         mapView.mapView.touchDelegate = self
         
         let initialCoordinate = NMGLatLng(lat: 37.5666102, lng: 126.9783881)
-        let cameraPosition = NMFCameraPosition(initialCoordinate, zoom: 1.0)
+        let cameraPosition = NMFCameraPosition(initialCoordinate, zoom: 15.0)
         
         mapView.mapView.moveCamera(NMFCameraUpdate(position: cameraPosition))
         mapView.showZoomControls = false
