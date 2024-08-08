@@ -28,6 +28,7 @@ public class PostDetailVC: BaseViewController {
     let workConditionView = WorkConditionDisplayingView()
     let customerInfoView = CustomerInformationDisplayingView()
     let applicationDetailView = ApplicationDetailDisplayingView()
+    let centerInfoCard = CenterInfoCardView()
     
     
     // Observable
@@ -77,7 +78,7 @@ public class PostDetailVC: BaseViewController {
             ("근무 조건", workConditionView),
             ("고객 정보", customerInfoView),
             ("추가 지원 정보", applicationDetailView),
-            ("기관 정보", UIView()),
+            ("기관 정보", centerInfoCard),
         ]
         
         // 카드뷰 따로추가
@@ -176,6 +177,7 @@ public class PostDetailVC: BaseViewController {
         
         cardView.bind(vo: .mock)
         workLocationView.bind()
+        centerInfoCard.bind(nameText: "세얼간이 센터", locationText: "아남타워 7층")
     }
 }
 
