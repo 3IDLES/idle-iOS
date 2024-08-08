@@ -11,7 +11,7 @@ import RxCocoa
 import Entity
 import PresentationCore
 
-public class IdleButtomSheetVC: UIViewController {
+open class IdleButtomSheetVC: UIViewController {
     
     // Not init
     private var gestureBeganPosition: CGPoint = .zero
@@ -40,12 +40,23 @@ public class IdleButtomSheetVC: UIViewController {
     
     let sheetView = UIView()
     
+    public init() {
+        super.init(nibName: nil, bundle: nil)
+        setGesture()
+    }
+    
+    public required init?(coder: NSCoder) { fatalError() }
+    
+    open override func viewDidLoad() {
+        setAppearance()
+    }
+    
     func setAppearance() {
         
         view.backgroundColor = .black.withAlphaComponent(0.0)
     }
     
-    func setLayout(contentView: UIView) {
+    public func setLayout(contentView: UIView) {
         
         let conerRadius = 16.0
         
@@ -53,22 +64,9 @@ public class IdleButtomSheetVC: UIViewController {
         sheetView.layer.cornerRadius = conerRadius
         sheetView.layoutMargins = .init(top: 0, left: 27, bottom: 64 + conerRadius, right: 27)
         
-        let label = IdleLabel(typography: .Heading3)
-        label.textString = "접수 마감일"
-        label.textAlignment = .center
-        
-        let stack = VStack(
-            [
-                label,
-                contentView
-            ],
-            spacing: 31,
-            alignment: .fill
-        )
-        
         [
             dragSpace,
-            stack
+            contentView
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             sheetView.addSubview($0)
@@ -80,10 +78,10 @@ public class IdleButtomSheetVC: UIViewController {
             dragSpace.leftAnchor.constraint(equalTo: sheetView.leftAnchor),
             dragSpace.rightAnchor.constraint(equalTo: sheetView.rightAnchor),
             
-            stack.topAnchor.constraint(equalTo: dragSpace.bottomAnchor),
-            stack.leftAnchor.constraint(equalTo: sheetView.layoutMarginsGuide.leftAnchor),
-            stack.rightAnchor.constraint(equalTo: sheetView.layoutMarginsGuide.rightAnchor),
-            stack.bottomAnchor.constraint(equalTo: sheetView.layoutMarginsGuide.bottomAnchor),
+            contentView.topAnchor.constraint(equalTo: dragSpace.bottomAnchor),
+            contentView.leftAnchor.constraint(equalTo: sheetView.layoutMarginsGuide.leftAnchor),
+            contentView.rightAnchor.constraint(equalTo: sheetView.layoutMarginsGuide.rightAnchor),
+            contentView.bottomAnchor.constraint(equalTo: sheetView.layoutMarginsGuide.bottomAnchor),
         ])
         
         [

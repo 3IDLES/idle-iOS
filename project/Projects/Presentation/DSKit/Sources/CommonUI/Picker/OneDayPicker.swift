@@ -18,6 +18,7 @@ public protocol OneDayPickerDelegate: NSObject {
 }
 
 /// 달력뷰를 바텀시트로 표출하는 뷰 입니다.
+/// setLayout을 반드시 호출해여 합니다.
 public class OneDayPickerViewController: IdleButtomSheetVC {
     
     // View
@@ -25,31 +26,42 @@ public class OneDayPickerViewController: IdleButtomSheetVC {
     
     public weak var delegate: OneDayPickerDelegate?
     
-    public init() {
+    public override init() {
         
-        super.init(nibName: nil, bundle: nil)
+        super.init()
+        
         configureCalendar()
         setObservable()
-        setGesture()
     }
-    
     
     required init?(coder: NSCoder) { fatalError() }
     
     public override func viewDidLoad() {
-        
-        setAppearance()
+        super.viewDidLoad()
         setLayout()
     }
     
-    public override func setAppearance() { }
-    
     private func setLayout() {
-        super.setLayout(contentView: calendar)
+        
+        let label = IdleLabel(typography: .Heading3)
+        label.textString = "접수 마감일"
+        label.textAlignment = .center
+        
+        let contentView = VStack(
+            [
+                label,
+                calendar
+            ],
+            spacing: 31,
+            alignment: .fill
+        )
+        
         // Calendar높이 설정
         NSLayoutConstraint.activate([
             calendar.heightAnchor.constraint(equalToConstant: 320),
         ])
+        
+        super.setLayout(contentView: contentView)
     }
     
     private func setObservable() { }
