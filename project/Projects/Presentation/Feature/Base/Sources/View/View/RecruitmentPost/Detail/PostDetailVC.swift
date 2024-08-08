@@ -22,13 +22,19 @@ public class PostDetailVC: BaseViewController {
         return bar
     }()
     
-    let cardView: WorkerEmployCard = .init()
+    let contentView = PostDetailContentView()
     
-    let workLocationView = WorkLocationView()
-    let workConditionView = WorkConditionDisplayingView()
-    let customerInfoView = CustomerInformationDisplayingView()
-    let applicationDetailView = ApplicationDetailDisplayingView()
-    let centerInfoCard = CenterInfoCardView()
+    // 하단 버튼
+    let csButton: IdleSecondaryButton = {
+        let btn = IdleSecondaryButton(level: .medium)
+        btn.label.textString = "문의하기"
+        return btn
+    }()
+    let applyButton: IdlePrimaryButton = {
+        let btn = IdlePrimaryButton(level: .medium)
+        btn.label.textString = "지원하기"
+        return btn
+    }()
     
     
     // Observable
@@ -57,7 +63,6 @@ public class PostDetailVC: BaseViewController {
         let contentGuide = scrollView.contentLayoutGuide
         let frameGuide = scrollView.frameLayoutGuide
         
-        let contentView = UIView()
         contentView.layoutMargins = .init(top: 24, left: 0, bottom: 16, right: 0)
         
         scrollView.addSubview(contentView)
@@ -72,6 +77,78 @@ public class PostDetailVC: BaseViewController {
             contentView.rightAnchor.constraint(equalTo: contentGuide.rightAnchor),
             contentView.bottomAnchor.constraint(equalTo: contentGuide.bottomAnchor),
         ])
+        
+        // Button
+        let buttonStack = HStack([csButton, applyButton], spacing: 8, distribution: .fillEqually)
+        
+        
+        // main view
+        [
+            navigationBar,
+            scrollView,
+            buttonStack
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
+            navigationBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 12),
+            navigationBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            
+            scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
+            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: buttonStack.topAnchor, constant: -12),
+            
+            buttonStack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+            buttonStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+            buttonStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+        ])
+    }
+    
+    private func setObservable() {
+        
+    }
+    
+    public func bind() {
+        
+        // back button
+        
+        // Content view
+        contentView.bind()
+        
+        // button
+    }
+}
+
+// MARK: PostDetailContentView
+public class PostDetailContentView: UIView {
+    
+    let cardView: WorkerEmployCard = .init()
+    
+    let workLocationView = WorkLocationView()
+    let workConditionView = WorkConditionDisplayingView()
+    let customerInfoView = CustomerInformationDisplayingView()
+    let applicationDetailView = ApplicationDetailDisplayingView()
+    let centerInfoCard = CenterInfoCardView()
+    
+    public init() {
+        super.init(frame: .zero)
+        
+        setAppearance()
+        setLayout()
+    }
+    
+    public required init?(coder: NSCoder) { fatalError() }
+    
+    func setAppearance() {
+        
+        self.layoutMargins = .init(top: 24, left: 0, bottom: 16, right: 0)
+    }
+    
+    func setLayout() {
         
         let titleViewData: [(title: String, view: UIView)] = [
             ("근무 장소", workLocationView),
@@ -137,40 +214,15 @@ public class PostDetailVC: BaseViewController {
             contentViewStack
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            contentView.addSubview($0)
+            self.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            contentViewStack.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            contentViewStack.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            contentViewStack.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            contentViewStack.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            contentViewStack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
+            contentViewStack.leftAnchor.constraint(equalTo: self.leftAnchor),
+            contentViewStack.rightAnchor.constraint(equalTo: self.rightAnchor),
+            contentViewStack.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
         ])
-        
-        
-        // main view
-        [
-            navigationBar,
-            scrollView
-        ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
-        }
-        
-        NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
-            navigationBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 12),
-            navigationBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-            
-            scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
-            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
-    }
-    
-    private func setObservable() {
-        
     }
     
     public func bind() {
@@ -180,4 +232,3 @@ public class PostDetailVC: BaseViewController {
         centerInfoCard.bind(nameText: "세얼간이 센터", locationText: "아남타워 7층")
     }
 }
-
