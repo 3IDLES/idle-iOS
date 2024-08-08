@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let vc = PostDetailVC()
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = SelectCSTypeVC()
+        window?.rootViewController = vc
         
         vc.bind()
         

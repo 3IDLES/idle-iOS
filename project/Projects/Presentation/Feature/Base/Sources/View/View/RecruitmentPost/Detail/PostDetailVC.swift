@@ -110,6 +110,14 @@ public class PostDetailVC: BaseViewController {
     
     private func setObservable() {
         
+        // '문의하기'버튼 클릭시
+        csButton.rx.tap
+            .subscribe { [weak self] _ in
+                let vc = SelectCSTypeVC()
+                vc.modalPresentationStyle = .overFullScreen
+                self?.present(vc, animated: false)
+            }
+            .disposed(by: disposeBag)
     }
     
     public func bind() {
@@ -223,6 +231,11 @@ public class PostDetailContentView: UIView {
             contentViewStack.rightAnchor.constraint(equalTo: self.rightAnchor),
             contentViewStack.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
         ])
+    }
+    
+    private func setObservable() {
+        
+        
     }
     
     public func bind() {
