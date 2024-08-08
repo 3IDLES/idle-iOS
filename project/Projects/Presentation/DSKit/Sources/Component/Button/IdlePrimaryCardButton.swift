@@ -1,5 +1,5 @@
 //
-//  IdlePrimaryButton.swift
+//  IdlePrimaryCardButton.swift
 //  DSKit
 //
 //  Created by choijunios on 8/8/24.
@@ -9,67 +9,36 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-public enum PrimaryButtonLevel {
+public enum PrimaryCardButtonLevel {
     case large
     case medium
-    case mediumRed
-    case small
     
     var buttonHeight: CGFloat {
         switch self {
         case .large:
-            56
-        case .medium, .mediumRed:
-            56
-        case .small:
-            44
+            38
+        case .medium:
+            38
         }
     }
     
     var typography: Typography {
         switch self {
         case .large:
-            .Heading4
-        case .medium, .mediumRed:
-            .Heading4
-        case .small:
             .Subtitle4
-        }
-    }
-    
-    var idleColor: UIColor {
-        switch self {
-        case .mediumRed:
-            DSKitAsset.Colors.red200.color
-        default:
-            DSKitAsset.Colors.orange500.color
-        }
-    }
-    
-    var accentColor: UIColor {
-        switch self {
-        case .mediumRed:
-            DSKitAsset.Colors.red100.color
-        default:
-            DSKitAsset.Colors.orange300.color
-        }
-    }
-    
-    var disabledColor: UIColor {
-        switch self {
-        default:
-            DSKitAsset.Colors.gray200.color
+        case .medium:
+            .Subtitle4
         }
     }
 }
 
-public class IdlePrimaryButton: TappableUIView {
+public class IdlePrimaryCardButton: TappableUIView {
     
     // State
     public private(set) var isEnabled: Bool = true
     
     // Init
-    public let level: PrimaryButtonLevel
+    public let level: PrimaryCardButtonLevel
     
     // View
     public private(set) lazy var label: IdleLabel = {
@@ -79,6 +48,11 @@ public class IdlePrimaryButton: TappableUIView {
         return label
     }()
     
+    // Button config
+    private let idle_background_color: UIColor = DSKitAsset.Colors.orange500.color
+    private let accent_background_color: UIColor = DSKitAsset.Colors.orange300.color
+    private let disabled_background_color: UIColor = DSKitAsset.Colors.gray200.color
+    
     public override var intrinsicContentSize: CGSize {
         .init(width: super.intrinsicContentSize.width, height: level.buttonHeight)
     }
@@ -86,7 +60,7 @@ public class IdlePrimaryButton: TappableUIView {
     private let disposeBag = DisposeBag()
     
     public init(
-        level: PrimaryButtonLevel
+        level: PrimaryCardButtonLevel
     ) {
         
         self.level = level
@@ -104,7 +78,7 @@ public class IdlePrimaryButton: TappableUIView {
         self.clipsToBounds = true
         
         // InitialSetting
-        backgroundColor = level.idleColor
+        backgroundColor = idle_background_color
     }
     
     private func setAutoLayout() {
@@ -128,10 +102,10 @@ public class IdlePrimaryButton: TappableUIView {
             .subscribe { [weak self] _ in
                 guard let self else { return }
                 
-                backgroundColor = level.accentColor
+                backgroundColor = accent_background_color
                 
                 UIView.animate(withDuration: 0.3) { [weak self] in
-                    self?.backgroundColor = self?.level.idleColor
+                    self?.backgroundColor = self?.idle_background_color
                 }
             }
             .disposed(by: disposeBag)
@@ -140,14 +114,14 @@ public class IdlePrimaryButton: TappableUIView {
     public func setEnabled(_ isEnabled: Bool) {
         self.isEnabled = isEnabled
         self.isUserInteractionEnabled = isEnabled
-        self.backgroundColor = isEnabled ? level.idleColor : level.disabledColor
+        self.backgroundColor = isEnabled ? idle_background_color : disabled_background_color
     }
 }
 
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
     
-    let button = IdlePrimaryButton(level: .mediumRed)
+    let button = IdlePrimaryButton(level: .large)
     button.label.textString = "다음"
     
     return button
