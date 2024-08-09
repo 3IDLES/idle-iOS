@@ -27,7 +27,13 @@ public class DefualtRecruitmentPostUseCase: RecruitmentPostUseCase {
         applicationDetailStateObject: ApplicationDetailStateObject
     ) -> Single<Result<Void, RecruitmentPostError>> {
         
-        convert(
+        // 마감기간이 지정되지 않는 경우 현재로 부터 한달 후로 설정
+        if applicationDetailStateObject.applyDeadlineType == .untilApplicationFinished {
+            let oneMonthLater = Calendar.current.date(byAdding: .month, value: 1, to: Date())
+            applicationDetailStateObject.deadlineDate = oneMonthLater
+        }
+        
+        return convert(
             task: repository.registerPost(
                 input1: workTimeAndPayStateObject,
                 input2: addressInputStateObject,
