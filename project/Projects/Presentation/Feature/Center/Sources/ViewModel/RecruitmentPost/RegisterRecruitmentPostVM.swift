@@ -36,6 +36,9 @@ public enum RegisterRecruitmentPostInputSection: CaseIterable {
 
 public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     
+    // MARK: UseCase
+    
+    
     // MARK: State
     var state_workTimeAndPay: WorkTimeAndPayStateObject = .init()
     var state_customerRequirement: CustomerRequirementStateObject = .init()
@@ -58,7 +61,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var casting_applicationDetail: Driver<ApplicationDetailStateObject>
     
     // MARK: Address input
-    public var detailAddress: PublishRelay<String> = .init()
     public var addressInformation: PublishRelay<AddressInformation> = .init()
     
     public var addressInputNextable: Driver<Bool>
@@ -181,21 +183,13 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 editing_addressInfo.value.addressInfo = newValue
             }
         
-        let detailAddress_changed = detailAddress
-            .map { [editing_addressInfo] newValue in
-                editing_addressInfo.value.detailAddress = newValue
+        let addressInputValidation = addressInformation_changed
+            .map { [editing_addressInfo] _ in
+                let object = editing_addressInfo.value
+                
+                return object.addressInfo != nil
             }
-        
-        let addressInputValidation = Observable.combineLatest(
-            addressInformation_changed,
-            detailAddress_changed
-        )
-        .map { [editing_addressInfo] _ in
-            let object = editing_addressInfo.value
             
-            return object.addressInfo != nil && !object.detailAddress.isEmpty
-        }
-        
         addressInputNextable = addressInputValidation.asDriver(onErrorJustReturn: false)
         
         

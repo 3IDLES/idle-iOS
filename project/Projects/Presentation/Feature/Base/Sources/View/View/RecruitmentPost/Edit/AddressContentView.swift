@@ -16,7 +16,6 @@ import DSKit
 public protocol AddressInputViewContentVMable {
     
     var addressInformation: PublishRelay<AddressInformation> { get }
-    var detailAddress: PublishRelay<String> { get }
     
     var casting_addressInput: Driver<AddressInputStateObject> { get }
     var addressInputNextable: Driver<Bool> { get }
@@ -103,11 +102,10 @@ public class AddressContentView: VStack, DaumAddressSearchDelegate {
             .disposed(by: disposeBag)
         
         addressPublisher
-            .subscribe(onNext: { [addressSearchButton] info in
+            .subscribe(onNext: { [weak self] info in
                 
                 if !info.roadAddress.isEmpty {
-                    
-                    addressSearchButton.label.textString = info.roadAddress
+                    self?.setAddressButtonLabel(addressStr: info.roadAddress)
                 }
             })
             .disposed(by: disposeBag)
@@ -129,17 +127,16 @@ public class AddressContentView: VStack, DaumAddressSearchDelegate {
     
     public func bind(viewModel: AddressInputViewContentVMable) {
         
+        // 공고등록의 경우 상세주소 입력창을 숨긴다.
+        detailAddressField.isHidden = true
+        
         // 초기값 설정
         viewModel
             .casting_addressInput
-            .drive(onNext: { [addressSearchButton, detailAddressField] state in
+            .drive(onNext: { [weak self] state in
                 
                 if let info = state.addressInfo {
-                    addressSearchButton.label.textString = info.roadAddress
-                }
-                
-                if !state.detailAddress.isEmpty {
-                    detailAddressField.uITextField.text = state.detailAddress
+                    self?.setAddressButtonLabel(addressStr: info.roadAddress)
                 }
             })
             .disposed(by: disposeBag)
@@ -148,14 +145,12 @@ public class AddressContentView: VStack, DaumAddressSearchDelegate {
         addressPublisher
             .bind(to: viewModel.addressInformation)
             .disposed(by: disposeBag)
-        
-        detailAddressField
-            .uITextField.rx.text
-            .compactMap { $0 }
-            .bind(to: viewModel.detailAddress)
-            .disposed(by: disposeBag)
     }
     
+    private func setAddressButtonLabel(addressStr: String) {
+        addressSearchButton.label.textString = addressStr
+        addressSearchButton.label.textColor = DSKitAsset.Colors.gray900.color
+    }
     
     private func showDaumSearchView() {
         let vc = DaumAddressSearchViewController()
