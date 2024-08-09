@@ -11,9 +11,30 @@ import RxCocoa
 import Entity
 import PresentationCore
 
-public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
+public enum RegisterRecruitmentPostInputSection: CaseIterable {
+    case workTimeAndPay
+    case customerRequirement
+    case customerInformation
+    case applicationDetail
+    case addressInfo
     
-    public var alert: Driver<DefaultAlertContentVO>?
+    var alertMessaage: String {
+        switch self {
+        case .workTimeAndPay:
+            "근무시간및 급여 입력 오류"
+        case .customerRequirement:
+            "주소정보 입력 오류"
+        case .customerInformation:
+            "고객 요구사항 입력 오류"
+        case .applicationDetail:
+            "지원 정보 입력오류"
+        case .addressInfo:
+            "근무지 정보 입력 오류"
+        }
+    }
+}
+
+public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     
     // MARK: State
     var state_workTimeAndPay: WorkTimeAndPayStateObject = .init()
@@ -82,8 +103,18 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var deadlineString: Driver<String>
     public var applicationDetailViewNextable: Driver<Bool>
     
+    
     // MARK: PostCard
     public let workerEmployCardVO: Driver<WorkerEmployCardVO>
+    
+    private let validationStateQueue = DispatchQueue.global(qos: .userInteractive)
+    private var validationState: [RegisterRecruitmentPostInputSection: Bool] = {
+        var dict: [RegisterRecruitmentPostInputSection: Bool] = [:]
+        RegisterRecruitmentPostInputSection.allCases.forEach { section in
+            dict[section] = false
+        }
+        return dict
+    }()
     
     // 옵셔널한 입력을 유지합니다.
     let disposeBag = DisposeBag()
@@ -118,7 +149,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 editing_workTimeAndPay.value.paymentAmount = newValue
             }
         
-        workTimeAndPayNextable = Observable.combineLatest(
+        let workTimeAndPayInputValidation = Observable.combineLatest(
             selectedDay_changed,
             workStartTime_changed,
             workEndTime_changed,
@@ -138,7 +169,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             object.paymentType != nil &&
             !object.paymentAmount.isEmpty
         }
-        .asDriver(onErrorJustReturn: false)
+        
+        workTimeAndPayNextable = workTimeAndPayInputValidation.asDriver(onErrorJustReturn: false)
         
         
         // MARK: Address input
@@ -154,7 +186,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 editing_addressInfo.value.detailAddress = newValue
             }
         
-        addressInputNextable = Observable.combineLatest(
+        let addressInputValidation = Observable.combineLatest(
             addressInformation_changed,
             detailAddress_changed
         )
@@ -163,7 +195,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             
             return object.addressInfo != nil && !object.detailAddress.isEmpty
         }
-        .asDriver(onErrorJustReturn: false)
+        
+        addressInputNextable = addressInputValidation.asDriver(onErrorJustReturn: false)
         
         
         // MARK: Customer requirement
@@ -196,7 +229,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             }
             .disposed(by: disposeBag)
         
-        customerRequirementNextable = Observable.combineLatest(
+        let customerRequirementInputValidation = Observable.combineLatest(
             mealSupportNeeded_changed,
             toiletSupportNeeded_changed,
             movingSupportNeeded_changed
@@ -208,9 +241,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                    requirement.toiletSupportNeeded != nil &&
                    requirement.movingSupportNeeded != nil
         }
-        .asDriver(onErrorJustReturn: false)
         
-        
+        customerRequirementNextable = customerRequirementInputValidation.asDriver(onErrorJustReturn: false)
         
         // MARK: Customer information
         casting_customerInformation = editing_customerInformation.asDriver { _ in fatalError() }
@@ -251,7 +283,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             }
             .disposed(by: disposeBag)
         
-        customerInformationNextable = Observable.combineLatest(
+        let customerInformationInputValidation = Observable.combineLatest(
             name_changed,
             gender_changed,
             birthYear_changed,
@@ -268,7 +300,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                    customerInfo.careGrade != nil &&
                    customerInfo.cognitionState != nil
         }
-        .asDriver(onErrorJustReturn: false)
+        
+        customerInformationNextable = customerInformationInputValidation.asDriver(onErrorJustReturn: false)
         
         // MARK: Application detail
         casting_applicationDetail = editing_applicationDetail.asDriver { _ in fatalError() }
@@ -297,8 +330,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             .compactMap { $0 }
             .map { $0.convertDateToString() }
             .asDriver(onErrorJustReturn: "")
-        
-        applicationDetailViewNextable = Observable.combineLatest(
+         
+        let applicationDetailInputValidation = Observable.combineLatest(
             experiencePreferenceType_changed,
             applyType_changed,
             applyDeadlineType_changed,
@@ -324,7 +357,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             }
             return false
         }
-        .asDriver(onErrorJustReturn: false)
+        
+        applicationDetailViewNextable = applicationDetailInputValidation.asDriver(onErrorJustReturn: false)
         
         // MARK: PostCard
         workerEmployCardVO = Observable<WorkerEmployCardVO>
@@ -403,10 +437,59 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             .asDriver(onErrorJustReturn: .mock)
         
         
+        Observable
+            .merge(
+                workTimeAndPayInputValidation.map({
+                    (RegisterRecruitmentPostInputSection.workTimeAndPay, $0)
+                }),
+                addressInputValidation.map({
+                    (RegisterRecruitmentPostInputSection.addressInfo, $0)
+                }),
+                customerRequirementInputValidation.map({
+                    (RegisterRecruitmentPostInputSection.customerRequirement, $0)
+                }),
+                customerInformationInputValidation.map({
+                    (RegisterRecruitmentPostInputSection.customerInformation, $0)
+                }),
+                applicationDetailInputValidation.map({
+                    (RegisterRecruitmentPostInputSection.applicationDetail, $0)
+                })
+            )
+            .subscribe { [weak self] inputSection, isValid in
+                self?.validationStateQueue.async { [weak self] in
+                    self?.validationState[inputSection] = isValid
+                }
+            }
+            .disposed(by: disposeBag)
+
             // 최초로 데이터를 가져옵니다.
             fetchFromState()
     }
     
+    public func allInputsValid() -> Single<DefaultAlertContentVO?> {
+        
+        Single<DefaultAlertContentVO?>.create { [weak self] single in
+            
+            self?.validationStateQueue.sync { [weak self, single] in
+                
+                guard let self else { return }
+                
+                for (key, value) in validationState {
+                    
+                    if !value {
+                        single(.success(.init(
+                            title: "입력 정보 오류",
+                            message: key.alertMessaage
+                        )))
+                    }
+                }
+                
+                single(.success(nil))
+            }
+            
+            return Disposables.create { }
+        }
+    }
     
     public func fetchFromState() {
         
