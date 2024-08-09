@@ -9,6 +9,7 @@ import UIKit
 import DSKit
 import PresentationCore
 import CenterFeature
+import UseCaseInterface
 
 
 class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable {
@@ -28,7 +29,9 @@ class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable {
     }
     
     func start() {
-        self.viewModel = RegisterRecruitmentPostVM()
+        self.viewModel = RegisterRecruitmentPostVM(
+            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
+        )
         
         let coordinator = RegisterRecruitmentCoordinator(
             viewModel: viewModel,

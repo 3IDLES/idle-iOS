@@ -27,5 +27,10 @@ public struct DataAssembly: Assembly {
         container.register(UserProfileRepository.self) { _ in
             return DefaultUserProfileRepository()
         }
+        
+        // MARK: 구인공고 레포지토리
+        container.register(RecruitmentPostRepository.self) { _ in
+            return DefaultRecruitmentPostRepository()
+        }
     }
 }

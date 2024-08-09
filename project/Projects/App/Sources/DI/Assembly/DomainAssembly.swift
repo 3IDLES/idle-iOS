@@ -30,5 +30,13 @@ public struct DomainAssembly: Assembly {
             
             return DefaultCenterProfileUseCase(repository: repository)
         }
+        
+        container.register(RecruitmentPostUseCase.self) { resolver in
+            let repository = resolver.resolve(RecruitmentPostRepository.self)!
+            
+            return DefaultRecruitmentPostUseCase(
+                repository: repository
+            )
+        }
     }
 }
