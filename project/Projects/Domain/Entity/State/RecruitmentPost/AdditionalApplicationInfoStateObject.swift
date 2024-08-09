@@ -9,7 +9,14 @@ import Foundation
 
 public class ApplicationDetailStateObject: NSCopying {
     public var experiencePreferenceType: ExperiencePreferenceType?
-    public var applyType: ApplyType?
+    public var applyType: [ApplyType: Bool] = {
+        var dict: [ApplyType: Bool] = [:]
+        ApplyType.allCases.forEach { type in
+            dict[type] = false
+        }
+        return dict
+    }()
+    
     public var applyDeadlineType: ApplyDeadlineType?
     public var deadlineDate: Date?
     
@@ -18,7 +25,11 @@ public class ApplicationDetailStateObject: NSCopying {
     public static var mock: ApplicationDetailStateObject {
         let mockObject = ApplicationDetailStateObject()
         mockObject.experiencePreferenceType = .beginnerPossible
-        mockObject.applyType = .app
+        mockObject.applyType = [
+            .app : true,
+            .message : false,
+            .phoneCall : false
+        ]
         mockObject.applyDeadlineType = .untilApplicationFinished
         mockObject.deadlineDate = Date(timeIntervalSinceNow: 86400 * 7) // 7 days from now
         return mockObject

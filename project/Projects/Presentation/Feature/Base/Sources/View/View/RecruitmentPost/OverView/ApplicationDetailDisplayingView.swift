@@ -110,7 +110,9 @@ public extension ApplicationDetailDisplayingView {
                 
                 expPreferenceLabel.textString = object.experiencePreferenceType?.korTextForBtn ?? "오류"
                 
-                applTypeLabel.textString = object.applyType?.korTextForBtn ?? "오류"
+                applTypeLabel.textString = object.applyType.compactMap({ (key, value) -> String? in
+                    value ? key.twoLetterKorTextForDisplay : nil
+                }).joined(separator: ", ")
                 
                 if let type = object.applyDeadlineType {
                     if type == .specificDate {

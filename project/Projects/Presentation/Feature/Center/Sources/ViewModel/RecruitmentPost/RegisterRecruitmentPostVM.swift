@@ -75,7 +75,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     
     // MARK: Application detail
     public var experiencePreferenceType: PublishRelay<ExperiencePreferenceType> = .init()
-    public var applyType: PublishRelay<ApplyType> = .init()
+    public var applyType: PublishRelay<(Entity.ApplyType, Bool)> = .init()
     public var applyDeadlineType: PublishRelay<ApplyDeadlineType> = .init()
     public var deadlineDate: BehaviorRelay<Date?> = .init(value: nil)
     
@@ -279,8 +279,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             }
         
         let applyType_changed = applyType
-            .map { [editing_applicationDetail] newValue in
-                editing_applicationDetail.value.applyType = newValue
+            .map { [editing_applicationDetail] (applyType, isActive) in
+                editing_applicationDetail.value.applyType[applyType] = isActive
             }
         
         let applyDeadlineType_changed = applyDeadlineType
@@ -308,8 +308,12 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             
             let state = editing_applicationDetail.value
             
+            let activeApplyTypeCnt = state.applyType.reduce(0) { partialResult, keyValue in
+                partialResult + (keyValue.value ? 1 : 0)
+            }
+            
             if state.applyDeadlineType != nil,
-               state.applyType != nil,
+               activeApplyTypeCnt != 0,
                state.experiencePreferenceType != nil {
                 
                 if state.applyDeadlineType == .specificDate {
