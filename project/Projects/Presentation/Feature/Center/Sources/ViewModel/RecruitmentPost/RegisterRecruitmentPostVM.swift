@@ -10,6 +10,7 @@ import RxSwift
 import RxCocoa
 import Entity
 import PresentationCore
+import UseCaseInterface
 
 public enum RegisterRecruitmentPostInputSection: CaseIterable {
     case workTimeAndPay
@@ -36,8 +37,11 @@ public enum RegisterRecruitmentPostInputSection: CaseIterable {
 
 public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     
-    // MARK: UseCase
+    //Init
+    let recruitmentPostUseCase: RecruitmentPostUseCase
     
+    // MARK: register request
+    public var postRegistrationSuccess: Driver<Void>
     
     // MARK: State
     var state_workTimeAndPay: WorkTimeAndPayStateObject = .init()
@@ -109,6 +113,13 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     // MARK: PostCard
     public let workerEmployCardVO: Driver<WorkerEmployCardVO>
     
+    // MARK: Alert
+    public var alert: Driver<Entity.DefaultAlertContentVO>
+    
+    // MARK: 공고등록 요청 결과
+    private let requestRegistrationResult = PublishRelay<Result<Void, RecruitmentPostError>>()
+    
+    // MARK: 모든 섹션의 유효성 확인
     private let validationStateQueue = DispatchQueue.global(qos: .userInteractive)
     private var validationState: [RegisterRecruitmentPostInputSection: Bool] = {
         var dict: [RegisterRecruitmentPostInputSection: Bool] = [:]
@@ -121,7 +132,9 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     // 옵셔널한 입력을 유지합니다.
     let disposeBag = DisposeBag()
     
-    public init() {
+    public init(recruitmentPostUseCase: RecruitmentPostUseCase) {
+        
+        self.recruitmentPostUseCase = recruitmentPostUseCase
         
         // MARK: Work time and pay
         casting_workTimeAndPay = editing_workTimeAndPay.asDriver { _ in fatalError() }
@@ -431,7 +444,26 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 return Disposables.create { }
             }
             .asDriver(onErrorJustReturn: .mock)
+
         
+        
+        let shareResult = requestRegistrationResult.share()
+        
+        postRegistrationSuccess = shareResult
+            .compactMap { $0.value }
+            .asDriver(onErrorRecover: { error in fatalError() })
+        
+        let requestRegistrationFailure = shareResult
+            .compactMap { $0.error }
+        
+        alert = requestRegistrationFailure
+            .map { error in
+                DefaultAlertContentVO(
+                    title: "공고등록 오류",
+                    message: error.message
+                )
+            }
+            .asDriver(onErrorJustReturn: .default)
         
         Observable
             .merge(
@@ -503,5 +535,23 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         state_customerInformation = editing_customerInformation.value.copy() as! CustomerInformationStateObject
         state_applicationDetail = editing_applicationDetail.value.copy() as! ApplicationDetailStateObject
         state_addressInfo = editing_addressInfo.value.copy() as! AddressInputStateObject
+    }
+    
+    public func requestRegisterPost() {
+        
+        // 공고를 등록합니다.
+        let inputs = RegisterRecruitmentPostBundle(
+            workTimeAndPay: state_workTimeAndPay,
+            customerRequirement: state_customerRequirement,
+            customerInformation: state_customerInformation,
+            applicationDetail: state_applicationDetail,
+            addressInfo: state_addressInfo
+        )
+        
+        recruitmentPostUseCase
+            .registerRecruitmentPost(inputs: inputs)
+            .asObservable()
+            .bind(to: requestRegistrationResult)
+            .disposed(by: disposeBag)
     }
 }

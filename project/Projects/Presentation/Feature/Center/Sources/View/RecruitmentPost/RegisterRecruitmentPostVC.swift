@@ -31,8 +31,13 @@ public protocol RegisterRecruitmentPostViewModelable:
     CustomerRequirementContentVMable,
     WorkTimeAndPayContentVMable,
     AddressInputViewContentVMable,
-    WorkerCardViewModelable
+    WorkerCardViewModelable,
+    DefaultAlertOutputable
 {
+    /// 현재 유효한 값으로 공고를 등록할 것을 요청합니다.
+    func requestRegisterPost()
+    /// 공고등록에 성공한 경우 해당 이벤트를 전달 받습니다
+    var postRegistrationSuccess: Driver<Void> { get }
     /// 유효한 값을 가져옵니다.
     func fetchFromState()
     /// 수정중인 값을 API를 사용하여 전송할 값(State)에 반영합니다.
