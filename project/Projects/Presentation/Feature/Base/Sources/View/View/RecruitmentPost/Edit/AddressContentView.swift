@@ -160,14 +160,18 @@ public class AddressContentView: VStack, DaumAddressSearchDelegate {
     
     public func addressSearch(addressData: [AddressDataKey : String]) {
         
-//            let address = addressData[.address] ?? "알 수 없는 주소"
-        let jibunAddress = addressData[.jibunAddress] ?? "알 수 없는 지번 주소"
-        let roadAddress = addressData[.roadAddress] ?? "알 수 없는 도로명 주소"
+        let jibunAddress = addressData[.jibunAddress]!
+        let roadAddress = addressData[.roadAddress]!
+        let autoJibunAddress = addressData[.autoJibunAddress]!
+        let autoRoadAddress = addressData[.autoRoadAddress]!
+        
+        let finalJibunAddress = jibunAddress.isEmpty ? autoJibunAddress : jibunAddress
+        let finalRoadAddress = roadAddress.isEmpty ? autoRoadAddress : roadAddress
         
         addressPublisher.accept(
             AddressInformation(
-                roadAddress: roadAddress,
-                jibunAddress: jibunAddress
+                roadAddress: finalRoadAddress,
+                jibunAddress: finalJibunAddress
             )
         )
     }
