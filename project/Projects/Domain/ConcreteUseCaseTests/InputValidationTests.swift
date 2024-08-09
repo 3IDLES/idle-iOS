@@ -10,7 +10,8 @@ import XCTest
 @testable import ConcreteRepository
 @testable import NetworkDataSource
 
-final class ConcreteTests: XCTestCase {
+/// 사용자의 입력을 판단하는 UseCase를 테스트 합니다.
+final class InputValidationTests: XCTestCase {
     
     let usecase = DefaultAuthInputValidationUseCase(
         repository: DefaultAuthInputValidationRepository()
