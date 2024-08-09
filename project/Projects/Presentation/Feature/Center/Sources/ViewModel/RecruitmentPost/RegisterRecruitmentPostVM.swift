@@ -211,6 +211,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 editing_customerRequirement.value.movingSupportNeeded = newValue
             }
         
+        // optional
         dailySupportTypes
             .subscribe { [editing_customerRequirement] (type, isAtive) in
                 editing_customerRequirement.value.dailySupportTypeNeeds[type] = isAtive
@@ -255,11 +256,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             .map { [editing_customerInformation] newValue in
                 editing_customerInformation.value.birthYear = newValue
             }
-            
-        let weight_changed = weight
-            .map { [editing_customerInformation] newValue in
-                editing_customerInformation.value.weight = newValue
-            }
         
         let careGrade_changed = careGrade
             .map { [editing_customerInformation] newValue in
@@ -271,6 +267,13 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 editing_customerInformation.value.cognitionState = newValue
             }
         
+        // optional
+        weight
+            .subscribe { [editing_customerInformation] newValue in
+                editing_customerInformation.value.weight = newValue
+            }
+            .disposed(by: disposeBag)
+        
         deceaseDescription
             .subscribe { [editing_customerInformation] newValue in
                 editing_customerInformation.value.deceaseDescription = newValue
@@ -281,7 +284,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             name_changed,
             gender_changed,
             birthYear_changed,
-            weight_changed,
             careGrade_changed,
             cognitionState_changed
         )
@@ -290,7 +292,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             
             return !customerInfo.name.isEmpty && 
                    !customerInfo.birthYear.isEmpty &&
-                   !customerInfo.weight.isEmpty &&
                    customerInfo.careGrade != nil &&
                    customerInfo.cognitionState != nil
         }
@@ -320,6 +321,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 editing_applicationDetail.value.deadlineDate = newValue
             }
         
+        // optional
         deadlineString = deadlineDate
             .compactMap { $0 }
             .map { $0.convertDateToString() }
