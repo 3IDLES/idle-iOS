@@ -17,13 +17,13 @@ public enum RcruitmentPostAPI {
 extension RcruitmentPostAPI: BaseAPI {
     
     public var apiType: APIType {
-        .users
+        .job_postings
     }
     
     public var path: String {
         switch self {
         case .registerPost:
-            "job-postings"
+            ""
         }
     }
     

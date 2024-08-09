@@ -20,7 +20,7 @@ public class DefualtRecruitmentPostUseCase: RecruitmentPostUseCase {
     }
     
     public func registerRecruitmentPost(
-        workTimeAndPayStateObject: Entity.WorkTimeAndPayStateObject,
+        workTimeAndPayStateObject: WorkTimeAndPayStateObject,
         addressInputStateObject: AddressInputStateObject,
         customerInformationStateObject: CustomerInformationStateObject,
         customerRequirementStateObject: CustomerRequirementStateObject,
