@@ -73,9 +73,9 @@ public class PostOverviewVC: BaseViewController {
         return button
     }()
     
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "확인했어요")
+    let executeRegisterButton: IdlePrimaryButton = {
+        let button = IdlePrimaryButton(level: .large)
+        button.label.textString = "확인했어요"
         return button
     }()
     
@@ -216,7 +216,7 @@ public class PostOverviewVC: BaseViewController {
             screenFoWorkerButton,
             overViewContentView,
             canEditRemiderLabel,
-            ctaButton
+            executeRegisterButton
             
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -245,10 +245,10 @@ public class PostOverviewVC: BaseViewController {
             canEditRemiderLabel.topAnchor.constraint(equalTo: overViewContentView.bottomAnchor, constant: 32),
             canEditRemiderLabel.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
             
-            ctaButton.topAnchor.constraint(equalTo: canEditRemiderLabel.bottomAnchor, constant: 12),
-            ctaButton.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
-            ctaButton.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
-            ctaButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            executeRegisterButton.topAnchor.constraint(equalTo: canEditRemiderLabel.bottomAnchor, constant: 12),
+            executeRegisterButton.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
+            executeRegisterButton.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
+            executeRegisterButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
         ])
         
         // main view
@@ -293,19 +293,25 @@ public class PostOverviewVC: BaseViewController {
                     animated: true)
             })
             .disposed(by: disposeBag)
-        
-        ctaButton
-            .eventPublisher
-            .subscribe(onNext: { [coordinator] _ in
-                
-                coordinator?.showCompleteScreen()
-            })
-            .disposed(by: disposeBag)
     }
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
         self.viewModel = viewModel
+        
+        // 공고등록 요청
+        executeRegisterButton
+            .rx.tap
+            .subscribe { [weak self] _ in
+                
+                guard let self else { return }
+                
+                // 공고 등록중 인터렉션 비활성화
+                view.isUserInteractionEnabled = false
+                viewModel.requestRegisterPost()
+            }
+            .disposed(by: disposeBag)
+        
         
         // 앞전가지 입력한 정보를 저장합니다.
         viewModel.updateToState()
@@ -328,6 +334,24 @@ public class PostOverviewVC: BaseViewController {
         workConditionOV.bind(viewModel: viewModel)
         customerInfoOV.bind(viewModel: viewModel)
         applyInfoOverView.bind(viewModel: viewModel)
+        
+        // Ouptut
+        // 공고등록성공 수신
+        viewModel
+            .postRegistrationSuccess
+            .drive(onNext: { [coordinator] _ in
+                coordinator?.showCompleteScreen()
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .alert
+            .drive(onNext: { [weak self] vo in
+                guard let self else { return }
+                view.isUserInteractionEnabled = true
+                showAlert(vo: vo)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
