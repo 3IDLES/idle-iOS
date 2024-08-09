@@ -34,13 +34,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let navigationController = UINavigationController()
         navigationController.setNavigationBarHidden(true, animated: false)
         
+        let vm = RegisterRecruitmentPostVM(
+            recruitmentPostUseCase: DefaultRecruitmentPostUseCase(
+                repository: DefaultRecruitmentPostRepository()
+            )
+        )
+        
         let coordinator = RegisterRecruitmentCoordinator(
-            viewModel: RegisterRecruitmentPostVM(),
+            viewModel: vm,
             navigationController: navigationController
         )
         
         let vc = PostOverviewVC()
-        let vm = RegisterRecruitmentPostVM()
+        
         vc.bind(viewModel: vm)
         
         window = UIWindow(windowScene: windowScene)
