@@ -157,7 +157,10 @@ public class CustomerInformationContentView: UIView {
             
             VStack(
                 [
-                    IdleContentTitleLabel(titleText: "몸무게"),
+                    IdleContentTitleLabel(
+                        titleText: "몸무게",
+                        subTitleText: "(선택)"
+                    ),
                     weightField
                 ],
                 spacing: 6,
