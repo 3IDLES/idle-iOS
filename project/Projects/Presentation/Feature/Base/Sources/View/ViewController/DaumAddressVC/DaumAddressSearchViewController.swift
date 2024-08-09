@@ -17,6 +17,8 @@ public enum AddressDataKey: String, CaseIterable {
     case address="address"
     case jibunAddress="jibunAddress"
     case roadAddress="roadAddress"
+    case autoRoadAddress="autoRoadAddress"
+    case autoJibunAddress="autoJibunAddress"
 }
 
 public protocol DaumAddressSearchDelegate: AnyObject {
