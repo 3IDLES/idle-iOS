@@ -36,6 +36,17 @@ public enum ApplyType: Int, CaseIterable {
             "어플 지원"
         }
     }
+    
+    public var twoLetterKorTextForDisplay: String {
+        switch self {
+        case .phoneCall:
+            "전화"
+        case .message:
+            "문자"
+        case .app:
+            "어플"
+        }
+    }
 }
 
 public enum ApplyDeadlineType: Int, CaseIterable {
