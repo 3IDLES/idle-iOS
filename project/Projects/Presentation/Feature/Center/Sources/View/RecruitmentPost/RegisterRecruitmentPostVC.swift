@@ -33,13 +33,12 @@ public protocol RegisterRecruitmentPostViewModelable:
     AddressInputViewContentVMable,
     WorkerCardViewModelable
 {
-    
-    // Output
-    var alert: Driver<DefaultAlertContentVO>? { get }
     /// 유효한 값을 가져옵니다.
     func fetchFromState()
     /// 수정중인 값을 API를 사용하여 전송할 값(State)에 반영합니다.
     func updateToState()
+    /// 모든 입력이 유효한지 확인하고 유효하지 않은 첫번째 섹션의 Alert정보를 반환합니다.
+    func allInputsValid() -> Single<DefaultAlertContentVO?>
 }
 
 public class RegisterRecruitmentPostVC: BaseViewController {
@@ -252,13 +251,6 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
         self.viewModel = viewModel
-        
-        viewModel
-            .alert?
-            .drive { [weak self] vo in
-                self?.showAlert(vo: vo)
-            }
-            .disposed(by: disposeBag)
         
         pageViews
             .forEach { view in
