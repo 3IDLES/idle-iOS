@@ -13,6 +13,12 @@ import RxSwift
 import Entity
 import DSKit
 
+public protocol CheckAllPostInputValidation {
+    
+    var requestAllInputValidation: PublishRelay<Void> { get }
+    var validationResultWithAlert: Driver<DefaultAlertContentVO?>? { get }
+}
+
 public class EditPostVC: BaseViewController {
     
     // Init
@@ -269,13 +275,27 @@ public class EditPostVC: BaseViewController {
         
         editingCompleteButton
             .eventPublisher
-            .subscribe { [weak self] _ in
+            .subscribe { [weak self, viewModel] _ in
                 
                 guard let self else { return }
                 
-                /// 저장하기 버튼을 누른 경우 값을 업데이트 합니다.
-                viewModel.updateToState()
-                navigationController?.popViewController(animated: true)
+                viewModel
+                    .allInputsValid()
+                    .subscribe  (onSuccess: { [weak self, viewModel] vo in
+                        
+                        guard let self else { return }
+                        
+                        if let alertVO = vo {
+                            
+                            showAlert(vo: alertVO)
+                            
+                        } else {
+                            /// 저장하기 버튼을 누른 경우 값을 업데이트 합니다.
+                            viewModel.updateToState()
+                            navigationController?.popViewController(animated: true)
+                        }
+                    })
+                    .disposed(by: disposeBag)
             }
             .disposed(by: disposeBag)
         
