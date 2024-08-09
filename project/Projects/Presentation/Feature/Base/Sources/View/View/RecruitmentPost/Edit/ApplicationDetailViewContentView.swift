@@ -16,7 +16,7 @@ public protocol ApplicationDetailContentVMable {
     
     // Input
     var experiencePreferenceType: PublishRelay<ExperiencePreferenceType> { get }
-    var applyType: PublishRelay<ApplyType> { get }
+    var applyType: PublishRelay<(ApplyType, Bool)> { get }
     var applyDeadlineType: PublishRelay<ApplyDeadlineType> { get }
     var deadlineDate: BehaviorRelay<Date?> { get }
     
@@ -210,18 +210,18 @@ public class ApplicationDetailViewContentView: UIView {
                 }
                 
                 // 지원 방법
-                if let state = stateFromVM.applyType {
+                stateFromVM.applyType.forEach { (key, value) in
                     
-                    applyTypeButtons
-                        .enumerated()
-                        .forEach { (index, button) in
-                            let item = ApplyType(rawValue: index)!
-                            
-                            if item == state {
-                                button.setState(.accent)
-                            }
-                        }
+                    
                 }
+                
+                applyTypeButtons
+                    .enumerated()
+                    .forEach { (index, button) in
+                        let currentButtonItem = ApplyType(rawValue: index)!
+                        let isActive = stateFromVM.applyType[currentButtonItem]!
+                        button.setState(isActive ? .accent : .normal)
+                    }
                 
                 // 마감기한 방법
                 if let state = stateFromVM.applyDeadlineType {
@@ -283,7 +283,6 @@ public class ApplicationDetailViewContentView: UIView {
             .bind(to: viewModel.experiencePreferenceType)
             .disposed(by: disposeBag)
         
-        
         Observable
             .merge(
                 applyTypeButtons
@@ -291,23 +290,10 @@ public class ApplicationDetailViewContentView: UIView {
                     .map { (index, button) in
                         let item = ApplyType(rawValue: index)!
                         return button.eventPublisher
-                            .compactMap { state -> ApplyType? in state == .accent ? item : nil }
+                            .map { state in (item, state == .accent) }
                             .asObservable()
                     }
             )
-            .map { [applyTypeButtons] (type) in
-                
-                applyTypeButtons
-                    .enumerated()
-                    .forEach { (index, button) in
-                        let item = ApplyType(rawValue: index)!
-                        if item != type {
-                            button.setState(.normal)
-                        }
-                    }
-                
-                return type
-            }
             .bind(to: viewModel.applyType)
             .disposed(by: disposeBag)
         
