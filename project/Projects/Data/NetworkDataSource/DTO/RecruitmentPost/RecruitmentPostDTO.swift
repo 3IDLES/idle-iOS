@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Entity
 
 public struct RecruitmentPostDTO: Codable {
     public let isMealAssistance, isBowelAssistance, isWalkingAssistance, isExperiencePreferred: Bool
@@ -13,14 +14,18 @@ public struct RecruitmentPostDTO: Codable {
     public let startTime, endTime, payType: String
     public let payAmount: Int
     public let roadNameAddress, lotNumberAddress, clientName, gender: String
-    public let birthYear, weight, careLevel: Int
-    public let mentalStatus, disease: String
-    public let lifeAssistance: [String]
-    public let speciality: String
+    public let birthYear: Int
+    public let weight: Int?
+    public let careLevel: Int
+    public let mentalStatus: String
+    public let disease: String?
+    public let lifeAssistance: [String]?
+    public let extraRequirement: String?
     public let applyMethod: [String]
-    public let applyDeadline, applyDeadlineType: String
+    public let applyDeadline: String
+    public let applyDeadlineType: String
     
-    public init(isMealAssistance: Bool, isBowelAssistance: Bool, isWalkingAssistance: Bool, isExperiencePreferred: Bool, weekdays: [String], startTime: String, endTime: String, payType: String, payAmount: Int, roadNameAddress: String, lotNumberAddress: String, clientName: String, gender: String, birthYear: Int, weight: Int, careLevel: Int, mentalStatus: String, disease: String, lifeAssistance: [String], speciality: String, applyMethod: [String], applyDeadline: String, applyDeadlineType: String) {
+    public init(isMealAssistance: Bool, isBowelAssistance: Bool, isWalkingAssistance: Bool, isExperiencePreferred: Bool, weekdays: [String], startTime: String, endTime: String, payType: String, payAmount: Int, roadNameAddress: String, lotNumberAddress: String, clientName: String, gender: String, birthYear: Int, weight: Int?, careLevel: Int, mentalStatus: String, disease: String?, lifeAssistance: [String]?, extraRequirement: String?, applyMethod: [String], applyDeadline: String, applyDeadlineType: String) {
         self.isMealAssistance = isMealAssistance
         self.isBowelAssistance = isBowelAssistance
         self.isWalkingAssistance = isWalkingAssistance
@@ -40,7 +45,7 @@ public struct RecruitmentPostDTO: Codable {
         self.mentalStatus = mentalStatus
         self.disease = disease
         self.lifeAssistance = lifeAssistance
-        self.speciality = speciality
+        self.extraRequirement = extraRequirement
         self.applyMethod = applyMethod
         self.applyDeadline = applyDeadline
         self.applyDeadlineType = applyDeadlineType
