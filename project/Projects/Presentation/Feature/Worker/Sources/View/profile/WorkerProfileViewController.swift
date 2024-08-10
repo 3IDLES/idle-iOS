@@ -413,3 +413,9 @@ public class WorkerProfileViewController: DisposableViewController {
         
     }
 }
+
+@available(iOS 17.0, *)
+#Preview("Preview", traits: .defaultLayout) {
+    
+    WorkerProfileViewController()
+}

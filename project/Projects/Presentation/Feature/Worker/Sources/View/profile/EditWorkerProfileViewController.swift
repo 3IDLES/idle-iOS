@@ -68,54 +68,16 @@ public class EditWorkerProfileViewController: DisposableViewController {
         return btn
     }()
     
-    // 이름
-    let nameInputField: MultiLineTextField = {
-        let textView = MultiLineTextField(
-            typography: .Body3,
-            placeholderText: "성함"
-        )
-        textView.textContainerInset = .init(top: 10, left: 16, bottom: 10, right: 24)
-        textView.isScrollEnabled = false
-        
-        return textView
-    }()
-    
-    // 성별
-    let femaleButton: StateButtonTyp1 = {
-        let btn = StateButtonTyp1(
-            text: Gender.female.twoLetterKoreanWord,
-            initial: .normal
-        )
-        return btn
-    }()
-    let maleButton: StateButtonTyp1 = {
-        let btn = StateButtonTyp1(
-            text: Gender.male.twoLetterKoreanWord,
-            initial: .normal
-        )
-        return btn
-    }()
-    
-    // 나이
-    let ageInputField: IdleTextField = {
-        let field = IdleTextField(typography: .Body2)
-        field.keyboardType = .numberPad
-        return field
-    }()
-    
     // 경력
-    let expLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Body2)
-        label.attrTextColor = DSKitAsset.Colors.gray500.color
-        return label
+    let experiencedSelectButton: ExpPicker = {
+        let button = ExpPicker(placeholderText: "연차")
+        
+        button.textLabel.attrTextColor = DSKitAsset.Colors.gray500.color
+        button.imageView.image = DSKitAsset.Icons.chevronDown.image
+        button.imageView.tintColor = DSKitAsset.Colors.gray200.color
+        
+        return button
     }()
-    let expEditButton: UIButton = {
-        let btn = UIButton()
-        btn.setImage(DSKitAsset.Icons.chevronDown.image, for: .normal)
-        btn.isUserInteractionEnabled = true
-        return btn
-    }()
-    
     
     // 주소
     let addressInputField: MultiLineTextField = {
@@ -123,7 +85,6 @@ public class EditWorkerProfileViewController: DisposableViewController {
             typography: .Body3,
             placeholderText: "주소"
         )
-        textView.textContainerInset = .init(top: 10, left: 16, bottom: 10, right: 24)
         textView.isScrollEnabled = false
         return textView
     }()
@@ -134,7 +95,6 @@ public class EditWorkerProfileViewController: DisposableViewController {
             typography: .Body3,
             placeholderText: "소개"
         )
-        textView.textContainerInset = .init(top: 10, left: 16, bottom: 10, right: 24)
         textView.isScrollEnabled = false
         return textView
     }()
@@ -145,7 +105,6 @@ public class EditWorkerProfileViewController: DisposableViewController {
             typography: .Body3,
             placeholderText: "특기"
         )
-        textView.textContainerInset = .init(top: 12, left: 16, bottom: 16, right: 22)
         textView.isScrollEnabled = false
         return textView
     }()
@@ -183,6 +142,7 @@ public class EditWorkerProfileViewController: DisposableViewController {
         ])
         navigationStack.distribution = .equalSpacing
         navigationStack.backgroundColor = .white
+        
         let navigationStackBackground = UIView()
         navigationStackBackground.addSubview(navigationStack)
         navigationStack.translatesAutoresizingMaskIntoConstraints = false
@@ -209,146 +169,15 @@ public class EditWorkerProfileViewController: DisposableViewController {
             workerProfileDisplayingImage.bottomAnchor.constraint(equalTo: profileImageContainer.bottomAnchor),
         ])
         
-        // 나이
-        let ageInputContainer = HStack(
-            [
-               ageInputField,
-               {
-                   let label = IdleLabel(typography: .Body3)
-                   label.textString = "세"
-                   return label
-               }()
-            ],
-            alignment: .center,
-            distribution: .equalSpacing
-        )
-        let ageInputContainerBackground = {
-            let view = UIView()
-            view.backgroundColor = .clear
-            view.layoutMargins = .init(top: 10, left: 16, bottom: 10, right: 15.5)
-            view.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
-            view.layer.borderWidth = 1.0
-            view.layer.cornerRadius = 6.0
-            return view
-        }()
-        ageInputContainerBackground.addSubview(ageInputContainer)
-        ageInputContainer.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            // 명시적 높이 지정
-            ageInputContainer.heightAnchor.constraint(equalToConstant: 24),
-            
-            ageInputContainer.topAnchor.constraint(equalTo: ageInputContainerBackground.layoutMarginsGuide.topAnchor),
-            ageInputContainer.bottomAnchor.constraint(equalTo: ageInputContainerBackground.layoutMarginsGuide.bottomAnchor),
-            ageInputContainer.leadingAnchor.constraint(equalTo: ageInputContainerBackground.layoutMarginsGuide.leadingAnchor),
-            ageInputContainer.trailingAnchor.constraint(equalTo: ageInputContainerBackground.layoutMarginsGuide.trailingAnchor),
-        ])
-        
-        // 경력
-        let expInputContainer = HStack(
-            [
-               expLabel,
-               expEditButton
-            ],
-            alignment: .center,
-            distribution: .equalSpacing
-        )
-        let expInputContainerBackground = {
-            let view = UIView()
-            view.backgroundColor = .clear
-            view.layoutMargins = .init(top: 10, left: 16, bottom: 10, right: 15.5)
-            view.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
-            view.layer.borderWidth = 1.0
-            view.layer.cornerRadius = 6.0
-            return view
-        }()
-        expInputContainerBackground.addSubview(expInputContainer)
-        expInputContainer.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            // 명시적 높이 지정
-            expInputContainer.heightAnchor.constraint(equalToConstant: 24),
-            
-            expInputContainer.topAnchor.constraint(equalTo: expInputContainerBackground.layoutMarginsGuide.topAnchor),
-            expInputContainer.bottomAnchor.constraint(equalTo: expInputContainerBackground.layoutMarginsGuide.bottomAnchor),
-            expInputContainer.leadingAnchor.constraint(equalTo: expInputContainerBackground.layoutMarginsGuide.leadingAnchor),
-            expInputContainer.trailingAnchor.constraint(equalTo: expInputContainerBackground.layoutMarginsGuide.trailingAnchor),
-        ])
- 
-        // 나이+경력
-        let ageExpStack = HStack(
-            [
-                ("나이", ageInputContainerBackground),
-                ("경력", expInputContainerBackground)
-            ].map { (title, content) in
-                
-                VStack(
-                    [
-                        {
-                            let label = IdleLabel(typography: .Subtitle4)
-                            label.textString = title
-                            label.attrTextColor = DSKitAsset.Colors.gray300.color
-                            label.textAlignment = .left
-                            return label
-                        }(),
-                        content
-                    ],
-                    spacing: 6,
-                    alignment: .fill
-                )
-            }
-            , spacing: 4,
-            distribution: .fillEqually
-        )
-        
-        // 성별
-        let genderStack = VStack(
-            [
-                {
-                    let label = IdleLabel(typography: .Subtitle4)
-                    label.textString = "성별"
-                    label.attrTextColor = DSKitAsset.Colors.gray300.color
-                    return label
-                }(),
-                HStack(
-                    [
-                        femaleButton,
-                        maleButton
-                    ].map { btn in
-                        NSLayoutConstraint.activate([
-                            btn.widthAnchor.constraint(equalToConstant: 104),
-                            btn.heightAnchor.constraint(equalToConstant: 44),
-                        ])
-                        return btn
-                    },
-                    spacing: 4
-                )
-            ],
-            spacing: 6,
-            alignment: .leading
-        )
-        
-        // 이름
-        let nameStack = VStack(
-            [
-                {
-                    let label = IdleLabel(typography: .Subtitle4)
-                    label.textString = "이름"
-                    label.attrTextColor = DSKitAsset.Colors.gray300.color
-                    label.textAlignment = .left
-                    return label
-                }(),
-                nameInputField
-            ],
-            spacing: 6,
-            alignment: .fill
-        )
         
         // // 요양보호사 인적정보 / 요양보호사 구직정보 디바이더
         let divider = UIView()
         divider.backgroundColor = DSKitAsset.Colors.gray050.color
         
-        // 주소 + 소개 + 특기
+        // 경력, 주소, 한줄소개, 특기
         let addressIntroductionAbilityStack = VStack(
             [
+                ("경력", experiencedSelectButton),
                 ("주소", addressInputField),
                 ("한줄 소개", introductionInputField),
                 ("특기", abilityInputField),
@@ -405,9 +234,6 @@ public class EditWorkerProfileViewController: DisposableViewController {
         // Scroll View
         [
             profileImageContainer,
-            nameStack,
-            genderStack,
-            ageExpStack,
             divider,
             addressIntroductionAbilityStack
         ].forEach {
@@ -428,19 +254,7 @@ public class EditWorkerProfileViewController: DisposableViewController {
             profileImageContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             profileImageContainer.topAnchor.constraint(equalTo: scrollViewContentGuide.topAnchor, constant: 40),
             
-            nameStack.topAnchor.constraint(equalTo: profileImageContainer.bottomAnchor, constant: 19),
-            nameStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            nameStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            
-            genderStack.topAnchor.constraint(equalTo: nameStack.bottomAnchor, constant: 24),
-            genderStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            genderStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            
-            ageExpStack.topAnchor.constraint(equalTo: genderStack.bottomAnchor, constant: 28),
-            ageExpStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            ageExpStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            
-            divider.topAnchor.constraint(equalTo: ageExpStack.bottomAnchor, constant: 24),
+            divider.topAnchor.constraint(equalTo: profileImageContainer.bottomAnchor, constant: 24),
             divider.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             divider.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             divider.heightAnchor.constraint(equalToConstant: 8),
@@ -464,6 +278,8 @@ public class EditWorkerProfileViewController: DisposableViewController {
                 self?.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
+        
+        
     }
     
     public func cleanUp() {
