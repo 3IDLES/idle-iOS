@@ -33,7 +33,7 @@ public struct WorkerProfileRenderObject {
             isJobFinding: vo.isLookingForJob,
             stateText: vo.isLookingForJob ? "구인중" : "휴식중",
             nameText: vo.nameText,
-            phoneNumber: "010-4444-555",
+            phoneNumber: vo.phoneNumber,
             ageText: "\(vo.age)세",
             genderText: vo.gender.twoLetterKoreanWord,
             expText: vo.expYear == nil ? "신입" : "\(vo.expYear!)년차",
