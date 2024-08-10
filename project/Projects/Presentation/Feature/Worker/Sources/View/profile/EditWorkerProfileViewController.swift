@@ -420,6 +420,7 @@ public class EditWorkerProfileViewController: BaseViewController {
                 navigationBar.navigationTitle = ro.navigationTitle
                 stateSelectButton.setState(ro.isJobFinding ? jobFindingState : restingState)
                 nameLabel.textString = ro.nameText
+                phoneNumberLabel.textString = ro.phoneNumber
                 ageLabel.textString = ro.ageText
                 genderLabel.textString = ro.genderText
                 experiencedSelectButton.textLabel.textString = ro.expText
@@ -433,12 +434,21 @@ public class EditWorkerProfileViewController: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        // 수정 실패 수신
         viewModel
             .alert?
             .drive(onNext: { [weak self] vo in
                 self?.showAlert(vo: vo) { [weak self] in
                     self?.navigationController?.popViewController(animated: true)
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        // 수정 성공 여부 수신
+        viewModel
+            .uploadSuccess?
+            .drive(onNext: { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
         

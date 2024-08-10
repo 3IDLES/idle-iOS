@@ -11,8 +11,11 @@ import RxSwift
 import RxCocoa
 import DSKit
 import Entity
+import UseCaseInterface
 
 public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
+    
+    let workerProfileUseCase: WorkerProfileUseCase
     
     // Input(Editing)
     var requestUpload: PublishRelay<Void> = .init()
@@ -34,13 +37,15 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     private let rederingState: BehaviorRelay<WorkerProfileRenderObject> = .init(value: .createRO(isMyProfile: true, vo: .mock))
     
     // Editing & State
-    var willSubmitImage: UIImage?
+    var willSubmitImageInfo: ImageUploadInfo?
     var editingState: WorkerProfileStateObject = .default
     var currentState: WorkerProfileStateObject = .default
     
     let disposbag: DisposeBag = .init()
     
-    public init() {
+    public init(workerProfileUseCase: WorkerProfileUseCase) {
+        
+        self.workerProfileUseCase = workerProfileUseCase
         
         // Input(Rendering)
         let fetchedProfileVOResult = viewWillAppear
@@ -75,12 +80,25 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
             .bind(to: rederingState)
             .disposed(by: disposbag)
         
+        
         // Edit Input
-        editingImage
-            .subscribe { [weak self] image in
-                self?.willSubmitImage = image
+        let imageValidationResult = editingImage
+            .map { [weak self] image -> UIImage? in
+                guard let imageInfo = self?.validateSelectedImage(image: image) else { return nil }
+                printIfDebug("✅ 업로드 가능한 이미지 타입 \(imageInfo.ext)")
+                self?.willSubmitImageInfo = imageInfo
+                return image
             }
-            .disposed(by: disposbag)
+            .share()
+        
+        let imageValidationFailure = imageValidationResult
+            .filter { $0 == nil }
+            .map { _ in
+                DefaultAlertContentVO(
+                    title: "이미지 선택 오류",
+                    message: "지원하지 않는 이미지 형식입니다."
+                )
+            }
         
         editingIsJobFinding
             .subscribe { [weak self] isJobFinding in
@@ -119,25 +137,32 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
             }
             .share()
         
-        uploadSuccess = editingRequestResult
-            .compactMap { $0.value }
-            .asDriver(onErrorRecover: { _ in fatalError() })
-        
-        alert = editingRequestResult
+        let editingRequestFailure = editingRequestResult
             .compactMap { $0.error }
             .map { error in
                 DefaultAlertContentVO(
                     title: "공고 수정 오류",
                     message: error.message
-                )
-            }
+            )
+        }
+        
+        uploadSuccess = editingRequestResult
+            .compactMap { $0.value }
+            .asDriver(onErrorRecover: { _ in fatalError() })
+        
+        alert = Observable
+            .merge(
+                imageValidationFailure,
+                editingRequestFailure
+            )
             .asDriver(onErrorJustReturn: .default)
         
         profileRenderObject = rederingState.asDriver(onErrorRecover: { _ in fatalError() })
     }
     
-    private func fetchProfileVO() -> Single<Result<WorkerProfileVO, Error>> {
-        return .just(.success(.mock))
+    private func fetchProfileVO() -> Single<Result<WorkerProfileVO, UserInfoError>> {
+        workerProfileUseCase
+            .getProfile(mode: .myProfile)
     }
     
     public func requestUpload(editObject: WorkerProfileStateObject) -> Single<Result<Void, UserInfoError>> {
@@ -148,15 +173,31 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
         
         submitObject.introduce = (currentState.introduce != editObject.introduce) ? editObject.introduce : nil
         
-        submitObject.isJobFinding = (currentState.isJobFinding != editObject.isJobFinding) ? editObject.isJobFinding : nil
+        // Required
+        submitObject.isJobFinding = editObject.isJobFinding ?? currentState.isJobFinding
         
-        submitObject.lotNumberAddress = (currentState.lotNumberAddress != editObject.lotNumberAddress) ? editObject.lotNumberAddress : nil
+        // Required
+        submitObject.lotNumberAddress = editObject.lotNumberAddress ?? currentState.lotNumberAddress
         
-        submitObject.roadNameAddress = (currentState.roadNameAddress != editObject.roadNameAddress) ? editObject.roadNameAddress : nil
+        // Required
+        submitObject.roadNameAddress = editObject.roadNameAddress ?? currentState.roadNameAddress
         
         submitObject.speciality = (currentState.speciality != editObject.speciality) ? editObject.speciality : nil
         
-        return .just(.success(()))
+        return workerProfileUseCase
+            .updateProfile(
+                stateObject: submitObject,
+                imageInfo: willSubmitImageInfo
+            )
+    }
+    
+    func validateSelectedImage(image: UIImage) -> ImageUploadInfo? {
+        if let pngData = image.pngData() {
+            return .init(data: pngData, ext: "PNG")
+        } else if let jpegData = image.jpegData(compressionQuality: 1) {
+            return .init(data: jpegData, ext: "JPEG")
+        }
+        return nil
     }
 }
 

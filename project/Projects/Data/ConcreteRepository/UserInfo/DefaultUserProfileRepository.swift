@@ -94,7 +94,34 @@ public class DefaultUserProfileRepository: UserProfileRepository {
     
     /// 요양보호사 프로필 정보를 업데이트 합니다.
     public func updateWorkerProfile(stateObject: WorkerProfileStateObject) -> RxSwift.Single<Void> {
-        let encoded = try! JSONEncoder().encode(stateObject)
+        
+        var availableValues: [String: Any] = [:]
+        
+        if let experienceYear = stateObject.experienceYear {
+            availableValues["experienceYear"] = experienceYear
+        }
+
+        if let roadNameAddress = stateObject.roadNameAddress {
+            availableValues["roadNameAddress"] = roadNameAddress
+        }
+
+        if let lotNumberAddress = stateObject.lotNumberAddress {
+            availableValues["lotNumberAddress"] = lotNumberAddress
+        }
+
+        if let introduce = stateObject.introduce {
+            availableValues["introduce"] = introduce
+        }
+
+        if let speciality = stateObject.speciality {
+            availableValues["speciality"] = speciality
+        }
+
+        if let isJobFinding = stateObject.isJobFinding {
+            availableValues["jobSearchStatus"] = isJobFinding ? "YES" : "NO"
+        }
+        
+        let encoded = try! JSONSerialization.data(withJSONObject: availableValues)
         
         return userInformationService
             .request(api: .updateWorkerProfile(data: encoded), with: .withToken)

@@ -36,17 +36,17 @@ public struct WorkerProfileVO {
 
 public extension WorkerProfileVO {
     static let mock: WorkerProfileVO = .init(
-        profileImageURL: "https://dummyimage.com/500x500/000/fff&text=worker+profile",
-        nameText: "홍갈동",
+        profileImageURL: nil,
+        nameText: "",
         isLookingForJob: true,
         age: 58,
         gender: .female,
         expYear: nil,
         address: .init(
-            roadAddress: "서울특별시 강남구 삼성동 512-3",
-            jibunAddress: "서울특별시 강남구 삼성동 63-43"
+            roadAddress: "",
+            jibunAddress: ""
         ),
-        introductionText: "안녕하세요 반갑습니다!",
-        specialty: "말동무 잘함"
+        introductionText: "",
+        specialty: ""
     )
 }
