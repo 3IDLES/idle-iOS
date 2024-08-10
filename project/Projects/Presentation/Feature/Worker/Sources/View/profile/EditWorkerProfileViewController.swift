@@ -333,6 +333,8 @@ public class EditWorkerProfileViewController: BaseViewController {
             addtionalInfoStack.leftAnchor.constraint(equalTo: addtionalInfoView.layoutMarginsGuide.leftAnchor),
             addtionalInfoStack.rightAnchor.constraint(equalTo: addtionalInfoView.layoutMarginsGuide.rightAnchor),
             addtionalInfoStack.bottomAnchor.constraint(equalTo: addtionalInfoView.layoutMarginsGuide.bottomAnchor),
+            
+            abilityInputField.heightAnchor.constraint(equalToConstant: 156),
         ])
         
         // 컨트롤러 뷰 설정
