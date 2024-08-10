@@ -27,9 +27,15 @@ public enum UserInformationAPI {
     case registerCenterProfile(data: Data)
     
     // 프로필 조회
-    case getCenterProfile
-    case getOtherCenterProfile(id: String)
+    // - Center
+    case getMyCenterProfile
+    case getCenterProfile(id: String)
     case updateCenterProfile(officeNumber: String, introduce: String?)
+    
+    // - Worker
+    case getMyWorkerProfile
+    case getOtherWorkerProfile(id: String)
+    case updateWorkerProfile(data: Data)
     
     // 프로필 사진 업로드
     case getPreSignedUrl(userType: UserType, imageExt: String)
@@ -49,10 +55,16 @@ extension UserInformationAPI: BaseAPI {
         switch self {
         case .registerCenterProfile:
             "center/my/profile"
-        case .getCenterProfile:
+        case .getMyCenterProfile:
             "center/my/profile"
-        case .getOtherCenterProfile(let id):
+        case .getCenterProfile(let id):
             "center/profile/\(id)"
+        case .getMyWorkerProfile:
+            "carer/my/profile"
+        case .getOtherWorkerProfile(let id):
+            "carer/profile/\(id)"
+        case .updateWorkerProfile:
+            "carer/my/profile"
         case .updateCenterProfile:
             "center/my/profile"
         case .getPreSignedUrl(let type, _):
@@ -66,9 +78,9 @@ extension UserInformationAPI: BaseAPI {
         switch self {
         case .registerCenterProfile:
             .post
-        case .getCenterProfile:
+        case .getMyCenterProfile:
             .get
-        case .getOtherCenterProfile:
+        case .getCenterProfile:
             .get
         case .updateCenterProfile:
             .patch
@@ -76,6 +88,12 @@ extension UserInformationAPI: BaseAPI {
             .get
         case .imageUploadSuccessCallback:
             .post
+        case .getMyWorkerProfile:
+            .get
+        case .getOtherWorkerProfile(id: let id):
+            .get
+        case .updateWorkerProfile(data: let data):
+            .patch
         }
     }
     
@@ -107,6 +125,8 @@ extension UserInformationAPI: BaseAPI {
                 "imageFileExtension": imageExt
             ]
             return .requestParameters(parameters: params, encoding: parameterEncoding)
+        case .updateWorkerProfile(let data):
+            return .requestData(data)
         default:
             return .requestPlain
         }
