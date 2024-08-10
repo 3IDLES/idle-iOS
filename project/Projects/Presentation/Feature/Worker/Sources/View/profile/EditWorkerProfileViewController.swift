@@ -14,7 +14,7 @@ import Entity
 import BaseFeature
 
 
-public class EditWorkerProfileViewController: DisposableViewController {
+public class EditWorkerProfileViewController: BaseViewController {
     
     // Navigation bar
     let navigationBar: NavigationBarType1 = {
@@ -50,14 +50,16 @@ public class EditWorkerProfileViewController: DisposableViewController {
 
         return view
     }()
-    let workerProfileDisplayingImage: UIImageView = {
+    let workerProfileImage: UIImageView = {
         
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 48
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
+        
         return imageView
     }()
+    
     let workerProfileImageEditButton: UIButton = {
         let btn = UIButton()
         btn.setImage(DSKitAsset.Icons.editPhoto.image, for: .normal)
@@ -67,6 +69,20 @@ public class EditWorkerProfileViewController: DisposableViewController {
         btn.isUserInteractionEnabled = true
         return btn
     }()
+    
+    // 상태 선택 버튼
+    let stateSelectButton: SlideStateButton = {
+        let button: SlideStateButton = .init(initialState: .state1)
+        button.state1Label.textString = "휴식중"
+        button.state2Label.textString = "구인중"
+        return button
+    }()
+    
+    // 이름, 나이, 성별, 전화번호
+    let nameLabel: IdleLabel = .init(typography: .Subtitle1)
+    let ageLabel: IdleLabel = .init(typography: .Body3)
+    let genderLabel: IdleLabel = .init(typography: .Body3)
+    let phoneNumberLabel: IdleLabel = .init(typography: .Body3)
     
     // 경력
     let experiencedSelectButton: ExpPicker = {
@@ -110,6 +126,9 @@ public class EditWorkerProfileViewController: DisposableViewController {
     }()
     
     let disposeBag = DisposeBag()
+    
+    // Optinal values
+    public var onError: (()->())?
     
     public init() {
         
@@ -156,26 +175,105 @@ public class EditWorkerProfileViewController: DisposableViewController {
         ])
         
         // 프로필 뷰
-        [
-            workerProfileDisplayingImage
-        ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            profileImageContainer.addSubview($0)
-        }
+        
+        // 유저의 입력으로 설정되는 사진을 표시하는 ImageView설정
+        profileImageContainer.addSubview(workerProfileImage)
+        workerProfileImage.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            workerProfileDisplayingImage.topAnchor.constraint(equalTo: profileImageContainer.topAnchor),
-            workerProfileDisplayingImage.leadingAnchor.constraint(equalTo: profileImageContainer.leadingAnchor),
-            workerProfileDisplayingImage.trailingAnchor.constraint(equalTo: profileImageContainer.trailingAnchor),
-            workerProfileDisplayingImage.bottomAnchor.constraint(equalTo: profileImageContainer.bottomAnchor),
+            workerProfileImage.topAnchor.constraint(equalTo: profileImageContainer.topAnchor),
+            workerProfileImage.leadingAnchor.constraint(equalTo: profileImageContainer.leadingAnchor),
+            workerProfileImage.trailingAnchor.constraint(equalTo: profileImageContainer.trailingAnchor),
+            workerProfileImage.bottomAnchor.constraint(equalTo: profileImageContainer.bottomAnchor),
         ])
         
+        let profileContainer = UIView()
+        [
+            profileImageContainer,
+            workerProfileImageEditButton
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            profileContainer.addSubview($0)
+        }
+        NSLayoutConstraint.activate([
+            profileImageContainer.widthAnchor.constraint(equalToConstant: 96),
+            profileImageContainer.heightAnchor.constraint(equalTo: profileImageContainer.widthAnchor),
+            
+            profileImageContainer.topAnchor.constraint(equalTo: profileContainer.topAnchor),
+            profileImageContainer.leadingAnchor.constraint(equalTo: profileContainer.leadingAnchor),
+            profileImageContainer.trailingAnchor.constraint(equalTo: profileContainer.trailingAnchor),
+            profileImageContainer.bottomAnchor.constraint(equalTo: profileContainer.bottomAnchor),
+            
+            workerProfileImageEditButton.widthAnchor.constraint(equalToConstant: 32),
+            workerProfileImageEditButton.heightAnchor.constraint(equalTo: workerProfileImageEditButton.widthAnchor),
+            
+            workerProfileImageEditButton.bottomAnchor.constraint(equalTo: profileContainer.bottomAnchor),
+            workerProfileImageEditButton.trailingAnchor.constraint(equalTo: profileContainer.trailingAnchor, constant: 7),
+        ])
         
-        // // 요양보호사 인적정보 / 요양보호사 구직정보 디바이더
-        let divider = UIView()
-        divider.backgroundColor = DSKitAsset.Colors.gray050.color
+        // 나이, 성별, 전화번호 컨테이너
+        let infoStack_divider1 = UIView()
+        infoStack_divider1.backgroundColor = DSKitAsset.Colors.gray050.color
+        let infoStack_divider2 = UIView()
+        infoStack_divider2.backgroundColor = DSKitAsset.Colors.gray050.color
+        
+        let infoStackViews = [
+            ("나이", ageLabel),
+            ("성별", genderLabel),
+            ("전화번호", phoneNumberLabel),
+        ].map({ (title, labelView) in
+            
+            let titleLabel = IdleLabel(typography: .Body3)
+            titleLabel.textString = title
+            titleLabel.attrTextColor = DSKitAsset.Colors.gray500.color
+            
+            return HStack([
+                titleLabel,
+                labelView
+            ], spacing: 4)
+        })
+        
+        let infoStack = HStack(
+            [
+                infoStackViews[0],
+                infoStack_divider1,
+                infoStackViews[1],
+                infoStack_divider2,
+                infoStackViews[2],
+            ],
+            spacing: 8
+        )
+        
+        NSLayoutConstraint.activate([
+            infoStack_divider1.widthAnchor.constraint(equalToConstant: 1),
+            infoStack_divider1.topAnchor.constraint(equalTo: infoStack.topAnchor, constant: 2),
+            infoStack_divider1.bottomAnchor.constraint(equalTo: infoStack.bottomAnchor, constant: -2),
+            
+            infoStack_divider2.widthAnchor.constraint(equalToConstant: 1),
+            infoStack_divider2.topAnchor.constraint(equalTo: infoStack.topAnchor, constant: 2),
+            infoStack_divider2.bottomAnchor.constraint(equalTo: infoStack.bottomAnchor, constant: -2),
+        ])
+        
+        let viewList = [
+            profileContainer,
+            Spacer(height: 12),
+            nameLabel,
+            Spacer(height: 6),
+            stateSelectButton,
+            Spacer(height: 16),
+            infoStack,
+        ]
+        
+        let profileAndInfoStack = VStack(
+            viewList,
+            spacing: 0,
+            alignment: .center
+        )
         
         // 경력, 주소, 한줄소개, 특기
-        let addressIntroductionAbilityStack = VStack(
+        let addtionalInfoView = UIView()
+        addtionalInfoView.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
+        
+        let addtionalInfoStack = VStack(
             [
                 ("경력", experiencedSelectButton),
                 ("주소", addressInputField),
@@ -201,16 +299,53 @@ public class EditWorkerProfileViewController: DisposableViewController {
             alignment: .fill
         )
         
-        // 컨트롤러 뷰 설정
-        let scrollView = {
-            let view = UIScrollView()
-            // 발생한 터치가 스크롤인지 판단하지 않고 즉시 touchShouldBegin매서드를 호출한다.
-            // true시 탭동작을 스크롤로 판단한다.
-            view.delaysContentTouches = false
-            return view
-        }()
+        [
+            addtionalInfoStack
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            addtionalInfoView.addSubview($0)
+        }
         
-        let scrollViewContentGuide = scrollView.contentLayoutGuide
+        NSLayoutConstraint.activate([
+            addtionalInfoStack.topAnchor.constraint(equalTo: addtionalInfoView.layoutMarginsGuide.topAnchor),
+            addtionalInfoStack.leftAnchor.constraint(equalTo: addtionalInfoView.layoutMarginsGuide.leftAnchor),
+            addtionalInfoStack.rightAnchor.constraint(equalTo: addtionalInfoView.layoutMarginsGuide.rightAnchor),
+            addtionalInfoStack.bottomAnchor.constraint(equalTo: addtionalInfoView.layoutMarginsGuide.bottomAnchor),
+        ])
+        
+        // 컨트롤러 뷰 설정
+        let scrollView = UIScrollView()
+        scrollView.delaysContentTouches = false
+        scrollView.contentInset = .init(top: 39, left: 0, bottom: 66, right: 0)
+        
+        let contentGuide = scrollView.contentLayoutGuide
+        let frameGuide = scrollView.frameLayoutGuide
+        
+        
+        
+        let divier = UIView()
+        divier.backgroundColor = DSKitAsset.Colors.gray050.color
+        
+        let contentView = VStack([profileAndInfoStack, divier, addtionalInfoView], spacing: 20, alignment: .fill)
+        
+        [
+            contentView
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            scrollView.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            divier.heightAnchor.constraint(equalToConstant: 8),
+            
+            contentView.widthAnchor.constraint(equalTo: frameGuide.widthAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: contentGuide.topAnchor),
+            contentView.leftAnchor.constraint(equalTo: contentGuide.leftAnchor),
+            contentView.rightAnchor.constraint(equalTo: contentGuide.rightAnchor),
+            contentView.bottomAnchor.constraint(equalTo: contentGuide.bottomAnchor),
+        ])
+        
         
         [
             navigationStackBackground,
@@ -230,44 +365,6 @@ public class EditWorkerProfileViewController: DisposableViewController {
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
-        
-        // Scroll View
-        [
-            profileImageContainer,
-            divider,
-            addressIntroductionAbilityStack
-        ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            scrollView.addSubview($0)
-        }
-        
-        scrollView.insertSubview(workerProfileImageEditButton, aboveSubview: profileImageContainer)
-        workerProfileImageEditButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            
-            workerProfileImageEditButton.widthAnchor.constraint(equalToConstant: 32),
-            workerProfileImageEditButton.heightAnchor.constraint(equalTo: workerProfileImageEditButton.widthAnchor),
-            workerProfileImageEditButton.bottomAnchor.constraint(equalTo: profileImageContainer.bottomAnchor),
-            workerProfileImageEditButton.trailingAnchor.constraint(equalTo: profileImageContainer.trailingAnchor, constant: 7),
-            
-            profileImageContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            profileImageContainer.topAnchor.constraint(equalTo: scrollViewContentGuide.topAnchor, constant: 40),
-            
-            divider.topAnchor.constraint(equalTo: profileImageContainer.bottomAnchor, constant: 24),
-            divider.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            divider.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            divider.heightAnchor.constraint(equalToConstant: 8),
-            
-            addressIntroductionAbilityStack.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 24),
-            addressIntroductionAbilityStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            addressIntroductionAbilityStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            addressIntroductionAbilityStack.bottomAnchor.constraint(
-                equalTo: scrollViewContentGuide.bottomAnchor, constant: -28.37),
-            
-            abilityInputField.heightAnchor.constraint(equalToConstant: 156)
-        ])
-        
     }
     
     private func setObservable() {
@@ -278,12 +375,33 @@ public class EditWorkerProfileViewController: DisposableViewController {
                 self?.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
-        
-        
     }
+}
+
+extension EditWorkerProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    public func cleanUp() {
+    private func showPhotoGalley() {
         
+        let imagePickerVC = UIImagePickerController()
+        imagePickerVC.delegate = self
+        
+        if !UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
+            onError?()
+            return
+        }
+        
+        imagePickerVC.sourceType = .photoLibrary
+        self.present(imagePickerVC, animated: true)
     }
-    
+        
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+     
+        if let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as? UIImage {
+            
+            // image
+            
+            
+            picker.dismiss(animated: true)
+        }
+    }
 }
