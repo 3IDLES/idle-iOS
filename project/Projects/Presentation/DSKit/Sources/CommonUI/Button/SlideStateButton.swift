@@ -22,11 +22,11 @@ public class SlideStateButton: UIView {
     // Init
     
     // View
-    let state1Label: IdleLabel = {
+    public let state1Label: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         return label
     }()
-    let state2Label: IdleLabel = {
+    public let state2Label: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         return label
     }()
