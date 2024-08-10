@@ -12,7 +12,7 @@ import RxCocoa
 import DSKit
 import Entity
 import BaseFeature
-
+import Kingfisher
 
 public class EditWorkerProfileViewController: BaseViewController {
     
@@ -38,6 +38,7 @@ public class EditWorkerProfileViewController: BaseViewController {
         view.layer.cornerRadius = 48
         view.clipsToBounds = true
         
+        /// PlaceHolderImage
         let imageView = DSKitAsset.Icons.workerProfilePlaceholder.image.toView()
         view.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -54,7 +55,7 @@ public class EditWorkerProfileViewController: BaseViewController {
         
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 48
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
         return imageView
@@ -375,6 +376,13 @@ public class EditWorkerProfileViewController: BaseViewController {
                 self?.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
+        
+        workerProfileImageEditButton
+            .rx.tap
+            .subscribe(onNext: { [weak self] _ in
+                self?.showPhotoGalley()
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -396,10 +404,11 @@ extension EditWorkerProfileViewController: UIImagePickerControllerDelegate, UINa
         
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
      
-        if let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as? UIImage {
+        if let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL {
             
-            // image
+            let pngSerializer = FormatIndicatedCacheSerializer.png
             
+            workerProfileImage.setImage(url: imageUrl)
             
             picker.dismiss(animated: true)
         }

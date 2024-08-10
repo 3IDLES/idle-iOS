@@ -12,15 +12,52 @@ import RxCocoa
 import DSKit
 import Entity
 
-public class WorkerProfileViewModel: WorkerProfileViewModelable {
+
+public struct WorkerProfileRenderObject {
     
-    public var input = Input()
-    public var output: Output?
+    let navigationTitle: String
+    let showEditButton: Bool
+    let stateText: String
+    let nameText: String
+    let ageText: String
+    let genderText: String
+    let expText: String
+    let address: String
+    let oneLineIntroduce: String
+    let specialty: String
+    let imageUrl: URL?
+    
+    static func createRO(isMyProfile: Bool, vo: WorkerProfileVO) -> WorkerProfileRenderObject {
+        
+        .init(
+            navigationTitle: isMyProfile ? "내 프로필" : "요양보호사 프로필",
+            showEditButton: isMyProfile,
+            stateText: vo.isLookingForJob ? "구인중" : "휴식중",
+            nameText: vo.nameText,
+            ageText: "\(vo.age)세",
+            genderText: vo.gender.twoLetterKoreanWord,
+            expText: vo.expYear == nil ? "신입" : "\(vo.expYear!)년차",
+            address: vo.addressText,
+            oneLineIntroduce: vo.introductionText,
+            specialty: vo.specialty,
+            imageUrl: URL(string: vo.profileImageURL ?? "")
+        )
+    }
+}
+
+
+public class WorkerMyProfileViewModel: WorkerProfileViewModelable {
+    
+    // Input
+    public var viewWillAppear: PublishRelay<Void> = .init()
+    
+    // Output
+    public var profileRenderObject: Driver<WorkerProfileRenderObject>?
     
     public init() {
         
-        let fetchedProfileVOResult = input
-            .viewWillAppear
+        // Input
+        let fetchedProfileVOResult = viewWillAppear
             .flatMap { [unowned self] _ in
                 fetchProfileVO()
             }
@@ -28,62 +65,17 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
         
         let fetchedProfileVOSuccess = fetchedProfileVOResult
             .compactMap { $0.value }
-          
-        let imageDriver = fetchedProfileVOSuccess
-            .compactMap { vo in
-                vo.profileImageURL
-            }
-            .flatMap { [unowned self] url in
-                fetchImageFrom(url: url)
-            }
-            .asDriver(onErrorJustReturn: nil)
-            
-        self.output = .init(
-            profileVO: fetchedProfileVOSuccess.asDriver(onErrorJustReturn: .mock),
-            displayingImage: imageDriver
-        )
+        
+        profileRenderObject = fetchedProfileVOSuccess
+            .map({ vo in
+                WorkerProfileRenderObject.createRO(isMyProfile: false, vo: vo)
+            })
+            .asDriver(onErrorRecover: { _ in fatalError() })
+        
     }
     
     private func fetchProfileVO() -> Single<Result<WorkerProfileVO, Error>> {
         return .just(.success(.mock))
     }
-    
-    private func fetchImageFrom(url: URL) -> Single<UIImage?> {
-        
-        Single.create { single in
-            
-            let task = Task.detached {
-                guard
-                    let data = try? Data(contentsOf: url),
-                    let image = UIImage(data: data)
-                else {
-                    return single(.success(nil))
-                }
-                
-                single(.success(image))
-            }
-            
-            return Disposables.create {
-                task.cancel()
-            }
-        }
-    }
 }
 
-
-public extension WorkerProfileViewModel {
-    
-    class Input: WorkerProfileInputable {
-        public var viewWillAppear: PublishRelay<Void> = .init()
-    }
-    
-    class Output: WorkerProfileOutputable {
-        public var profileVO: Driver<WorkerProfileVO>
-        public var displayingImage: Driver<UIImage?>
-        
-        init(profileVO: Driver<WorkerProfileVO>, displayingImage: Driver<UIImage?>) {
-            self.profileVO = profileVO
-            self.displayingImage = displayingImage
-        }
-    }
-}
