@@ -140,6 +140,7 @@ extension ExpPicker : UIPickerViewDataSource, UIPickerViewDelegate {
     public func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         
         // 라벨 변경
+        currentExp = row
         textLabel.textString = pickerData[row]
         
         // row = 경력연차

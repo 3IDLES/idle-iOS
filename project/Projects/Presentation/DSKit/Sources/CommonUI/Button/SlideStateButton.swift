@@ -46,9 +46,7 @@ public class SlideStateButton: UIView {
     
     // Observable
     /// 핫옵저버블 입니다.
-    public lazy var signal: Single<State> = stateObservable.asSingle()
-    
-    private let stateObservable: PublishRelay<State> = .init()
+    public let stateObservable: PublishRelay<State> = .init()
     private let disposeBag = DisposeBag()
     
     public override var intrinsicContentSize: CGSize {

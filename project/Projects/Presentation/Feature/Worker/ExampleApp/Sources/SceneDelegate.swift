@@ -20,11 +20,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let vm = WorkerMyProfileViewModel()
         
+        
         let vc = WorkerProfileViewController()
         
         vc.bind(vm)
         
-        window?.rootViewController = vc
+        let nav = UINavigationController(rootViewController: vc)
+        nav.setNavigationBarHidden(true, animated: false)
+        
+        window?.rootViewController = nav
         window?.makeKeyAndVisible()
     }
 }

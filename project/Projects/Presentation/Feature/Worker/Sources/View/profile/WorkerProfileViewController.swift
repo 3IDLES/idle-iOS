@@ -53,6 +53,7 @@ public class WorkerProfileViewController: DisposableViewController {
         button.label.attrTextColor = DSKitAsset.Colors.gray300.color
         button.layoutMargins = .init(top: 5.5, left:12, bottom: 5.5, right: 12)
         button.layer.cornerRadius = 16
+        button.isHidden = true
         return button
     }()
     
@@ -192,7 +193,6 @@ public class WorkerProfileViewController: DisposableViewController {
         
         setApearance()
         setAutoLayout()
-        setObservable()
     }
     
     public required init?(coder: NSCoder) {
@@ -360,23 +360,20 @@ public class WorkerProfileViewController: DisposableViewController {
         ])
     }
     
-    private func setObservable() {
+    public func bind(_ viewModel: any WorkerProfileViewModelable) {
+        
+        self.viewModel = viewModel
         
         profileEditButton
             .eventPublisher
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
+            .subscribe(onNext: { [weak self, viewModel] _ in
                 let editVC = EditWorkerProfileViewController()
+                editVC.bind(viewModel: viewModel as! WorkerProfileEditViewModelable)
                 editVC.modalPresentationStyle = .fullScreen
-                self?.present(editVC, animated: true)
+                self?.navigationController?.pushViewController(editVC, animated: true)
             })
             .disposed(by: disposeBag)
-    }
-    
-    
-    public func bind(_ viewModel: any WorkerProfileViewModelable) {
-        
-        self.viewModel = viewModel
         
         // Input
         self.rx

@@ -14,6 +14,20 @@ import Entity
 import BaseFeature
 import Kingfisher
 
+protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
+    
+    var requestUpload: PublishRelay<Void> { get }
+    var editingImage: PublishRelay<UIImage> { get }
+    var editingIsJobFinding: PublishRelay<Bool> { get }
+    var editingExpYear: PublishRelay<Int> { get }
+    var editingAddress: PublishRelay<AddressInformation> { get }
+    var editingIntroduce: PublishRelay<String> { get }
+    var editingSpecialty: PublishRelay<String> { get }
+    
+    var uploadSuccess: Driver<Void>? { get }
+    var alert: Driver<DefaultAlertContentVO>? { get }
+}
+
 public class EditWorkerProfileViewController: BaseViewController {
     
     // Navigation bar
@@ -72,6 +86,8 @@ public class EditWorkerProfileViewController: BaseViewController {
     }()
     
     // 상태 선택 버튼
+    let jobFindingState = SlideStateButton.State.state2
+    let restingState = SlideStateButton.State.state1
     let stateSelectButton: SlideStateButton = {
         let button: SlideStateButton = .init(initialState: .state1)
         button.state1Label.textString = "휴식중"
@@ -97,13 +113,10 @@ public class EditWorkerProfileViewController: BaseViewController {
     }()
     
     // 주소
-    let addressInputField: MultiLineTextField = {
-        let textView = MultiLineTextField(
-            typography: .Body3,
-            placeholderText: "주소"
-        )
-        textView.isScrollEnabled = false
-        return textView
+    private let addressSearchButton: TextButtonType2 = {
+        let button = TextButtonType2(labelText: "")
+        button.label.attrTextColor = DSKitAsset.Colors.gray900.color
+        return button
     }()
     
     // 한줄소개
@@ -126,6 +139,8 @@ public class EditWorkerProfileViewController: BaseViewController {
         return textView
     }()
     
+    let addressPublisher: PublishRelay<AddressInformation> = .init()
+    let imagePublisher: PublishRelay<UIImage> = .init()
     let disposeBag = DisposeBag()
     
     // Optinal values
@@ -277,7 +292,7 @@ public class EditWorkerProfileViewController: BaseViewController {
         let addtionalInfoStack = VStack(
             [
                 ("경력", experiencedSelectButton),
-                ("주소", addressInputField),
+                ("주소", addressSearchButton),
                 ("한줄 소개", introductionInputField),
                 ("특기", abilityInputField),
             ].map { (title, content) in
@@ -373,7 +388,7 @@ public class EditWorkerProfileViewController: BaseViewController {
         navigationBar
             .eventPublisher
             .subscribe(onNext: { [weak self] _ in
-                self?.dismiss(animated: true)
+                self?.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
         
@@ -383,9 +398,130 @@ public class EditWorkerProfileViewController: BaseViewController {
                 self?.showPhotoGalley()
             })
             .disposed(by: disposeBag)
+        
+        addressSearchButton
+            .eventPublisher
+            .subscribe { [weak self] _ in
+                self?.showDaumSearchView()
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    func bind(viewModel: WorkerProfileEditViewModelable) {
+        
+        // RO
+        viewModel
+            .profileRenderObject?
+            .drive(onNext: { [weak self] ro in
+                
+                guard let self else { return }
+                
+                // UI 업데이트
+                navigationBar.navigationTitle = ro.navigationTitle
+                stateSelectButton.setState(ro.isJobFinding ? jobFindingState : restingState)
+                nameLabel.textString = ro.nameText
+                ageLabel.textString = ro.ageText
+                genderLabel.textString = ro.genderText
+                experiencedSelectButton.textLabel.textString = ro.expText
+                addressSearchButton.label.textString = ro.address
+                introductionInputField.textString = ro.oneLineIntroduce
+                abilityInputField.textString = ro.specialty
+                
+                if let imageUrl = ro.imageUrl {
+                    workerProfileImage.setImage(url: imageUrl)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .alert?
+            .drive(onNext: { [weak self] vo in
+                self?.showAlert(vo: vo) { [weak self] in
+                    self?.navigationController?.popViewController(animated: true)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        // Input
+        // 프로필 사진
+        imagePublisher
+            .bind(to: viewModel.editingImage)
+            .disposed(by: disposeBag)
+        
+        // 상태
+        stateSelectButton
+            .stateObservable
+            .map { [jobFindingState] state in
+                state == jobFindingState
+            }
+            .asObservable()
+            .bind(to: viewModel.editingIsJobFinding)
+            .disposed(by: disposeBag)
+            
+        // 경력
+        experiencedSelectButton
+            .pickedExp
+            .bind(to: viewModel.editingExpYear)
+            .disposed(by: disposeBag)
+        
+        // 주소
+        addressPublisher
+            .bind(to: viewModel.editingAddress)
+            .disposed(by: disposeBag)
+        
+        // 한줄 소개
+        introductionInputField
+            .rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.editingIntroduce)
+            .disposed(by: disposeBag)
+        
+        // 특기
+        abilityInputField
+            .rx.text
+            .compactMap { $0 }
+            .bind(to: viewModel.editingSpecialty)
+            .disposed(by: disposeBag)
+
+        // 업로드 요청
+        editingCompleteButton
+            .eventPublisher
+            .bind(to: viewModel.requestUpload)
+            .disposed(by: disposeBag)
     }
 }
 
+// MARK: 주소설정
+extension EditWorkerProfileViewController: DaumAddressSearchDelegate {
+    
+    private func showDaumSearchView() {
+        let vc = DaumAddressSearchViewController()
+        vc.delegate = self
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    public func addressSearch(addressData: [AddressDataKey : String]) {
+        
+        let jibunAddress = addressData[.jibunAddress]!
+        let roadAddress = addressData[.roadAddress]!
+        let autoJibunAddress = addressData[.autoJibunAddress]!
+        let autoRoadAddress = addressData[.autoRoadAddress]!
+        
+        let finalJibunAddress = jibunAddress.isEmpty ? autoJibunAddress : jibunAddress
+        let finalRoadAddress = roadAddress.isEmpty ? autoRoadAddress : roadAddress
+        
+        addressSearchButton.label.textString = finalRoadAddress
+        
+        addressPublisher.accept(
+            AddressInformation(
+                roadAddress: finalRoadAddress,
+                jibunAddress: finalJibunAddress
+            )
+        )
+    }
+}
+
+// MARK: 사진 선택
 extension EditWorkerProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     private func showPhotoGalley() {
@@ -404,11 +540,13 @@ extension EditWorkerProfileViewController: UIImagePickerControllerDelegate, UINa
         
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
      
-        if let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL {
-            
-            let pngSerializer = FormatIndicatedCacheSerializer.png
-            
+        if 
+            let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL,
+            let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+        {
+                        
             workerProfileImage.setImage(url: imageUrl)
+            imagePublisher.accept(image)
             
             picker.dismiss(animated: true)
         }
