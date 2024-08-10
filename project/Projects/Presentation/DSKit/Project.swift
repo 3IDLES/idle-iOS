@@ -32,6 +32,7 @@ let proejct = Project(
                 D.ThirdParty.RxSwift,
                 D.ThirdParty.RxCocoa,
                 D.ThirdParty.FSCalendar,
+                D.ThirdParty.KingFisher,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
