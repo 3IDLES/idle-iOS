@@ -12,7 +12,7 @@ import RepositoryInterface
 import NetworkDataSource
 
 public class DefaultUserProfileRepository: UserProfileRepository {
-    
+
     let userInformationService: UserInformationService
     let externalRequestService: ExternalRequestService
     
@@ -51,9 +51,9 @@ public class DefaultUserProfileRepository: UserProfileRepository {
         
         switch mode {
         case .myProfile:
-            api = .getCenterProfile
+            api = .getMyCenterProfile
         case .otherProfile(let id):
-            api = .getOtherCenterProfile(id: id)
+            api = .getCenterProfile(id: id)
         }
         
         return userInformationService
@@ -63,7 +63,7 @@ public class DefaultUserProfileRepository: UserProfileRepository {
     
     public func getCenterProfile(id: String) -> Single<CenterProfileVO> {
         userInformationService
-            .requestDecodable(api: .getOtherCenterProfile(id: id), with: .withToken)
+            .requestDecodable(api: .getCenterProfile(id: id), with: .withToken)
             .map { (dto: CenterProfileDTO) in dto.toEntity() }
     }
     
@@ -73,6 +73,31 @@ public class DefaultUserProfileRepository: UserProfileRepository {
                 officeNumber: phoneNumber,
                 introduce: introduction
             ), with: .withToken)
+            .map { _ in return () }
+    }
+    
+    /// 요양보호사 프로필 정보를 가져옵니다.
+    public func getWorkerProfile(mode: Entity.ProfileMode) -> RxSwift.Single<Entity.WorkerProfileVO> {
+        var api: UserInformationAPI!
+        
+        switch mode {
+        case .myProfile:
+            api = .getMyWorkerProfile
+        case .otherProfile(let id):
+            api = .getOtherWorkerProfile(id: id)
+        }
+        
+        return userInformationService
+            .requestDecodable(api: api, with: .withToken)
+            .map { (dto: CarerProfileDTO) in dto.toVO() }
+    }
+    
+    /// 요양보호사 프로필 정보를 업데이트 합니다.
+    public func updateWorkerProfile(stateObject: WorkerProfileStateObject) -> RxSwift.Single<Void> {
+        let encoded = try! JSONEncoder().encode(stateObject)
+        
+        return userInformationService
+            .request(api: .updateWorkerProfile(data: encoded), with: .withToken)
             .map { _ in return () }
     }
     

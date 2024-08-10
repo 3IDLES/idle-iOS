@@ -18,4 +18,7 @@ public protocol UserProfileRepository: RepositoryBase {
     
     // ImageUpload
     func uploadImage(_ userType: UserType, imageInfo: ImageUploadInfo) -> Single<Void>
+    
+    func getWorkerProfile(mode: ProfileMode) -> Single<WorkerProfileVO>
+    func updateWorkerProfile(stateObject: WorkerProfileStateObject) -> Single<Void>
 }
