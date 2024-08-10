@@ -290,6 +290,9 @@ public class WorkerProfileViewController: DisposableViewController {
         
         
         // 요양보호사 구직정보
+        let employeeInfoTitleLabel = IdleLabel(typography: .Subtitle1)
+        employeeInfoTitleLabel.textString = "상세 정보"
+        employeeInfoTitleLabel.textAlignment = .left
         
         let employeeInfoStack = VStack(
             [
@@ -318,6 +321,7 @@ public class WorkerProfileViewController: DisposableViewController {
             tagNameStack,
             humanInfoStack,
             divider,
+            employeeInfoTitleLabel,
             employeeInfoStack
             
         ].forEach {
@@ -354,7 +358,10 @@ public class WorkerProfileViewController: DisposableViewController {
             divider.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             divider.heightAnchor.constraint(equalToConstant: 8),
             
-            employeeInfoStack.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 24),
+            employeeInfoTitleLabel.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 24),
+            employeeInfoTitleLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            
+            employeeInfoStack.topAnchor.constraint(equalTo: employeeInfoTitleLabel.bottomAnchor, constant: 20),
             employeeInfoStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             employeeInfoStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
