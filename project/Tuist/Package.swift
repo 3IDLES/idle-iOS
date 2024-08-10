@@ -40,5 +40,7 @@ let package = Package(
         .package(url: "https://github.com/WenchaoD/FSCalendar.git", from: "2.8.4"),
         // Naver map
         .package(url: "https://github.com/J0onYEong/NaverMapSDKForSPM.git", from: "1.0.0"),
+        // KingFisher
+        .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.12.0")
     ]
 )
