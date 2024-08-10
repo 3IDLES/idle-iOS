@@ -13,9 +13,11 @@ open class BaseViewController: UIViewController { }
 // MARK: Alert
 public extension BaseViewController {
     
-    func showAlert(vo: DefaultAlertContentVO) {
+    func showAlert(vo: DefaultAlertContentVO, onClose: (() -> ())? = nil) {
         let alret = UIAlertController(title: vo.title, message: vo.message, preferredStyle: .alert)
-        let close = UIAlertAction(title: "닫기", style: .default, handler: nil)
+        let close = UIAlertAction(title: "닫기", style: .default) { _ in
+            onClose?()
+        }
         alret.addAction(close)
         present(alret, animated: true, completion: nil)
     }
