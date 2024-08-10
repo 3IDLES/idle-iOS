@@ -19,6 +19,7 @@ import Entity
 public protocol CenterProfileUseCase: UseCaseBase {
     
     /// 1. 나의 센터/다른 센터 프로필 정보 조회
+    /// 6. 특정 센터의 프로필 불러오기
     func getProfile(mode: ProfileMode) -> Single<Result<CenterProfileVO, UserInfoError>>
     
     /// 2. 센터 프로필 정보 업데이트(전화번호, 센터소개글)

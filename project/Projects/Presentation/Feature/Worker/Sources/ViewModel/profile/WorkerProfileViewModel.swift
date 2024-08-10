@@ -11,8 +11,11 @@ import RxSwift
 import RxCocoa
 import DSKit
 import Entity
+import UseCaseInterface
 
 public class WorkerProfileViewModel: WorkerProfileViewModelable {
+    
+    let workerProfileUseCase: WorkerProfileUseCase
     
     // Init
     let workerId: String
@@ -34,8 +37,9 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
     
     let disposbag: DisposeBag = .init()
     
-    public init(workerId: String) {
+    public init(workerProfileUseCase: WorkerProfileUseCase, workerId: String) {
         
+        self.workerProfileUseCase = workerProfileUseCase
         self.workerId = workerId
         
         // Input(Rendering)
@@ -73,13 +77,9 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
         profileRenderObject = rederingState.asDriver(onErrorRecover: { _ in fatalError() })
     }
     
-    private func fetchProfileVO() -> Single<Result<WorkerProfileVO, Error>> {
-        return .just(.success(.mock))
-    }
-    
-    public func requestUpload(editObject: WorkerProfileStateObject) -> Single<Result<Void, UserInfoError>> {
-        
-        return .just(.success(()))
+    private func fetchProfileVO() -> Single<Result<WorkerProfileVO, UserInfoError>> {
+        workerProfileUseCase
+            .getProfile(mode: .otherProfile(id: self.workerId))
     }
 }
 
