@@ -24,12 +24,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let store = TestStore()
         
         try! store.saveAuthToken(
-            accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOm51bGwsInN1YiI6bnVsbCwiaXNzIjoiM2lkaW90cyIsImlhdCI6MTcyMzI4MjA5MSwibmJmIjoxNzIzMjgyMDkxLCJleHAiOjE3MjMyODI2OTEsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiIwMTkxM2I5ZC1lZTJiLTc4NjQtOWMxNC0zMDYzNDcwODViNzgiLCJwaG9uZU51bWJlciI6IjAxMC02NjY2LTU2NzgiLCJ1c2VyVHlwZSI6ImNhcmVyIn0.ugfPnQAR-B_AlhIor3BNGjaVZ5IAsSPqG1puH_kQRMc",
-            refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOm51bGwsInN1YiI6bnVsbCwiaXNzIjoiM2lkaW90cyIsImlhdCI6MTcyMzI4MjA5MSwibmJmIjoxNzIzMjgyMDkxLCJleHAiOjE3Mzg4MzQwOTEsInR5cGUiOiJSRUZSRVNIX1RPS0VOIiwidXNlcklkIjoiMDE5MTNiOWQtZWUyYi03ODY0LTljMTQtMzA2MzQ3MDg1Yjc4IiwidXNlclR5cGUiOiJjYXJlciJ9.2NETtfIGn8KX9XiEDqH_QqgagNXpHmu3wOsNUPix2p0"
+            accessToken: "",
+            refreshToken: ""
         )
         
         let useCase = DefaultWorkerProfileUseCase(
-            repository: DefaultUserProfileRepository()
+            repository: DefaultUserProfileRepository(store)
         )
         
         let vm = WorkerMyProfileViewModel(workerProfileUseCase: useCase)
