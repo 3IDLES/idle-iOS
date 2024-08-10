@@ -54,7 +54,7 @@ public class ExpPicker: TextImageButtonType2 {
             action: nil
         )
         let doneButton = UIBarButtonItem(
-            title: "닫기",
+            title: "선택",
             style: .done,
             target: self,
             action: #selector(didTapDone(_:))
@@ -110,7 +110,9 @@ extension ExpPicker {
     
     private func didTapDone(_ button: UIBarButtonItem) {
         
-        
+        // row = 경력연차
+        textLabel.textString = pickerData[currentExp!]
+        pickedExp.accept(currentExp!)
         
         resignFirstResponder()
     }
@@ -141,9 +143,5 @@ extension ExpPicker : UIPickerViewDataSource, UIPickerViewDelegate {
         
         // 라벨 변경
         currentExp = row
-        textLabel.textString = pickerData[row]
-        
-        // row = 경력연차
-        pickedExp.accept(row)
     }
 }
