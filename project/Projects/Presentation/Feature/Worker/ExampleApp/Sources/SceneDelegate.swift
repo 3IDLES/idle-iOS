@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         self.window = UIWindow(windowScene: windowScene)
         
-        let vm = WorkerProfileViewModel()
+        let vm = WorkerMyProfileViewModel()
         
         let vc = WorkerProfileViewController()
         

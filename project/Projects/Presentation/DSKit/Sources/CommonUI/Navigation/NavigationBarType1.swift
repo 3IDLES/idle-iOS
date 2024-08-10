@@ -15,7 +15,13 @@ public class NavigationBarType1: UIStackView {
     public let eventPublisher: PublishRelay<Void> = .init()
     
     // Init parameters
-    public let navigationTitle: String
+    public var navigationTitle: String {
+        get {
+            titleLabel.textString
+        } set {
+            titleLabel.textString = newValue
+        }
+    }
     
     // View
     private let backButton: UIButton = {
@@ -31,24 +37,21 @@ public class NavigationBarType1: UIStackView {
         return btn
     }()
     
-    private lazy var titleText: ResizableUILabel = {
+    private lazy var titleLabel: IdleLabel = {
         
-        let label = ResizableUILabel()
-        
+        let label = IdleLabel(typography: .Subtitle1)
         label.textAlignment = .left
-        label.text = navigationTitle
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 20)
-        
         return label
     }()
     
     private let disposeBag = DisposeBag()
     
     public init(
-        navigationTitle: String
+        navigationTitle: String = ""
     ) {
-        self.navigationTitle = navigationTitle
         super.init(frame: .zero)
+        
+        self.navigationTitle = navigationTitle
         
         setApearance()
         setAutoLayout()
@@ -69,13 +72,13 @@ public class NavigationBarType1: UIStackView {
         
         [
             backButton,
-            titleText,
+            titleLabel,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.addArrangedSubview($0)
         }
         
-        titleText.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        titleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
         
         backButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         

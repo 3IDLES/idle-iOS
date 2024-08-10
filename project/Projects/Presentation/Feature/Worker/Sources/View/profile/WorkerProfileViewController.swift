@@ -12,22 +12,27 @@ import RxCocoa
 import DSKit
 import Entity
 import BaseFeature
+import Kingfisher
 
-public protocol WorkerProfileViewModelable where Input: WorkerProfileInputable, Output: WorkerProfileOutputable {
-    associatedtype Input
-    associatedtype Output
-    var input: Input { get }
-    var output: Output? { get }
-}
-
-public protocol WorkerProfileInputable: AnyObject {
-    var viewWillAppear: PublishRelay<Void> { get }
-}
-
-public protocol WorkerProfileOutputable: AnyObject {
+public protocol WorkerProfileViewModelable {
     
-    var profileVO: Driver<WorkerProfileVO> { get }
-    var displayingImage: Driver<UIImage?> { get }
+    // Input
+    var viewWillAppear: PublishRelay<Void> { get }
+    
+    // Output
+    var profileRenderObject: Driver<WorkerProfileRenderObject>? { get }
+}
+
+extension UIImageView {
+    
+    func setImage(url: URL) {
+        let pngSerializer = FormatIndicatedCacheSerializer.png
+        self
+            .kf.setImage(
+                with: url,
+                options: [.cacheSerializer(pngSerializer)]
+            )
+    }
 }
 
 public class WorkerProfileViewController: DisposableViewController {
@@ -36,7 +41,7 @@ public class WorkerProfileViewController: DisposableViewController {
     
     // 네비게이션 바
     let navigationBar: NavigationBarType1 = {
-        let bar = NavigationBarType1(navigationTitle: "내 프로필")
+        let bar = NavigationBarType1(navigationTitle: "")
         return bar
     }()
     
@@ -75,7 +80,7 @@ public class WorkerProfileViewController: DisposableViewController {
         
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 48
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
         return imageView
@@ -84,7 +89,7 @@ public class WorkerProfileViewController: DisposableViewController {
     // 구인중 / 휴식중
     let workingTag: TagLabel = {
        let label = TagLabel(
-        text: "구직중",
+        text: "",
         typography: .caption,
         textColor: DSKitAsset.Colors.orange500.color,
         backgroundColor: DSKitAsset.Colors.orange100.color
@@ -373,40 +378,38 @@ public class WorkerProfileViewController: DisposableViewController {
         
         self.viewModel = viewModel
         
-        let input = viewModel.input
-           
-        guard let output = viewModel.output else { fatalError() }
-        
-        output
-            .profileVO
-            .drive(onNext: { [weak self] vo in
-                
-                guard let self else { return }
-                
-                // UI 업데이트
-                workingTag.isHidden = !vo.isLookingForJob
-                nameLabel.textString = vo.nameText
-                ageLabel.textString = vo.ageText
-                genderLabel.textString = vo.genderText
-                expLabel.textString = vo.expYearText
-                addressLabel.textString = vo.addressText
-                introductionLabel.textString = vo.introductionText
-                abilityLabel.textString = vo.abilitiesText
-            })
-            .disposed(by: disposeBag)
-        
-        output
-            .displayingImage
-            .drive(workerProfileImage.rx.image)
-            .disposed(by: disposeBag)
-        
+        // Input
         self.rx
             .viewWillAppear
             .filter { $0 }
             .map { _ in () }
-            .bind(to: input.viewWillAppear)
+            .bind(to: viewModel.viewWillAppear)
             .disposed(by: disposeBag)
         
+        // Output
+        viewModel
+            .profileRenderObject?
+            .drive(onNext: { [weak self] ro in
+                
+                guard let self else { return }
+                
+                // UI 업데이트
+                navigationBar.navigationTitle = ro.navigationTitle
+                profileEditButton.isHidden = !ro.showEditButton
+                workingTag.textString = ro.stateText
+                nameLabel.textString = ro.nameText
+                ageLabel.textString = ro.ageText
+                genderLabel.textString = ro.genderText
+                expLabel.textString = ro.expText
+                addressLabel.textString = ro.address
+                introductionLabel.textString = ro.oneLineIntroduce
+                abilityLabel.textString = ro.specialty
+                
+                if let imageUrl = ro.imageUrl {
+                    workerProfileImage.setImage(url: imageUrl)
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     public func cleanUp() {
