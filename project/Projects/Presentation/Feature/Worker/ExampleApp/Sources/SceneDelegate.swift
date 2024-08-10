@@ -24,7 +24,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let store = TestStore()
         
         try! store.saveAuthToken(
-            accessToken: "",
+            accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOm51bGwsInN1YiI6bnVsbCwiaXNzIjoiM2lkaW90cyIsImlhdCI6MTcyMzI5NzQyOCwibmJmIjoxNzIzMjk3NDI4LCJleHAiOjE3MjMyOTgwMjgsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiIwMTkxM2M4Ny1mMjMxLTdmMDctYTNjYS1jYTJhNjk4OTExZWQiLCJwaG9uZU51bWJlciI6IjAxMC0zMzI2LTU2NzgiLCJ1c2VyVHlwZSI6ImNhcmVyIn0.R_obT8lFGxf2jeDhrpC0aLntwDslI-NYoEbyEZLwhZ0",
             refreshToken: ""
         )
         

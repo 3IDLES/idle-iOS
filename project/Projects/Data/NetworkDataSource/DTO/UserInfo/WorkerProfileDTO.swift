@@ -27,6 +27,7 @@ public struct CarerProfileDTO: Codable {
         return .init(
             profileImageURL: profileImageUrl,
             nameText: carerName,
+            phoneNumber: phoneNumber,
             isLookingForJob: jobSearchStatus == "YES",
             age: age,
             gender: gender == "MAN" ? .male : .female,
