@@ -102,6 +102,12 @@ public class EditWorkerProfileViewController: BaseViewController {
     let phoneNumberLabel: IdleLabel = .init(typography: .Body3)
     
     // 경력
+    let addtionalInfoView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        return view
+    }()
+    
     let experiencedSelectButton: ExpPicker = {
         let button = ExpPicker(placeholderText: "연차")
         
@@ -153,6 +159,7 @@ public class EditWorkerProfileViewController: BaseViewController {
         setApearance()
         setAutoLayout()
         setObservable()
+        setKeyboardAvoidance()
     }
     
     public required init?(coder: NSCoder) {
@@ -286,7 +293,6 @@ public class EditWorkerProfileViewController: BaseViewController {
         )
         
         // 경력, 주소, 한줄소개, 특기
-        let addtionalInfoView = UIView()
         addtionalInfoView.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
         
         let addtionalInfoStack = VStack(
@@ -498,6 +504,16 @@ public class EditWorkerProfileViewController: BaseViewController {
             .eventPublisher
             .bind(to: viewModel.requestUpload)
             .disposed(by: disposeBag)
+    }
+    
+    func setKeyboardAvoidance() {
+        
+         [
+            introductionInputField.setKeyboardAvoidance,
+            abilityInputField.setKeyboardAvoidance,
+         ].forEach { setFunc in
+             setFunc(addtionalInfoView)
+         }
     }
 }
 
