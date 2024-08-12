@@ -10,6 +10,38 @@ import PresentationCore
 import RxCocoa
 import RxSwift
 import Entity
+import Kingfisher
+
+public struct ApplicantCardRO {
+    
+    public let profileUrl: URL?
+    public let isJobFinding: Bool
+    public let isStared: Bool
+    public let name: String
+    public let ageText: String
+    public let genderText: String
+    public let expText: String
+    
+    public init(profileUrl: URL?, isJobFinding: Bool, isStared: Bool, name: String, ageText: String, genderText: String, expText: String) {
+        self.profileUrl = profileUrl
+        self.isJobFinding = isJobFinding
+        self.isStared = isStared
+        self.name = name
+        self.ageText = ageText
+        self.genderText = genderText
+        self.expText = expText
+    }
+    
+    static let mock: ApplicantCardRO = .init(
+        profileUrl: URL(string: "https://dummyimage.com/600x400/00ffbf/0011ff&text=worker+profile"),
+        isJobFinding: false,
+        isStared: false,
+        name: "홍길동",
+        ageText: "51세",
+        genderText: "여성",
+        expText: "1년차"
+    )
+}
 
 public class ApplicantCardView: UIView {
     
@@ -29,7 +61,6 @@ public class ApplicantCardView: UIView {
     let workerProfileImage: UIImageView = {
         
         let imageView = UIImageView()
-        imageView.layer.cornerRadius = 36
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
@@ -62,6 +93,8 @@ public class ApplicantCardView: UIView {
         
         return label
     }()
+    
+    // Row3
     let infoLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSKitAsset.Colors.gray500.color
@@ -73,25 +106,116 @@ public class ApplicantCardView: UIView {
         return label
     }()
     
-    
+    // 버튼들
+    let showProfileButton: IdleSecondaryButton = {
+        let button = IdleSecondaryButton(level: .medium)
+        button.label.textString = "프로필 보기"
+        return button
+    }()
+    let employButton: IdlePrimaryButton = {
+        let button = IdlePrimaryButton(level: .medium)
+        button.label.textString = "채용하기"
+        return button
+    }()
     
     // Observable
     private let disposeBag = DisposeBag()
     
     public init() {
         super.init(frame: .zero)
+        setAppearance()
+        setLayout()
+        setObservable()
     }
     
     public required init?(coder: NSCoder) { fatalError() }
     
     private func setAppearance() {
-        
+        self.backgroundColor = .white
+        self.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
+        self.layer.borderWidth = 1.0
+        self.layer.cornerRadius = 12
     }
     
     private func setLayout() {
+        
+        self.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
+        
+        profileImageContainer.addSubview(workerProfileImage)
+        workerProfileImage.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            
+            profileImageContainer.widthAnchor.constraint(equalToConstant: 72),
+            profileImageContainer.heightAnchor.constraint(equalTo: profileImageContainer.widthAnchor),
+            
+            workerProfileImage.topAnchor.constraint(equalTo: profileImageContainer.topAnchor),
+            workerProfileImage.leftAnchor.constraint(equalTo: profileImageContainer.leftAnchor),
+            workerProfileImage.rightAnchor.constraint(equalTo: profileImageContainer.rightAnchor),
+            workerProfileImage.bottomAnchor.constraint(equalTo: profileImageContainer.bottomAnchor),
+        ])
+        
+        let nameTitleLabel: IdleLabel = .init(typography: .Body3)
+        nameTitleLabel.textString = "요양보호사"
+        
+        let nameStack = HStack([
+            nameLabel,
+            nameTitleLabel,
+        ], spacing: 2, alignment: .center)
+        
+        let divider = UIView()
+        divider.backgroundColor = DSKitAsset.Colors.gray300.color
+        let detailWorkerInfoStack = HStack([
+            infoLabel,
+            divider,
+            expLabel,
+        ], spacing: 8)
+        
+        NSLayoutConstraint.activate([
+            divider.widthAnchor.constraint(equalToConstant: 1),
+            divider.topAnchor.constraint(equalTo: detailWorkerInfoStack.topAnchor, constant: 3),
+            divider.bottomAnchor.constraint(equalTo: detailWorkerInfoStack.bottomAnchor, constant: -3),
+        ])
+        
+        let labelStack = VStack([
+            workingTag,
+            nameStack,
+            detailWorkerInfoStack,
+        ], spacing: 2, alignment: .leading)
+        
+        let workerInfoStack = HStack([
+            profileImageContainer,
+            labelStack,
+            Spacer(),
+            starButton
+        ], spacing: 16, alignment: .top)
+        
         NSLayoutConstraint.activate([
             starButton.widthAnchor.constraint(equalToConstant: 22),
             starButton.heightAnchor.constraint(equalTo: starButton.widthAnchor),
+        ])
+        
+        let buttonStack = HStack([
+            showProfileButton, employButton
+        ], spacing: 8, distribution: .fillEqually)
+        
+        let mainStack = VStack([
+            workerInfoStack,
+            buttonStack
+        ], spacing: 12, alignment: .fill)
+        
+        [
+            mainStack
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            mainStack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
+            mainStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            mainStack.rightAnchor.constraint(equalTo: self.layoutMarginsGuide.rightAnchor),
+            mainStack.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
         ])
     }
     
@@ -99,4 +223,24 @@ public class ApplicantCardView: UIView {
         
     }
     
+    public func bind(ro: ApplicantCardRO) {
+        
+        if let imageUrl = ro.profileUrl {
+            workerProfileImage
+                .setImage(url: imageUrl)
+        }
+        
+        workingTag.textString = ro.isJobFinding ? "구직중" : "휴식중"
+        starButton.setState(ro.isStared ? .accent : .normal)
+        nameLabel.textString = ro.name
+        infoLabel.textString = "\(ro.ageText) \(ro.genderText)"
+        expLabel.textString = "\(ro.expText)"
+    }
+}
+
+@available(iOS 17.0, *)
+#Preview("Preview", traits: .defaultLayout) {
+    let cardView = ApplicantCardView()
+    cardView.bind(ro: .mock)
+    return cardView
 }

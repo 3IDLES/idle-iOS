@@ -12,7 +12,6 @@ import RxCocoa
 import DSKit
 import Entity
 import BaseFeature
-import Kingfisher
 
 public protocol WorkerProfileViewModelable {
     
@@ -21,18 +20,6 @@ public protocol WorkerProfileViewModelable {
     
     // Output
     var profileRenderObject: Driver<WorkerProfileRenderObject>? { get }
-}
-
-extension UIImageView {
-    
-    func setImage(url: URL) {
-        let pngSerializer = FormatIndicatedCacheSerializer.png
-        self
-            .kf.setImage(
-                with: url,
-                options: [.cacheSerializer(pngSerializer)]
-            )
-    }
 }
 
 public class WorkerProfileViewController: DisposableViewController {
