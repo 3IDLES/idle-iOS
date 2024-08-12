@@ -63,30 +63,8 @@ public class CenterEmployCard: TappableUIView {
     
     // View
     
-    // Row1
-    let durationLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Body3)
-        label.attrTextColor = DSKitAsset.Colors.gray300.color
-        return label
-    }()
-    
-    // Row2
-    let postTitleLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Subtitle2)
-        return label
-    }()
-    
-    // Row3
-    let nameLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Body2)
-        label.attrTextColor = DSKitAsset.Colors.gray500.color
-        return label
-    }()
-    let informationLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Body2)
-        label.attrTextColor = DSKitAsset.Colors.gray500.color
-        return label
-    }()
+    // Row1, 2, 3 View
+    let centerEmployCardInfoView = CenterEmployCardInfoView()
     
     // Row4
     let checkApplicantsButton: IdlePrimaryCardButton = {
@@ -141,37 +119,14 @@ public class CenterEmployCard: TappableUIView {
     private func setLayout() {
         
         self.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
-        
-        // InfoLabel
-        let divider = UIView()
-        divider.backgroundColor = DSKitAsset.Colors.gray300.color
-        let infoStack = HStack([
-            nameLabel,
-            divider,
-            informationLabel,
-        ], spacing: 8)
-            
-        NSLayoutConstraint.activate([
-            divider.widthAnchor.constraint(equalToConstant: 1),
-            divider.topAnchor.constraint(equalTo: infoStack.topAnchor, constant: 5),
-            divider.bottomAnchor.constraint(equalTo: infoStack.bottomAnchor, constant: -5),
-        ])
-        
-        let textStack = VStack([
-            durationLabel,
-            Spacer(height: 4),
-            postTitleLabel,
-            Spacer(height: 2),
-            infoStack,
-        ], alignment: .leading)
-        
+    
         let buttonStack = HStack([
             editPostButton,
             terminatePostButton,
         ], spacing: 4)
         
         let contentStack = VStack([
-            HStack([textStack, Spacer()]),
+            HStack([centerEmployCardInfoView, Spacer()]),
             Spacer(height: 12),
             checkApplicantsButton,
             HStack([buttonStack, Spacer()])
@@ -196,10 +151,10 @@ public class CenterEmployCard: TappableUIView {
     
     public func binc(ro: CenterEmployCardRO) {
         
-        durationLabel.textString = "\(ro.startDay) ~ \(ro.endDay)"
-        postTitleLabel.textString = ro.postTitle
-        nameLabel.textString = ro.nameText
-        informationLabel.textString = "\(ro.careGradeText) \(ro.ageText) \(ro.genderText)"
+        centerEmployCardInfoView.durationLabel.textString = "\(ro.startDay) ~ \(ro.endDay)"
+        centerEmployCardInfoView.postTitleLabel.textString = ro.postTitle
+        centerEmployCardInfoView.nameLabel.textString = ro.nameText
+        centerEmployCardInfoView.informationLabel.textString = "\(ro.careGradeText) \(ro.ageText) \(ro.genderText)"
         checkApplicantsButton.label.textString = "지원자 \(ro.applicantCount)명 조회"
     }
 }
