@@ -12,7 +12,6 @@ import RxCocoa
 import DSKit
 import Entity
 import BaseFeature
-import Kingfisher
 
 protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
     
