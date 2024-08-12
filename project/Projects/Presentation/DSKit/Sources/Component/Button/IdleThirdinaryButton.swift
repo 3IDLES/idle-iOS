@@ -1,15 +1,15 @@
 //
-//  IdleSecondaryButton.swift
+//  IdleThirdinaryButton.swift
 //  DSKit
 //
-//  Created by choijunios on 8/8/24.
+//  Created by choijunios on 8/12/24.
 //
 
 import UIKit
 import RxSwift
 import RxCocoa
 
-public enum IdleSecondaryButtonLevel {
+public enum IdleThirdinaryButtonLevel {
     
     case medium
     
@@ -37,7 +37,7 @@ public enum IdleSecondaryButtonLevel {
     var accentTextColor: UIColor {
         switch self {
         case .medium:
-            DSKitAsset.Colors.orange500.color
+            DSKitAsset.Colors.gray300.color
         }
     }
     
@@ -52,14 +52,14 @@ public enum IdleSecondaryButtonLevel {
     var idleBackgroundColor: UIColor {
         switch self {
         case .medium:
-            DSKitAsset.Colors.gray0.color
+            .white
         }
     }
     
     var accentBackgroundColor: UIColor {
         switch self {
         case .medium:
-            DSKitAsset.Colors.gray0.color
+            DSKitAsset.Colors.orange100.color
         }
     }
     
@@ -74,14 +74,14 @@ public enum IdleSecondaryButtonLevel {
     var idleBorderColor: UIColor {
         switch self {
         case .medium:
-            DSKitAsset.Colors.gray200.color
+            DSKitAsset.Colors.orange400.color
         }
     }
     
     var accentBorderColor: UIColor {
         switch self {
         case .medium:
-            DSKitAsset.Colors.gray200.color
+            DSKitAsset.Colors.orange300.color
         }
     }
     
@@ -93,7 +93,7 @@ public enum IdleSecondaryButtonLevel {
     }
 }
 
-public class IdleSecondaryButton: TappableUIView {
+public class IdleThirdinaryButton: TappableUIView {
     
     // State
     public private(set) var isEnabled: Bool = true
@@ -208,7 +208,7 @@ public class IdleSecondaryButton: TappableUIView {
     
     let button = IdleSecondaryButton(level: .medium)
     button.label.textString = "다음"
-    button.setEnabled(true)
+    button.setEnabled(false)
     return button
 }
 
