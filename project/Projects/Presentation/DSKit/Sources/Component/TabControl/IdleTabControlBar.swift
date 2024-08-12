@@ -40,7 +40,7 @@ public class IdleTabControlBar<Item: IdleTabItem>: UIView {
     
     let items: [Item]
     
-    let statePublisher: BehaviorRelay<Item>
+    public let statePublisher: BehaviorRelay<Item>
     
     private var buttons: [IdleTabBarCell]!
     let movingBar: UIView = {
@@ -127,6 +127,7 @@ public class IdleTabControlBar<Item: IdleTabItem>: UIView {
                     .observe(on: MainScheduler.instance)
                     .subscribe(onNext: { [weak self] item in
                         self?.selectItem(item: item)
+                        self?.statePublisher.accept(item)
                     })
                     .disposed(by: disposeBag)
             }
