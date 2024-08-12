@@ -45,23 +45,14 @@ public class EditWorkerProfileViewController: BaseViewController {
     }()
     
     // 프로필 이미지
-    let profileImageContainer: UIView = {
+    let profileImageContainer: UIImageView = {
         
-        let view = UIView()
+        let view = UIImageView()
         view.backgroundColor = DSKitAsset.Colors.orange100.color
         view.layer.cornerRadius = 48
         view.clipsToBounds = true
-        
-        /// PlaceHolderImage
-        let imageView = DSKitAsset.Icons.workerProfilePlaceholder.image.toView()
-        view.addSubview(imageView)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 26),
-            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25),
-            imageView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -29),
-            imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -27),
-        ])
+        view.image = DSKitAsset.Icons.workerProfilePlaceholder.image
+        view.contentMode = .scaleAspectFit
 
         return view
     }()
