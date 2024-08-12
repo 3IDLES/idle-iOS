@@ -45,14 +45,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             navigationController: navigationController
         )
         
-        let vc = PostOverviewVC()
+        let vc = CenterRecruitmentPostBoardVC()
         
-        vc.bind(viewModel: vm)
+//        vc.bind(viewModel: vm)
         
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = vc
         window?.makeKeyAndVisible()
         
-        coordinator.start()
+//        coordinator.start()
     }
 }
