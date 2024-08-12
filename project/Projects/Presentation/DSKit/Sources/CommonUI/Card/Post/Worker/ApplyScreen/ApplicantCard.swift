@@ -43,7 +43,18 @@ public struct ApplicantCardRO {
     )
 }
 
-public class ApplicantCardView: UIView {
+public protocol ApplicantCardViewModelable {
+    
+    // - Buttons
+    var showProfileButtonClicked: PublishRelay<Void> { get }
+    var employButtonClicked: PublishRelay<Void> { get }
+    var staredThisWorker: PublishRelay<Bool> { get }
+    
+    // Output
+    var renderObject: Driver<ApplicantCardRO>? { get }
+}
+
+public class ApplicantCard: UIView {
     
     // View
     // Profile
@@ -240,7 +251,7 @@ public class ApplicantCardView: UIView {
 
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
-    let cardView = ApplicantCardView()
+    let cardView = ApplicantCard()
     cardView.bind(ro: .mock)
     return cardView
 }
