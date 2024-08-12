@@ -1,18 +1,19 @@
 //
-//  CenterEmployCardCell.swift
+//  ApplicantCardCell.swift
 //  DSKit
 //
 //  Created by choijunios on 8/12/24.
 //
+
 
 import UIKit
 import RxSwift
 import RxCocoa
 import Entity
 
-public class CenterEmployCardCell: UITableViewCell {
+public class ApplicantCardCell: UITableViewCell {
     
-    let cardView = CenterEmployCard()
+    let cardView = ApplicantCard()
     
     private var disposables: [Disposable?]?
     
@@ -47,7 +48,7 @@ public class CenterEmployCardCell: UITableViewCell {
         ])
     }
     
-    public func binc(viewModel: CenterEmployCardViewModelable) {
+    public func binc(viewModel: ApplicantCardViewModelable) {
         
         let disposables: [Disposable?] = [
             // Output
@@ -56,24 +57,25 @@ public class CenterEmployCardCell: UITableViewCell {
                 .drive(onNext: { [cardView] ro in
                     cardView.bind(ro: ro)
                 }),
-            
+   
             // Input
-            cardView.rx.tap
-                .bind(to: viewModel.cardClicked),
+            cardView
+                .starButton.eventPublisher
+                .map { state in
+                    state == .accent
+                }
+                .bind(to: viewModel.staredThisWorker),
             
-            cardView.checkApplicantsButton
-                .rx.tap
-                .bind(to: viewModel.checkApplicantBtnClicked),
+            cardView
+                .showProfileButton.rx.tap
+                .bind(to: viewModel.showProfileButtonClicked),
             
-            cardView.editPostButton
-                .rx.tap
-                .bind(to: viewModel.editPostBtnClicked),
-                
-            cardView.terminatePostButton
-                .rx.tap
-                .bind(to: viewModel.terminatePostBtnClicked),
+            cardView
+                .employButton.rx.tap
+                .bind(to: viewModel.employButtonClicked),
         ]
         
         self.disposables = disposables
     }
 }
+
