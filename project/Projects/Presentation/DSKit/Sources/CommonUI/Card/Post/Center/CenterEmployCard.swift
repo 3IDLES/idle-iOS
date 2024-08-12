@@ -194,42 +194,13 @@ public class CenterEmployCard: TappableUIView {
     
     private func setObservable() { }
     
-    public func binc(viewModel: CenterEmployCardViewModelable) {
-        // Output
-        viewModel
-            .renderObject?
-            .drive(onNext: { [weak self] ro in
-                // public let applicantCount: Int
-                guard let self else { return }
-                durationLabel.textString = "\(ro.startDay) ~ \(ro.endDay)"
-                postTitleLabel.textString = ro.postTitle
-                nameLabel.textString = ro.nameText
-                informationLabel.textString = "\(ro.careGradeText) \(ro.ageText) \(ro.genderText)"
-                checkApplicantsButton.label.textString = "지원자 \(ro.applicantCount)명 조회"
-            })
-            .disposed(by: disposeBag)
+    public func binc(ro: CenterEmployCardRO) {
         
-        // Input
-        [
-            self.rx.tap
-                .bind(to: viewModel.postCardClicked),
-            
-            checkApplicantsButton
-                .rx.tap
-                .bind(to: viewModel.checkApplicantBtnClicked),
-            
-            editPostButton
-                .rx.tap
-                .bind(to: viewModel.editPostBtnClicked),
-                
-            terminatePostButton
-                .rx.tap
-                .bind(to: viewModel.terminatePostBtnClicked),
-        ].forEach {
-            $0.disposed(by: disposeBag)
-        }
-        
-        (viewModel as? TextVM)?.publishObect.accept(.mock)
+        durationLabel.textString = "\(ro.startDay) ~ \(ro.endDay)"
+        postTitleLabel.textString = ro.postTitle
+        nameLabel.textString = ro.nameText
+        informationLabel.textString = "\(ro.careGradeText) \(ro.ageText) \(ro.genderText)"
+        checkApplicantsButton.label.textString = "지원자 \(ro.applicantCount)명 조회"
     }
 }
 
@@ -253,8 +224,7 @@ fileprivate class TextVM: CenterEmployCardViewModelable {
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
     let btn = CenterEmployCard()
-    let vm = TextVM()
-    btn.binc(viewModel: vm)
+    btn.binc(ro: .mock)
     
     return btn
 }
