@@ -49,7 +49,7 @@ public protocol CenterEmployCardViewModelable {
     var renderObject: Driver<CenterEmployCardRO>? { get }
     
     // Input
-    var postCardClicked: PublishRelay<Void> { get }
+    var cardClicked: PublishRelay<Void> { get }
     
     // - Buttons
     var checkApplicantBtnClicked: PublishRelay<Void> { get }
@@ -149,7 +149,7 @@ public class CenterEmployCard: TappableUIView {
     
     private func setObservable() { }
     
-    public func binc(ro: CenterEmployCardRO) {
+    public func bind(ro: CenterEmployCardRO) {
         
         centerEmployCardInfoView.durationLabel.textString = "\(ro.startDay) ~ \(ro.endDay)"
         centerEmployCardInfoView.postTitleLabel.textString = ro.postTitle
@@ -165,7 +165,7 @@ fileprivate class TextVM: CenterEmployCardViewModelable {
     
     var renderObject: RxCocoa.Driver<CenterEmployCardRO>?
     
-    var postCardClicked: RxRelay.PublishRelay<Void> = .init()
+    var cardClicked: RxRelay.PublishRelay<Void> = .init()
     var checkApplicantBtnClicked: RxRelay.PublishRelay<Void> = .init()
     var editPostBtnClicked: RxRelay.PublishRelay<Void> = .init()
     var terminatePostBtnClicked: RxRelay.PublishRelay<Void> = .init()
@@ -179,7 +179,6 @@ fileprivate class TextVM: CenterEmployCardViewModelable {
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
     let btn = CenterEmployCard()
-    btn.binc(ro: .mock)
-    
+    btn.bind(ro: .mock)
     return btn
 }
