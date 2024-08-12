@@ -37,4 +37,13 @@ public extension UIImage {
         view.contentMode = .scaleAspectFit
         return view
     }
+    
+    /// SingleImageButton을 만듭니다.
+    func toButton(tintColor: UIColor) -> SingleImageButton {
+        self.withRenderingMode(.alwaysTemplate)
+        let btn = SingleImageButton()
+        btn.tintColor = tintColor
+        btn.imageView.image = self
+        return btn
+    }
 }
