@@ -12,6 +12,8 @@ import Entity
 
 public class WorkerEmployCardCell: UITableViewCell {
     
+    public static let identifier = String(describing: WorkerEmployCardCell.self)
+    
     let tappableArea: TappableUIView = .init()
     
     let cardView = WorkerEmployCard()

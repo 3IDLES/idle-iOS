@@ -8,12 +8,12 @@
 import UIKit
 import PresentationCore
 
-struct Dependency {
-    let navigationController: UINavigationController
-    let injector: Injector
-}
-
 class RootCoordinator: ParentCoordinator {
+    
+    struct Dependency {
+        let navigationController: UINavigationController
+        let injector: Injector
+    }
     
     var childCoordinators: [Coordinator] = []
     

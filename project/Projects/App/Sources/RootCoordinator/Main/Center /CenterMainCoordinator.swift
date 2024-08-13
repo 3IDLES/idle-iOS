@@ -11,6 +11,12 @@ import PresentationCore
 import RootFeature
 
 class CenterMainCoordinator: CenterMainCoordinatable {
+    
+    struct Dependency {
+        let navigationController: UINavigationController
+        let injector: Injector
+    }
+    
     var childCoordinators: [Coordinator] = []
     
     var parent: ParentCoordinator?
@@ -95,6 +101,7 @@ enum CenterMainScreen: Int, CaseIterable {
     }
 }
 
+// Test
 extension CenterMainCoordinator {
     
     /// 센터 정보등록 창을 표시합니다.

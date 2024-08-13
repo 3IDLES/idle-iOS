@@ -8,6 +8,5 @@
 import Foundation
 
 public protocol CenterMainCoordinatable: ParentCoordinator {
-    func centerProfileRegister()
-    func registerRecruitmentPost()
+
 }

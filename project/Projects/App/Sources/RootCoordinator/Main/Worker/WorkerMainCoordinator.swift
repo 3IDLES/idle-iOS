@@ -11,6 +11,12 @@ import PresentationCore
 import RootFeature
 
 class WorkerMainCoordinator: ParentCoordinator {
+    
+    struct Dependency {
+        let navigationController: UINavigationController
+        let injector: Injector
+    }
+    
     var childCoordinators: [Coordinator] = []
     
     var parent: ParentCoordinator?

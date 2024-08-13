@@ -9,7 +9,14 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-public class ImagePrefixButton: TappableUIView {
+public class ImageTextButton: TappableUIView {
+    
+    public enum ImagePose {
+        case prefix
+        case postfix
+    }
+    
+    let imagePose: ImagePose
     
     let icon: UIImageView = {
         let icon = UIImageView()
@@ -17,14 +24,15 @@ public class ImagePrefixButton: TappableUIView {
         return icon
     }()
     
-    let label: IdleLabel = {
+    public let label: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         return label
     }()
     
     private let disposeBag = DisposeBag()
     
-    public init(iconImage: UIImage) {
+    public init(iconImage: UIImage, position: ImagePose) {
+        self.imagePose = position
         super.init()
         
         icon.image = iconImage
@@ -41,9 +49,12 @@ public class ImagePrefixButton: TappableUIView {
     }
     
     private func setLayout() {
-        let mainStack = HStack([
+        let mainStack = imagePose == .prefix ? HStack([
             icon,
             label
+        ], spacing: 2, alignment: .center) : HStack([
+            label,
+            icon
         ], spacing: 2, alignment: .center)
         
         NSLayoutConstraint.activate([
@@ -81,8 +92,9 @@ public class ImagePrefixButton: TappableUIView {
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
     
-    let btn = ImagePrefixButton(
-        iconImage: DSKitAsset.Icons.editPhoto.image
+    let btn = ImageTextButton(
+        iconImage: DSKitAsset.Icons.editPhoto.image,
+        position: .postfix
     )
     btn.label.textString = "공고 수정"
     btn.tintColor = .black

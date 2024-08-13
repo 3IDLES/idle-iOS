@@ -1,0 +1,194 @@
+//
+//  OnGoingPostVC.swift
+//  CenterFeature
+//
+//  Created by choijunios on 8/13/24.
+//
+
+import UIKit
+import BaseFeature
+import PresentationCore
+import RxCocoa
+import RxSwift
+import Entity
+import DSKit
+
+public protocol OnGoingPostViewModelable {
+    
+    var ongoingPostCardVO: Driver<[CenterEmployCardVO]>? { get }
+    var requestOngoingPost: PublishRelay<Void> { get }
+}
+
+class BoardSortigHeaderView: UIView {
+    
+    let sortingTypeButton: ImageTextButton = {
+        let button = ImageTextButton(
+            iconImage: DSKitAsset.Icons.chevronDown.image,
+            position: .postfix
+        )
+        button.label.textString = "정렬 기준"
+        button.label.attrTextColor = DSKitAsset.Colors.gray300.color
+        return button
+    }()
+    
+    init() {
+        super.init(frame: .zero)
+        setLayout()
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
+    
+    func setLayout() {
+        
+        [
+            sortingTypeButton
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            sortingTypeButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 24),
+            sortingTypeButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -24),
+            sortingTypeButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -12),
+        ])
+    }
+}
+
+public class OnGoingPostVC: BaseViewController {
+    
+    typealias Cell = CenterEmployCardCell
+    
+    // View
+    let postTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
+        return tableView
+    }()
+    
+    let tableHeader = BoardSortigHeaderView()
+    
+    let ongoingPostCardVO: BehaviorRelay<[CenterEmployCardVO]> = .init(value: [.mock])
+    
+    // Observable
+    private let disposeBag = DisposeBag()
+    
+    public init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    public required init?(coder: NSCoder) { fatalError() }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        setAppearance()
+        setLayout()
+        setObservable()
+        setTableView()
+    }
+    
+    private func setTableView() {
+        postTableView.dataSource = self
+        postTableView.delegate = self
+        postTableView.separatorStyle = .none
+        postTableView.delaysContentTouches = false
+        
+        postTableView.tableHeaderView = tableHeader
+        
+        tableHeader.frame = .init(origin: .zero, size: .init(
+            width: view.bounds.width,
+            height: 60)
+        )
+    }
+    
+    private func setAppearance() {
+        
+    }
+    
+    private func setLayout() {
+        
+        [
+            postTableView
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            postTableView.topAnchor.constraint(equalTo: view.topAnchor),
+            postTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            postTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            postTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+
+    }
+    
+    private func setObservable() {
+        
+    }
+    
+    public func bind(viewModel: OnGoingPostViewModelable) {
+        
+        // Output
+        viewModel
+            .ongoingPostCardVO?
+            .drive(onNext: { [weak self] vos in
+                guard let self else { return }
+                ongoingPostCardVO.accept(vos)
+                postTableView.reloadData()
+            })
+            .disposed(by: disposeBag)
+        
+        // Input
+        rx.viewWillAppear
+            .map { _ in }
+            .bind(to: viewModel.requestOngoingPost)
+            .disposed(by: disposeBag)
+    }
+}
+
+extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
+    
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        ongoingPostCardVO.value.count
+    }
+    
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
+        let vo = ongoingPostCardVO.value[indexPath.section]
+        let vm = CenterEmployCardVM(vo: vo)
+        cell.bind(viewModel: vm)
+        cell.selectionStyle = .none
+        return cell
+    }
+}
+
+// MARK: 카드 뷰에 사용될 ViewModel
+class CenterEmployCardVM: CenterEmployCardViewModelable {
+    
+    // Init
+    var id: String
+    
+    // Output
+    var renderObject: Driver<CenterEmployCardRO>?
+    
+    // Input
+    var cardClicked: PublishRelay<Void> = .init()
+    var checkApplicantBtnClicked: PublishRelay<Void> = .init()
+    var editPostBtnClicked: PublishRelay<Void> = .init()
+    var terminatePostBtnClicked: PublishRelay<Void> = .init()
+    
+    init(vo: CenterEmployCardVO) {
+        self.id = vo.postId
+        
+        // MARK: RenderObject
+        let publishRelay: BehaviorRelay<CenterEmployCardRO> = .init(value: .mock)
+        renderObject = publishRelay.asDriver(onErrorJustReturn: .mock)
+        
+        publishRelay.accept(CenterEmployCardRO.create(vo))
+        
+        // MARK: 버튼 처리
+    }
+}
