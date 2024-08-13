@@ -19,6 +19,9 @@ public class IdleTabBar: UIViewController {
     public private(set) var viewControllers: [UIViewController] = []
     private var tabBarItems: [IdleTabBarItem] = []
     
+    // View
+    var tabBarItemStack: UIView!
+    
     // 탭바 아이템
     private var tabBarItemViews: [IdleTabBarItemViewable] = []
     
@@ -71,12 +74,14 @@ public class IdleTabBar: UIViewController {
         tabBarItemViews = tabBarItems.map { item in
             TextButtonType1(labelText: item.name)
         }
-        
+         
         let tabBarItemStack = HStack(
             tabBarItemViews,
             alignment: .fill,
             distribution: .fillEqually
         )
+        
+        self.tabBarItemStack = tabBarItemStack
         
         view.addSubview(tabBarItemStack)
         tabBarItemStack.translatesAutoresizingMaskIntoConstraints = false
@@ -122,10 +127,10 @@ public class IdleTabBar: UIViewController {
         let currentView = currentVC.view!
         
         NSLayoutConstraint.activate([
-            currentView.topAnchor.constraint(equalTo: view.topAnchor),
+            currentView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             currentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             currentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            currentView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor)
+            currentView.bottomAnchor.constraint(equalTo: tabBarItemStack.topAnchor)
         ])
     }
     

@@ -31,7 +31,7 @@ public struct CenterEmployCardRO {
         self.applicantCount = applicantCount
     }
     
-    static let mock: CenterEmployCardRO = .init(
+    public static let mock: CenterEmployCardRO = .init(
         startDay: "2024. 07. 10",
         endDay: "2024. 07. 31",
         postTitle: "서울특별시 강남구 신사동",
@@ -41,6 +41,20 @@ public struct CenterEmployCardRO {
         genderText: "여성",
         applicantCount: 2
     )
+    
+    
+    public static func create(_ vo: CenterEmployCardVO) -> CenterEmployCardRO {
+        .init(
+            startDay: vo.startDay,
+            endDay: vo.endDay ?? "채용 시까지",
+            postTitle: vo.postTitle,
+            nameText: vo.name,
+            careGradeText: "\(vo.careGrade.textForCellBtn)등급",
+            ageText: "\(vo.age)세",
+            genderText: vo.gender.twoLetterKoreanWord,
+            applicantCount: vo.applicantCount
+        )
+    }
 }
 
 public protocol CenterEmployCardViewModelable {
@@ -74,9 +88,10 @@ public class CenterEmployCard: TappableUIView {
     }()
     
     // Row5
-    let editPostButton: ImagePrefixButton = {
-        let button = ImagePrefixButton(
-            iconImage: DSKitAsset.Icons.postEdit.image
+    let editPostButton: ImageTextButton = {
+        let button = ImageTextButton(
+            iconImage: DSKitAsset.Icons.postEdit.image,
+            position: .prefix
         )
         button.icon.tintColor = DSKitAsset.Colors.gray300.color
         button.label.textString = "공고 수정"
@@ -84,9 +99,10 @@ public class CenterEmployCard: TappableUIView {
         
         return button
     }()
-    let terminatePostButton: ImagePrefixButton = {
-        let button = ImagePrefixButton(
-            iconImage: DSKitAsset.Icons.postCheck.image
+    let terminatePostButton: ImageTextButton = {
+        let button = ImageTextButton(
+            iconImage: DSKitAsset.Icons.postCheck.image,
+            position: .prefix
         )
         button.icon.tintColor = DSKitAsset.Colors.gray300.color
         button.label.textString = "채용 종료"

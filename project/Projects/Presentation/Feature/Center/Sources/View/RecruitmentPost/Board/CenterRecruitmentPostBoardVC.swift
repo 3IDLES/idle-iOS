@@ -15,14 +15,14 @@ import DSKit
 
 public class CenterRecruitmentPostBoardVC: BaseViewController {
     enum TabBarState: Int, CaseIterable {
-        case current = 0
-        case prev = 1
+        case onGoingPost = 0
+        case closedPost = 1
         
         var titleText: String {
             switch self {
-            case .current:
+            case .onGoingPost:
                 "진행 중인 공고"
-            case .prev:
+            case .closedPost:
                 "이전 공고"
             }
         }
@@ -37,10 +37,12 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
         }
     }
     
-    private var currentState: TabBarState = .current
+    var viewModel: CenterRecruitmentPostBoardViewModelable?
+    
+    private var currentState: TabBarState = .onGoingPost
     private let viewControllerDict: [TabBarState: UIViewController] = [
-        .current : CurrentPostVC(),
-        .prev : PrevPostVC()
+        .onGoingPost : OnGoingPostVC(),
+        .closedPost : ClosedPostVC()
     ]
     
     // Init
@@ -81,14 +83,14 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
     private func setLayout() {
         [
             titleLabel,
-            tabBar
+            tabBar,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 21),
             titleLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
             
             tabBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
@@ -146,93 +148,32 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
     private func addViewControllerAndSetLayout(vc: UIViewController) {
         addChild(vc)
         view.addSubview(vc.view)
+        vc.didMove(toParent: self)
         vc.view.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             vc.view.topAnchor.constraint(equalTo: tabBar.bottomAnchor),
             vc.view.leftAnchor.constraint(equalTo: view.leftAnchor),
             vc.view.rightAnchor.constraint(equalTo: view.rightAnchor),
-            vc.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            vc.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
-}
-
-// MARK: Current VC
-public class CurrentPostVC: BaseViewController {
     
-    // Init
-    
-    // View
-    
-    // Observable
-    private let disposeBag = DisposeBag()
-    
-    public init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    public required init?(coder: NSCoder) { fatalError() }
-    
-    public override func viewDidLoad() {
-        setAppearance()
-    }
-    
-    private func setAppearance() {
-        view.backgroundColor = .yellow
-    }
-    
-    private func setLayout() {
+    public func bind(viewModel: CenterRecruitmentPostBoardViewModelable) {
         
-    }
-    
-    private func setObservable() {
+        self.viewModel = viewModel
+         
+        (viewControllerDict[.onGoingPost] as? OnGoingPostVC)?.bind(viewModel: viewModel)
+        (viewControllerDict[.closedPost] as? ClosedPostVC)?.bind(viewModel: viewModel)
         
-    }
-    
-    public override func viewWillAppear(_ animated: Bool) {
-        
-        print("CurrentPostVC")
+        viewModel
+            .alert?
+            .drive(onNext: { [weak self] alertVO in
+                self?.showAlert(vo: alertVO)
+            })
+            .disposed(by: disposeBag)
     }
 }
-
-// MARK: Prev VC
-public class PrevPostVC: BaseViewController {
-    
-    // Init
-    
-    // View
-    
-    // Observable
-    private let disposeBag = DisposeBag()
-    
-    public init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    public required init?(coder: NSCoder) { fatalError() }
-    
-    public override func viewDidLoad() {
-        setAppearance()
-    }
-    
-    private func setAppearance() {
-        view.backgroundColor = .red
-    }
-    
-    private func setLayout() {
-        
-    }
-    
-    private func setObservable() {
-        
-    }
-    
-    public override func viewWillAppear(_ animated: Bool) {
-        
-        print("PrevPostVC")
-    }
-}
-
 
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {

@@ -1,6 +1,6 @@
 //
 //  AuthCoordinator+Extension.swift
-//  AuthFeature
+//  Idle-iOS
 //
 //  Created by choijunios on 6/30/24.
 //

@@ -13,6 +13,11 @@ import ConcreteRepository
 
 class CenterAuthCoorinator: ParentCoordinator {
     
+    struct Dependency {
+        let navigationController: UINavigationController
+        let injector: Injector
+    }
+    
     var childCoordinators: [Coordinator] = []
     
     var parent: AuthCoordinatable?

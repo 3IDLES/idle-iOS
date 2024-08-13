@@ -12,6 +12,8 @@ import Entity
 
 public class CenterEmployCardCell: UITableViewCell {
     
+    public static let identifier = String(describing: CenterEmployCardCell.self)
+    
     let cardView = CenterEmployCard()
     
     private var disposables: [Disposable?]?
@@ -26,6 +28,12 @@ public class CenterEmployCardCell: UITableViewCell {
     public override func prepareForReuse() {
         disposables?.forEach { $0?.dispose() }
         disposables = nil
+    }
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+
+        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 20, bottom: 8, right: 20))
     }
     
     func setAppearance() { }
@@ -47,7 +55,7 @@ public class CenterEmployCardCell: UITableViewCell {
         ])
     }
     
-    public func binc(viewModel: CenterEmployCardViewModelable) {
+    public func bind(viewModel: CenterEmployCardViewModelable) {
         
         let disposables: [Disposable?] = [
             // Output

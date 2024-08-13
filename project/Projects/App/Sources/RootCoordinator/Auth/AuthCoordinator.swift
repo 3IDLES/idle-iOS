@@ -1,6 +1,6 @@
 //
 //  AuthCoordinator.swift
-//  AuthFeature
+//  Idle-iOS
 //
 //  Created by choijunios on 6/30/24.
 //
@@ -10,6 +10,11 @@ import PresentationCore
 import AuthFeature
 
 class AuthCoordinator: ParentCoordinator {
+    
+    struct Dependency {
+        let navigationController: UINavigationController
+        let injector: Injector
+    }
     
     var childCoordinators: [Coordinator] = []
     

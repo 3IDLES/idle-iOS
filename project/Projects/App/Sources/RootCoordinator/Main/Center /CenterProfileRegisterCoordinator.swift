@@ -12,6 +12,11 @@ import PresentationCore
 import UseCaseInterface
 
 class CenterProfileRegisterCoordinator: CenterProfileRegisterCoordinatable {
+    
+    struct Dependency {
+        let navigationController: UINavigationController
+        let injector: Injector
+    }
 
     var childCoordinators: [Coordinator] = []
     

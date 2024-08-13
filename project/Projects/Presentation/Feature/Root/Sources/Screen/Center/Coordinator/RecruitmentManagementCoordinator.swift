@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CenterFeature
 import PresentationCore
 
 public class RecruitmentManagementCoordinator: ChildCoordinator {
@@ -25,22 +26,26 @@ public class RecruitmentManagementCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        let vc = RecuitmentManagementVC(coordinator: self)
+        let vc = CenterRecruitmentPostBoardVC()
+        let vm = CenterRecruitmentPostBoardVM()
+        vc.bind(viewModel: vm)
         navigationController.pushViewController(vc, animated: false)
     }
     
     public func coordinatorDidFinish() {
-        
+        popViewController()
+        parent?.removeChildCoordinator(self)
     }
 }
 
 extension RecruitmentManagementCoordinator {
     
     func showCenterRegisterScreen() {
-        parent?.centerProfileRegister()
+    
     }
     
     func showRegisterRecruitmentPostScreen() {
-        parent?.registerRecruitmentPost()
+        
     }
+    
 }
