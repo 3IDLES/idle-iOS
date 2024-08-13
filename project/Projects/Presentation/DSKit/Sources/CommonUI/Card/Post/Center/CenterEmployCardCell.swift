@@ -12,6 +12,8 @@ import Entity
 
 public class CenterEmployCardCell: UITableViewCell {
     
+    var viewModel: CenterEmployCardViewModelable?
+    
     public static let identifier = String(describing: CenterEmployCardCell.self)
     
     let cardView = CenterEmployCard()
@@ -26,6 +28,8 @@ public class CenterEmployCardCell: UITableViewCell {
     public required init?(coder: NSCoder) { fatalError() }
     
     public override func prepareForReuse() {
+        viewModel = nil
+        
         disposables?.forEach { $0?.dispose() }
         disposables = nil
     }
@@ -56,6 +60,8 @@ public class CenterEmployCardCell: UITableViewCell {
     }
     
     public func bind(viewModel: CenterEmployCardViewModelable) {
+        
+        self.viewModel = viewModel
         
         let disposables: [Disposable?] = [
             // Output
