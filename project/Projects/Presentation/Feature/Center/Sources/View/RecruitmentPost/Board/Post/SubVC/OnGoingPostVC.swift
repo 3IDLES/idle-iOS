@@ -17,47 +17,15 @@ public protocol OnGoingPostViewModelable {
     
     var ongoingPostCardVO: Driver<[CenterEmployCardVO]>? { get }
     var requestOngoingPost: PublishRelay<Void> { get }
-}
-
-class BoardSortigHeaderView: UIView {
     
-    let sortingTypeButton: ImageTextButton = {
-        let button = ImageTextButton(
-            iconImage: DSKitAsset.Icons.chevronDown.image,
-            position: .postfix
-        )
-        button.label.textString = "정렬 기준"
-        button.label.attrTextColor = DSKitAsset.Colors.gray300.color
-        return button
-    }()
-    
-    init() {
-        super.init(frame: .zero)
-        setLayout()
-    }
-    
-    required init?(coder: NSCoder) { fatalError() }
-    
-    func setLayout() {
-        
-        [
-            sortingTypeButton
-        ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            self.addSubview($0)
-        }
-        
-        NSLayoutConstraint.activate([
-            sortingTypeButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 24),
-            sortingTypeButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -24),
-            sortingTypeButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -12),
-        ])
-    }
+    func createCellVM(vo: CenterEmployCardVO) -> CenterEmployCardViewModelable
 }
 
 public class OnGoingPostVC: BaseViewController {
     
     typealias Cell = CenterEmployCardCell
+    
+    var viewModel: OnGoingPostViewModelable?
     
     // View
     let postTableView: UITableView = {
@@ -130,6 +98,8 @@ public class OnGoingPostVC: BaseViewController {
     
     public func bind(viewModel: OnGoingPostViewModelable) {
         
+        self.viewModel = viewModel
+        
         // Output
         viewModel
             .ongoingPostCardVO?
@@ -157,10 +127,50 @@ extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
-        let vo = ongoingPostCardVO.value[indexPath.section]
-        let vm = CenterEmployCardVM(vo: vo)
-        cell.bind(viewModel: vm)
         cell.selectionStyle = .none
+        
+        if let viewModel = self.viewModel {
+            let vo = ongoingPostCardVO.value[indexPath.row]
+            let vm = viewModel.createCellVM(vo: vo)
+            cell.bind(viewModel: vm)
+        }
+        
         return cell
+    }
+}
+
+class BoardSortigHeaderView: UIView {
+    
+    let sortingTypeButton: ImageTextButton = {
+        let button = ImageTextButton(
+            iconImage: DSKitAsset.Icons.chevronDown.image,
+            position: .postfix
+        )
+        button.label.textString = "정렬 기준"
+        button.label.attrTextColor = DSKitAsset.Colors.gray300.color
+        return button
+    }()
+    
+    init() {
+        super.init(frame: .zero)
+        setLayout()
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
+    
+    func setLayout() {
+        
+        [
+            sortingTypeButton
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            sortingTypeButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 24),
+            sortingTypeButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -24),
+            sortingTypeButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -12),
+        ])
     }
 }

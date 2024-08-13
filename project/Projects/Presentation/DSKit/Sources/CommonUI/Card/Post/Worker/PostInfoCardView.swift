@@ -64,6 +64,14 @@ public class PostInfoCardView: TappableUIView {
     }
     
     private func setObservable() { }
+    
+    public func bind(vo: CenterEmployCardVO) {
+        let ro = CenterEmployCardRO.create(vo)
+        contentView.durationLabel.textString = "\(ro.startDay) ~ \(ro.endDay)"
+        contentView.informationLabel.textString = "\(ro.careGradeText) \(ro.ageText) \(ro.genderText)"
+        contentView.nameLabel.textString = ro.nameText
+        contentView.postTitleLabel.textString = ro.postTitle
+    }
 }
 
 @available(iOS 17.0, *)

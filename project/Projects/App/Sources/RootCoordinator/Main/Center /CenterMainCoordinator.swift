@@ -52,7 +52,7 @@ class CenterMainCoordinator: CenterMainCoordinatable {
     func createNavForTab(tab: CenterMainScreen) -> UINavigationController {
         
         let tabNavController = UINavigationController()
-        tabNavController.setNavigationBarHidden(false, animated: false)
+        tabNavController.setNavigationBarHidden(true, animated: false)
         
         startTabCoordinator(
             tab: tab,
@@ -64,7 +64,7 @@ class CenterMainCoordinator: CenterMainCoordinatable {
     // #2. 생성한 컨트롤러를 각 탭별 Coordinator에 전달
     func startTabCoordinator(tab: CenterMainScreen, navigationController: UINavigationController) {
         
-        var coordinator: ChildCoordinator!
+        var coordinator: Coordinator!
         
         switch tab {
         case .recruitmentManage:
