@@ -8,8 +8,12 @@
 import UIKit
 import CenterFeature
 import PresentationCore
+import Entity
 
-public class RecruitmentManagementCoordinator: ChildCoordinator {
+
+public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatable {
+    
+    public var childCoordinators: [any PresentationCore.Coordinator] = []
     
     public weak var viewControllerRef: UIViewController?
     
@@ -27,8 +31,9 @@ public class RecruitmentManagementCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = CenterRecruitmentPostBoardVC()
-        let vm = CenterRecruitmentPostBoardVM()
+        let vm = CenterRecruitmentPostBoardVM(coordinator: self)
         vc.bind(viewModel: vm)
+        viewControllerRef = vc
         navigationController.pushViewController(vc, animated: false)
     }
     
@@ -38,14 +43,17 @@ public class RecruitmentManagementCoordinator: ChildCoordinator {
     }
 }
 
-extension RecruitmentManagementCoordinator {
-    
-    func showCenterRegisterScreen() {
-    
+public extension RecruitmentManagementCoordinator {
+
+    func showCheckingApplicantScreen(_ centerEmployCardVO: CenterEmployCardVO) {
+        let coordinator = CheckApplicantCoordinator(
+            dependency: .init(
+                navigationController: navigationController,
+                centerEmployCardVO: centerEmployCardVO
+            )
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
     }
-    
-    func showRegisterRecruitmentPostScreen() {
-        
-    }
-    
 }

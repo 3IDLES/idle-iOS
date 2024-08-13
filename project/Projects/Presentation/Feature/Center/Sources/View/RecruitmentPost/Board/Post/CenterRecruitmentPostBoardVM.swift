@@ -20,6 +20,8 @@ public protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelabl
 
 
 public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelable {
+    
+    weak var coordinator: RecruitmentManagementCoordinatable?
 
     public var requestOngoingPost: PublishRelay<Void> = .init()
     public var requestClosedPost: PublishRelay<Void> = .init()
@@ -29,7 +31,8 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
     
     public var alert: Driver<DefaultAlertContentVO>?
     
-    public init() {
+    public init(coordinator: RecruitmentManagementCoordinatable?) {
+        self.coordinator = coordinator
         
         let requestOngoingPostResult = requestOngoingPost
             .flatMap { [unowned self] _ in
@@ -73,13 +76,22 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
     func publishClosedPostMocks() -> Single<Result<[CenterEmployCardVO], RecruitmentPostError>> {
         return .just(.success((0...10).map { _ in CenterEmployCardVO.mock }))
     }
+    
+    public func createCellVM(vo: CenterEmployCardVO) -> any CenterEmployCardViewModelable {
+        CenterEmployCardVM(
+            vo: vo,
+            coordinator: coordinator
+        )
+    }
 }
 
 // MARK: 카드 뷰에 사용될 ViewModel
 class CenterEmployCardVM: CenterEmployCardViewModelable {
     
+    weak var coordinator: RecruitmentManagementCoordinatable?
+    
     // Init
-    var id: String
+    let id: String
     
     // Output
     var renderObject: Driver<CenterEmployCardRO>?
@@ -90,8 +102,11 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
     var editPostBtnClicked: PublishRelay<Void> = .init()
     var terminatePostBtnClicked: PublishRelay<Void> = .init()
     
-    init(vo: CenterEmployCardVO) {
+    let disposeBag = DisposeBag()
+    
+    init(vo: CenterEmployCardVO, coordinator: RecruitmentManagementCoordinatable? = nil) {
         self.id = vo.postId
+        self.coordinator = coordinator
         
         // MARK: RenderObject
         let publishRelay: BehaviorRelay<CenterEmployCardRO> = .init(value: .mock)
@@ -100,5 +115,10 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
         publishRelay.accept(CenterEmployCardRO.create(vo))
         
         // MARK: 버튼 처리
+        checkApplicantBtnClicked
+            .subscribe(onNext: { [weak self] _ in
+                self?.coordinator?.showCheckingApplicantScreen(vo)
+            })
+            .disposed(by: disposeBag)
     }
 }

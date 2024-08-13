@@ -41,17 +41,6 @@ public class RecuitmentManagementVC: UIViewController {
         button2.setTitleColor(.black, for: .normal)
         button2.isUserInteractionEnabled = true
         
-        button1.rx.tap
-            .subscribe { [weak coordinator] _ in
-                coordinator?.showCenterRegisterScreen()
-            }
-            .disposed(by: dispoesBag)
-        
-        button2.rx.tap
-            .subscribe { [weak coordinator] _ in
-                coordinator?.showRegisterRecruitmentPostScreen()
-            }
-            .disposed(by: dispoesBag)
         [
             label,
             button1,

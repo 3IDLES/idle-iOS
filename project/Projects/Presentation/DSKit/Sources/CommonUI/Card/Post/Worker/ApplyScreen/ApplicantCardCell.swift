@@ -13,6 +13,8 @@ import Entity
 
 public class ApplicantCardCell: UITableViewCell {
     
+    public static let identifier = String(describing: ApplicantCardCell.self)
+    
     let cardView = ApplicantCard()
     
     private var disposables: [Disposable?]?
@@ -31,6 +33,12 @@ public class ApplicantCardCell: UITableViewCell {
     
     func setAppearance() { }
     
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+
+        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0))
+    }
+    
     func setLayout() {
         
         [
@@ -48,7 +56,7 @@ public class ApplicantCardCell: UITableViewCell {
         ])
     }
     
-    public func binc(viewModel: ApplicantCardViewModelable) {
+    public func bind(viewModel: ApplicantCardViewModelable) {
         
         let disposables: [Disposable?] = [
             // Output

@@ -17,11 +17,15 @@ public protocol ClosedPostViewModelable {
     
     var closedPostCardVO: Driver<[CenterEmployCardVO]>? { get }
     var requestClosedPost: PublishRelay<Void> { get }
+    
+    func createCellVM(vo: CenterEmployCardVO) -> CenterEmployCardViewModelable
 }
 
 public class ClosedPostVC: BaseViewController {
     
     typealias Cell = CenterEmployCardCell
+    
+    var viewModel: ClosedPostViewModelable?
     
     // View
     let postTableView: UITableView = {
@@ -33,10 +37,10 @@ public class ClosedPostVC: BaseViewController {
     
     let tableHeader = BoardSortigHeaderView()
     
-    let closedPostCardVO: BehaviorRelay<[CenterEmployCardVO]> = .init(value: [])
-    
     // Observable
     private let disposeBag = DisposeBag()
+    
+    let closedPostCardVO: BehaviorRelay<[CenterEmployCardVO]> = .init(value: [])
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -92,6 +96,8 @@ public class ClosedPostVC: BaseViewController {
     
     public func bind(viewModel: ClosedPostViewModelable) {
         
+        self.viewModel = viewModel
+        
         // Output
         viewModel
             .closedPostCardVO?
@@ -119,10 +125,13 @@ extension ClosedPostVC: UITableViewDataSource, UITableViewDelegate {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
-        let vo = closedPostCardVO.value[indexPath.row]
-        let vm = CenterEmployCardVM(vo: vo)
-        cell.bind(viewModel: vm)
         cell.selectionStyle = .none
+        
+        if let viewModel = self.viewModel {
+            let vo = closedPostCardVO.value[indexPath.row]
+            let vm = viewModel.createCellVM(vo: vo)
+            cell.bind(viewModel: vm)
+        }
         return cell
     }
 }

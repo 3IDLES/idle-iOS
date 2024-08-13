@@ -11,6 +11,7 @@ import RxCocoa
 import RxSwift
 import Entity
 import Kingfisher
+import Entity
 
 public struct ApplicantCardRO {
     
@@ -32,7 +33,7 @@ public struct ApplicantCardRO {
         self.expText = expText
     }
     
-    static let mock: ApplicantCardRO = .init(
+    public static let mock: ApplicantCardRO = .init(
         profileUrl: URL(string: "https://dummyimage.com/600x400/00ffbf/0011ff&text=worker+profile"),
         isJobFinding: false,
         isStared: false,
@@ -41,6 +42,18 @@ public struct ApplicantCardRO {
         genderText: "여성",
         expText: "1년차"
     )
+    
+    public static func create(vo: PostApplicantVO) -> ApplicantCardRO {
+        .init(
+            profileUrl: vo.profileUrl,
+            isJobFinding: vo.isJobFinding,
+            isStared: vo.isStared,
+            name: vo.name,
+            ageText: "\(vo.age)세",
+            genderText: vo.gender.twoLetterKoreanWord,
+            expText: vo.expYear == nil ? "신입" : "\(vo.expYear!)년차"
+        )
+    }
 }
 
 public protocol ApplicantCardViewModelable {
