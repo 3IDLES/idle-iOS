@@ -27,16 +27,6 @@ class MyTableView: UITableView {
     }
 }
 
-public protocol CheckApplicantViewModelable {
-    // Input
-    var requestpostApplicantVO: PublishRelay<Void> { get }
-    
-    // Output
-    var postApplicantVO: Driver<[PostApplicantVO]>? { get }
-    var postCardVO: CenterEmployCardVO { get }
-    var alert: Driver<DefaultAlertContentVO>? { get }
-}
-
 public class CheckApplicantVC: BaseViewController {
     
     typealias Cell = ApplicantCardCell
@@ -186,6 +176,11 @@ public class CheckApplicantVC: BaseViewController {
     public func bind(viewModel: CheckApplicantViewModelable) {
         
         self.viewModel = viewModel
+        
+        navigationBar
+            .eventPublisher
+            .bind(to: viewModel.exitButtonClicked)
+            .disposed(by: disposeBag)
         
         postSummaryCard
             .bind(vo: viewModel.postCardVO)
