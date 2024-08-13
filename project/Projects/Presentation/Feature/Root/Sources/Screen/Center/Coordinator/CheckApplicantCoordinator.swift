@@ -13,7 +13,7 @@ import CenterFeature
 import WorkerFeature
 import BaseFeature
 
-public class CheckApplicantCoordinator: ParentCoordinator {
+public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
     
     public var childCoordinators: [any PresentationCore.Coordinator] = []
     
@@ -43,14 +43,20 @@ public class CheckApplicantCoordinator: ParentCoordinator {
     public func start() {
         let vc = CheckApplicantVC()
         let vm = CheckApplicantVM(
-            postCardVO: centerEmployCardVO
+            postCardVO: centerEmployCardVO, 
+            coorindator: self
         )
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
     }
+}
+
+extension CheckApplicantCoordinator {
     
-    public func coordinatorDidFinish() {
+    public func taskFinished() {
+        clearChildren()
+        popViewController()
         parent?.removeChildCoordinator(self)
     }
 }
