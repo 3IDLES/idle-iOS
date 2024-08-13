@@ -164,31 +164,3 @@ extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
 }
-
-// MARK: 카드 뷰에 사용될 ViewModel
-class CenterEmployCardVM: CenterEmployCardViewModelable {
-    
-    // Init
-    var id: String
-    
-    // Output
-    var renderObject: Driver<CenterEmployCardRO>?
-    
-    // Input
-    var cardClicked: PublishRelay<Void> = .init()
-    var checkApplicantBtnClicked: PublishRelay<Void> = .init()
-    var editPostBtnClicked: PublishRelay<Void> = .init()
-    var terminatePostBtnClicked: PublishRelay<Void> = .init()
-    
-    init(vo: CenterEmployCardVO) {
-        self.id = vo.postId
-        
-        // MARK: RenderObject
-        let publishRelay: BehaviorRelay<CenterEmployCardRO> = .init(value: .mock)
-        renderObject = publishRelay.asDriver(onErrorJustReturn: .mock)
-        
-        publishRelay.accept(CenterEmployCardRO.create(vo))
-        
-        // MARK: 버튼 처리
-    }
-}
