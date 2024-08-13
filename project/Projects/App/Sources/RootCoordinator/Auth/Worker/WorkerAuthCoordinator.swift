@@ -1,6 +1,6 @@
 //
 //  WorkerAuthCoordinator.swift
-//  AuthFeature
+//  Idle-iOS
 //
 //  Created by choijunios on 6/30/24.
 //
@@ -11,6 +11,11 @@ import UseCaseInterface
 import AuthFeature
 
 class WorkerAuthCoordinator: ParentCoordinator {
+    
+    struct Dependency {
+        let navigationController: UINavigationController
+        let injector: Injector
+    }
     
     var childCoordinators: [Coordinator] = []
     
