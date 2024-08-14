@@ -9,7 +9,7 @@ import Entity
 
 public protocol RecruitmentManagementCoordinatable: ParentCoordinator {
     
-    func showCheckingApplicantScreen(postId: String, _ centerEmployCardVO: CenterEmployCardVO)
+    func showCheckingApplicantScreen(postId: String)
     func showPostDetailScreenForCenter(postId: String, applicantCount: Int?)
     func showEditScreen(postId: String)
 }

@@ -69,11 +69,11 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
 
 public extension RecruitmentManagementCoordinator {
 
-    func showCheckingApplicantScreen(postId: String, _ centerEmployCardVO: CenterEmployCardVO) {
+    func showCheckingApplicantScreen(postId: String) {
         let coordinator = CheckApplicantCoordinator(
             dependency: .init(
                 navigationController: navigationController,
-                centerEmployCardVO: centerEmployCardVO,
+                centerEmployCardVO: .mock,
                 workerProfileUseCase: workerProfileUseCase
             )
         )

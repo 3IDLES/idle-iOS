@@ -119,7 +119,7 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
                 
-                coordinator?.showCheckingApplicantScreen(postId: id, vo)
+                coordinator?.showCheckingApplicantScreen(postId: id)
             })
             .disposed(by: disposeBag)
         
