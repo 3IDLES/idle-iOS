@@ -129,7 +129,7 @@ public struct RecruitmentPostFetchDTO: Codable {
             let entity = WorkDay.toEntity(text: dayText)
             workTimeAndPay.selectedDays[entity] =  true
         })
-        workTimeAndPay.workEndTime = IdleDateComponent.toEntity(text: startTime)
+        workTimeAndPay.workStartTime = IdleDateComponent.toEntity(text: startTime)
         workTimeAndPay.workEndTime = IdleDateComponent.toEntity(text: endTime)
         workTimeAndPay.paymentType = PaymentType.toEntity(text: payType)
         workTimeAndPay.paymentAmount = String(payAmount)

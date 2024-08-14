@@ -19,6 +19,7 @@ public protocol PostDetailViewModelable:
 {
     
     var workerEmployCardVO: Driver<WorkerEmployCardVO>? { get }
+    var requestDetailFailure: Driver<DefaultAlertContentVO>? { get }
     var applicantCount: Int? { get }
     
     // Input
@@ -35,6 +36,8 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
     // MARK: DetailVC Interaction
     public var applicantCount: Int?
     public var workerEmployCardVO: RxCocoa.Driver<Entity.WorkerEmployCardVO>?
+    public var requestDetailFailure: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    
     public var postEditButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var checkApplicationButtonClicked: RxRelay.PublishRelay<Void> = .init()
@@ -98,6 +101,15 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
         
         let fetchPostDetailSuccess = fetchPostDetailResult.compactMap { $0.value }
         let fetchPostDetailFailure = fetchPostDetailResult.compactMap { $0.error }
+         
+        requestDetailFailure = fetchPostDetailFailure
+            .map({ error in
+                DefaultAlertContentVO(
+                    title: "공고 상세보기 오류",
+                    message: error.message
+                )
+            })
+            .asDriver(onErrorJustReturn: .default)
         
         workerEmployCardVO = fetchPostDetailSuccess
             .map { [weak self] bundle in
@@ -171,13 +183,11 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
                 )
             }
             .asDriver(onErrorJustReturn: .default)
-        
             
         
         postEditButtonClicked
-            .subscribe(onNext: { _ in
-                
-                
+            .subscribe(onNext: { [weak self] _ in
+                self?.coordinator?.showPostEditScreen(postId: id)
             })
             .disposed(by: disposeBag)
         

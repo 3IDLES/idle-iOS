@@ -12,12 +12,9 @@ import Entity
 public protocol RecruitmentPostRepository: RepositoryBase {
     
     // MARK: Center
-    func registerPost(
-        input1: WorkTimeAndPayStateObject,
-        input2: AddressInputStateObject,
-        input3: CustomerInformationStateObject,
-        input4: CustomerRequirementStateObject,
-        input5: ApplicationDetailStateObject
-    ) -> Single<Void>
+    func registerPost(bundle: RegisterRecruitmentPostBundle) -> Single<Void>
+    
     func getPostDetailForCenter(id: String) -> Single<RegisterRecruitmentPostBundle>
+    
+    func editPostDetail(id: String, bundle: RegisterRecruitmentPostBundle) -> Single<Void>
 }

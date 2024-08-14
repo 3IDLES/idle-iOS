@@ -29,14 +29,26 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         
         return convert(
             task: repository.registerPost(
-                input1: inputs.workTimeAndPay,
-                input2: inputs.addressInfo,
-                input3: inputs.customerInformation,
-                input4: inputs.customerRequirement,
-                input5: inputs.applicationDetail
+                bundle: inputs
             )
         )
     }
+    
+    public func editRecruitmentPost(id: String, inputs: Entity.RegisterRecruitmentPostBundle) -> RxSwift.Single<Result<Void, Entity.RecruitmentPostError>> {
+        
+        if inputs.applicationDetail.applyDeadlineType == .untilApplicationFinished {
+            let oneMonthLater = Calendar.current.date(byAdding: .month, value: 1, to: Date())
+            inputs.applicationDetail.deadlineDate = oneMonthLater
+        }
+        
+        return convert(
+            task: repository.editPostDetail(
+                id: id,
+                bundle: inputs
+            )
+        )
+    }
+    
     
     public func getPostDetailForCenter(id: String) -> RxSwift.Single<Result<Entity.RegisterRecruitmentPostBundle, Entity.RecruitmentPostError>> {
         convert(task: repository.getPostDetailForCenter(id: id))

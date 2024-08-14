@@ -280,6 +280,16 @@ public class PostDetailForCenterVC: BaseViewController {
         applyInfoOverView.bind(viewModel: viewModel)
         
         viewModel
+            .requestDetailFailure?
+            .drive(onNext: { [weak self] alertVO in
+                
+                self?.showAlert(vo: alertVO, onClose: {
+                    self?.viewModel?.exitButtonClicked.accept(())
+                })
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
             .workerEmployCardVO?
             .drive(onNext: { [sampleCard] vo in
                 sampleCard.bind(vo: vo)

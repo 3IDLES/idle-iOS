@@ -21,54 +21,85 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         }
     }
     
-    public func registerPost(input1: Entity.WorkTimeAndPayStateObject, input2: Entity.AddressInputStateObject, input3: Entity.CustomerInformationStateObject, input4: Entity.CustomerRequirementStateObject, input5: Entity.ApplicationDetailStateObject) -> RxSwift.Single<Void> {
+    public func registerPost(bundle: RegisterRecruitmentPostBundle) -> RxSwift.Single<Void> {
+        
+        let encodedData = try! JSONEncoder().encode(bundle.toDTO())
+        
+        return service.request(api: .registerPost(postData: encodedData), with: .withToken)
+            .map { _ in () }
+    }
+
+    public func getPostDetailForCenter(id: String) -> RxSwift.Single<Entity.RegisterRecruitmentPostBundle> {
+        
+        service.request(api: .postDetail(id: id, userType: .center), with: .withToken)
+            .map(RecruitmentPostFetchDTO.self)
+            .map { dto in
+                dto.toEntity()
+            }
+    }
+    
+    public func editPostDetail(id: String, bundle: RegisterRecruitmentPostBundle) -> RxSwift.Single<Void> {
+        
+        let encodedData = try! JSONEncoder().encode(bundle.toDTO())
+        
+        return service.request(
+            api: .editPost(id: id, postData: encodedData),
+            with: .withToken
+        ).map { _ in () }
+    }
+}
+
+fileprivate extension RegisterRecruitmentPostBundle {
+    
+    func toDTO() -> RecruitmentPostRegisterDTO {
         
         // WorkTimeAndPayment
         // - all required
-        let weekDays: [String] = input1.selectedDays
+        let weekDays: [String] = workTimeAndPay.selectedDays
             .filter ({ (key, value) in value }).keys
             .map { day in day.dtoFormString }
         
-        let startTime: String = input1.workStartTime!.dtoFormString
-        let endTime: String = input1.workEndTime!.dtoFormString
-        let paymentType: String = input1.paymentType!.dtoFormString
-        let paymentAmount: Int = .init(input1.paymentAmount)!
+        let startTime: String = workTimeAndPay.workStartTime!.dtoFormString
+        let endTime: String = workTimeAndPay.workEndTime!.dtoFormString
+        let paymentType: String = workTimeAndPay.paymentType!.dtoFormString
+        let paymentAmount: Int = .init(workTimeAndPay.paymentAmount)!
         
         // AddressInputStateObject
         // - all required
-        let roadNameAddress: String = input2.addressInfo!.roadAddress
-        let lotNumberAddress: String = input2.addressInfo!.jibunAddress
+        let roadNameAddress: String = addressInfo.addressInfo!.roadAddress
+        let lotNumberAddress: String = addressInfo.addressInfo!.jibunAddress
         
         // CustomerInformationStateObject
         // - required
-        let clientName: String = input3.name
-        let gender: String = input3.gender!.dtoFormString
-        let birthYear: Int = .init(input3.birthYear)!
-        let weight: Int = .init(input3.weight)!
-        let careLevel: Int = input3.careGrade!.dtoFormInt
-        let mentalStatus: String = input3.cognitionState!.dtoFormString
+        let clientName: String = customerInformation.name
+        let gender: String = customerInformation.gender!.dtoFormString
+        let birthYear: Int = .init(customerInformation.birthYear)!
+        let weight: Int? = .init(customerInformation.weight) ?? nil
+        let careLevel: Int = customerInformation.careGrade!.dtoFormInt
+        let mentalStatus: String = customerInformation.cognitionState!.dtoFormString
         // - optional
-        let disease: String = input3.deceaseDescription
+        let disease: String? = customerInformation.deceaseDescription.isEmpty ? nil : customerInformation.deceaseDescription
         
         // CustomerRequirementStateObject
         // - required
-        let isMealAssistance: Bool = input4.mealSupportNeeded!
-        let isBowelAssistance: Bool = input4.toiletSupportNeeded!
-        let isWalkingAssistance: Bool = input4.movingSupportNeeded!
+        let isMealAssistance: Bool = customerRequirement.mealSupportNeeded!
+        let isBowelAssistance: Bool = customerRequirement.toiletSupportNeeded!
+        let isWalkingAssistance: Bool = customerRequirement.movingSupportNeeded!
         // - optional
-        let extraRequirement: String = input4.additionalRequirement
-        let lifeAssistance: [String] = input4.dailySupportTypeNeeds
+        let extraRequirement: String? = customerRequirement.additionalRequirement.isEmpty ? nil  :customerRequirement.additionalRequirement
+        let lifAssistanceList = customerRequirement.dailySupportTypeNeeds
             .filter ({ $1 }).keys
             .map { type in type.dtoFormString }
+        let lifeAssistance: [String] = lifAssistanceList.isEmpty ? ["NONE"] : lifAssistanceList
         
         // ApplicationDetailStateObject
         // - required
-        let isExperiencePreferred = input5.experiencePreferenceType! == .beginnerPossible ? false : true
-        let applyMethod = input5.applyType
+        let isExperiencePreferred = applicationDetail.experiencePreferenceType! == .beginnerPossible ? false : true
+        let applyMethod = applicationDetail.applyType
             .filter ({ $1 }).keys
             .map { type in type.dtoFormString }
-        let applyDeadlineType = input5.applyDeadlineType!.dtoFormString
-        let applyDeadline = input5.deadlineDate!.dtoFormString
+        let applyDeadlineType = applicationDetail.applyDeadlineType!.dtoFormString
+        let applyDeadline = applicationDetail.deadlineDate!.dtoFormString
         
         let dto = RecruitmentPostRegisterDTO(
             isMealAssistance: isMealAssistance,
@@ -95,20 +126,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             applyDeadline: applyDeadline,
             applyDeadlineType: applyDeadlineType
         )
-        
-        let encodedData = try! JSONEncoder().encode(dto)
-        
-        return service.request(api: .registerPost(postData: encodedData), with: .withToken)
-            .map { _ in () }
-    }
-    
-    public func getPostDetailForCenter(id: String) -> RxSwift.Single<Entity.RegisterRecruitmentPostBundle> {
-        
-        service.request(api: .postDetail(id: id, userType: .center), with: .withToken)
-            .map(RecruitmentPostFetchDTO.self)
-            .map { dto in
-                dto.toEntity()
-            }
+        return dto
     }
 }
 
