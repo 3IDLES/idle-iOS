@@ -31,19 +31,14 @@ public protocol RegisterRecruitmentPostViewModelable:
     CustomerRequirementContentVMable,
     WorkTimeAndPayContentVMable,
     AddressInputViewContentVMable,
-    WorkerCardViewModelable,
-    DefaultAlertOutputable
+    DefaultAlertOutputable,
+
+    // 오버뷰와 수정화면의 뷰컨트롤러 요구사항
+    EditPostViewModelable,
+    PostOverviewViewModelable
 {
-    /// 현재 유효한 값으로 공고를 등록할 것을 요청합니다.
-    func requestRegisterPost()
-    /// 공고등록에 성공한 경우 해당 이벤트를 전달 받습니다
-    var postRegistrationSuccess: Driver<Void> { get }
-    /// 유효한 값을 가져옵니다.
-    func fetchFromState()
-    /// 수정중인 값을 API를 사용하여 전송할 값(State)에 반영합니다.
-    func updateToState()
-    /// 모든 입력이 유효한지 확인하고 유효하지 않은 첫번째 섹션의 Alert정보를 반환합니다.
-    func allInputsValid() -> Single<DefaultAlertContentVO?>
+    /// 코디네이터
+    var registerRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable? { get }
 }
 
 public class RegisterRecruitmentPostVC: BaseViewController {
@@ -51,7 +46,6 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     // Init
     
     // Not Init
-    weak var coordinator: RegisterRecruitmentCoordinator?
     
     /// 현재 스크린의 넓이를 의미합니다.
     private var screenWidth: CGFloat {
@@ -226,7 +220,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
         } else {
             
             // 오버뷰화면으로 이동
-            coordinator?.showOverViewScreen()
+            viewModel?.registerRecruitmentPostCoordinator?.showOverViewScreen()
         }
     }
     
@@ -249,7 +243,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
         } else {
             
             // 돌아가기, Coordinator호출
-            coordinator?.registerFinished()
+            viewModel?.registerRecruitmentPostCoordinator?.registerFinished()
         }
     }
     

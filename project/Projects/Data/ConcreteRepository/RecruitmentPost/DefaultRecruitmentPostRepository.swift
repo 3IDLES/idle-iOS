@@ -13,9 +13,13 @@ import Foundation
 
 public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     
-    let service: RecruitmentPostService = .init()
+    private var service: RecruitmentPostService = .init()
     
-    public init() { }
+    public init(_ store: KeyValueStore? = nil) {
+        if let store {
+            self.service = RecruitmentPostService(keyValueStore: store)
+        }
+    }
     
     public func registerPost(input1: Entity.WorkTimeAndPayStateObject, input2: Entity.AddressInputStateObject, input3: Entity.CustomerInformationStateObject, input4: Entity.CustomerRequirementStateObject, input5: Entity.ApplicationDetailStateObject) -> RxSwift.Single<Void> {
         

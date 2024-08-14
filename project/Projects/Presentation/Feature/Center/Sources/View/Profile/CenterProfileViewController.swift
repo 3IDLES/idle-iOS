@@ -453,7 +453,7 @@ public class CenterProfileViewController: BaseViewController {
         }
         
         output
-            .alert
+            .alert?
             .drive { [weak self] vo in
                 self?.showAlert(vo: vo)
             }

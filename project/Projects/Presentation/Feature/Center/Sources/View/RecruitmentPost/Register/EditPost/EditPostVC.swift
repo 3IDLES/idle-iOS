@@ -13,10 +13,17 @@ import RxSwift
 import Entity
 import DSKit
 
-public protocol CheckAllPostInputValidation {
-    
-    var requestAllInputValidation: PublishRelay<Void> { get }
-    var validationResultWithAlert: Driver<DefaultAlertContentVO?>? { get }
+public protocol EditPostViewModelable: AnyObject,
+    ApplicationDetailContentVMable,
+    CustomerInformationContentVMable,
+    CustomerRequirementContentVMable,
+    WorkTimeAndPayContentVMable,
+    AddressInputViewContentVMable
+{
+    var editPostCoordinator: EditPostCoordinator? { get set }
+    var editViewExitButtonClicked: PublishRelay<Void> { get }
+    var saveButtonClicked: PublishRelay<Void> { get }
+    var requestSaveFailure: Driver<DefaultAlertContentVO>? { get }
 }
 
 public class EditPostVC: BaseViewController {
@@ -262,41 +269,26 @@ public class EditPostVC: BaseViewController {
     }
     
     private func setObservable() {
-        
-        navigationBar
-            .eventPublisher
-            .subscribe(onNext: {  [weak self] _ in
-                self?.navigationController?.popViewController(animated: true)
-            })
-            .disposed(by: disposeBag)
     }
     
-    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
+    public func bind(viewModel: EditPostViewModelable) {
         
         editingCompleteButton
             .eventPublisher
-            .subscribe { [weak self, viewModel] _ in
+            .bind(to: viewModel.saveButtonClicked)
+            .disposed(by: disposeBag)
+        
+        navigationBar
+            .eventPublisher
+            .bind(to: viewModel.editViewExitButtonClicked)
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .requestSaveFailure?
+            .drive(onNext: { [weak self] alertVO in
                 
-                guard let self else { return }
-                
-                viewModel
-                    .allInputsValid()
-                    .subscribe  (onSuccess: { [weak self, viewModel] vo in
-                        
-                        guard let self else { return }
-                        
-                        if let alertVO = vo {
-                            
-                            showAlert(vo: alertVO)
-                            
-                        } else {
-                            /// 저장하기 버튼을 누른 경우 값을 업데이트 합니다.
-                            viewModel.updateToState()
-                            navigationController?.popViewController(animated: true)
-                        }
-                    })
-                    .disposed(by: disposeBag)
-            }
+                self?.showAlert(vo: alertVO)
+            })
             .disposed(by: disposeBag)
         
         workTimeAndPaymentEditView.bind(viewModel: viewModel)
