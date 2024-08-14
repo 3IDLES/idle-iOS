@@ -13,15 +13,6 @@ import DSKit
 import Entity
 import BaseFeature
 
-public protocol WorkerProfileViewModelable {
-    
-    // Input
-    var viewWillAppear: PublishRelay<Void> { get }
-    
-    // Output
-    var profileRenderObject: Driver<WorkerProfileRenderObject>? { get }
-}
-
 public class WorkerProfileViewController: DisposableViewController {
     
     private var viewModel: (any WorkerProfileViewModelable)?
@@ -172,7 +163,6 @@ public class WorkerProfileViewController: DisposableViewController {
         
         setApearance()
         setAutoLayout()
-        setObservable()
     }
     
     public required init?(coder: NSCoder) {
@@ -362,6 +352,7 @@ public class WorkerProfileViewController: DisposableViewController {
         
         self.viewModel = viewModel
         
+        // Input
         profileEditButton
             .eventPublisher
             .observe(on: MainScheduler.instance)
@@ -373,13 +364,18 @@ public class WorkerProfileViewController: DisposableViewController {
             })
             .disposed(by: disposeBag)
         
-        // Input
+        navigationBar
+            .eventPublisher
+            .bind(to: viewModel.exitButtonClicked)
+            .disposed(by: disposeBag)
+        
         self.rx
             .viewWillAppear
             .filter { $0 }
             .map { _ in () }
             .bind(to: viewModel.viewWillAppear)
             .disposed(by: disposeBag)
+
         
         // Output
         viewModel

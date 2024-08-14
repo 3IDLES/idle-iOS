@@ -13,7 +13,22 @@ import DSKit
 import Entity
 import UseCaseInterface
 
+public protocol WorkerProfileViewModelable {
+    
+    var coordinator: WorkerProfileCoordinator? { get }
+    
+    // Input
+    var viewWillAppear: PublishRelay<Void> { get }
+    var exitButtonClicked: PublishRelay<Void> { get }
+    
+    // Output
+    var profileRenderObject: Driver<WorkerProfileRenderObject>? { get }
+}
+
+
 public class WorkerProfileViewModel: WorkerProfileViewModelable {
+    
+    public weak var coordinator: WorkerProfileCoordinator?
     
     let workerProfileUseCase: WorkerProfileUseCase
     
@@ -22,6 +37,7 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
     
     // Input(Rendering)
     public var viewWillAppear: PublishRelay<Void> = .init()
+    public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
     // Output
     var uploadSuccess: Driver<Void>?
@@ -37,8 +53,13 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
     
     let disposbag: DisposeBag = .init()
     
-    public init(workerProfileUseCase: WorkerProfileUseCase, workerId: String) {
+    public init(
+        coordinator: WorkerProfileCoordinator?,
+        workerProfileUseCase: WorkerProfileUseCase,
+        workerId: String
+    ) {
         
+        self.coordinator = coordinator
         self.workerProfileUseCase = workerProfileUseCase
         self.workerId = workerId
         
@@ -65,6 +86,12 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
                 
                 return vo
             }
+        
+        exitButtonClicked
+            .subscribe(onNext: { [weak self] in
+                self?.coordinator?.coordinatorDidFinish()
+            })
+            .disposed(by: disposbag)
         
         fetchedProfileVOSuccess
             .asObservable()

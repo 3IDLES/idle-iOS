@@ -15,6 +15,8 @@ import UseCaseInterface
 
 public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     
+    public weak var coordinator: WorkerProfileCoordinator?
+    
     let workerProfileUseCase: WorkerProfileUseCase
     
     // Input(Editing)
@@ -28,6 +30,8 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     
     // Input(Rendering)
     public var viewWillAppear: PublishRelay<Void> = .init()
+    
+    public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
     // Output
     var uploadSuccess: Driver<Void>?
@@ -43,8 +47,12 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     
     let disposbag: DisposeBag = .init()
     
-    public init(workerProfileUseCase: WorkerProfileUseCase) {
+    public init(
+        coordinator: WorkerProfileCoordinator?,
+        workerProfileUseCase: WorkerProfileUseCase
+    ) {
         
+        self.coordinator = coordinator
         self.workerProfileUseCase = workerProfileUseCase
         
         // Input(Rendering)
@@ -78,6 +86,12 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
                 WorkerProfileRenderObject.createRO(isMyProfile: true, vo: vo)
             })
             .bind(to: rederingState)
+            .disposed(by: disposbag)
+        
+        exitButtonClicked
+            .subscribe(onNext: { [weak self] in
+                self?.coordinator?.coordinatorDidFinish()
+            })
             .disposed(by: disposbag)
         
         
