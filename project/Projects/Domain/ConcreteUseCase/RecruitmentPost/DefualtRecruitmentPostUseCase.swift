@@ -35,12 +35,10 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
                 input4: inputs.customerRequirement,
                 input5: inputs.applicationDetail
             )
-            .map({ _ in Void() }) ) { [unowned self] error in
-                toDomainError(error: error)
-        }
+        )
     }
     
     public func getPostDetailForCenter(id: String) -> RxSwift.Single<Result<Entity.RegisterRecruitmentPostBundle, Entity.RecruitmentPostError>> {
-        <#code#>
+        convert(task: repository.getPostDetailForCenter(id: id))
     }
 }

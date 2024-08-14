@@ -20,13 +20,11 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
     }
     
     public func getProfile(mode: ProfileMode) -> Single<Result<CenterProfileVO, UserInfoError>> {
-        convert(task: repository.getCenterProfile(mode: mode)) { [unowned self] error in
-            toDomainError(error: error)
-        }
+        convert(task: repository.getCenterProfile(mode: mode))
     }
     
     public func updateProfile(phoneNumber: String?, introduction: String?, imageInfo: ImageUploadInfo?) -> Single<Result<Void, UserInfoError>> {
-
+        
         var updateText: Single<Void>!
         var updateImage: Single<Void>!
         
@@ -61,7 +59,7 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
                 }
                 return .error(error)
             }
-          
+        
         let uploadImageResult = updateImage
             .catch { error in
                 if let httpExp = error as? HTTPResponseException {
@@ -84,9 +82,7 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
             .map { _ in () }
             .asSingle()
         
-        return convert(task: task) { [unowned self] error in
-            toDomainError(error: error)
-        }
+        return convert(task: task)
     }
     
     public func registerCenterProfile(state: CenterProfileRegisterState) -> Single<Result<Void, UserInfoError>> {
@@ -140,8 +136,6 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
             .map { _ in () }
             .asSingle()
         
-        return convert(task: task) { [unowned self] error in
-            toDomainError(error: error)
-        }
+        return convert(task: task)
     }
 }
