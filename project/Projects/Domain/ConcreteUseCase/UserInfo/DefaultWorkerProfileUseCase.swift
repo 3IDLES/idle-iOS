@@ -20,9 +20,7 @@ public class DefaultWorkerProfileUseCase: WorkerProfileUseCase {
     }
     
     public func getProfile(mode: ProfileMode) -> Single<Result<WorkerProfileVO, UserInfoError>> {
-        convert(task: repository.getWorkerProfile(mode: mode)) { [unowned self] error in
-            toDomainError(error: error)
-        }
+        convert(task: repository.getWorkerProfile(mode: mode))
     }
     
     public func updateProfile(stateObject: WorkerProfileStateObject, imageInfo: ImageUploadInfo?) -> Single<Result<Void, UserInfoError>> {
@@ -79,8 +77,6 @@ public class DefaultWorkerProfileUseCase: WorkerProfileUseCase {
             .map { _ in () }
             .asSingle()
         
-        return convert(task: task) { [unowned self] error in
-            toDomainError(error: error)
-        }
+        return convert(task: task)
     }
 }

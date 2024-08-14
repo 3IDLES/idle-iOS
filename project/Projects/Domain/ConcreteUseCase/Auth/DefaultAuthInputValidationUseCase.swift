@@ -30,9 +30,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         convert(task: self.repository
             .requestPhoneNumberAuthentication(phoneNumber: phoneNumber)
             .map { _ in phoneNumber }
-        ) { [unowned self] error in
-            toDomainError(error: error)
-        }
+        )
     }
     
     public func checkPhoneNumberIsValid(phoneNumber: String) -> Bool {
@@ -46,9 +44,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         convert(task: repository
             .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
             .map({ _ in phoneNumber })
-        ) { [unowned self] error in
-            toDomainError(error: error)
-        }
+        )
     }
     
     // MARK: 사업자 번호 인증
@@ -56,9 +52,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         convert(task: repository
             .requestBusinessNumberAuthentication(businessNumber: businessNumber)
             .map({ vo in (businessNumber, vo) })
-        ) { [unowned self] error in
-            toDomainError(error: error)
-        }
+        )
     }
     
     public func checkBusinessNumberIsValid(businessNumber: String) -> Bool {
@@ -80,9 +74,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         convert(task: repository
             .requestCheckingIdDuplication(id: id)
             .map({ _ in id })
-        ) { [unowned self] error in
-            toDomainError(error: error)
-        }
+        )
     }
     
     public func checkPasswordIsValid(password: String) -> Bool {
