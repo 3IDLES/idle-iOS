@@ -18,11 +18,18 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
         weak var parent: CenterMainCoordinatable?
         let navigationController: UINavigationController
         let workerProfileUseCase: WorkerProfileUseCase
+        let recruitmentPostUseCase: RecruitmentPostUseCase
         
-        public init(parent: CenterMainCoordinatable? = nil, navigationController: UINavigationController, workerProfileUseCase: WorkerProfileUseCase) {
+        public init(
+            parent: CenterMainCoordinatable? = nil,
+            navigationController: UINavigationController,
+            workerProfileUseCase: WorkerProfileUseCase,
+            recruitmentPostUseCase: RecruitmentPostUseCase
+        ) {
             self.parent = parent
             self.navigationController = navigationController
             self.workerProfileUseCase = workerProfileUseCase
+            self.recruitmentPostUseCase = recruitmentPostUseCase
         }
     }
     
@@ -35,6 +42,7 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
     public weak var parent: CenterMainCoordinatable?
     
     let workerProfileUseCase: WorkerProfileUseCase
+    let recruitmentPostUseCase: RecruitmentPostUseCase
     
     public init(
         dependency: Dependency
@@ -42,6 +50,7 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
         self.parent = dependency.parent
         self.navigationController = dependency.navigationController
         self.workerProfileUseCase = dependency.workerProfileUseCase
+        self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
     }
     
     public func start() {
@@ -60,12 +69,27 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
 
 public extension RecruitmentManagementCoordinator {
 
-    func showCheckingApplicantScreen(_ centerEmployCardVO: CenterEmployCardVO) {
+    func showCheckingApplicantScreen(postId: String, _ centerEmployCardVO: CenterEmployCardVO) {
         let coordinator = CheckApplicantCoordinator(
             dependency: .init(
                 navigationController: navigationController,
                 centerEmployCardVO: centerEmployCardVO,
                 workerProfileUseCase: workerProfileUseCase
+            )
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
+    }
+    
+    func showPostDetailScreenForCenter(postId: String, applicantCount: Int?) {
+        
+        let coordinator = PostDetailForCenterCoordinator(
+            dependency: .init(
+                postId: postId,
+                applicantCount: applicantCount,
+                navigationController: navigationController,
+                recruitmentPostUseCase: recruitmentPostUseCase
             )
         )
         addChildCoordinator(coordinator)

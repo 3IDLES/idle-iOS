@@ -13,16 +13,11 @@ import RxSwift
 import Entity
 import DSKit
 
-public struct KeyValueListViewComponent {
-    public let title: String
-    public let valueLabelView: IdleLabel
-    public let subValue: String?
+
+public protocol CustomerInformationDisplayingVMable {
     
-    public init(title: String, valueLabelView: IdleLabel, subValue: String? = nil) {
-        self.title = title
-        self.valueLabelView = valueLabelView
-        self.subValue = subValue
-    }
+    var casting_customerInformation: Driver<CustomerInformationStateObject> { get }
+    var casting_customerRequirement: Driver<CustomerRequirementStateObject> { get }
 }
 
 public class CustomerInformationDisplayingView: VStack {
@@ -207,7 +202,7 @@ public class CustomerInformationDisplayingView: VStack {
 
 public extension CustomerInformationDisplayingView {
     
-    func bind(viewModel: CustomerInformationContentVMable & CustomerRequirementContentVMable) {
+    func bind(viewModel: CustomerInformationDisplayingVMable) {
         
         viewModel
             .casting_customerInformation
@@ -254,5 +249,17 @@ public extension CustomerInformationDisplayingView {
                 additionalTextLabel.textString = object.additionalRequirement
             })
             .disposed(by: disposeBag)
+    }
+}
+
+struct KeyValueListViewComponent {
+    public let title: String
+    public let valueLabelView: IdleLabel
+    public let subValue: String?
+    
+    public init(title: String, valueLabelView: IdleLabel, subValue: String? = nil) {
+        self.title = title
+        self.valueLabelView = valueLabelView
+        self.subValue = subValue
     }
 }

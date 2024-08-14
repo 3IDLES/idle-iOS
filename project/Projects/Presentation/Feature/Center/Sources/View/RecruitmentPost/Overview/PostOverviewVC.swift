@@ -13,6 +13,8 @@ import RxSwift
 import Entity
 import DSKit
 
+public typealias PostDetailDisplayingViewModelable = ApplicationDetailDisplayingVMable & CustomerInformationDisplayingVMable & WorkConditionDisplayingVMable
+
 public protocol PostOverviewViewModelable:
     AnyObject,
     ApplicationDetailContentVMable,
@@ -20,7 +22,8 @@ public protocol PostOverviewViewModelable:
     CustomerRequirementContentVMable,
     WorkTimeAndPayContentVMable,
     AddressInputViewContentVMable,
-    DefaultAlertOutputable
+    DefaultAlertOutputable,
+    PostDetailDisplayingViewModelable
 {
     
     var postOverviewCoordinator: PostOverviewCoordinator? { get set }
@@ -302,7 +305,7 @@ public class PostOverviewVC: BaseViewController {
             .disposed(by: disposeBag)
     }
     
-    public func bind(viewModel: PostOverviewViewModelable) {
+    func bind(viewModel: PostOverviewViewModelable) {
         
         self.viewModel = viewModel
         

@@ -73,7 +73,8 @@ class CenterMainCoordinator: CenterMainCoordinatable {
                 dependency: .init(
                     parent: self,
                     navigationController: navigationController,
-                    workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
+                    workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self), 
+                    recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
                 )
             )
             
@@ -123,9 +124,13 @@ extension CenterMainCoordinator {
     /// 공고등록창을 표시합니다.
     func registerRecruitmentPost() {
         
-        let coordinator = RegisterRecruitmentPostCoordinator(dependency: .init(
-            navigationController: navigationController,
-            injector: injector)
+        let coordinator = RegisterRecruitmentPostCoordinator(
+            dependency: .init(
+                navigationController: navigationController,
+                recruitmentPostUseCase: injector.resolve(
+                    RecruitmentPostUseCase.self
+                )
+            )
         )
         coordinator.parent = self
         addChildCoordinator(coordinator)

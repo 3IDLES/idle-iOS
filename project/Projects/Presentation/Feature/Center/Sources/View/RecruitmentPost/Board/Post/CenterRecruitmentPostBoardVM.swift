@@ -117,7 +117,17 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
         // MARK: 버튼 처리
         checkApplicantBtnClicked
             .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.showCheckingApplicantScreen(vo)
+                guard let self else { return }
+                
+                coordinator?.showCheckingApplicantScreen(postId: id, vo)
+            })
+            .disposed(by: disposeBag)
+        
+        cardClicked
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                
+                coordinator?.showPostDetailScreenForCenter(postId: id, applicantCount: vo.applicantCount)
             })
             .disposed(by: disposeBag)
     }

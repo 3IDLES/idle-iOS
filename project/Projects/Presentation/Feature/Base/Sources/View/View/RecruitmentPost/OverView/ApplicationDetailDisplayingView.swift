@@ -13,6 +13,11 @@ import RxSwift
 import Entity
 import DSKit
 
+public protocol ApplicationDetailDisplayingVMable {
+    
+    var casting_applicationDetail: Driver<ApplicationDetailStateObject> { get }
+}
+
 public class ApplicationDetailDisplayingView: HStack {
     
     // Init
@@ -101,7 +106,7 @@ public class ApplicationDetailDisplayingView: HStack {
 public extension ApplicationDetailDisplayingView {
     
     /// ViewModelType: ApplicationDetailContentVMable
-    func bind(viewModel: ApplicationDetailContentVMable) {
+    func bind(viewModel: ApplicationDetailDisplayingVMable) {
         
         viewModel
             .casting_applicationDetail
