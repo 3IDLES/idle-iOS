@@ -269,7 +269,7 @@ public extension CenterProfileViewModel {
         // 요구사항 X
         public var editingValidation: Driver<Void>
         
-        public var alert: Driver<DefaultAlertContentVO>
+        public var alert: Driver<DefaultAlertContentVO>?
         
         init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, displayingImage: Driver<UIImage?>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>, alert: Driver<DefaultAlertContentVO>) {
             self.centerName = centerName

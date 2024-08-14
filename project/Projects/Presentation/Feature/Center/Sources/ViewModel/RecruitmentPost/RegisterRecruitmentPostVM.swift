@@ -36,12 +36,28 @@ public enum RegisterRecruitmentPostInputSection: CaseIterable {
 }
 
 public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
-    
+
     //Init
     let recruitmentPostUseCase: RecruitmentPostUseCase
+    public weak var registerRecruitmentPostCoordinator: (any PresentationCore.RegisterRecruitmentPostCoordinatable)?
+    
+    // MARK: Edit Screen
+    public weak var editPostCoordinator: EditPostCoordinator?
+    public var editViewExitButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var saveButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var requestSaveFailure: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    
+    // MARK: OverView Screen
+    public weak var postOverviewCoordinator: PostOverviewCoordinator?
+    public var postEditButtonClicked: PublishRelay<Void> = .init()
+    public var overViewExitButtonClicked: PublishRelay<Void> = .init()
+    public var registerButtonClicked: PublishRelay<Void> = .init()
+    public var overViewWillAppear: RxRelay.PublishRelay<Void> = .init()
+    
+    public let workerEmployCardVO: Driver<WorkerEmployCardVO>?
     
     // MARK: register request
-    public var postRegistrationSuccess: Driver<Void>
+    public var postRegistrationSuccess: Driver<Void>?
     
     // MARK: State
     var state_workTimeAndPay: WorkTimeAndPayStateObject = .init()
@@ -110,14 +126,9 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var applicationDetailViewNextable: Driver<Bool>
     
     
-    // MARK: PostCard
-    public let workerEmployCardVO: Driver<WorkerEmployCardVO>
-    
     // MARK: Alert
-    public var alert: Driver<Entity.DefaultAlertContentVO>
+    public var alert: Driver<Entity.DefaultAlertContentVO>?
     
-    // MARK: 공고등록 요청 결과
-    private let requestRegistrationResult = PublishRelay<Result<Void, RecruitmentPostError>>()
     
     // MARK: 모든 섹션의 유효성 확인
     private let validationStateQueue = DispatchQueue.global(qos: .userInteractive)
@@ -132,8 +143,11 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     // 옵셔널한 입력을 유지합니다.
     let disposeBag = DisposeBag()
     
-    public init(recruitmentPostUseCase: RecruitmentPostUseCase) {
-        
+    public init(
+        registerRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable,
+        recruitmentPostUseCase: RecruitmentPostUseCase
+    ) {
+        self.registerRecruitmentPostCoordinator = registerRecruitmentPostCoordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         
         // MARK: Work time and pay
@@ -369,7 +383,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         applicationDetailViewNextable = applicationDetailInputValidation.asDriver(onErrorJustReturn: false)
         
-        // MARK: PostCard
+        // MARK: ----- Over view -----
+        
         workerEmployCardVO = Observable<WorkerEmployCardVO>
             .create { [
                 editing_workTimeAndPay,
@@ -444,16 +459,86 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 return Disposables.create { }
             }
             .asDriver(onErrorJustReturn: .mock)
+        
+        overViewWillAppear
+            .subscribe(onNext: { [weak self] _ in
+                // OverView가 나타날때 마다 상태를 업데이트 합니다.
+                self?.fetchFromState()
+            })
+            .disposed(by: disposeBag)
+        
+        postEditButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                self?.registerRecruitmentPostCoordinator?.showEditPostScreen()
+            })
+            .disposed(by: disposeBag)
+        
+        overViewExitButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                self?.postOverviewCoordinator?.coordinatorDidFinish()
+            })
+            .disposed(by: disposeBag)
+        
 
+        // MARK: ----- Edit -----
+        editViewExitButtonClicked
+            .subscribe(onNext: { [weak self] in
+                self?.editPostCoordinator?.coordinatorDidFinish()
+            })
+            .disposed(by: disposeBag)
         
+        let requestSaveResult = saveButtonClicked
+            .flatMap { [weak self] _ in
+                self?.allInputsValid() ?? .just(.default)
+            }
+            .share()
         
-        let shareResult = requestRegistrationResult.share()
+        let requestSaveSuccess = requestSaveResult.filter { $0 == nil }
         
-        postRegistrationSuccess = shareResult
+        requestSaveSuccess
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                updateToState()
+                
+                // 저장이 성공적으로 완료되어 코디네이터와 뷰컨트롤러 종료
+                editPostCoordinator?.coordinatorDidFinish()
+            })
+            .disposed(by: disposeBag)
+        
+        self.requestSaveFailure = requestSaveResult
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: .default)
+            
+        
+        // MARK: -----------------
+        let registerPostResult = registerButtonClicked
+            .flatMap { [weak self] _ -> Single<Result<Void, RecruitmentPostError>> in
+                guard let self else { return .never() }
+                
+                // 공고를 등록합니다.
+                let inputs = RegisterRecruitmentPostBundle(
+                    workTimeAndPay: state_workTimeAndPay,
+                    customerRequirement: state_customerRequirement,
+                    customerInformation: state_customerInformation,
+                    applicationDetail: state_applicationDetail,
+                    addressInfo: state_addressInfo
+                )
+                
+                return recruitmentPostUseCase
+                    .registerRecruitmentPost(inputs: inputs)
+            }
+            .share()
+        
+        // 공고 등록 성공
+        registerPostResult
             .compactMap { $0.value }
-            .asDriver(onErrorRecover: { error in fatalError() })
+            .subscribe { [weak self] _ in
+                self?.registerRecruitmentPostCoordinator?.showRegisterCompleteScreen()
+            }
+            .disposed(by: disposeBag)
+            
         
-        let requestRegistrationFailure = shareResult
+        let requestRegistrationFailure = registerPostResult
             .compactMap { $0.error }
         
         alert = requestRegistrationFailure
@@ -484,7 +569,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 })
             )
             .subscribe { [weak self] inputSection, isValid in
-                self?.validationStateQueue.async { [weak self] in
+                self?.validationStateQueue.sync { [weak self] in
                     self?.validationState[inputSection] = isValid
                 }
             }
@@ -505,10 +590,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 for (key, value) in validationState {
                     
                     if !value {
-                        single(.success(.init(
-                            title: "입력 정보 오류",
-                            message: key.alertMessaage
-                        )))
+                        single(.success(.init(title: "입력 정보 오류", message: key.alertMessaage)))
                     }
                 }
                 
@@ -535,23 +617,5 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         state_customerInformation = editing_customerInformation.value.copy() as! CustomerInformationStateObject
         state_applicationDetail = editing_applicationDetail.value.copy() as! ApplicationDetailStateObject
         state_addressInfo = editing_addressInfo.value.copy() as! AddressInputStateObject
-    }
-    
-    public func requestRegisterPost() {
-        
-        // 공고를 등록합니다.
-        let inputs = RegisterRecruitmentPostBundle(
-            workTimeAndPay: state_workTimeAndPay,
-            customerRequirement: state_customerRequirement,
-            customerInformation: state_customerInformation,
-            applicationDetail: state_applicationDetail,
-            addressInfo: state_addressInfo
-        )
-        
-        recruitmentPostUseCase
-            .registerRecruitmentPost(inputs: inputs)
-            .asObservable()
-            .bind(to: requestRegistrationResult)
-            .disposed(by: disposeBag)
     }
 }

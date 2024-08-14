@@ -10,5 +10,5 @@ import RxCocoa
 
 public protocol DefaultAlertOutputable {
     
-    var alert: Driver<DefaultAlertContentVO> { get }
+    var alert: Driver<DefaultAlertContentVO>? { get }
 }

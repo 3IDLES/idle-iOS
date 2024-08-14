@@ -13,8 +13,30 @@ import RxSwift
 import Entity
 import DSKit
 
-public protocol WorkerCardViewModelable {
-    var workerEmployCardVO: Driver<WorkerEmployCardVO> { get }
+public protocol PostOverviewViewModelable:
+    AnyObject,
+    ApplicationDetailContentVMable,
+    CustomerInformationContentVMable,
+    CustomerRequirementContentVMable,
+    WorkTimeAndPayContentVMable,
+    AddressInputViewContentVMable,
+    DefaultAlertOutputable
+{
+    
+    var postOverviewCoordinator: PostOverviewCoordinator? { get set }
+    
+    /// 공고등록에 성공한 경우 해당 이벤트를 전달 받습니다
+    var workerEmployCardVO: Driver<WorkerEmployCardVO>? { get }
+    
+    /// 유효한 값을 가져옵니다.
+    func fetchFromState()
+    /// 수정중인 값을 API를 사용하여 전송할 값(State)에 반영합니다.
+    func updateToState()
+    
+    var postEditButtonClicked: PublishRelay<Void> { get }
+    var overViewExitButtonClicked: PublishRelay<Void> { get }
+    var registerButtonClicked: PublishRelay<Void> { get }
+    var overViewWillAppear: PublishRelay<Void> { get }
 }
 
 public class PostOverviewVC: BaseViewController {
@@ -22,9 +44,7 @@ public class PostOverviewVC: BaseViewController {
     // Init
     
     // Not init
-    weak var coordinator: PostOverviewCoordinator?
-    
-    var viewModel: RegisterRecruitmentPostViewModelable?
+    var viewModel: PostOverviewViewModelable?
     
     // View
     let backButton: UIButton = {
@@ -274,78 +294,57 @@ public class PostOverviewVC: BaseViewController {
     }
     
     private func setObservable() {
-        backButton.rx.tap
-            .subscribe(onNext: { [coordinator] _ in
-                
-                coordinator?.backToEditScreen()
-            })
-            .disposed(by: disposeBag)
-        
-        postEditButton.eventPublisher
-            .subscribe(onNext: { [weak self] _ in
-                
-                guard let self, let vm = viewModel else { return }
-                
-                let vc = EditPostVC()
-                vc.bind(viewModel: vm)
-                self.navigationController?.pushViewController(
-                    vc,
-                    animated: true)
-            })
-            .disposed(by: disposeBag)
-    }
-    
-    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
-        
-        self.viewModel = viewModel
-        
-        // 공고등록 요청
         executeRegisterButton
             .rx.tap
             .subscribe { [weak self] _ in
-                
-                guard let self else { return }
-                
-                // 공고 등록중 인터렉션 비활성화
-                view.isUserInteractionEnabled = false
-                viewModel.requestRegisterPost()
+                self?.view.isUserInteractionEnabled = false
             }
             .disposed(by: disposeBag)
+    }
+    
+    public func bind(viewModel: PostOverviewViewModelable) {
         
+        self.viewModel = viewModel
         
         // 앞전까지 입력한 정보를 저장합니다.
         viewModel.updateToState()
         
-        // 화면이 등장할 때마다 유효한 상태를 불러옵니다.
-        self.rx.viewWillAppear
-            .subscribe { [viewModel, sampleCard] _ in
-                viewModel.fetchFromState()
-                
-                // 예시카드 바인딩
-                let disposable = viewModel
-                    .workerEmployCardVO
-                    .drive(onNext: { [sampleCard] vo in
-                        sampleCard.bind(vo: vo)
-                    })
-                disposable.dispose()
-            }
+        // 공고등록 요청
+        executeRegisterButton
+            .rx.tap
+            .bind(to: viewModel.registerButtonClicked)
             .disposed(by: disposeBag)
         
+        // 나가기
+        backButton.rx.tap
+            .bind(to: viewModel.overViewExitButtonClicked)
+            .disposed(by: disposeBag)
+        
+        // 수정화면으로 이동
+        postEditButton.eventPublisher
+            .bind(to: viewModel.postEditButtonClicked)
+            .disposed(by: disposeBag)
+        
+        // 화면이 등장할 때마다 유효한 상태를 불러옵니다.
+        self.rx.viewWillAppear
+            .map({ _ in })
+            .bind(to: viewModel.overViewWillAppear)
+            .disposed(by: disposeBag)
+        
+        // Ouptut
         workConditionOV.bind(viewModel: viewModel)
         customerInfoOV.bind(viewModel: viewModel)
         applyInfoOverView.bind(viewModel: viewModel)
         
-        // Ouptut
-        // 공고등록성공 수신
         viewModel
-            .postRegistrationSuccess
-            .drive(onNext: { [coordinator] _ in
-                coordinator?.showCompleteScreen()
+            .workerEmployCardVO?
+            .drive(onNext: { [sampleCard] vo in
+                sampleCard.bind(vo: vo)
             })
             .disposed(by: disposeBag)
-        
+
         viewModel
-            .alert
+            .alert?
             .drive(onNext: { [weak self] vo in
                 guard let self else { return }
                 view.isUserInteractionEnabled = true

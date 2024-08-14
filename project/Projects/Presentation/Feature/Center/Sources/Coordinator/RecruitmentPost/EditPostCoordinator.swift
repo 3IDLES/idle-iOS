@@ -1,8 +1,8 @@
 //
-//  PostOverviewCoordinator.swift
+//  EditPostCoordinator.swift
 //  CenterFeature
 //
-//  Created by choijunios on 8/5/24.
+//  Created by choijunios on 8/14/24.
 //
 
 import UIKit
@@ -10,38 +10,39 @@ import PresentationCore
 import UseCaseInterface
 import Entity
 
-public class PostOverviewCoordinator: ChildCoordinator {
+public class EditPostCoordinator: ChildCoordinator {
     
     public struct Dependency {
         let navigationController: UINavigationController
-        let viewModel: PostOverviewViewModelable
+        let viewModel: EditPostViewModelable
         
-        public init(navigationController: UINavigationController, viewModel: PostOverviewViewModelable) {
+        public init(navigationController: UINavigationController, viewModel: EditPostViewModelable) {
             self.navigationController = navigationController
             self.viewModel = viewModel
         }
     }
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: RegisterRecruitmentPostCoordinatable?
+    public weak var parent: ParentCoordinator?
     
     public let navigationController: UINavigationController
+    public let viewModel: EditPostViewModelable
     
-    public let viewModel: PostOverviewViewModelable
-    
-    public init(dependency: Dependency) {
-        self.viewModel = dependency.viewModel
+    public init(
+        dependency: Dependency
+    ) {
         self.navigationController = dependency.navigationController
+        self.viewModel = dependency.viewModel
+        viewModel.editPostCoordinator = self
     }
     
     deinit {
-        printIfDebug("\(String(describing: RegisterRecruitmentCoordinator.self))")
+        printIfDebug("\(String(describing: EditPostCoordinator.self))")
     }
     
     public func start() {
-        let vc = PostOverviewVC()
+        let vc = EditPostVC()
         vc.bind(viewModel: viewModel)
-        viewModel.postOverviewCoordinator = self
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
     }
@@ -52,8 +53,3 @@ public class PostOverviewCoordinator: ChildCoordinator {
     }
 }
 
-extension PostOverviewCoordinator {
-    func showCompleteScreen() {
-        parent?.showRegisterCompleteScreen()
-    }
-}
