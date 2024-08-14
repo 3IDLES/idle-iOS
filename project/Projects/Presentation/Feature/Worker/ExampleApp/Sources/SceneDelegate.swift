@@ -32,7 +32,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             repository: DefaultUserProfileRepository(store)
         )
         
-        let vm = WorkerMyProfileViewModel(workerProfileUseCase: useCase)
+        let vm = WorkerMyProfileViewModel(
+            coordinator: nil,
+            workerProfileUseCase: useCase
+        )
         
         let vc = WorkerProfileViewController()
         
