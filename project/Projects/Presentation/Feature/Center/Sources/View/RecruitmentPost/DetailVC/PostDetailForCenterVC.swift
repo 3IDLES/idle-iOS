@@ -1,5 +1,5 @@
 //
-//  PostDetailVC.swift
+//  PostDetailForCenterVC.swift
 //  CenterFeature
 //
 //  Created by choijunios on 8/14/24.
@@ -13,7 +13,7 @@ import RxSwift
 import Entity
 import DSKit
 
-public class PostDetailVC: BaseViewController {
+public class PostDetailForCenterVC: BaseViewController {
     
     // Init
     
@@ -21,33 +21,17 @@ public class PostDetailVC: BaseViewController {
     var viewModel: PostDetailViewModelable?
     
     // View
-    let backButton: UIButton = {
-        let btn = UIButton()
-        btn.setImage(DSKitAsset.Icons.back.image, for: .normal)
-        btn.imageView?.contentMode = .scaleAspectFit
-        return btn
+    lazy var navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(titleText: "공고 상세 정보", innerViews: [postEditButton])
+        return bar
     }()
     let postEditButton: TextButtonType2 = {
-        let button = TextButtonType2(labelText: "공고 상세 정보")
+        let button = TextButtonType2(labelText: "공고 수정하기")
         button.label.typography = .Body3
         button.label.attrTextColor = DSKitAsset.Colors.gray300.color
         button.layoutMargins = .init(top: 5.5, left:12, bottom: 5.5, right: 12)
         button.layer.cornerRadius = 16
         return button
-    }()
-    
-    let titleLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Heading1)
-        label.textString = "다음의 공고 정보가 맞지\n확인해주세요."
-        label.textAlignment = .left
-        label.numberOfLines = 2
-        return label
-    }()
-    
-    let subtitleLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Subtitle1)
-        label.textString = "공고 상세 정보"
-        return label
     }()
     
     let sampleCard: WorkerEmployCard = {
@@ -100,16 +84,13 @@ public class PostDetailVC: BaseViewController {
     
     private func setLayout() {
         
-        let headerStack = HStack([backButton, postEditButton],
-                                 alignment: .center, distribution: .equalSpacing)
-        
         let scrollView = UIScrollView()
         scrollView.delaysContentTouches = false
         let contentGuide = scrollView.contentLayoutGuide
         let frameGuide = scrollView.frameLayoutGuide
         
         let contentView = UIView()
-        contentView.layoutMargins = .init(top: 21, left: 20, bottom: 16, right: 20)
+        contentView.layoutMargins = .init(top: 24, left: 20, bottom: 16, right: 20)
         
         scrollView.addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -204,8 +185,6 @@ public class PostDetailVC: BaseViewController {
         
         // scroll view
         [
-            titleLabel,
-            subtitleLabel,
             cardBackgroundView,
             screenFoWorkerButton,
             overViewContentView,
@@ -219,13 +198,7 @@ public class PostDetailVC: BaseViewController {
         
         NSLayoutConstraint.activate([
             
-            titleLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            titleLabel.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
-            
-            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 32),
-            subtitleLabel.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
-                
-            cardBackgroundView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 20),
+            cardBackgroundView.topAnchor.constraint(equalTo: contentView.topAnchor),
             cardBackgroundView.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
             cardBackgroundView.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
             
@@ -247,7 +220,7 @@ public class PostDetailVC: BaseViewController {
         
         // main view
         [
-            headerStack,
+            navigationBar,
             scrollView
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -255,11 +228,11 @@ public class PostDetailVC: BaseViewController {
         }
         
         NSLayoutConstraint.activate([
-            headerStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
-            headerStack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12),
-            headerStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leftAnchor.constraint(equalTo: view.leftAnchor),
+            navigationBar.rightAnchor.constraint(equalTo: view.rightAnchor),
             
-            scrollView.topAnchor.constraint(equalTo: headerStack.bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -283,7 +256,7 @@ public class PostDetailVC: BaseViewController {
             .disposed(by: disposeBag)
         
         // 나가기
-        backButton.rx.tap
+        navigationBar.backButton.rx.tap
             .bind(to: viewModel.exitButtonClicked)
             .disposed(by: disposeBag)
         
@@ -299,16 +272,12 @@ public class PostDetailVC: BaseViewController {
             .disposed(by: disposeBag)
         
         // Ouptut
+        
+        checkApplicantButton.label.textString = "지원자 \(viewModel.applicantCount ?? 0)명 조회"
+        
         workConditionOV.bind(viewModel: viewModel)
         customerInfoOV.bind(viewModel: viewModel)
         applyInfoOverView.bind(viewModel: viewModel)
-        
-        viewModel
-            .applicantCount?
-            .drive(onNext: { [weak self] cnt in
-                self?.checkApplicantButton.label.textString = "지원자 \(cnt)명 조회"
-            })
-            .disposed(by: disposeBag)
         
         viewModel
             .workerEmployCardVO?

@@ -13,6 +13,12 @@ import RxSwift
 import Entity
 import DSKit
 
+public protocol WorkConditionDisplayingVMable {
+    
+    var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject> { get }
+    var casting_addressInput: Driver<AddressInputStateObject> { get }
+}
+
 public class WorkConditionDisplayingView: HStack {
     
     // Init
@@ -102,7 +108,7 @@ public class WorkConditionDisplayingView: HStack {
 
 public extension WorkConditionDisplayingView {
     
-    func bind(viewModel: WorkTimeAndPayContentVMable & AddressInputViewContentVMable) {
+    func bind(viewModel: WorkConditionDisplayingVMable) {
         
         viewModel
             .casting_workTimeAndPay

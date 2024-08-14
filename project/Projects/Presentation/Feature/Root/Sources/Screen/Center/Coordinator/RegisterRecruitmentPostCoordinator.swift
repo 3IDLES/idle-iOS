@@ -28,7 +28,7 @@ public class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordina
     
     public var childCoordinators: [Coordinator] = []
     
-    var parent: ParentCoordinator?
+    public var parent: ParentCoordinator?
     
     public var navigationController: UINavigationController
     

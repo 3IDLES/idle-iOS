@@ -54,4 +54,19 @@ public extension WorkerEmployCardVO {
         paymentType: .monthly,
         paymentAmount: "12,500"
     )
+    
+    static let `default` = WorkerEmployCardVO(
+        dayLeft: 0,
+        isBeginnerPossible: true,
+        title: "기본값",
+        timeTakenForWalk: "기본값",
+        targetAge: 10,
+        targetLevel: 1,
+        targetGender: .notDetermined,
+        days: [],
+        startTime: "00:00",
+        endTime: "00:00",
+        paymentType: .hourly,
+        paymentAmount: "12,500"
+    )
 }
