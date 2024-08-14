@@ -10,4 +10,5 @@ import Foundation
 public protocol CheckApplicantCoordinatable: ParentCoordinator { 
     
     func taskFinished()
+    func showWorkerProfileScreen(profileId: String)
 }

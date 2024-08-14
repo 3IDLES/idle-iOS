@@ -20,6 +20,13 @@ public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
     public struct Dependency {
         let navigationController: UINavigationController
         let centerEmployCardVO: CenterEmployCardVO
+        let workerProfileUseCase: WorkerProfileUseCase
+        
+        public init(navigationController: UINavigationController, centerEmployCardVO: CenterEmployCardVO, workerProfileUseCase: WorkerProfileUseCase) {
+            self.navigationController = navigationController
+            self.centerEmployCardVO = centerEmployCardVO
+            self.workerProfileUseCase = workerProfileUseCase
+        }
     }
     
     public weak var viewControllerRef: UIViewController?
@@ -27,13 +34,14 @@ public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
     
     public let navigationController: UINavigationController
     let centerEmployCardVO: CenterEmployCardVO
-    
+    let workerProfileUseCase: WorkerProfileUseCase
     
     public init(
         dependency: Dependency
     ) {
         self.navigationController = dependency.navigationController
         self.centerEmployCardVO = dependency.centerEmployCardVO
+        self.workerProfileUseCase = dependency.workerProfileUseCase
     }
     
     deinit {
@@ -55,8 +63,19 @@ public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
 extension CheckApplicantCoordinator {
     
     public func taskFinished() {
-        clearChildren()
         popViewController()
         parent?.removeChildCoordinator(self)
+    }
+    
+    public func showWorkerProfileScreen(profileId: String) {
+        let coordinator = WorkerProfileCoordinator(
+            dependency: .init(
+                profileMode: .otherProfile(id: profileId),
+                navigationController: navigationController,
+                workerProfileUseCase: workerProfileUseCase
+            )
+        )
+        addChildCoordinator(coordinator)
+        coordinator.start()
     }
 }

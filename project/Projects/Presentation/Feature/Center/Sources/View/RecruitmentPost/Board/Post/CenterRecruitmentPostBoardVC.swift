@@ -90,7 +90,7 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
         }
         
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 21),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
             titleLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
             
             tabBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),

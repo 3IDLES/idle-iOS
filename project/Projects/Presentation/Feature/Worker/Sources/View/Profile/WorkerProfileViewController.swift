@@ -172,6 +172,7 @@ public class WorkerProfileViewController: DisposableViewController {
         
         setApearance()
         setAutoLayout()
+        setObservable()
     }
     
     public required init?(coder: NSCoder) {
@@ -344,6 +345,17 @@ public class WorkerProfileViewController: DisposableViewController {
             employeeInfoStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             employeeInfoStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
+    }
+    
+    private func setObservable() {
+        
+        navigationBar
+            .eventPublisher
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
     
     public func bind(_ viewModel: any WorkerProfileViewModelable) {

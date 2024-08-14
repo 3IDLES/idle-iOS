@@ -8,10 +8,23 @@
 import UIKit
 import CenterFeature
 import PresentationCore
+import UseCaseInterface
 import Entity
 
 
 public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatable {
+    
+    public struct Dependency {
+        weak var parent: CenterMainCoordinatable?
+        let navigationController: UINavigationController
+        let workerProfileUseCase: WorkerProfileUseCase
+        
+        public init(parent: CenterMainCoordinatable? = nil, navigationController: UINavigationController, workerProfileUseCase: WorkerProfileUseCase) {
+            self.parent = parent
+            self.navigationController = navigationController
+            self.workerProfileUseCase = workerProfileUseCase
+        }
+    }
     
     public var childCoordinators: [any PresentationCore.Coordinator] = []
     
@@ -21,12 +34,14 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
     
     public weak var parent: CenterMainCoordinatable?
     
+    let workerProfileUseCase: WorkerProfileUseCase
+    
     public init(
-        parent: CenterMainCoordinatable,
-        navigationController: UINavigationController
+        dependency: Dependency
     ) {
-        self.parent = parent
-        self.navigationController = navigationController
+        self.parent = dependency.parent
+        self.navigationController = dependency.navigationController
+        self.workerProfileUseCase = dependency.workerProfileUseCase
     }
     
     public func start() {
@@ -49,7 +64,8 @@ public extension RecruitmentManagementCoordinator {
         let coordinator = CheckApplicantCoordinator(
             dependency: .init(
                 navigationController: navigationController,
-                centerEmployCardVO: centerEmployCardVO
+                centerEmployCardVO: centerEmployCardVO,
+                workerProfileUseCase: workerProfileUseCase
             )
         )
         addChildCoordinator(coordinator)

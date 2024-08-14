@@ -38,5 +38,12 @@ public struct DomainAssembly: Assembly {
                 repository: repository
             )
         }
+        
+        container.register(WorkerProfileUseCase.self) { resolver in
+            let repository = resolver.resolve(UserProfileRepository.self)!
+            
+            return DefaultWorkerProfileUseCase(repository: repository)
+        }
+        
     }
 }

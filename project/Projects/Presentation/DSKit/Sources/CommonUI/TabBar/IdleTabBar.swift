@@ -127,7 +127,7 @@ public class IdleTabBar: UIViewController {
         let currentView = currentVC.view!
         
         NSLayoutConstraint.activate([
-            currentView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            currentView.topAnchor.constraint(equalTo: view.topAnchor),
             currentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             currentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             currentView.bottomAnchor.constraint(equalTo: tabBarItemStack.topAnchor)
