@@ -71,12 +71,12 @@ public class ApplicantCardCell: UITableViewCell {
                 }),
    
             // Input
-            cardView
-                .starButton.eventPublisher
-                .map { state in
-                    state == .accent
-                }
-                .bind(to: viewModel.staredThisWorker),
+//            cardView
+//                .starButton.eventPublisher
+//                .map { state in
+//                    state == .accent
+//                }
+//                .bind(to: viewModel.staredThisWorker),
             
             cardView
                 .showProfileButton.rx.tap

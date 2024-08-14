@@ -17,16 +17,24 @@ public struct ApplicantCardRO {
     
     public let profileUrl: URL?
     public let isJobFinding: Bool
-    public let isStared: Bool
+//    public let isStared: Bool
     public let name: String
     public let ageText: String
     public let genderText: String
     public let expText: String
     
-    public init(profileUrl: URL?, isJobFinding: Bool, isStared: Bool, name: String, ageText: String, genderText: String, expText: String) {
+    public init(
+        profileUrl: URL?,
+        isJobFinding: Bool,
+//        isStared: Bool,
+        name: String,
+        ageText: String,
+        genderText: String,
+        expText: String
+    ) {
         self.profileUrl = profileUrl
         self.isJobFinding = isJobFinding
-        self.isStared = isStared
+//        self.isStared = isStared
         self.name = name
         self.ageText = ageText
         self.genderText = genderText
@@ -36,7 +44,7 @@ public struct ApplicantCardRO {
     public static let mock: ApplicantCardRO = .init(
         profileUrl: URL(string: "https://dummyimage.com/600x400/00ffbf/0011ff&text=worker+profile"),
         isJobFinding: false,
-        isStared: false,
+//        isStared: false,
         name: "홍길동",
         ageText: "51세",
         genderText: "여성",
@@ -47,7 +55,7 @@ public struct ApplicantCardRO {
         .init(
             profileUrl: vo.profileUrl,
             isJobFinding: vo.isJobFinding,
-            isStared: vo.isStared,
+//            isStared: vo.isStared,
             name: vo.name,
             ageText: "\(vo.age)세",
             genderText: vo.gender.twoLetterKoreanWord,
@@ -91,14 +99,14 @@ public class ApplicantCard: UIView {
         return imageView
     }()
     // Star
-    public let starButton: IconWithColorStateButton = {
-        let button = IconWithColorStateButton(
-            representImage: DSKitAsset.Icons.subscribeStar.image,
-            normalColor: DSKitAsset.Colors.gray200.color,
-            accentColor: DSKitAsset.Colors.orange300.color
-        )
-        return button
-    }()
+//    public let starButton: IconWithColorStateButton = {
+//        let button = IconWithColorStateButton(
+//            representImage: DSKitAsset.Icons.subscribeStar.image,
+//            normalColor: DSKitAsset.Colors.gray200.color,
+//            accentColor: DSKitAsset.Colors.orange300.color
+//        )
+//        return button
+//    }()
     
     // Row1
     let workingTag: TagLabel = {
@@ -211,13 +219,13 @@ public class ApplicantCard: UIView {
             profileImageContainer,
             labelStack,
             Spacer(),
-            starButton
+//            starButton
         ], spacing: 16, alignment: .top)
         
-        NSLayoutConstraint.activate([
-            starButton.widthAnchor.constraint(equalToConstant: 22),
-            starButton.heightAnchor.constraint(equalTo: starButton.widthAnchor),
-        ])
+//        NSLayoutConstraint.activate([
+//            starButton.widthAnchor.constraint(equalToConstant: 22),
+//            starButton.heightAnchor.constraint(equalTo: starButton.widthAnchor),
+//        ])
         
         let buttonStack = HStack([
             showProfileButton, employButton
@@ -255,7 +263,7 @@ public class ApplicantCard: UIView {
         }
         
         workingTag.textString = ro.isJobFinding ? "구직중" : "휴식중"
-        starButton.setState(ro.isStared ? .accent : .normal)
+//        starButton.setState(ro.isStared ? .accent : .normal)
         nameLabel.textString = ro.name
         infoLabel.textString = "\(ro.ageText) \(ro.genderText)"
         expLabel.textString = "\(ro.expText)"

@@ -313,7 +313,7 @@ public class PostOverviewVC: BaseViewController {
             .disposed(by: disposeBag)
         
         
-        // 앞전가지 입력한 정보를 저장합니다.
+        // 앞전까지 입력한 정보를 저장합니다.
         viewModel.updateToState()
         
         // 화면이 등장할 때마다 유효한 상태를 불러옵니다.
