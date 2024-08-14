@@ -45,23 +45,23 @@ public class WorkerProfileCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        var vm: WorkerProfileViewModelable!
         let vc = WorkerProfileViewController()
         
         switch profileMode {
         case .myProfile:
-            vm = WorkerMyProfileViewModel(
+            let vm = WorkerMyProfileViewModel(
                 coordinator: self,
                 workerProfileUseCase: workerProfileUseCase
             )
+            vc.bind(vm)
         case .otherProfile(let id):
-            vm = WorkerProfileViewModel(
+            let vm = WorkerProfileViewModel(
                 coordinator: self,
                 workerProfileUseCase: workerProfileUseCase,
                 workerId: id
             )
+            vc.bind(vm)
         }
-        vc.bind(vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
     }

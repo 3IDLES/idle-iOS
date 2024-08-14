@@ -13,20 +13,13 @@ import DSKit
 import Entity
 import UseCaseInterface
 
-public protocol WorkerProfileViewModelable {
+/// 자신의 프로필을 확인하는 경우가 아닌 센터측에서 요양보호사를 보는 경우
+public protocol OtherWorkerProfileViewModelable: WorkerProfileViewModelable {
     
-    var coordinator: WorkerProfileCoordinator? { get }
-    
-    // Input
-    var viewWillAppear: PublishRelay<Void> { get }
-    var exitButtonClicked: PublishRelay<Void> { get }
-    
-    // Output
-    var profileRenderObject: Driver<WorkerProfileRenderObject>? { get }
+    var phoneCallButtonClicked: PublishRelay<Void> { get }
 }
 
-
-public class WorkerProfileViewModel: WorkerProfileViewModelable {
+public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
     
     public weak var coordinator: WorkerProfileCoordinator?
     
@@ -37,7 +30,8 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
     
     // Input(Rendering)
     public var viewWillAppear: PublishRelay<Void> = .init()
-    public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var exitButtonClicked: PublishRelay<Void> = .init()
+    public var phoneCallButtonClicked: PublishRelay<Void> = .init()
     
     // Output
     var uploadSuccess: Driver<Void>?
@@ -90,6 +84,14 @@ public class WorkerProfileViewModel: WorkerProfileViewModelable {
         exitButtonClicked
             .subscribe(onNext: { [weak self] in
                 self?.coordinator?.coordinatorDidFinish()
+            })
+            .disposed(by: disposbag)
+        
+        phoneCallButtonClicked
+            .subscribe(onNext: { _ in
+                
+                // 안심번호 전화연결
+                
             })
             .disposed(by: disposbag)
         
