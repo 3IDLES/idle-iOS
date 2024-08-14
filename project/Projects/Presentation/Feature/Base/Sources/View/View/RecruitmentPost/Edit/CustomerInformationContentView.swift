@@ -246,14 +246,10 @@ public class CustomerInformationContentView: UIView {
                 }
                 
                 // 출생년도
-                if !stateFromVM.birthYear.isEmpty {
-                    birthYearField.textString = stateFromVM.birthYear
-                }
+                birthYearField.textString = stateFromVM.birthYear
                 
                 // 몸무게
-                if !stateFromVM.weight.isEmpty {
-                    weightField.textField.textString = stateFromVM.weight
-                }
+                weightField.textField.textString = stateFromVM.weight.emptyDefault("-")
                 
                 // 요양등급
                 if let state = stateFromVM.careGrade {

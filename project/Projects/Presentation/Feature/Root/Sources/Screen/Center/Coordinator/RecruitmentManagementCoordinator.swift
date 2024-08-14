@@ -96,4 +96,22 @@ public extension RecruitmentManagementCoordinator {
         coordinator.parent = self
         coordinator.start()
     }
+    
+    func showEditScreen(postId: String) {
+        
+        let vm = EditPostVM(
+            id: postId,
+            recruitmentPostUseCase: recruitmentPostUseCase
+        )
+        let coordinator = EditPostCoordinator(
+            dependency: .init(
+                navigationController: navigationController,
+                viewModel: vm
+            )
+        )
+        vm.editPostCoordinator = coordinator
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
+    }
 }

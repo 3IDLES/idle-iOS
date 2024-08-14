@@ -27,7 +27,7 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
     }
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: ParentCoordinator?
+    public weak var parent: RecruitmentManagementCoordinatable?
     
     public let navigationController: UINavigationController
     let postId: String
@@ -68,8 +68,7 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
 
 extension PostDetailForCenterCoordinator {
     
-    func showPostEditScreen() {
-        
-        
+    func showPostEditScreen(postId: String) {
+        parent?.showEditScreen(postId: postId)
     }
 }
