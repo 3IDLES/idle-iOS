@@ -25,16 +25,12 @@ public protocol RegisterRecruitmentPostVMBindable {
     func bind(viewModel: RegisterRecruitmentPostViewModelable)
 }
 
-public protocol RegisterRecruitmentPostViewModelable: 
-    ApplicationDetailContentVMable,
-    CustomerInformationContentVMable,
-    CustomerRequirementContentVMable,
-    WorkTimeAndPayContentVMable,
-    AddressInputViewContentVMable,
-    DefaultAlertOutputable,
-
-    // 오버뷰와 수정화면의 뷰컨트롤러 요구사항
+public protocol RegisterRecruitmentPostViewModelable:
+    
+    // 수정화면 요구사항
     EditPostViewModelable,
+
+    // 오버뷰 화면 요구 사항
     PostOverviewViewModelable
 {
     /// 코디네이터

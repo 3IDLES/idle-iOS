@@ -70,7 +70,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         let applyDeadlineType = input5.applyDeadlineType!.dtoFormString
         let applyDeadline = input5.deadlineDate!.dtoFormString
         
-        let dto = RecruitmentPostDTO(
+        let dto = RecruitmentPostRegisterDTO(
             isMealAssistance: isMealAssistance,
             isBowelAssistance: isBowelAssistance,
             isWalkingAssistance: isWalkingAssistance,
@@ -100,6 +100,15 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         
         return service.request(api: .registerPost(postData: encodedData), with: .withToken)
             .map { _ in () }
+    }
+    
+    public func getPostDetailForCenter(id: String) -> RxSwift.Single<Entity.RegisterRecruitmentPostBundle> {
+        
+        service.request(api: .postDetail(id: id, userType: .center), with: .withToken)
+            .map(RecruitmentPostFetchDTO.self)
+            .map { dto in
+                dto.toEntity()
+            }
     }
 }
 

@@ -39,4 +39,8 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
                 toDomainError(error: error)
         }
     }
+    
+    public func getPostDetailForCenter(id: String) -> RxSwift.Single<Result<Entity.RegisterRecruitmentPostBundle, Entity.RecruitmentPostError>> {
+        <#code#>
+    }
 }

@@ -209,12 +209,6 @@ public class ApplicationDetailViewContentView: UIView {
                         }
                 }
                 
-                // 지원 방법
-                stateFromVM.applyType.forEach { (key, value) in
-                    
-                    
-                }
-                
                 applyTypeButtons
                     .enumerated()
                     .forEach { (index, button) in
