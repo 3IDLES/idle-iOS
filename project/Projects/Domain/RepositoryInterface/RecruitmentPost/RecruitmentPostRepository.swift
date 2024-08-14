@@ -19,4 +19,5 @@ public protocol RecruitmentPostRepository: RepositoryBase {
         input4: CustomerRequirementStateObject,
         input5: ApplicationDetailStateObject
     ) -> Single<Void>
+    func getPostDetailForCenter(id: String) -> Single<RegisterRecruitmentPostBundle>
 }

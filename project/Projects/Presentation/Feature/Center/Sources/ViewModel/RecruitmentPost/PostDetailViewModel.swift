@@ -1,8 +1,8 @@
 //
-//  RegisterRecruitmentPostVM.swift
+//  PostDetailAndEditVM.swift
 //  CenterFeature
 //
-//  Created by choijunios on 8/2/24.
+//  Created by choijunios on 8/14/24.
 //
 
 import Foundation
@@ -11,53 +11,37 @@ import RxCocoa
 import Entity
 import PresentationCore
 import UseCaseInterface
+import BaseFeature
 
-public enum RegisterRecruitmentPostInputSection: CaseIterable {
-    case workTimeAndPay
-    case customerRequirement
-    case customerInformation
-    case applicationDetail
-    case addressInfo
+public protocol PostDetailViewModelable:
+    AnyObject,
+    ApplicationDetailContentVMable,
+    CustomerInformationContentVMable,
+    CustomerRequirementContentVMable,
+    WorkTimeAndPayContentVMable,
+    AddressInputViewContentVMable
+{
     
-    var alertMessaage: String {
-        switch self {
-        case .workTimeAndPay:
-            "근무시간및 급여 입력 오류"
-        case .customerRequirement:
-            "주소정보 입력 오류"
-        case .customerInformation:
-            "고객 요구사항 입력 오류"
-        case .applicationDetail:
-            "지원 정보 입력오류"
-        case .addressInfo:
-            "근무지 정보 입력 오류"
-        }
-    }
+    var workerEmployCardVO: Driver<WorkerEmployCardVO>? { get }
+    var applicantCount: Driver<Int>? { get }
+    
+    // Input
+    var postEditButtonClicked: PublishRelay<Void> { get }
+    var exitButtonClicked: PublishRelay<Void> { get }
+    var checkApplicationButtonClicked: PublishRelay<Void> { get }
+    var viewWillAppear: PublishRelay<Void> { get }
 }
 
-public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
-
-    //Init
-    let recruitmentPostUseCase: RecruitmentPostUseCase
-    public weak var registerRecruitmentPostCoordinator: (any PresentationCore.RegisterRecruitmentPostCoordinatable)?
+public class PostDetailAndEditVM: PostDetailViewModelable {
     
-    // MARK: Edit Screen
-    public weak var editPostCoordinator: EditPostCoordinator?
-    public var editViewExitButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var saveButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var requestSaveFailure: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    // MARK: DetailVC
+    public var workerEmployCardVO: RxCocoa.Driver<Entity.WorkerEmployCardVO>?
+    public var applicantCount: RxCocoa.Driver<Int>?
+    public var postEditButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var checkApplicationButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
     
-    // MARK: OverView Screen
-    public weak var postOverviewCoordinator: PostOverviewCoordinator?
-    public var postEditButtonClicked: PublishRelay<Void> = .init()
-    public var overViewExitButtonClicked: PublishRelay<Void> = .init()
-    public var registerButtonClicked: PublishRelay<Void> = .init()
-    public var overViewWillAppear: RxRelay.PublishRelay<Void> = .init()
-    
-    public let workerEmployCardVO: Driver<WorkerEmployCardVO>?
-    
-    // MARK: register request
-    public var postRegistrationSuccess: Driver<Void>?
     
     // MARK: State
     var state_workTimeAndPay: WorkTimeAndPayStateObject = .init()
@@ -125,11 +109,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var deadlineString: Driver<String>
     public var applicationDetailViewNextable: Driver<Bool>
     
-    
-    // MARK: Alert
-    public var alert: Driver<Entity.DefaultAlertContentVO>?
-    
-    
     // MARK: 모든 섹션의 유효성 확인
     private let validationStateQueue = DispatchQueue.global(qos: .userInteractive)
     private var validationState: [RegisterRecruitmentPostInputSection: Bool] = {
@@ -140,15 +119,9 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         return dict
     }()
     
-    // 옵셔널한 입력을 유지합니다.
     let disposeBag = DisposeBag()
     
-    public init(
-        registerRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable,
-        recruitmentPostUseCase: RecruitmentPostUseCase
-    ) {
-        self.registerRecruitmentPostCoordinator = registerRecruitmentPostCoordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
+    init(recruitmentPostUseCase: RecruitmentPostUseCase) {
         
         // MARK: Work time and pay
         casting_workTimeAndPay = editing_workTimeAndPay.asDriver { _ in fatalError() }
@@ -317,7 +290,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         .map { [editing_customerInformation] _ in
             let customerInfo = editing_customerInformation.value
             
-            return !customerInfo.name.isEmpty && 
+            return !customerInfo.name.isEmpty &&
                    !customerInfo.birthYear.isEmpty &&
                    customerInfo.careGrade != nil &&
                    customerInfo.cognitionState != nil
@@ -383,200 +356,33 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         applicationDetailViewNextable = applicationDetailInputValidation.asDriver(onErrorJustReturn: false)
         
-        // MARK: ----- Over view -----
         
-        workerEmployCardVO = Observable<WorkerEmployCardVO>
-            .create { [
-                editing_workTimeAndPay,
-                editing_customerInformation,
-                editing_applicationDetail,
-                editing_addressInfo
-            ] emitter in
-                
-                // 남은 일수
-                var leftDay: Int? = nil
-                let calendar = Calendar.current
-                let currentDate = Date()
-                
-                if editing_applicationDetail.value.applyDeadlineType == .specificDate, let deadlineDate = editing_applicationDetail.value.deadlineDate {
-                    
-                    let component = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
-                    leftDay = component.day
-                }
-                
-                // 초보가능 여부
-                let isBeginnerPossible = editing_applicationDetail.value.experiencePreferenceType == .beginnerPossible
-                
-                // 제목(=도로명주소)
-                let title = editing_addressInfo.value.addressInfo?.roadAddress ?? "위치정보 표기 오류"
-                
-                // 도보시간
-                let timeTakenForWalk = "도보 n분"
-                
-                // 생년
-                let birthYear = Int(editing_customerInformation.value.birthYear) ?? 1970
-                let currentYear = calendar.component(.year, from: currentDate)
-                let targetAge = currentYear - birthYear + 1
-                
-                // 요양등급
-                let targetLavel: Int = (editing_customerInformation.value.careGrade?.rawValue ?? 0)+1
-                
-                // 성별
-                let targetGender = editing_customerInformation.value.gender
-                
-                // 근무 요일
-                let days = editing_workTimeAndPay.value.selectedDays.filter { (_, value) in
-                    value
-                }.map { (key, _) in
-                    key
-                }
-                
-                // 근무 시작, 종료시간
-                let startTime = editing_workTimeAndPay.value.workStartTime?.convertToStringForButton() ?? "00:00"
-                let workEndTime = editing_workTimeAndPay.value.workEndTime?.convertToStringForButton() ?? "00:00"
-                
-                // 급여타입및 양
-                let paymentType = editing_workTimeAndPay.value.paymentType ?? .hourly
-                let paymentAmount = editing_workTimeAndPay.value.paymentAmount
-                
-                let vo = WorkerEmployCardVO(
-                    dayLeft: leftDay ?? 0,
-                    isBeginnerPossible: isBeginnerPossible,
-                    title: title,
-                    timeTakenForWalk: timeTakenForWalk,
-                    targetAge: targetAge,
-                    targetLevel: targetLavel,
-                    targetGender: targetGender ?? .notDetermined,
-                    days: days,
-                    startTime: startTime,
-                    endTime: workEndTime,
-                    paymentType: paymentType,
-                    paymentAmount: paymentAmount
-                )
-                
-                emitter.onNext(vo)
-                
-                return Disposables.create { }
-            }
-            .asDriver(onErrorJustReturn: .mock)
-        
-        overViewWillAppear
-            .subscribe(onNext: { [weak self] _ in
-                // OverView가 나타날때 마다 상태를 업데이트 합니다.
-                self?.fetchFromState()
-            })
-            .disposed(by: disposeBag)
+        // MARK: Detail View
+//        viewWillAppear
+//            .flatMap { _ in
+//
+//            }
         
         postEditButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                self?.registerRecruitmentPostCoordinator?.showEditPostScreen()
-            })
-            .disposed(by: disposeBag)
-        
-        overViewExitButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                self?.postOverviewCoordinator?.coordinatorDidFinish()
-            })
-            .disposed(by: disposeBag)
-        
-
-        // MARK: ----- Edit -----
-        editViewExitButtonClicked
-            .subscribe(onNext: { [weak self] in
-                self?.editPostCoordinator?.coordinatorDidFinish()
-            })
-            .disposed(by: disposeBag)
-        
-        let requestSaveResult = saveButtonClicked
-            .flatMap { [weak self] _ in
-                self?.allInputsValid() ?? .just(.default)
-            }
-            .share()
-        
-        let requestSaveSuccess = requestSaveResult.filter { $0 == nil }
-        
-        requestSaveSuccess
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                updateToState()
+            .subscribe(onNext: { _ in
                 
-                // 저장이 성공적으로 완료되어 코디네이터와 뷰컨트롤러 종료
-                editPostCoordinator?.coordinatorDidFinish()
+                
             })
             .disposed(by: disposeBag)
         
-        self.requestSaveFailure = requestSaveResult
-            .compactMap { $0 }
-            .asDriver(onErrorJustReturn: .default)
-            
-        
-        // MARK: -----------------
-        let registerPostResult = registerButtonClicked
-            .flatMap { [weak self] _ -> Single<Result<Void, RecruitmentPostError>> in
-                guard let self else { return .never() }
+        exitButtonClicked
+            .subscribe(onNext: { _ in
                 
-                // 공고를 등록합니다.
-                let inputs = RegisterRecruitmentPostBundle(
-                    workTimeAndPay: state_workTimeAndPay,
-                    customerRequirement: state_customerRequirement,
-                    customerInformation: state_customerInformation,
-                    applicationDetail: state_applicationDetail,
-                    addressInfo: state_addressInfo
-                )
                 
-                return recruitmentPostUseCase
-                    .registerRecruitmentPost(inputs: inputs)
-            }
-            .share()
-        
-        // 공고 등록 성공
-        registerPostResult
-            .compactMap { $0.value }
-            .subscribe { [weak self] _ in
-                self?.registerRecruitmentPostCoordinator?.showRegisterCompleteScreen()
-            }
+            })
             .disposed(by: disposeBag)
-            
         
-        let requestRegistrationFailure = registerPostResult
-            .compactMap { $0.error }
-        
-        alert = requestRegistrationFailure
-            .map { error in
-                DefaultAlertContentVO(
-                    title: "공고등록 오류",
-                    message: error.message
-                )
-            }
-            .asDriver(onErrorJustReturn: .default)
-        
-        Observable
-            .merge(
-                workTimeAndPayInputValidation.map({
-                    (RegisterRecruitmentPostInputSection.workTimeAndPay, $0)
-                }),
-                addressInputValidation.map({
-                    (RegisterRecruitmentPostInputSection.addressInfo, $0)
-                }),
-                customerRequirementInputValidation.map({
-                    (RegisterRecruitmentPostInputSection.customerRequirement, $0)
-                }),
-                customerInformationInputValidation.map({
-                    (RegisterRecruitmentPostInputSection.customerInformation, $0)
-                }),
-                applicationDetailInputValidation.map({
-                    (RegisterRecruitmentPostInputSection.applicationDetail, $0)
-                })
-            )
-            .subscribe { [weak self] inputSection, isValid in
-                self?.validationStateQueue.sync { [weak self] in
-                    self?.validationState[inputSection] = isValid
-                }
-            }
+        checkApplicationButtonClicked
+            .subscribe(onNext: { _ in
+                
+                
+            })
             .disposed(by: disposeBag)
-
-            // 최초로 데이터를 가져옵니다.
-            fetchFromState()
     }
     
     public func allInputsValid() -> Single<DefaultAlertContentVO?> {
@@ -599,23 +405,5 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             
             return Disposables.create { }
         }
-    }
-    
-    public func fetchFromState() {
-        
-        editing_workTimeAndPay.accept(state_workTimeAndPay.copy() as! WorkTimeAndPayStateObject)
-        editing_customerRequirement.accept(state_customerRequirement.copy() as! CustomerRequirementStateObject)
-        editing_customerInformation.accept(state_customerInformation.copy() as! CustomerInformationStateObject)
-        editing_applicationDetail.accept(state_applicationDetail.copy() as! ApplicationDetailStateObject)
-        editing_addressInfo.accept(state_addressInfo.copy() as! AddressInputStateObject)
-    }
-    
-    public func updateToState() {
-        
-        state_workTimeAndPay = editing_workTimeAndPay.value.copy() as! WorkTimeAndPayStateObject
-        state_customerRequirement = editing_customerRequirement.value.copy() as! CustomerRequirementStateObject
-        state_customerInformation = editing_customerInformation.value.copy() as! CustomerInformationStateObject
-        state_applicationDetail = editing_applicationDetail.value.copy() as! ApplicationDetailStateObject
-        state_addressInfo = editing_addressInfo.value.copy() as! AddressInputStateObject
     }
 }
