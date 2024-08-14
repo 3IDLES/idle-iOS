@@ -198,8 +198,9 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
             .disposed(by: disposeBag)
         
         checkApplicationButtonClicked
-            .subscribe(onNext: { _ in
-                
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                coordinator?.showCheckApplicantScreen(postId: id)
             })
             .disposed(by: disposeBag)
     }

@@ -130,5 +130,13 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
                 coordinator?.showPostDetailScreenForCenter(postId: id, applicantCount: vo.applicantCount)
             })
             .disposed(by: disposeBag)
+        
+        editPostBtnClicked
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                
+                coordinator?.showEditScreen(postId: id)
+            })
+            .disposed(by: disposeBag)
     }
 }
