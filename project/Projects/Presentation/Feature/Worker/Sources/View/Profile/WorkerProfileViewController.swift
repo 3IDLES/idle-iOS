@@ -18,8 +18,8 @@ public class WorkerProfileViewController: DisposableViewController {
     private var viewModel: (any WorkerProfileViewModelable)?
     
     // 네비게이션 바
-    let navigationBar: NavigationBarType1 = {
-        let bar = NavigationBarType1(navigationTitle: "")
+    lazy var navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(titleText: "", innerViews: [profileEditButton])
         return bar
     }()
     
@@ -200,14 +200,6 @@ public class WorkerProfileViewController: DisposableViewController {
     
     private func setAutoLayout() {
         
-        // 상단 네비게이션바 세팅
-        let navigationStack = HStack([
-            navigationBar,
-            profileEditButton,
-        ])
-        navigationStack.distribution = .equalSpacing
-        navigationStack.backgroundColor = .clear
-        
         // 흑색 바탕
         let grayBackgrounnd = UIView()
         grayBackgrounnd.backgroundColor = DSKitAsset.Colors.gray050.color
@@ -387,7 +379,7 @@ public class WorkerProfileViewController: DisposableViewController {
         
         
         [
-            navigationStack,
+            navigationBar,
             scrollView,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -396,11 +388,11 @@ public class WorkerProfileViewController: DisposableViewController {
         
         NSLayoutConstraint.activate([
             
-            navigationStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
-            navigationStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
-            navigationStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
-            scrollView.topAnchor.constraint(equalTo: navigationStack.bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
             scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -410,7 +402,7 @@ public class WorkerProfileViewController: DisposableViewController {
     private func setObservable() {
         
         navigationBar
-            .eventPublisher
+            .backButton.rx.tap
             .observe(on: MainScheduler.instance)
             .subscribe { [weak self] _ in
                 self?.navigationController?.popViewController(animated: true)
@@ -450,7 +442,7 @@ public class WorkerProfileViewController: DisposableViewController {
             .disposed(by: disposeBag)
         
         navigationBar
-            .eventPublisher
+            .backButton.rx.tap
             .bind(to: viewModel.exitButtonClicked)
             .disposed(by: disposeBag)
         
@@ -470,7 +462,7 @@ public class WorkerProfileViewController: DisposableViewController {
                 guard let self else { return }
                 
                 // UI 업데이트
-                navigationBar.navigationTitle = ro.navigationTitle
+                navigationBar.titleLabel.textString = ro.navigationTitle
                 profileEditButton.isHidden = !ro.showEditButton
                 contactButtonContainer.isHidden = !ro.showContactButton
 //                starButton.isHidden = !ro.showStarButton
