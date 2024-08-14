@@ -13,6 +13,8 @@ public struct WorkerProfileRenderObject {
     
     let navigationTitle: String
     let showEditButton: Bool
+    let showContactButton: Bool
+//    let showStarButton: Bool
     let isJobFinding: Bool
     let stateText: String
     let nameText: String
@@ -30,6 +32,8 @@ public struct WorkerProfileRenderObject {
         .init(
             navigationTitle: isMyProfile ? "내 프로필" : "요양보호사 프로필",
             showEditButton: isMyProfile,
+            showContactButton: !isMyProfile,
+//            showStarButton: !isMyProfile,
             isJobFinding: vo.isLookingForJob,
             stateText: vo.isLookingForJob ? "구인중" : "휴식중",
             nameText: vo.nameText,

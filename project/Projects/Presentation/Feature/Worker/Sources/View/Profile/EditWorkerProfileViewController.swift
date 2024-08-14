@@ -13,20 +13,6 @@ import DSKit
 import Entity
 import BaseFeature
 
-protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
-    
-    var requestUpload: PublishRelay<Void> { get }
-    var editingImage: PublishRelay<UIImage> { get }
-    var editingIsJobFinding: PublishRelay<Bool> { get }
-    var editingExpYear: PublishRelay<Int> { get }
-    var editingAddress: PublishRelay<AddressInformation> { get }
-    var editingIntroduce: PublishRelay<String> { get }
-    var editingSpecialty: PublishRelay<String> { get }
-    
-    var uploadSuccess: Driver<Void>? { get }
-    var alert: Driver<DefaultAlertContentVO>? { get }
-}
-
 public class EditWorkerProfileViewController: BaseViewController {
     
     // Navigation bar

@@ -57,6 +57,16 @@ public class WorkerProfileViewController: DisposableViewController {
         return imageView
     }()
     
+    // 즐겨찾기 버튼
+//    public let starButton: IconWithColorStateButton = {
+//        let button = IconWithColorStateButton(
+//            representImage: DSKitAsset.Icons.subscribeStar.image,
+//            normalColor: DSKitAsset.Colors.gray200.color,
+//            accentColor: DSKitAsset.Colors.orange300.color
+//        )
+//        return button
+//    }()
+    
     // 구인중 / 휴식중
     let workingTag: TagLabel = {
        let label = TagLabel(
@@ -116,6 +126,21 @@ public class WorkerProfileViewController: DisposableViewController {
         return label
     }()
     
+    // 통화하기 버튼
+    // 통화하기, 채팅하기
+    lazy var contactButtonContainer: HStack = .init(
+        [phoneCallButton],
+        spacing: 8,
+        distribution: .fillEqually
+    )
+    let phoneCallButton: IdleSecondaryButton = {
+        let button = IdleSecondaryButton(level: .medium)
+        button.label.textString = "통화하기"
+        return button
+    }()
+    
+    // MARK: 상세정보
+    
     // 주소(Label + Content)
     let addressTitleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
@@ -170,13 +195,7 @@ public class WorkerProfileViewController: DisposableViewController {
     }
     
     private func setApearance() {
-        view.backgroundColor = .white
-        view.layoutMargins = .init(
-            top: 0,
-            left: 20,
-            bottom: 0,
-            right: 20
-        )
+        view.backgroundColor = DSKitAsset.Colors.gray050.color
     }
     
     private func setAutoLayout() {
@@ -254,6 +273,7 @@ public class WorkerProfileViewController: DisposableViewController {
             }
         }
         
+        // MARK: Divider
         // 요양보호사 인적정보 / 요양보호사 구직정보 디바이더
         let divider = UIView()
         divider.backgroundColor = DSKitAsset.Colors.gray050.color
@@ -283,57 +303,107 @@ public class WorkerProfileViewController: DisposableViewController {
             spacing: 28,
             alignment: .leading)
 
-        // view hierarchy
+        let contentView = UIView()
+        contentView.backgroundColor = DSKitAsset.Colors.gray0.color
+        contentView.layoutMargins = .init(
+            top: 0,
+            left: 20,
+            bottom: 54,
+            right: 20
+        )
+        
         [
             grayBackgrounnd,
-            navigationStack,
             profileImageContainer,
+//            starButton,
             tagNameStack,
             humanInfoStack,
+            contactButtonContainer,
             divider,
             employeeInfoTitleLabel,
             employeeInfoStack
             
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
+            contentView.addSubview($0)
         }
-        grayBackgrounnd.layer.zPosition = 0.0
-        navigationStack.layer.zPosition = 1.0
                 
         NSLayoutConstraint.activate([
             
-            grayBackgrounnd.topAnchor.constraint(equalTo: view.topAnchor),
-            grayBackgrounnd.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            grayBackgrounnd.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            grayBackgrounnd.heightAnchor.constraint(equalToConstant: 196),
+            grayBackgrounnd.topAnchor.constraint(equalTo: contentView.topAnchor),
+            grayBackgrounnd.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            grayBackgrounnd.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            grayBackgrounnd.heightAnchor.constraint(equalToConstant: 80),
+            
+            profileImageContainer.widthAnchor.constraint(equalToConstant: 96),
+            profileImageContainer.heightAnchor.constraint(equalTo: profileImageContainer.widthAnchor),
+            profileImageContainer.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            profileImageContainer.centerYAnchor.constraint(equalTo: grayBackgrounnd.bottomAnchor),
+            
+//            starButton.widthAnchor.constraint(equalToConstant: 24),
+//            starButton.heightAnchor.constraint(equalTo: starButton.widthAnchor),
+//            starButton.topAnchor.constraint(equalTo: grayBackgrounnd.bottomAnchor, constant: 20),
+//            starButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+            
+            tagNameStack.topAnchor.constraint(equalTo: profileImageContainer.bottomAnchor, constant: 16),
+            tagNameStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            
+            humanInfoStack.topAnchor.constraint(equalTo: tagNameStack.bottomAnchor, constant: 16),
+            humanInfoStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            
+            contactButtonContainer.topAnchor.constraint(equalTo: humanInfoStack.bottomAnchor, constant: 24),
+            contactButtonContainer.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
+            contactButtonContainer.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
+            
+            divider.topAnchor.constraint(equalTo: contactButtonContainer.bottomAnchor, constant: 24),
+            divider.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            divider.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            divider.heightAnchor.constraint(equalToConstant: 8),
+            
+            employeeInfoTitleLabel.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 24),
+            employeeInfoTitleLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            
+            employeeInfoStack.topAnchor.constraint(equalTo: employeeInfoTitleLabel.bottomAnchor, constant: 20),
+            employeeInfoStack.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            employeeInfoStack.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            employeeInfoStack.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+        ])
+        
+        let scrollView = UIScrollView()
+        scrollView.delaysContentTouches = false
+        let contentGuide = scrollView.contentLayoutGuide
+        let frameGuide = scrollView.frameLayoutGuide
+        
+        scrollView.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: contentGuide.topAnchor),
+            contentView.leftAnchor.constraint(equalTo: contentGuide.leftAnchor),
+            contentView.rightAnchor.constraint(equalTo: contentGuide.rightAnchor),
+            contentView.bottomAnchor.constraint(equalTo: contentGuide.bottomAnchor),
+            
+            contentView.widthAnchor.constraint(equalTo: frameGuide.widthAnchor),
+        ])
+        
+        
+        [
+            navigationStack,
+            scrollView,
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
             
             navigationStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
             navigationStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             navigationStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            profileImageContainer.widthAnchor.constraint(equalToConstant: 96),
-            profileImageContainer.heightAnchor.constraint(equalTo: profileImageContainer.widthAnchor),
-            profileImageContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            profileImageContainer.centerYAnchor.constraint(equalTo: grayBackgrounnd.bottomAnchor),
-            
-            tagNameStack.topAnchor.constraint(equalTo: profileImageContainer.bottomAnchor, constant: 16),
-            tagNameStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
-            humanInfoStack.topAnchor.constraint(equalTo: tagNameStack.bottomAnchor, constant: 16),
-            humanInfoStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
-            divider.topAnchor.constraint(equalTo: humanInfoStack.bottomAnchor, constant: 24),
-            divider.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            divider.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            divider.heightAnchor.constraint(equalToConstant: 8),
-            
-            employeeInfoTitleLabel.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 24),
-            employeeInfoTitleLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            
-            employeeInfoStack.topAnchor.constraint(equalTo: employeeInfoTitleLabel.bottomAnchor, constant: 20),
-            employeeInfoStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            employeeInfoStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: navigationStack.bottomAnchor),
+            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
     
@@ -348,7 +418,22 @@ public class WorkerProfileViewController: DisposableViewController {
             .disposed(by: disposeBag)
     }
     
-    public func bind(_ viewModel: any WorkerProfileViewModelable) {
+    /// 다른 프로필 확인용 바인딩 입니다.
+    public func bind(_ viewModel: OtherWorkerProfileViewModelable) {
+        bind(viewModel as WorkerProfileViewModelable)
+        
+        phoneCallButton
+            .rx.tap
+            .bind(to: viewModel.phoneCallButtonClicked)
+            .disposed(by: disposeBag)
+    }
+    
+    /// 내프로필 접속용 바인딩 입니다.
+    public func bind(_ viewModel: WorkerProfileEditViewModelable) {
+        bind(viewModel as WorkerProfileViewModelable)
+    }
+    
+    private func bind(_ viewModel: any WorkerProfileViewModelable) {
         
         self.viewModel = viewModel
         
@@ -387,14 +472,17 @@ public class WorkerProfileViewController: DisposableViewController {
                 // UI 업데이트
                 navigationBar.navigationTitle = ro.navigationTitle
                 profileEditButton.isHidden = !ro.showEditButton
+                contactButtonContainer.isHidden = !ro.showContactButton
+//                starButton.isHidden = !ro.showStarButton
                 workingTag.textString = ro.stateText
                 nameLabel.textString = ro.nameText
                 ageLabel.textString = ro.ageText
                 genderLabel.textString = ro.genderText
                 expLabel.textString = ro.expText
+                
                 addressLabel.textString = ro.address
-                introductionLabel.textString = ro.oneLineIntroduce
-                abilityLabel.textString = ro.specialty
+                introductionLabel.textString = ro.oneLineIntroduce.emptyDefault("-")
+                abilityLabel.textString = ro.specialty.emptyDefault("-")
                 
                 if let imageUrl = ro.imageUrl {
                     workerProfileImage.setImage(url: imageUrl)
@@ -407,6 +495,8 @@ public class WorkerProfileViewController: DisposableViewController {
         
     }
 }
+
+
 
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {

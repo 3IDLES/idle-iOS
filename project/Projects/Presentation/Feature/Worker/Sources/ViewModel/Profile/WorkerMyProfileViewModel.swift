@@ -13,6 +13,20 @@ import DSKit
 import Entity
 import UseCaseInterface
 
+public protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
+    
+    var requestUpload: PublishRelay<Void> { get }
+    var editingImage: PublishRelay<UIImage> { get }
+    var editingIsJobFinding: PublishRelay<Bool> { get }
+    var editingExpYear: PublishRelay<Int> { get }
+    var editingAddress: PublishRelay<AddressInformation> { get }
+    var editingIntroduce: PublishRelay<String> { get }
+    var editingSpecialty: PublishRelay<String> { get }
+    
+    var uploadSuccess: Driver<Void>? { get }
+    var alert: Driver<DefaultAlertContentVO>? { get }
+}
+
 public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     
     public weak var coordinator: WorkerProfileCoordinator?
@@ -20,13 +34,13 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     let workerProfileUseCase: WorkerProfileUseCase
     
     // Input(Editing)
-    var requestUpload: PublishRelay<Void> = .init()
-    var editingImage: PublishRelay<UIImage> = .init()
-    var editingIsJobFinding: PublishRelay<Bool> = .init()
-    var editingExpYear: PublishRelay<Int> = .init()
-    var editingAddress: PublishRelay<AddressInformation> = .init()
-    var editingIntroduce: PublishRelay<String> = .init()
-    var editingSpecialty: PublishRelay<String> = .init()
+    public var requestUpload: PublishRelay<Void> = .init()
+    public var editingImage: PublishRelay<UIImage> = .init()
+    public var editingIsJobFinding: PublishRelay<Bool> = .init()
+    public var editingExpYear: PublishRelay<Int> = .init()
+    public var editingAddress: PublishRelay<AddressInformation> = .init()
+    public var editingIntroduce: PublishRelay<String> = .init()
+    public var editingSpecialty: PublishRelay<String> = .init()
     
     // Input(Rendering)
     public var viewWillAppear: PublishRelay<Void> = .init()
@@ -34,7 +48,7 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
     // Output
-    var uploadSuccess: Driver<Void>?
+    public var uploadSuccess: Driver<Void>?
     public var alert: Driver<Entity.DefaultAlertContentVO>?
     
     public var profileRenderObject: Driver<WorkerProfileRenderObject>?
