@@ -15,6 +15,8 @@ public class ApplicantCardCell: UITableViewCell {
     
     public static let identifier = String(describing: ApplicantCardCell.self)
     
+    var viewModel: ApplicantCardViewModelable?
+    
     let cardView = ApplicantCard()
     
     private var disposables: [Disposable?]?
@@ -57,6 +59,8 @@ public class ApplicantCardCell: UITableViewCell {
     }
     
     public func bind(viewModel: ApplicantCardViewModelable) {
+        
+        self.viewModel = viewModel
         
         let disposables: [Disposable?] = [
             // Output

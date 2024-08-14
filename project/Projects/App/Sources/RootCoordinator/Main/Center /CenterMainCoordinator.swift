@@ -9,6 +9,7 @@ import UIKit
 import DSKit
 import PresentationCore
 import RootFeature
+import UseCaseInterface
 
 class CenterMainCoordinator: CenterMainCoordinatable {
     
@@ -69,8 +70,11 @@ class CenterMainCoordinator: CenterMainCoordinatable {
         switch tab {
         case .recruitmentManage:
             coordinator = RecruitmentManagementCoordinator(
-                parent: self,
-                navigationController: navigationController
+                dependency: .init(
+                    parent: self,
+                    navigationController: navigationController,
+                    workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
+                )
             )
             
         case .setting:

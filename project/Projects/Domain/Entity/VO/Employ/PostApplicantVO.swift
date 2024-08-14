@@ -33,7 +33,7 @@ public struct PostApplicantVO {
     }
     
     public static let mock: PostApplicantVO = .init(
-        workerId: "11111-222222-333333",
+        workerId: "testworkerId",
         profileUrl: URL(string: "https://dummyimage.com/600x400/00ffbf/0011ff&text=worker+profile"),
         isJobFinding: false,
         isStared: false,

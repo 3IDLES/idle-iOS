@@ -150,7 +150,7 @@ public class CheckApplicantVC: BaseViewController {
         }
         
         NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.topAnchor, constant: 21),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
             navigationBar.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12),
             
             scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
@@ -209,34 +209,13 @@ extension CheckApplicantVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
-        let vm = ApplicantCardVM(vo: postApplicantVO.value[indexPath.row])
-        cell.bind(viewModel: vm)
-        cell.selectionStyle = .none
+        
+        if let viewModel = self.viewModel {
+            let vm = viewModel.createApplicantCardVM(vo: postApplicantVO.value[indexPath.row])
+            cell.bind(viewModel: vm)
+            cell.selectionStyle = .none
+        }
+        
         return cell
-    }
-}
-
-// MARK: ApplicantCardVM
-public class ApplicantCardVM: ApplicantCardViewModelable {
-    
-    // Init
-    let id: String
-    
-    public var showProfileButtonClicked: PublishRelay<Void> = .init()
-    public var employButtonClicked: PublishRelay<Void> = .init()
-    public var staredThisWorker: PublishRelay<Bool> = .init()
-    
-    public var renderObject: Driver<ApplicantCardRO>?
-    
-    public init(vo: PostApplicantVO) {
-        self.id = vo.workerId
-        
-        // MARK: RenderObject
-        let publishRelay: BehaviorRelay<ApplicantCardRO> = .init(value: .mock)
-        renderObject = publishRelay.asDriver(onErrorJustReturn: .mock)
-        
-        publishRelay.accept(ApplicantCardRO.create(vo: vo))
-        
-        // MARK: 버튼 처리
     }
 }
