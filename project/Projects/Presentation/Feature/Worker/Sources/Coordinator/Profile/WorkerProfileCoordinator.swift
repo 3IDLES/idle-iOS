@@ -51,10 +51,12 @@ public class WorkerProfileCoordinator: ChildCoordinator {
         switch profileMode {
         case .myProfile:
             vm = WorkerMyProfileViewModel(
+                coordinator: self,
                 workerProfileUseCase: workerProfileUseCase
             )
         case .otherProfile(let id):
             vm = WorkerProfileViewModel(
+                coordinator: self,
                 workerProfileUseCase: workerProfileUseCase,
                 workerId: id
             )
