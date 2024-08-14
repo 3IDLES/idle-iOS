@@ -72,6 +72,6 @@ extension PostDetailForCenterCoordinator {
         parent?.showEditScreen(postId: postId)
     }
     func showCheckApplicantScreen(postId: String) {
-        parent?.showCheckingApplicantScreen(postId: postId, .mock)
+        parent?.showCheckingApplicantScreen(postId: postId)
     }
 }
