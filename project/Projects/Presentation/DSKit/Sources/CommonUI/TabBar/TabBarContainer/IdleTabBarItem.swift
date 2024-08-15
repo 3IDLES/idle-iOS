@@ -23,15 +23,15 @@ public class IdleTabBarItem: TappableUIView {
     
     // idle
     let idleIconColor: UIColor = DSColor.gray300.color
-    
+    let idleTextColor: UIColor = DSColor.gray300.color
     
     // accent
     let accentIconColor: UIColor = DSColor.gray700.color
+    let accentTextColor: UIColor = DSColor.gray700.color
     
     // View
     let label: IdleLabel = {
         let label = IdleLabel(typography: .caption)
-        label.attrTextColor = DSColor.gray700.color
         return label
     }()
     let imageView: UIImageView = {
@@ -54,6 +54,7 @@ public class IdleTabBarItem: TappableUIView {
     
     private func setAppearance() {
         imageView.tintColor = idleIconColor
+        label.attrTextColor = idleTextColor
     }
     
     private func setLayout() {
@@ -86,10 +87,12 @@ public class IdleTabBarItem: TappableUIView {
     
     private func setToIdle() {
         imageView.tintColor = idleIconColor
+        label.attrTextColor = idleTextColor
     }
     
     private func setToAccent() {
         imageView.tintColor = accentIconColor
+        label.attrTextColor = accentTextColor
     }
 }
 
