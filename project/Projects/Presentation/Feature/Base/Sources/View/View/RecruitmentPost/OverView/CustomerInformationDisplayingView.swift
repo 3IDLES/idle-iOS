@@ -202,32 +202,57 @@ public class CustomerInformationDisplayingView: VStack {
 
 public extension CustomerInformationDisplayingView {
     
+    private func applyObject(_ object: CustomerInformationStateObject) {
+        nameLabel.textString = object.name
+        genderLabel.textString = object.gender?.twoLetterKoreanWord ?? "오류"
+        birthYearLabel.textString = object.birthYear
+        weightLabel.textString = object.weight
+        
+        if let careGrade = object.careGrade {
+            let text: String = careGrade.textForCellBtn + "등급"
+            careGradeLabel.textString = text
+        } else {
+            careGradeLabel.textString = "오류"
+        }
+        
+        if let cognitionState = object.cognitionState {
+            cognitionStateLabel.textString = cognitionState.korTextForCellBtn
+        } else {
+            cognitionStateLabel.textString = "오류"
+        }
+        
+        deceaseLabel.textString = object.deceaseDescription.isEmpty ? "-" : object.deceaseDescription
+    }
+    private func applyObject(_ object: CustomerRequirementStateObject) {
+        
+        mealSupportLabel.textString = object.mealSupportNeeded == true ? "필요" : "불필요"
+        toiletSupportLabel.textString = object.toiletSupportNeeded == true ? "필요" : "불필요"
+        movingSupportLabel.textString = object.movingSupportNeeded == true ? "필요" : "불필요"
+        
+        let dailySupportText = object.dailySupportTypeNeeds.compactMap { (day, isActive) -> String? in
+            return isActive ? day.korLetterTextForBtn : nil
+        }.joined(separator: ", ")
+        
+        dailySupportLabel.textString = dailySupportText
+        
+        additionalTextLabel.textString = object.additionalRequirement
+    }
+    
+    func bind(
+        customerInformationStateObject: CustomerInformationStateObject,
+        customerRequirementStateObject: CustomerRequirementStateObject
+    ) {
+        applyObject(customerInformationStateObject)
+        applyObject(customerRequirementStateObject)
+    }
+    
     func bind(viewModel: CustomerInformationDisplayingVMable) {
         
         viewModel
             .casting_customerInformation
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
-                
-                nameLabel.textString = object.name
-                genderLabel.textString = object.gender?.twoLetterKoreanWord ?? "오류"
-                birthYearLabel.textString = object.birthYear
-                weightLabel.textString = object.weight
-                
-                if let careGrade = object.careGrade {
-                    let text: String = careGrade.textForCellBtn + "등급"
-                    careGradeLabel.textString = text
-                } else {
-                    careGradeLabel.textString = "오류"
-                }
-                
-                if let cognitionState = object.cognitionState {
-                    cognitionStateLabel.textString = cognitionState.korTextForCellBtn
-                } else {
-                    cognitionStateLabel.textString = "오류"
-                }
-                
-                deceaseLabel.textString = object.deceaseDescription.isEmpty ? "-" : object.deceaseDescription
+                applyObject(object)
             })
             .disposed(by: disposeBag)
         
@@ -235,18 +260,7 @@ public extension CustomerInformationDisplayingView {
             .casting_customerRequirement
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
-                
-                mealSupportLabel.textString = object.mealSupportNeeded == true ? "필요" : "불필요"
-                toiletSupportLabel.textString = object.toiletSupportNeeded == true ? "필요" : "불필요"
-                movingSupportLabel.textString = object.movingSupportNeeded == true ? "필요" : "불필요"
-                
-                let dailySupportText = object.dailySupportTypeNeeds.compactMap { (day, isActive) -> String? in
-                    return isActive ? day.korLetterTextForBtn : nil
-                }.joined(separator: ", ")
-                
-                dailySupportLabel.textString = dailySupportText
-                
-                additionalTextLabel.textString = object.additionalRequirement
+                applyObject(object)
             })
             .disposed(by: disposeBag)
     }

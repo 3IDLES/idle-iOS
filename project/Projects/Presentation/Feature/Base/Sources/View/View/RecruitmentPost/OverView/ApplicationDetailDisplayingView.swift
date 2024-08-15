@@ -105,6 +105,36 @@ public class ApplicationDetailDisplayingView: HStack {
 
 public extension ApplicationDetailDisplayingView {
     
+    private func applyObject(_ object: ApplicationDetailStateObject) {
+        expPreferenceLabel.textString = object.experiencePreferenceType?.korTextForBtn ?? "오류"
+        
+        applTypeLabel.textString = object.applyType.compactMap({ (key, value) -> String? in
+            value ? key.twoLetterKorTextForDisplay : nil
+        }).joined(separator: ", ")
+        
+        if let type = object.applyDeadlineType {
+            if type == .specificDate {
+                if let date = object.deadlineDate {
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy. MM. dd"
+                    let deadLineText = dateFormatter.string(from: date)
+                    deadlineLabel.textString = deadLineText
+                } else {
+                    deadlineLabel.textString = "오류"
+                }
+            } else {
+                deadlineLabel.textString = type.korTextForBtn
+            }
+            
+        } else {
+            deadlineLabel.textString = "오류"
+        }
+    }
+    
+    func bind(applicationDetailStateObject: ApplicationDetailStateObject) {
+        applyObject(applicationDetailStateObject)
+    }
+    
     /// ViewModelType: ApplicationDetailContentVMable
     func bind(viewModel: ApplicationDetailDisplayingVMable) {
         
@@ -112,30 +142,7 @@ public extension ApplicationDetailDisplayingView {
             .casting_applicationDetail
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
-                
-                expPreferenceLabel.textString = object.experiencePreferenceType?.korTextForBtn ?? "오류"
-                
-                applTypeLabel.textString = object.applyType.compactMap({ (key, value) -> String? in
-                    value ? key.twoLetterKorTextForDisplay : nil
-                }).joined(separator: ", ")
-                
-                if let type = object.applyDeadlineType {
-                    if type == .specificDate {
-                        if let date = object.deadlineDate {
-                            let dateFormatter = DateFormatter()
-                            dateFormatter.dateFormat = "yyyy. MM. dd"
-                            let deadLineText = dateFormatter.string(from: date)
-                            deadlineLabel.textString = deadLineText
-                        } else {
-                            deadlineLabel.textString = "오류"
-                        }
-                    } else {
-                        deadlineLabel.textString = type.korTextForBtn
-                    }
-                    
-                } else {
-                    deadlineLabel.textString = "오류"
-                }
+                applyObject(object)
             })
             .disposed(by: disposeBag)
     }

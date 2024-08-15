@@ -12,14 +12,37 @@ import RxSwift
 import Entity
 import DSKit
 
+public struct WorkAndWorkerLocationMapRO {
+    
+    let workLocation: LocationInformation
+    let workerLocation: LocationInformation
+}
+ 
+public protocol PostDetailForWorkerViewModelable {
+    
+    // Output
+    var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
+    var locationInfo: Driver<WorkAndWorkerLocationMapRO>? { get }
+    
+    // Input
+    var backButtonClicked: PublishRelay<Void> { get }
+    var applyButtonClicked: PublishRelay<Void> { get }
+    var startButtonClicked: PublishRelay<Bool> { get }
+    var centerCardClicked: PublishRelay<Void> { get }
+    var viewWillAppear: PublishRelay<Void> { get }
+}
+
 /// 센토도 요양보호사가 보는 공고화면을 볼 수 있기 때문에 해당뷰를 BaseFeature에 구현하였습니다.
 public class PostDetailForWorkerVC: BaseViewController {
+    
+    var viewModel: PostDetailForWorkerViewModelable?
     
     // Init
     
     // View
-    let navigationBar: NavigationBarType1 = {
-        let bar = NavigationBarType1(navigationTitle: "공고 정보")
+    let navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(innerViews: [])
+        bar.titleLabel.textString = "공고 정보"
         return bar
     }()
     
@@ -94,8 +117,8 @@ public class PostDetailForWorkerVC: BaseViewController {
         }
         
         NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
-            navigationBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 12),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             navigationBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             
             scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
@@ -121,14 +144,86 @@ public class PostDetailForWorkerVC: BaseViewController {
             .disposed(by: disposeBag)
     }
     
-    public func bind() {
+    public func bind(viewModel: PostDetailForWorkerViewModelable) {
         
-        // back button
+        self.viewModel = viewModel
         
-        // Content view
-        contentView.bind()
+        // Output
+        viewModel
+            .postForWorkerBundle?
+            .drive(onNext: {
+                [weak self] bundle in
+                guard let self else { return }
+                
+                // 근무 조건
+                contentView.workConditionView.bind(
+                    workTimeAndPayStateObject: bundle.workTimeAndPay,
+                    addressInputStateObject: bundle.addressInfo
+                )
+                
+                // 고객 정보
+                contentView.customerInfoView.bind(
+                    customerInformationStateObject: bundle.customerInformation,
+                    customerRequirementStateObject: bundle.customerRequirement
+                )
+                
+                // 추가 지원 정보
+                contentView.applicationDetailView.bind(
+                    applicationDetailStateObject: bundle.applicationDetail
+                )
+                
+                // 센터 정보 카드
+                let centerInfo = bundle.centerInfo
+                contentView.centerInfoCard.bind(
+                    nameText: centerInfo.centerName,
+                    locationText: centerInfo.centerRoadAddress
+                )
+                
+            })
+            .disposed(by: disposeBag)
         
-        // button
+        
+        viewModel
+            .locationInfo?
+            .drive(onNext: { bundle in
+                
+                // 위치정보 전달
+                
+            })
+            .disposed(by: disposeBag)
+        
+        // Input
+        
+        // viewWillAppear
+        self.rx.viewWillAppear
+            .map({ _ in  })
+            .bind(to: viewModel.viewWillAppear)
+            .disposed(by: disposeBag)
+        
+        // 지원하기
+        applyButton
+            .rx.tap
+            .bind(to: viewModel.applyButtonClicked)
+            .disposed(by: disposeBag)
+        
+        // 즐겨 찾기 버튼
+        contentView.cardView.starButton
+            .eventPublisher
+            .map { state in return state == .accent }
+            .bind(to: viewModel.startButtonClicked)
+            .disposed(by: disposeBag)
+        
+        // 센터 프로필 보기 버튼
+        contentView.centerInfoCard
+            .rx.tap
+            .bind(to: viewModel.applyButtonClicked)
+            .disposed(by: disposeBag)
+        
+        // 뒤로가기 버튼
+        navigationBar.backButton
+            .rx.tap
+            .bind(to: viewModel.backButtonClicked)
+            .disposed(by: disposeBag)
     }
 }
 
@@ -243,12 +338,5 @@ public class PostDetailForWorkerContentView: UIView {
     private func setObservable() {
         
         
-    }
-    
-    public func bind() {
-        
-        cardView.bind(ro: .mock)
-        workLocationView.bind()
-        centerInfoCard.bind(nameText: "세얼간이 센터", locationText: "아남타워 7층")
     }
 }

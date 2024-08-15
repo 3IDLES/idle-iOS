@@ -108,30 +108,45 @@ public class WorkConditionDisplayingView: HStack {
 
 public extension WorkConditionDisplayingView {
     
+    private func applyObject(_ object: WorkTimeAndPayStateObject) {
+        let daysText = object.selectedDays.compactMap { (day, isActive) -> String? in
+            return isActive ? day.korOneLetterText : nil
+        }.joined(separator: ", ")
+        
+        workDaysLabel.textString = daysText
+        
+        let workTimeText = [
+            object.workStartTime?.convertToStringForButton() ?? "00:00",
+            object.workEndTime?.convertToStringForButton() ?? "00:00"
+        ].joined(separator: " - ")
+        
+        workTimeLabel.textString = workTimeText
+        
+        let paymentTypeText = object.paymentType?.korLetterText ?? "오류"
+        let paymentAmountText = object.paymentAmount
+        
+        workPaymentLabel.textString = "\(paymentTypeText) \(paymentAmountText)원"
+    }
+    
+    private func applyObject(_ object: AddressInputStateObject) {
+        workLocationLabel.textString = object.addressInfo?.roadAddress ?? "오류"
+    }
+    
+    func bind(
+        workTimeAndPayStateObject: WorkTimeAndPayStateObject,
+        addressInputStateObject: AddressInputStateObject
+    ) {
+        applyObject(workTimeAndPayStateObject)
+        applyObject(addressInputStateObject)
+    }
+    
     func bind(viewModel: WorkConditionDisplayingVMable) {
         
         viewModel
             .casting_workTimeAndPay
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
-                
-                let daysText = object.selectedDays.compactMap { (day, isActive) -> String? in
-                    return isActive ? day.korOneLetterText : nil
-                }.joined(separator: ", ")
-                
-                workDaysLabel.textString = daysText
-                
-                let workTimeText = [
-                    object.workStartTime?.convertToStringForButton() ?? "00:00",
-                    object.workEndTime?.convertToStringForButton() ?? "00:00"
-                ].joined(separator: " - ")
-                
-                workTimeLabel.textString = workTimeText
-                
-                let paymentTypeText = object.paymentType?.korLetterText ?? "오류"
-                let paymentAmountText = object.paymentAmount
-                
-                workPaymentLabel.textString = "\(paymentTypeText) \(paymentAmountText)원"
+                applyObject(object)
             })
             .disposed(by: disposeBag)
         
@@ -139,8 +154,7 @@ public extension WorkConditionDisplayingView {
             .casting_addressInput
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
-                
-                workLocationLabel.textString = object.addressInfo?.roadAddress ?? "오류"
+                applyObject(object)
             })
             .disposed(by: disposeBag)
     }
