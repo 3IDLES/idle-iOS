@@ -9,7 +9,6 @@ import Foundation
 
 public struct WorkerEmployCardVO {
     
-    public let postId: String
     public let dayLeft: Int
     public let isBeginnerPossible: Bool
     public let timeTakenForWalk: String
@@ -23,8 +22,8 @@ public struct WorkerEmployCardVO {
     public let paymentType: PaymentType
     public let paymentAmount: Int
     
-    public init(postId: String, dayLeft: Int, isBeginnerPossible: Bool, timeTakenForWalk: String, title: String, targetAge: Int, careGrade: CareGrade, targetGender: Gender, days: [WorkDay], startTime: String, endTime: String, paymentType: PaymentType, paymentAmount: Int) {
-        self.postId = postId
+    public init(dayLeft: Int, isBeginnerPossible: Bool, timeTakenForWalk: String, title: String, targetAge: Int, careGrade: CareGrade, targetGender: Gender, days: [WorkDay], startTime: String, endTime: String, paymentType: PaymentType, paymentAmount: Int) {
+        
         self.dayLeft = dayLeft
         self.isBeginnerPossible = isBeginnerPossible
         self.timeTakenForWalk = timeTakenForWalk
@@ -40,7 +39,6 @@ public struct WorkerEmployCardVO {
     }
       
     public static func create(
-        postId: String,
         workTimeAndPay: WorkTimeAndPayStateObject,
         customerRequirement: CustomerRequirementStateObject,
         customerInformation: CustomerInformationStateObject,
@@ -93,7 +91,6 @@ public struct WorkerEmployCardVO {
         let paymentAmount = Int(workTimeAndPay.paymentAmount) ?? 0
         
         return WorkerEmployCardVO(
-            postId: postId,
             dayLeft: leftDay ?? 0,
             isBeginnerPossible: isBeginnerPossible,
             timeTakenForWalk: timeTakenForWalk,
@@ -121,7 +118,6 @@ fileprivate extension String {
 public extension WorkerEmployCardVO {
     
     static let mock = WorkerEmployCardVO(
-        postId: "00-00000-00000",
         dayLeft: 10,
         isBeginnerPossible: true,
         timeTakenForWalk: "도보 15분",
@@ -137,7 +133,6 @@ public extension WorkerEmployCardVO {
     )
     
     static let `default` = WorkerEmployCardVO(
-        postId: "00-00000-00000",
         dayLeft: 0,
         isBeginnerPossible: true,
         timeTakenForWalk: "도보 15분",

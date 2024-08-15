@@ -57,7 +57,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         )
         .map(RecruitmentPostDTO.self)
         .map { dto in
-            <#code#>
+            dto.toEntity()
         }
     }
 }

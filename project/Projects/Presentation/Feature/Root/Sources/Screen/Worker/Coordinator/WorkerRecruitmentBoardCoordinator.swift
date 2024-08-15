@@ -7,6 +7,7 @@
 
 import UIKit
 import WorkerFeature
+import BaseFeature
 import PresentationCore
 import UseCaseInterface
 
@@ -58,7 +59,16 @@ public class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinata
 
 extension WorkerRecruitmentBoardCoordinator {
     public func showPostDetail(postId: String) {
-        
+        let coodinator = PostDetailForWorkerCoodinator(
+            dependency: .init(
+                postId: postId,
+                parent: self,
+                navigationController: navigationController,
+                recruitmentPostUseCase: recruitmentPostUseCase
+            )
+        )
+        addChildCoordinator(coodinator)
+        coodinator.start()
     }
     public func showCenterProfile(centerId: String) {
         

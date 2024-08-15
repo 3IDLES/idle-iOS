@@ -395,7 +395,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             ] emitter in
                 
                 let vo = WorkerEmployCardVO.create(
-                    postId: "",
                     workTimeAndPay: editing_workTimeAndPay.value,
                     customerRequirement: editing_customerRequirement.value,
                     customerInformation: editing_customerInformation.value,
