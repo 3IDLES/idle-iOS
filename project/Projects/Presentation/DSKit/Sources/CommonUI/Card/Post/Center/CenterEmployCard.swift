@@ -42,7 +42,6 @@ public struct CenterEmployCardRO {
         applicantCount: 2
     )
     
-    
     public static func create(_ vo: CenterEmployCardVO) -> CenterEmployCardRO {
         .init(
             startDay: vo.startDay,
@@ -187,7 +186,6 @@ fileprivate class TextVM: CenterEmployCardViewModelable {
     var terminatePostBtnClicked: RxRelay.PublishRelay<Void> = .init()
     
     init() {
-        
         renderObject = publishObect.asDriver(onErrorJustReturn: .mock)
     }
 }
