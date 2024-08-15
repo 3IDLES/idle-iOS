@@ -1,5 +1,5 @@
 //
-//  PostDetailVc.swift
+//  PostDetailForWorkerVC.swift
 //  BaseFeature
 //
 //  Created by choijunios on 8/7/24.
@@ -12,7 +12,8 @@ import RxSwift
 import Entity
 import DSKit
 
-public class PostDetailVC: BaseViewController {
+/// 센토도 요양보호사가 보는 공고화면을 볼 수 있기 때문에 해당뷰를 BaseFeature에 구현하였습니다.
+public class PostDetailForWorkerVC: BaseViewController {
     
     // Init
     
@@ -22,7 +23,7 @@ public class PostDetailVC: BaseViewController {
         return bar
     }()
     
-    let contentView = PostDetailContentView()
+    let contentView = PostDetailForWorkerContentView()
     
     // 하단 버튼
     let csButton: IdleSecondaryButton = {
@@ -132,14 +133,20 @@ public class PostDetailVC: BaseViewController {
 }
 
 // MARK: PostDetailContentView
-public class PostDetailContentView: UIView {
+public class PostDetailForWorkerContentView: UIView {
     
+    /// 구인공고 카드
     let cardView: WorkerEmployCard = .init()
     
+    /// 지도뷰
     let workLocationView = WorkLocationView()
+    
+    /// 공고 상세정보들
     let workConditionView = WorkConditionDisplayingView()
     let customerInfoView = CustomerInformationDisplayingView()
     let applicationDetailView = ApplicationDetailDisplayingView()
+    
+    /// 센터 프로필로 이동하는 카드및 센터정보 표시
     let centerInfoCard = CenterInfoCardView()
     
     public init() {

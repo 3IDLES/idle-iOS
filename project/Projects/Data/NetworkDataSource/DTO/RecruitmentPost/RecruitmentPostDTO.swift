@@ -184,7 +184,7 @@ public struct RecruitmentPostFetchDTO: Codable {
     }
 }
 
-fileprivate extension ApplyType {
+extension ApplyType {
     static func toEntity(text: String) -> ApplyType {
         switch text {
         case "CALLING":
@@ -200,7 +200,7 @@ fileprivate extension ApplyType {
     }
 }
 
-fileprivate extension ApplyDeadlineType {
+extension ApplyDeadlineType {
     static func toEntity(text: String) -> ApplyDeadlineType {
         switch text {
         case "UNLIMITED":
@@ -214,7 +214,7 @@ fileprivate extension ApplyDeadlineType {
     }
 }
 
-fileprivate extension DailySupportType {
+extension DailySupportType {
     static func toEntity(text: String) -> DailySupportType {
         switch text {
         case "CLEANING":
@@ -234,7 +234,7 @@ fileprivate extension DailySupportType {
     }
 }
 
-fileprivate extension Gender {
+extension Gender {
     static func toEntity(text: String) -> Gender {
         switch text {
         case "MAN":
@@ -248,7 +248,7 @@ fileprivate extension Gender {
     }
 }
 
-fileprivate extension PaymentType {
+extension PaymentType {
     
     static func toEntity(text: String) -> PaymentType {
         switch text {
@@ -265,7 +265,7 @@ fileprivate extension PaymentType {
     }
 }
 
-fileprivate extension IdleDateComponent {
+extension IdleDateComponent {
     
     static func toEntity(text: String) -> IdleDateComponent {
         let timeArr = text.split(separator: ":")
@@ -283,7 +283,7 @@ fileprivate extension IdleDateComponent {
     }
 }
 
-fileprivate extension CognitionDegree {
+extension CognitionDegree {
     static func toEntity(text: String) -> CognitionDegree {
         switch text {
         case "NORMAL":
@@ -299,7 +299,7 @@ fileprivate extension CognitionDegree {
     }
 }
 
-fileprivate extension WorkDay {
+extension WorkDay {
     
     static func toEntity(text: String) -> WorkDay {
         
