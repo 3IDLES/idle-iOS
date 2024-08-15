@@ -121,65 +121,13 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
                 fetched_applicationDetail.accept(bundle.applicationDetail)
                 fetched_addressInfo.accept(bundle.addressInfo)
                 
-                // 남은 일수
-                var leftDay: Int? = nil
-                let calendar = Calendar.current
-                let currentDate = Date()
-                
-                if fetched_applicationDetail.value.applyDeadlineType == .specificDate, let deadlineDate = fetched_applicationDetail.value.deadlineDate {
-                    
-                    let component = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
-                    leftDay = component.day
-                }
-                
-                // 초보가능 여부
-                let isBeginnerPossible = fetched_applicationDetail.value.experiencePreferenceType == .beginnerPossible
-                
-                // 제목(=도로명주소)
-                let title = fetched_addressInfo.value.addressInfo?.roadAddress.emptyDefault("위치정보 표기 오류") ?? ""
-                
-                // 도보시간
-                let timeTakenForWalk = "도보 n분"
-                
-                // 생년
-                let birthYear = Int(fetched_customerInformation.value.birthYear) ?? 1970
-                let currentYear = calendar.component(.year, from: currentDate)
-                let targetAge = currentYear - birthYear + 1
-                
-                // 요양등급
-                let targetLavel: Int = (fetched_customerInformation.value.careGrade?.rawValue ?? 0)+1
-                
-                // 성별
-                let targetGender = fetched_customerInformation.value.gender
-                
-                // 근무 요일
-                let days = fetched_workTimeAndPay.value.selectedDays.filter { (_, value) in
-                    value
-                }.map { (key, _) in
-                    key
-                }
-                
-                // 근무 시작, 종료시간
-                let startTime = fetched_workTimeAndPay.value.workStartTime?.convertToStringForButton() ?? "00:00"
-                let workEndTime = fetched_workTimeAndPay.value.workEndTime?.convertToStringForButton() ?? "00:00"
-                
-                // 급여타입및 양
-                let paymentType = fetched_workTimeAndPay.value.paymentType ?? .hourly
-                let paymentAmount = fetched_workTimeAndPay.value.paymentAmount
-                
-                return WorkerEmployCardVO(
-                    dayLeft: leftDay ?? 0,
-                    isBeginnerPossible: isBeginnerPossible,
-                    title: title,
-                    timeTakenForWalk: timeTakenForWalk,
-                    targetAge: targetAge,
-                    targetLevel: targetLavel,
-                    targetGender: targetGender ?? .notDetermined,
-                    days: days,
-                    startTime: startTime,
-                    endTime: workEndTime,
-                    paymentType: paymentType,
-                    paymentAmount: paymentAmount
+                return WorkerEmployCardVO.create(
+                    postId: id,
+                    workTimeAndPay: fetched_workTimeAndPay.value,
+                    customerRequirement: fetched_customerRequirement.value,
+                    customerInformation: fetched_customerInformation.value,
+                    applicationDetail: fetched_applicationDetail.value,
+                    addressInfo: fetched_addressInfo.value
                 )
             }
             .asDriver(onErrorJustReturn: .default)

@@ -17,18 +17,18 @@ public class WorkerEmployCardRO {
     let dayLeftTagText: String?
     let titleText: String
     let timeTakenForWalkText: String
-    let tagetInfoText: String
+    let targetInfoText: String
     let workDaysText: String
     let workTimeText: String
     let payText: String
     
-    init(showBiginnerTag: Bool, showDayLeftTag: Bool, dayLeftTagText: String?, titleText: String, timeTakenForWalkText: String, tagetInfoText: String, workDaysText: String, workTimeText: String, payText: String) {
+    init(showBiginnerTag: Bool, showDayLeftTag: Bool, dayLeftTagText: String?, titleText: String, timeTakenForWalkText: String, targetInfoText: String, workDaysText: String, workTimeText: String, payText: String) {
         self.showBiginnerTag = showBiginnerTag
         self.showDayLeftTag = showDayLeftTag
         self.dayLeftTagText = dayLeftTagText
         self.titleText = titleText
         self.timeTakenForWalkText = timeTakenForWalkText
-        self.tagetInfoText = tagetInfoText
+        self.targetInfoText = targetInfoText
         self.workDaysText = workDaysText
         self.workTimeText = workTimeText
         self.payText = payText
@@ -46,22 +46,37 @@ public class WorkerEmployCardRO {
        
         let targetInfoText = "\(vo.careGrade.textForCellBtn)등급 \(vo.targetAge)세 \(vo.targetGender.twoLetterKoreanWord)"
         
-        let workDaysText = vo.days.map({ $0.korOneLetterText }).joined(separator: ",")
+        let workDaysText = vo.days.sorted(by: { d1, d2 in
+            d1.rawValue < d2.rawValue
+        }).map({ $0.korOneLetterText }).joined(separator: ",")
+        
         let workTimeText = "\(vo.startTime) - \(vo.endTime)"
         let payText = "\(vo.paymentType.korLetterText) \(vo.paymentAmount) 원"
         
         return .init(
-            showBiginnerTag: !vo.isBeginnerPossible,
+            showBiginnerTag: vo.isBeginnerPossible,
             showDayLeftTag: showDayLeftTag,
             dayLeftTagText: dayLeftTagText,
             titleText: vo.title,
-            timeTakenForWalkText: "걸어서 n분(미구현)",
-            tagetInfoText: targetInfoText,
+            timeTakenForWalkText: vo.timeTakenForWalk,
+            targetInfoText: targetInfoText,
             workDaysText: workDaysText,
             workTimeText: workTimeText,
             payText: payText
         )
     }
+    
+    public static let `mock`: WorkerEmployCardRO = .init(
+        showBiginnerTag: true,
+        showDayLeftTag: true,
+        dayLeftTagText: "D-14",
+        titleText: "사울시 강남동",
+        timeTakenForWalkText: "도보 5분",
+        targetInfoText: "1등급 54세 여성",
+        workDaysText: "",
+        workTimeText: "월, 화, 수",
+        payText: "시급 5000원"
+    )
 }
 
 
@@ -282,9 +297,11 @@ public class WorkerEmployCard: UIView {
     public func bind(ro: WorkerEmployCardRO) {
         
         beginnerTag.isHidden = !ro.showBiginnerTag
+        dayLeftTag.isHidden = !ro.showDayLeftTag
+        dayLeftTag.textString = ro.dayLeftTagText ?? ""
         titleLabel.textString = ro.titleText
         timeTakenForWalkLabel.textString = ro.timeTakenForWalkText
-        serviceTargetInfoLabel.textString = ro.tagetInfoText
+        serviceTargetInfoLabel.textString = ro.targetInfoText
         workDaysLabel.textString = ro.workDaysText
         workTimeLabel.textString = ro.workTimeText
         payLabel.textString = ro.payText

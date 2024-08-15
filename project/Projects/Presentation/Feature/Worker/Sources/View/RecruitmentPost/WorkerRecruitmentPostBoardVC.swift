@@ -13,14 +13,6 @@ import RxSwift
 import Entity
 import DSKit
 
-public protocol WorkerRecruitmentPostBoardVMable: DefaultAlertOutputable {
-    
-    var ongoingPostCardVO: Driver<[WorkerEmployCardVO]>? { get }
-    var requestOngoingPost: PublishRelay<Void> { get }
-    
-    func createCellVM(vo: WorkerEmployCardVO) -> WorkerEmployCardViewModelable
-}
-
 public class WorkerRecruitmentPostBoardVC: BaseViewController {
     typealias Cell = WorkerEmployCardCell
     
@@ -58,6 +50,11 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     }
     
     public func bind(viewModel: WorkerRecruitmentPostBoardVMable) {
+        
+        self.viewModel = viewModel
+        
+        topContainer.locationLabel.textString = "서울시 영등포구(미구현)"
+        
         // Output
         viewModel
             .ongoingPostCardVO?
@@ -67,7 +64,7 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         // Input
         rx.viewWillAppear
             .map { _ in () }
-            .bind(to: viewModel.requestOngoingPost)
+            .bind(to: viewModel.viewWillAppear)
             .disposed(by: disposeBag)
     }
     

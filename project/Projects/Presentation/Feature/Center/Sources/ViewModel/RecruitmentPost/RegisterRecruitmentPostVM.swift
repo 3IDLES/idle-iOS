@@ -389,69 +389,18 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
             .create { [
                 editing_workTimeAndPay,
                 editing_customerInformation,
+                editing_customerRequirement,
                 editing_applicationDetail,
                 editing_addressInfo
             ] emitter in
                 
-                // 남은 일수
-                var leftDay: Int? = nil
-                let calendar = Calendar.current
-                let currentDate = Date()
-                
-                if editing_applicationDetail.value.applyDeadlineType == .specificDate, let deadlineDate = editing_applicationDetail.value.deadlineDate {
-                    
-                    let component = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
-                    leftDay = component.day
-                }
-                
-                // 초보가능 여부
-                let isBeginnerPossible = editing_applicationDetail.value.experiencePreferenceType == .beginnerPossible
-                
-                // 제목(=도로명주소)
-                let title = editing_addressInfo.value.addressInfo?.roadAddress ?? "위치정보 표기 오류"
-                
-                // 도보시간
-                let timeTakenForWalk = "도보 n분"
-                
-                // 생년
-                let birthYear = Int(editing_customerInformation.value.birthYear) ?? 1970
-                let currentYear = calendar.component(.year, from: currentDate)
-                let targetAge = currentYear - birthYear + 1
-                
-                // 요양등급
-                let targetLavel: Int = (editing_customerInformation.value.careGrade?.rawValue ?? 0)+1
-                
-                // 성별
-                let targetGender = editing_customerInformation.value.gender
-                
-                // 근무 요일
-                let days = editing_workTimeAndPay.value.selectedDays.filter { (_, value) in
-                    value
-                }.map { (key, _) in
-                    key
-                }
-                
-                // 근무 시작, 종료시간
-                let startTime = editing_workTimeAndPay.value.workStartTime?.convertToStringForButton() ?? "00:00"
-                let workEndTime = editing_workTimeAndPay.value.workEndTime?.convertToStringForButton() ?? "00:00"
-                
-                // 급여타입및 양
-                let paymentType = editing_workTimeAndPay.value.paymentType ?? .hourly
-                let paymentAmount = editing_workTimeAndPay.value.paymentAmount
-                
-                let vo = WorkerEmployCardVO(
-                    dayLeft: leftDay ?? 0,
-                    isBeginnerPossible: isBeginnerPossible,
-                    title: title,
-                    timeTakenForWalk: timeTakenForWalk,
-                    targetAge: targetAge,
-                    targetLevel: targetLavel,
-                    targetGender: targetGender ?? .notDetermined,
-                    days: days,
-                    startTime: startTime,
-                    endTime: workEndTime,
-                    paymentType: paymentType,
-                    paymentAmount: paymentAmount
+                let vo = WorkerEmployCardVO.create(
+                    postId: "",
+                    workTimeAndPay: editing_workTimeAndPay.value,
+                    customerRequirement: editing_customerRequirement.value,
+                    customerInformation: editing_customerInformation.value,
+                    applicationDetail: editing_applicationDetail.value,
+                    addressInfo: editing_addressInfo.value
                 )
                 
                 emitter.onNext(vo)

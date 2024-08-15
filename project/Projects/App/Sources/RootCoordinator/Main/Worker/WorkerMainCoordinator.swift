@@ -9,6 +9,7 @@ import UIKit
 import DSKit
 import PresentationCore
 import RootFeature
+import UseCaseInterface
 
 class WorkerMainCoordinator: ParentCoordinator {
     
@@ -54,7 +55,7 @@ class WorkerMainCoordinator: ParentCoordinator {
     func createNavForTab(page: IdleWorkerMainPage) -> UINavigationController {
         
         let tabNavController = UINavigationController()
-        tabNavController.setNavigationBarHidden(false, animated: false)
+        tabNavController.setNavigationBarHidden(true, animated: false)
         
         startTabCoordinator(
             page: page,
@@ -66,19 +67,23 @@ class WorkerMainCoordinator: ParentCoordinator {
     // #2. 생성한 컨트롤러를 각 탭별 Coordinator에 전달
     func startTabCoordinator(page: IdleWorkerMainPage, navigationController: UINavigationController) {
         
-        var coordinator: ChildCoordinator!
+        var coordinator: Coordinator!
         
         switch page {
         case .home:
-            coordinator = RecruitmentBoardCoordinator(
-                navigationController: navigationController
+            coordinator = WorkerRecruitmentBoardCoordinator(
+                depedency: .init(
+                    navigationController: navigationController,
+                    centerProfileUseCase: injector.resolve(CenterProfileUseCase.self),
+                    recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
+                )
             )
         case .preferredPost:
             coordinator = ApplyManagementCoordinator(
                 navigationController: navigationController
             )
         case .setting:
-            coordinator = RecruitmentBoardCoordinator(
+            coordinator = ApplyManagementCoordinator(
                 navigationController: navigationController
             )
         }
