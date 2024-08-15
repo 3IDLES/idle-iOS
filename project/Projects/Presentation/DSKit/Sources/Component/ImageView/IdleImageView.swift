@@ -16,7 +16,7 @@ public extension UIImageView {
     }()
     
     static let locationMark: UIImageView = {
-        let view = UIImageView(image: DSKitAsset.Icons.locationSmall.image)
+        let view = UIImageView(image: DSKitAsset.Icons.location.image)
         view.contentMode = .scaleAspectFit
         return view
     }()

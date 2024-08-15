@@ -292,7 +292,7 @@ public class PostDetailForCenterVC: BaseViewController {
         viewModel
             .workerEmployCardVO?
             .drive(onNext: { [sampleCard] vo in
-                sampleCard.bind(vo: vo)
+                sampleCard.bind(ro: .create(vo: vo))
             })
             .disposed(by: disposeBag)
     }

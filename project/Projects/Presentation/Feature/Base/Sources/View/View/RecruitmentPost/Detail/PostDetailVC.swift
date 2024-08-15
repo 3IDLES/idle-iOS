@@ -240,7 +240,7 @@ public class PostDetailContentView: UIView {
     
     public func bind() {
         
-        cardView.bind(vo: .mock)
+        cardView.bind(ro: .mock)
         workLocationView.bind()
         centerInfoCard.bind(nameText: "세얼간이 센터", locationText: "아남타워 7층")
     }

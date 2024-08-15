@@ -14,6 +14,11 @@ import Entity
 public struct ApplicationInfo {
     let isApplied: Bool
     let applicationDateText: String
+    
+    public static let mock: ApplicationInfo = .init(
+        isApplied: true,
+        applicationDateText: "2024. 10. 22"
+    )
 }
 
 public protocol WorkerEmployCardViewModelable {
@@ -38,6 +43,11 @@ public class WorkerEmployCardCell: UITableViewCell {
     var viewModel: WorkerEmployCardViewModelable?
     private var disposables: [Disposable?]?
     
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+
+        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 20, bottom: 8, right: 20))
+    }
     
     // View
     let tappableArea: TappableUIView = .init()

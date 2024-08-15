@@ -6,20 +6,22 @@
 //
 
 import UIKit
+import WorkerFeature
 import PresentationCore
-
-public protocol WorkerRecruitmentBoardCoordinatable: ParentCoordinator {
-    /// 요양보호사가 볼 수 있는 공고 상세정보를 표시합니다.
-    func showPostDetail(postId: String)
-    
-    /// 센터 프로필을 표시합니다.
-    func showCenterProfile(centerId: String)
-}
+import UseCaseInterface
 
 public class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
     
     public struct Dependency {
         let navigationController: UINavigationController
+        let centerProfileUseCase: CenterProfileUseCase
+        let recruitmentPostUseCase: RecruitmentPostUseCase
+        
+        public init(navigationController: UINavigationController, centerProfileUseCase: CenterProfileUseCase, recruitmentPostUseCase: RecruitmentPostUseCase) {
+            self.navigationController = navigationController
+            self.centerProfileUseCase = centerProfileUseCase
+            self.recruitmentPostUseCase = recruitmentPostUseCase
+        }
     }
     
     public var childCoordinators: [any PresentationCore.Coordinator] = []
@@ -30,13 +32,21 @@ public class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinata
     
     weak var parent: ParentCoordinator?
     
+    let centerProfileUseCase: CenterProfileUseCase
+    let recruitmentPostUseCase: RecruitmentPostUseCase
+    
     public init(depedency: Dependency) {
         self.navigationController = depedency.navigationController
+        self.centerProfileUseCase = depedency.centerProfileUseCase
+        self.recruitmentPostUseCase = depedency.recruitmentPostUseCase
     }
     
     public func start() {
-        let vc = RecruitmentBoardVC()
-        
+        let vc = WorkerRecruitmentPostBoardVC()
+        let vm = WorkerRecruitmentPostBoardVM(
+            coordinator: self
+        )
+        vc.bind(viewModel: vm)
         navigationController.pushViewController(vc, animated: false)
     }
     

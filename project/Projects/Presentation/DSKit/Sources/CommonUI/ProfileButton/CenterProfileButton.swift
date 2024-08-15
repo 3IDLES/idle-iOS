@@ -65,7 +65,7 @@ public class CenterProfileButton: TappableUIView {
     
     private func setLayout() {
         
-        let locImage = DSKitAsset.Icons.locationSmall.image.toView()
+        let locImage = DSKitAsset.Icons.location.image.toView()
         let locationStack = HStack(
             [
                 locImage,

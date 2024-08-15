@@ -47,7 +47,7 @@ public class CenterInfoCardView: TappableUIView {
     
     private func setLayout() {
         
-        let locationImageView = DSKitAsset.Icons.locationSmall.image.toView()
+        let locationImageView = DSKitAsset.Icons.location.image.toView()
         let locationStack = HStack(
             [
                 locationImageView,
