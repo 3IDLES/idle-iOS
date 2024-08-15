@@ -19,7 +19,7 @@ public protocol WorkerRecruitmentPostBoardVMable: DefaultAlertOutputable {
     var viewWillAppear: PublishRelay<Void> { get }
     var locationTtitleText: PublishRelay<String> { get }
     
-    func createCellVM(vo: WorkerEmployCardVO) -> WorkerEmployCardViewModelable
+    func createCellVM(postId: String, vo: WorkerEmployCardVO) -> WorkerEmployCardViewModelable
 }
 
 
@@ -58,8 +58,9 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
             .asDriver(onErrorJustReturn: .default)
     }
     
-    public func createCellVM(vo: Entity.WorkerEmployCardVO) -> any DSKit.WorkerEmployCardViewModelable {
+    public func createCellVM(postId: String, vo: Entity.WorkerEmployCardVO) -> any DSKit.WorkerEmployCardViewModelable {
         WorkerEmployCardVM(
+            postId: postId,
             vo: vo,
             coordinator: coordinator
         )
@@ -88,11 +89,12 @@ public class WorkerEmployCardVM: WorkerEmployCardViewModelable {
     
     public init
         (
+            postId: String,
             vo: WorkerEmployCardVO,
             coordinator: WorkerRecruitmentBoardCoordinatable? = nil
         )
     {
-        self.postId = vo.postId
+        self.postId = postId
         self.coordinator = coordinator
         
         // MARK: 지원여부

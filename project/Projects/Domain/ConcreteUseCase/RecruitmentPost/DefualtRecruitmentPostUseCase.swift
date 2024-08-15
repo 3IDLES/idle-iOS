@@ -49,7 +49,6 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         )
     }
     
-    
     public func getPostDetailForCenter(id: String) -> RxSwift.Single<Result<Entity.RegisterRecruitmentPostBundle, Entity.RecruitmentPostError>> {
         convert(task: repository.getPostDetailForCenter(id: id))
     }

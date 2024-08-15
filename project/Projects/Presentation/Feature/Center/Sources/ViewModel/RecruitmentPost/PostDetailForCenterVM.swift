@@ -122,7 +122,6 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
                 fetched_addressInfo.accept(bundle.addressInfo)
                 
                 return WorkerEmployCardVO.create(
-                    postId: id,
                     workTimeAndPay: fetched_workTimeAndPay.value,
                     customerRequirement: fetched_customerRequirement.value,
                     customerInformation: fetched_customerInformation.value,

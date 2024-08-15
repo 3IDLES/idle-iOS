@@ -120,9 +120,14 @@ extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelega
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
         cell.selectionStyle = .none
         
+        // MARK: TODO: PostId를 가져오기
+        
         if let viewModel = self.viewModel {
             let vo = ongoingPostCardVO.value[indexPath.row]
-            let vm = viewModel.createCellVM(vo: vo)
+            let vm = viewModel.createCellVM(
+                postId: "00-00000-00000",
+                vo: vo
+            )
             cell.bind(viewModel: vm)
         }
         

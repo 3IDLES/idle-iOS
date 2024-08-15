@@ -42,7 +42,7 @@ public struct RecruitmentPostDTO: Codable {
     public let applyDeadlineType: String
     public let applyDeadline: String?
     
-    func toEntity() -> RecruitmentPostForWorkerBundle {
+    public func toEntity() -> RecruitmentPostForWorkerBundle {
         
         let workTimeAndPay: WorkTimeAndPayStateObject = .init()
         weekdays.forEach({ dayText in

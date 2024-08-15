@@ -17,20 +17,6 @@ public struct WorkAndWorkerLocationMapRO {
     let workLocation: LocationInformation
     let workerLocation: LocationInformation
 }
- 
-public protocol PostDetailForWorkerViewModelable {
-    
-    // Output
-    var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
-    var locationInfo: Driver<WorkAndWorkerLocationMapRO>? { get }
-    
-    // Input
-    var backButtonClicked: PublishRelay<Void> { get }
-    var applyButtonClicked: PublishRelay<Void> { get }
-    var startButtonClicked: PublishRelay<Bool> { get }
-    var centerCardClicked: PublishRelay<Void> { get }
-    var viewWillAppear: PublishRelay<Void> { get }
-}
 
 /// 센토도 요양보호사가 보는 공고화면을 볼 수 있기 때문에 해당뷰를 BaseFeature에 구현하였습니다.
 public class PostDetailForWorkerVC: BaseViewController {
@@ -154,6 +140,19 @@ public class PostDetailForWorkerVC: BaseViewController {
             .drive(onNext: {
                 [weak self] bundle in
                 guard let self else { return }
+                
+                // 상단 구인공고 카드
+                contentView.cardView.bind(
+                    ro: WorkerEmployCardRO.create(
+                        vo: .create(
+                            workTimeAndPay: bundle.workTimeAndPay,
+                            customerRequirement: bundle.customerRequirement,
+                            customerInformation: bundle.customerInformation,
+                            applicationDetail: bundle.applicationDetail,
+                            addressInfo: bundle.addressInfo
+                        )
+                    )
+                )
                 
                 // 근무 조건
                 contentView.workConditionView.bind(
