@@ -42,7 +42,7 @@ public class IdleTabBarItem: TappableUIView {
     
     public init(index: Int, labelText: String, image: UIImage) {
         self.index = index
-        self.label.text = labelText
+        self.label.textString = labelText
         self.imageView.image = image
         
         super.init()
@@ -53,8 +53,7 @@ public class IdleTabBarItem: TappableUIView {
     public required init?(coder: NSCoder) { nil }
     
     private func setAppearance() {
-        self.layer.cornerRadius = 44
-        self.clipsToBounds = true
+        imageView.tintColor = idleIconColor
     }
     
     private func setLayout() {
@@ -64,6 +63,9 @@ public class IdleTabBarItem: TappableUIView {
         mainStack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
+            imageView.widthAnchor.constraint(equalToConstant: 32),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor),
+            
             mainStack.topAnchor.constraint(equalTo: self.topAnchor),
             mainStack.leftAnchor.constraint(equalTo: self.leftAnchor),
             mainStack.rightAnchor.constraint(equalTo: self.rightAnchor),

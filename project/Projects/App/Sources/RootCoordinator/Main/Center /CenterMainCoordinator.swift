@@ -42,7 +42,7 @@ class CenterMainCoordinator: CenterMainCoordinatable {
             )
         }
         
-        let tabController = IdleTabBar()
+        let tabController = IdleTabBarProto()
         tabController.setViewControllers(info: tabInfo)
         tabController.selectedIndex = 0
         

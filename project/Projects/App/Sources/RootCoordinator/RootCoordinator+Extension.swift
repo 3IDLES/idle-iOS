@@ -13,14 +13,18 @@ extension RootCoordinator {
     /// 로그인및 회원가입을 실행합니다.
     func auth() {
         
-        let authCoordinator = AuthCoordinator(
+        let coordinator = AuthCoordinator(
             dependency: .init(
                 navigationController: navigationController,
                 injector: injector
             )
         )
         
-        authCoordinator.start()
+        coordinator.parent = self
+        
+        addChildCoordinator(coordinator)
+        
+        coordinator.start()
     }
     
     /// 요양보호사 메인화면을 실행합니다.
