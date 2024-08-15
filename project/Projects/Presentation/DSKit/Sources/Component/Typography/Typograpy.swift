@@ -32,6 +32,7 @@ public enum Typography {
     case Body3
     
     case caption
+    case caption2
     
     var lineHeight: CGFloat {
         switch self {
@@ -58,6 +59,8 @@ public enum Typography {
         case .Body3:
             20
         case .caption:
+            18.6
+        case .caption2:
             18.6
         }
     }
@@ -145,6 +148,13 @@ public enum Typography {
         case .caption:
             Self.createAttribute(
                 weight: .medium,
+                size: 12,
+                letterSpacing: -0.2,
+                color: DSKitAsset.Colors.gray900.color
+            )
+        case .caption2:
+            Self.createAttribute(
+                weight: .Semibold,
                 size: 12,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
