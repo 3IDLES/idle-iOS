@@ -89,7 +89,6 @@ public class OnGoingPostVC: BaseViewController {
             postTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
             postTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
-
     }
     
     private func setObservable() {
@@ -136,41 +135,5 @@ extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
         }
         
         return cell
-    }
-}
-
-class BoardSortigHeaderView: UIView {
-    
-    let sortingTypeButton: ImageTextButton = {
-        let button = ImageTextButton(
-            iconImage: DSKitAsset.Icons.chevronDown.image,
-            position: .postfix
-        )
-        button.label.textString = "정렬 기준"
-        button.label.attrTextColor = DSKitAsset.Colors.gray300.color
-        return button
-    }()
-    
-    init() {
-        super.init(frame: .zero)
-        setLayout()
-    }
-    
-    required init?(coder: NSCoder) { fatalError() }
-    
-    func setLayout() {
-        
-        [
-            sortingTypeButton
-        ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            self.addSubview($0)
-        }
-        
-        NSLayoutConstraint.activate([
-            sortingTypeButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 24),
-            sortingTypeButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -24),
-            sortingTypeButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -12),
-        ])
     }
 }
