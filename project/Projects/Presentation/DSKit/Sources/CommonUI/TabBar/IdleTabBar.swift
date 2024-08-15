@@ -17,7 +17,7 @@ public class IdleTabBar: UIViewController {
 
     // 탭바구성
     public private(set) var viewControllers: [UIViewController] = []
-    private var tabBarItems: [IdleTabBarItem] = []
+    private var tabBarItems: [IdleTabBarItemProto] = []
     
     // View
     var tabBarItemStack: UIView!
@@ -151,7 +151,7 @@ public protocol IdleTabBarItemViewable: UIView {
 }
 
 
-public struct IdleTabBarItem {
+public struct IdleTabBarItemProto {
     let name: String
     
     public init(name: String) {
@@ -161,9 +161,9 @@ public struct IdleTabBarItem {
 
 public struct TabBarInfo {
     let viewController: UIViewController
-    let tabBarItem: IdleTabBarItem
+    let tabBarItem: IdleTabBarItemProto
     
-    public init(viewController: UIViewController, tabBarItem: IdleTabBarItem) {
+    public init(viewController: UIViewController, tabBarItem: IdleTabBarItemProto) {
         self.viewController = viewController
         self.tabBarItem = tabBarItem
     }
