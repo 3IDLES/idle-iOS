@@ -10,6 +10,61 @@ import RxSwift
 import RxCocoa
 import Entity
 
+public class WorkerEmployCardRO {
+    
+    let showBiginnerTag: Bool
+    let showDayLeftTag: Bool
+    let dayLeftTagText: String?
+    let titleText: String
+    let timeTakenForWalkText: String
+    let tagetInfoText: String
+    let workDaysText: String
+    let workTimeText: String
+    let payText: String
+    
+    init(showBiginnerTag: Bool, showDayLeftTag: Bool, dayLeftTagText: String?, titleText: String, timeTakenForWalkText: String, tagetInfoText: String, workDaysText: String, workTimeText: String, payText: String) {
+        self.showBiginnerTag = showBiginnerTag
+        self.showDayLeftTag = showDayLeftTag
+        self.dayLeftTagText = dayLeftTagText
+        self.titleText = titleText
+        self.timeTakenForWalkText = timeTakenForWalkText
+        self.tagetInfoText = tagetInfoText
+        self.workDaysText = workDaysText
+        self.workTimeText = workTimeText
+        self.payText = payText
+    }
+    
+    public static func create(vo: WorkerEmployCardVO) -> WorkerEmployCardRO {
+
+        var dayLeftTagText: String? = nil
+        var showDayLeftTag: Bool = false
+        
+        if (0...14).contains(vo.dayLeft) {
+            showDayLeftTag = true
+            dayLeftTagText = vo.dayLeft == 0 ? "D-Day" : "D-\(vo.dayLeft)"
+        }
+       
+        let targetInfoText = "\(vo.careGrade.textForCellBtn)등급 \(vo.targetAge)세 \(vo.targetGender.twoLetterKoreanWord)"
+        
+        let workDaysText = vo.days.map({ $0.korOneLetterText }).joined(separator: ",")
+        let workTimeText = "\(vo.startTime) - \(vo.endTime)"
+        let payText = "\(vo.paymentType.korLetterText) \(vo.paymentAmount) 원"
+        
+        return .init(
+            showBiginnerTag: !vo.isBeginnerPossible,
+            showDayLeftTag: showDayLeftTag,
+            dayLeftTagText: dayLeftTagText,
+            titleText: vo.title,
+            timeTakenForWalkText: "걸어서 n분(미구현)",
+            tagetInfoText: targetInfoText,
+            workDaysText: workDaysText,
+            workTimeText: workTimeText,
+            payText: payText
+        )
+    }
+}
+
+
 public class WorkerEmployCard: UIView {
     
     // View
@@ -68,7 +123,7 @@ public class WorkerEmployCard: UIView {
         return label
     }()
     
-    let payPerHourLabel: IdleLabel = {
+    let payLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSKitAsset.Colors.gray500.color
         return label
@@ -166,7 +221,7 @@ public class WorkerEmployCard: UIView {
         payView.backgroundColor = .clear
         [
             payImage,
-            payPerHourLabel
+            payLabel
         ]
         .forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -180,10 +235,10 @@ public class WorkerEmployCard: UIView {
             payView.leadingAnchor.constraint(equalTo: payImage.leadingAnchor),
             payView.bottomAnchor.constraint(equalTo: payImage.bottomAnchor),
             
-            payPerHourLabel.leadingAnchor.constraint(equalTo: payImage.trailingAnchor, constant: 2),
-            payPerHourLabel.centerYAnchor.constraint(equalTo: payImage.centerYAnchor),
+            payLabel.leadingAnchor.constraint(equalTo: payImage.trailingAnchor, constant: 2),
+            payLabel.centerYAnchor.constraint(equalTo: payImage.centerYAnchor),
             
-            payView.trailingAnchor.constraint(equalTo: payPerHourLabel.trailingAnchor),
+            payView.trailingAnchor.constraint(equalTo: payLabel.trailingAnchor),
         ])
         
         
@@ -224,23 +279,14 @@ public class WorkerEmployCard: UIView {
         ])
     }
     
-    public func bind(vo: WorkerEmployCardVO) {
+    public func bind(ro: WorkerEmployCardRO) {
         
-        beginnerTag.isHidden = !vo.isBeginnerPossible
-        if vo.dayLeft <= 0 {
-            if vo.dayLeft == 0 {
-                dayLeftTag.textString = "D-Day"
-            } else {
-                dayLeftTag.isHidden = true
-            }
-        } else {
-            dayLeftTag.textString = "D-\(vo.dayLeft)"
-        }
-        titleLabel.textString = vo.title
-        timeTakenForWalkLabel.textString = vo.timeTakenForWalk
-        serviceTargetInfoLabel.textString = "\(vo.targetLevel)등급 \(vo.targetAge)세 \(vo.targetGender.twoLetterKoreanWord)"
-        workDaysLabel.textString = vo.days.map({ $0.korOneLetterText }).joined(separator: ",")
-        workTimeLabel.textString = "\(vo.startTime) - \(vo.endTime)"
-        payPerHourLabel.textString = "\(vo.paymentType.korLetterText) \(vo.paymentAmount) 원"
+        beginnerTag.isHidden = !ro.showBiginnerTag
+        titleLabel.textString = ro.titleText
+        timeTakenForWalkLabel.textString = ro.timeTakenForWalkText
+        serviceTargetInfoLabel.textString = ro.tagetInfoText
+        workDaysLabel.textString = ro.workDaysText
+        workTimeLabel.textString = ro.workTimeText
+        payLabel.textString = ro.payText
     }
 }
