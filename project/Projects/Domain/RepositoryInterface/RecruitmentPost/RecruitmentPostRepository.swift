@@ -17,4 +17,7 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     func getPostDetailForCenter(id: String) -> Single<RegisterRecruitmentPostBundle>
     
     func editPostDetail(id: String, bundle: RegisterRecruitmentPostBundle) -> Single<Void>
+    
+    // MARK: Worker
+    func getPostDetailForWorker(id: String) -> Single<RecruitmentPostForWorkerBundle>
 }

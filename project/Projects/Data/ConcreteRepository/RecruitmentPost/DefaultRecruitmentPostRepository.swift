@@ -21,6 +21,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         }
     }
     
+    // MARK:  Center
     public func registerPost(bundle: RegisterRecruitmentPostBundle) -> RxSwift.Single<Void> {
         
         let encodedData = try! JSONEncoder().encode(bundle.toDTO())
@@ -46,6 +47,18 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             api: .editPost(id: id, postData: encodedData),
             with: .withToken
         ).map { _ in () }
+    }
+    
+    // MARK: Worker
+    public func getPostDetailForWorker(id: String) -> RxSwift.Single<Entity.RecruitmentPostForWorkerBundle> {
+        service.request(
+            api: .postDetail(id: id, userType: .worker),
+            with: .withToken
+        )
+        .map(RecruitmentPostDTO.self)
+        .map { dto in
+            <#code#>
+        }
     }
 }
 
