@@ -1,5 +1,5 @@
 //
-//   RecruitmentBoardVC.swift
+//  RecruitmentBoardVC.swift
 //  RootFeature
 //
 //  Created by choijunios on 7/25/24.
