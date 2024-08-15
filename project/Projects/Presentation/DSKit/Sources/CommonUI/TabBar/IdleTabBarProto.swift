@@ -1,5 +1,5 @@
 //
-//  IdleTabBar.swift
+//  IdleTabBarProto.swift
 //  PresentationCore
 //
 //  Created by choijunios on 7/25/24.
@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 import PresentationCore
 
-public class IdleTabBar: UIViewController {
+public class IdleTabBarProto: UIViewController {
     
     // Coordinator
     public weak var coordinator: ParentCoordinator?
