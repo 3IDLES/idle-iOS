@@ -90,9 +90,9 @@ extension UserInformationAPI: BaseAPI {
             .post
         case .getMyWorkerProfile:
             .get
-        case .getOtherWorkerProfile(id: let id):
+        case .getOtherWorkerProfile:
             .get
-        case .updateWorkerProfile(data: let data):
+        case .updateWorkerProfile:
             .patch
         }
     }
