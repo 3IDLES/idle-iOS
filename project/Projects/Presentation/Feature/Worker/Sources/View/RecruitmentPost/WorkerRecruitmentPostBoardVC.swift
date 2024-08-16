@@ -13,13 +13,14 @@ import RxSwift
 import Entity
 import DSKit
 
+
 public class WorkerRecruitmentPostBoardVC: BaseViewController {
     typealias Cell = WorkerEmployCardCell
     
     var viewModel: WorkerRecruitmentPostBoardVMable?
     
     // View
-    let topContainer: WorkerMainTopContainer = {
+    fileprivate let topContainer: WorkerMainTopContainer = {
         let container = WorkerMainTopContainer(innerViews: [])
         return container
     }()
@@ -136,7 +137,7 @@ extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelega
 }
 
 // MARK: Top Container
-class WorkerMainTopContainer: UIView {
+fileprivate class WorkerMainTopContainer: UIView {
     
     // Init parameters
     
