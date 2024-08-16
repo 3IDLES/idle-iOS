@@ -12,15 +12,49 @@ import RxCocoa
 import PresentationCore
 import UseCaseInterface
 
-public struct ChangeCenterInformation {
+struct ChangeCenterInformation {
     let phoneNumber: String?
     let introduction: String?
     let image: UIImage?
 }
 
+public protocol CenterProfileViewModelable where Input: CenterProfileInputable, Output: CenterProfileOutputable {
+    associatedtype Input
+    associatedtype Output
+    var input: Input { get }
+    var output: Output? { get }
+    
+    var profileMode: ProfileMode { get }
+}
+
+public protocol CenterProfileInputable {
+    var readyToFetch: PublishRelay<Void> { get }
+    var editingButtonPressed: PublishRelay<Void> { get }
+    var editingFinishButtonPressed: PublishRelay<Void> { get }
+    var editingPhoneNumber: BehaviorRelay<String> { get }
+    var editingInstruction: BehaviorRelay<String> { get }
+    var selectedImage: PublishRelay<UIImage> { get }
+    
+    var exitButtonClicked: PublishRelay<Void> { get }
+}
+
+public protocol CenterProfileOutputable {
+    var centerName: Driver<String> { get }
+    var centerLocation: Driver<String> { get }
+    var centerPhoneNumber: Driver<String> { get }
+    var centerIntroduction: Driver<String> { get }
+    var displayingImage: Driver<UIImage?> { get }
+    var isEditingMode: Driver<Bool> { get }
+    var editingValidation: Driver<Void> { get }
+    
+    var alert: Driver<AlertWithCompletionVO>? { get }
+}
+
+
 public class CenterProfileViewModel: CenterProfileViewModelable {
     
     let profileUseCase: CenterProfileUseCase
+    weak var coordinator: CenterProfileCoordinator?
     
     public var input: Input
     public var output: Output? = nil
@@ -45,9 +79,16 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         )
     }
     
-    public init(mode: ProfileMode, useCase: CenterProfileUseCase) {
+    let disposeBag = DisposeBag()
+    
+    public init(
+        mode: ProfileMode,
+        coordinator: CenterProfileCoordinator,
+        useCase: CenterProfileUseCase) 
+    {
         
         self.profileMode = mode
+        self.coordinator = coordinator
         self.profileUseCase = useCase
         
         self.input = Input()
@@ -66,7 +107,15 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         let profileRequestFailure = profileRequestResult
             .compactMap { $0.error }
             .map { error in
-                DefaultAlertContentVO(title: "프로필 정보 불러오기 실패", message: error.message)
+                AlertWithCompletionVO(
+                    title: "프로필 정보 불러오기 실패",
+                    message: error.message,
+                    buttonInfo: [
+                        ("닫기", { [weak self] in
+                            self?.coordinator?.coordinatorDidFinish()
+                        })
+                    ]
+                )
             }
             
         let centerNameDriver = profileRequestSuccess
@@ -122,7 +171,7 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         let imageValidationFailure = imageValidationResult
             .filter { $0 == nil }
             .map { _ in
-                DefaultAlertContentVO(
+                AlertWithCompletionVO(
                     title: "이미지 선택 오류",
                     message: "지원하지 않는 이미지 형식입니다."
                 )
@@ -177,7 +226,7 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
             .compactMap({ $0.error })
             .map({ error in
                 // 변경 실패 Alert
-                return DefaultAlertContentVO(
+                return AlertWithCompletionVO(
                     title: "변경 실패",
                     message: "변경 싪패 이유"
                 )
@@ -218,6 +267,13 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
                 imageValidationFailure
             )
             .asDriver(onErrorJustReturn: .default)
+            
+        // MARK: Exit Button
+            input.exitButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                self?.coordinator?.coordinatorDidFinish()
+            })
+            .disposed(by: disposeBag)
         
         self.output = .init(
             centerName: centerNameDriver,
@@ -245,7 +301,6 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
 public extension CenterProfileViewModel {
     
     class Input: CenterProfileInputable {
-        
         // ViewController에서 받아오는 데이터
         public var readyToFetch: PublishRelay<Void> = .init()
         public var editingButtonPressed: PublishRelay<Void> = .init()
@@ -253,6 +308,7 @@ public extension CenterProfileViewModel {
         public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
         public var editingInstruction: BehaviorRelay<String> = .init(value: "")
         public var selectedImage: PublishRelay<UIImage> = .init()
+        public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     }
     
     class Output: CenterProfileOutputable {
@@ -269,9 +325,9 @@ public extension CenterProfileViewModel {
         // 요구사항 X
         public var editingValidation: Driver<Void>
         
-        public var alert: Driver<DefaultAlertContentVO>?
+        public var alert: Driver<AlertWithCompletionVO>?
         
-        init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, displayingImage: Driver<UIImage?>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>, alert: Driver<DefaultAlertContentVO>) {
+        init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, displayingImage: Driver<UIImage?>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>, alert: Driver<AlertWithCompletionVO>) {
             self.centerName = centerName
             self.centerLocation = centerLocation
             self.centerPhoneNumber = centerPhoneNumber
