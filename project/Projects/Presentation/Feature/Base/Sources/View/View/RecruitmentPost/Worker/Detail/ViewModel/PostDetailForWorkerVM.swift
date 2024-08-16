@@ -12,11 +12,12 @@ import Entity
 import PresentationCore
 import UseCaseInterface
 
-public protocol PostDetailForWorkerViewModelable: DefaultAlertOutputable {
+public protocol PostDetailForWorkerViewModelable {
     
     // Output
     var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
     var locationInfo: Driver<WorkAndWorkerLocationMapRO>? { get }
+    var alert: Driver<AlertWithCompletionVO>? { get }
     
     // Input
     var viewWillAppear: PublishRelay<Void> { get }
@@ -39,8 +40,7 @@ public class PostDetailForWorkerVM: PostDetailForWorkerViewModelable {
     public var postForWorkerBundle: RxCocoa.Driver<Entity.RecruitmentPostForWorkerBundle>?
     public var locationInfo: RxCocoa.Driver<WorkAndWorkerLocationMapRO>?
     
-    public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
-    
+    public var alert: RxCocoa.Driver<Entity.AlertWithCompletionVO>?
     
     
     public var backButtonClicked: RxRelay.PublishRelay<Void> = .init()
@@ -74,6 +74,20 @@ public class PostDetailForWorkerVM: PostDetailForWorkerViewModelable {
         postForWorkerBundle = getPostDetailSuccess.asDriver(onErrorRecover: { _ in fatalError() })
         
         // Alert 처리 필요
+        alert = getPostDetailFailure
+            .map { error in
+                AlertWithCompletionVO(
+                    title: "공고 불러오기 실패",
+                    message: error.message,
+                    buttonInfo: [
+                        ("닫기",  { [weak self] in
+                            self?.coordinator?.coordinatorDidFinish()
+                        })
+                    ]
+                )
+            }
+            .asDriver(onErrorJustReturn: .default)
+        
         
         // MARK: 버튼 처리
         backButtonClicked

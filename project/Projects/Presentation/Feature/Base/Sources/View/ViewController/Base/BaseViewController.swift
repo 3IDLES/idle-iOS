@@ -21,4 +21,16 @@ public extension BaseViewController {
         alret.addAction(close)
         present(alret, animated: true, completion: nil)
     }
+    
+    func showAlert(vo: AlertWithCompletionVO) {
+        let alret = UIAlertController(title: vo.title, message: vo.message, preferredStyle: .alert)
+        
+        vo.buttonInfo.forEach { (buttonTitle: String, completion: AlertWithCompletionVO.AlertCompletion?) in
+            let button = UIAlertAction(title: buttonTitle, style: .default) { _ in
+                completion?()
+            }
+            alret.addAction(button)
+        }
+        present(alret, animated: true, completion: nil)
+    }
 }
