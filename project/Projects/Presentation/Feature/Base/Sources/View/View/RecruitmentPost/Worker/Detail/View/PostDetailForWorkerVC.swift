@@ -230,7 +230,11 @@ public class PostDetailForWorkerVC: BaseViewController {
 public class PostDetailForWorkerContentView: UIView {
     
     /// 구인공고 카드
-    let cardView: WorkerEmployCard = .init()
+    let cardView: WorkerEmployCard = {
+        let view = WorkerEmployCard()
+        view.setToPostAppearance()
+        return view
+    }()
     
     /// 지도뷰
     let workLocationView = WorkLocationView()

@@ -48,6 +48,7 @@ public class CenterInfoCardView: TappableUIView {
     private func setLayout() {
         
         let locationImageView = DSKitAsset.Icons.location.image.toView()
+        locationImageView.tintColor = DSColor.gray400.color
         let locationStack = HStack(
             [
                 locationImageView,
