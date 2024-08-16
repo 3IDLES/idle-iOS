@@ -89,7 +89,7 @@ public struct RecruitmentPostFetchDTO: Codable {
         age: Int,
         weight: Int?,
         careLevel: Int,
-        mentalStatus: String,
+        mentalStatus: String, ㅇ
         disease: String?,
         lifeAssistance: [String]?,
         extraRequirement: String?,
@@ -132,7 +132,17 @@ public struct RecruitmentPostFetchDTO: Codable {
         workTimeAndPay.workStartTime = IdleDateComponent.toEntity(text: startTime)
         workTimeAndPay.workEndTime = IdleDateComponent.toEntity(text: endTime)
         workTimeAndPay.paymentType = PaymentType.toEntity(text: payType)
-        workTimeAndPay.paymentAmount = String(payAmount)
+        
+        let payAmount = String(payAmount)
+        var formedPayAmount = ""
+        for (index, char) in payAmount.reversed().enumerated() {
+            if (index % 3) == 0, index != 0 {
+                formedPayAmount += ","
+            }
+            formedPayAmount += String(char)
+        }
+        
+        workTimeAndPay.paymentAmount = formedPayAmount
         
         let addressInfo: AddressInputStateObject = .init()
         addressInfo.addressInfo = .init(

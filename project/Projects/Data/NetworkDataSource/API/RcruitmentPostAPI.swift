@@ -7,6 +7,7 @@
 
 import Moya
 import Foundation
+import Alamofire
 import Entity
 
 public enum RcruitmentPostAPI {
@@ -19,6 +20,9 @@ public enum RcruitmentPostAPI {
     case editPost(id: String, postData: Data)
     case removePost(id: String)
     case closePost(id: String)
+    
+    // Worker
+    case postList(nextPageId: String?, requestCnt: Int)
 }
 
 extension RcruitmentPostAPI: BaseAPI {
@@ -39,6 +43,8 @@ extension RcruitmentPostAPI: BaseAPI {
             "/\(id)"
         case .closePost(let id):
             "/\(id)/end"
+        case .postList:
+            ""
         }
     }
     
@@ -54,7 +60,23 @@ extension RcruitmentPostAPI: BaseAPI {
             .delete
         case .closePost:
             .patch
+        case .postList:
+            .get
         }
+    }
+    
+    var bodyParameters: Parameters? {
+        var params: Parameters = [:]
+        switch self {
+        case .postList(let nextPageId, let requestCnt):
+            if let nextPageId {
+                params["next"] = nextPageId
+            }
+            params["limit"] = requestCnt
+        default:
+            break
+        }
+        return params
     }
     
     var parameterEncoding: ParameterEncoding {
@@ -66,6 +88,8 @@ extension RcruitmentPostAPI: BaseAPI {
     
     public var task: Moya.Task {
         switch self {
+        case .postList:
+            .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .registerPost(let bodyData):
             .requestData(bodyData)
         case .editPost(_, let editData):
