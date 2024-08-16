@@ -294,6 +294,15 @@ public class WorkerEmployCard: UIView {
         ])
     }
     
+    public func setToPostAppearance() {
+        titleLabel.typography = .Subtitle1
+        timeTakenForWalkLabel.isHidden = true
+        serviceTargetInfoLabel.typography = .Body3
+        workDaysLabel.typography = .Body2
+        workTimeLabel.typography = .Body2
+        payLabel.typography = .Body2
+    }
+    
     public func bind(ro: WorkerEmployCardRO) {
         
         beginnerTag.isHidden = !ro.showBiginnerTag
