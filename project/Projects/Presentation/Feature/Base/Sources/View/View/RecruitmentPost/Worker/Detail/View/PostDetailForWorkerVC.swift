@@ -12,9 +12,9 @@ import RxSwift
 import Entity
 import DSKit
 
-public struct WorkAndWorkerLocationMapRO {
+public struct WorkPlaceAndWorkerLocationMapRO {
     
-    let workLocation: LocationInformation
+    let workPlaceLocation: LocationInformation
     let workerLocation: LocationInformation
 }
 
@@ -244,7 +244,7 @@ public class PostDetailForWorkerContentView: UIView {
     }()
     
     /// 지도뷰
-    let workLocationView = WorkLocationView()
+    let workPlaceAndWorkerLocationView = WorkPlaceAndWorkerLocationView()
     
     /// 공고 상세정보들
     let workConditionView = WorkConditionDisplayingView()
@@ -271,7 +271,7 @@ public class PostDetailForWorkerContentView: UIView {
     func setLayout() {
         
         let titleViewData: [(title: String, view: UIView)] = [
-            ("근무 장소", workLocationView),
+            ("근무 장소", workPlaceAndWorkerLocationView),
             ("근무 조건", workConditionView),
             ("고객 정보", customerInfoView),
             ("추가 지원 정보", applicationDetailView),
