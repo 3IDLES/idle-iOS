@@ -42,6 +42,7 @@ public class RecruitmentPostForWorkerBundle {
     public let centerInfo: CenterInfo
     
     /// 근무지 위치정보
+    public let distanceToWorkPlace: Int
     public let jobLocation: LocationInformation
     
     
@@ -52,7 +53,8 @@ public class RecruitmentPostForWorkerBundle {
         applicationDetail: ApplicationDetailStateObject,
         addressInfo: AddressInputStateObject,
         centerInfo: CenterInfo,
-        jobLocation: LocationInformation
+        jobLocation: LocationInformation,
+        distanceToWorkPlace: Int
     ) {
         self.workTimeAndPay = workTimeAndPay
         self.customerRequirement = customerRequirement
@@ -61,5 +63,6 @@ public class RecruitmentPostForWorkerBundle {
         self.addressInfo = addressInfo
         self.centerInfo = centerInfo
         self.jobLocation = jobLocation
+        self.distanceToWorkPlace = distanceToWorkPlace
     }
 }

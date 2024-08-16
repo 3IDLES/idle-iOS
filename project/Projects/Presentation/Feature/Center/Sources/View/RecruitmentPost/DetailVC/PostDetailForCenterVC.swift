@@ -241,7 +241,10 @@ public class PostDetailForCenterVC: BaseViewController {
     }
     
     private func setObservable() {
-        
+        // 지도뷰 풀스크린
+        // 재사용률이 떨어져 ViewController에 직접 삽입합니다.
+        let fullMapVC = WorkPlaceAndWorkerLocationFullVC()
+        navigationController?.pushViewController(fullMapVC, animated: true)
     }
     
     public func bind(viewModel: PostDetailViewModelable) {
