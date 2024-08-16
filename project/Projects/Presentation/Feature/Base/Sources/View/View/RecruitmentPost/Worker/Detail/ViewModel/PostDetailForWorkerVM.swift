@@ -11,12 +11,13 @@ import RxSwift
 import Entity
 import PresentationCore
 import UseCaseInterface
+import DSKit
 
 public protocol PostDetailForWorkerViewModelable {
     
     // Output
     var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
-    var locationInfo: Driver<WorkAndWorkerLocationMapRO>? { get }
+    var locationInfo: Driver<WorkPlaceAndWorkerLocationMapRO>? { get }
     var alert: Driver<AlertWithCompletionVO>? { get }
     
     // Input
@@ -38,7 +39,7 @@ public class PostDetailForWorkerVM: PostDetailForWorkerViewModelable {
     
     
     public var postForWorkerBundle: RxCocoa.Driver<Entity.RecruitmentPostForWorkerBundle>?
-    public var locationInfo: RxCocoa.Driver<WorkAndWorkerLocationMapRO>?
+    public var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
     
     public var alert: RxCocoa.Driver<Entity.AlertWithCompletionVO>?
     
@@ -72,6 +73,36 @@ public class PostDetailForWorkerVM: PostDetailForWorkerViewModelable {
         let getPostDetailFailure = getPostDetailResult.compactMap { $0.error }
         
         postForWorkerBundle = getPostDetailSuccess.asDriver(onErrorRecover: { _ in fatalError() })
+        
+        // MARK: 센터, 워커 위치정보
+        locationInfo = getPostDetailSuccess
+            .map { [weak self] bundle in
+                // 요양보호사 위치 가져오기
+                let workerLocation = self?.getWorkerLocation()
+                
+                let workPlaceLocation = bundle.jobLocation
+                
+                let roadAddress = bundle.addressInfo.addressInfo?.roadAddress ?? "근무지 위치"
+                let text = "거주지에서 \(roadAddress) 까지"
+                var normalAttr = Typography.Body2.attributes
+                normalAttr[.foregroundColor] = DSKitAsset.Colors.gray500.color
+                
+                let attrText = NSMutableAttributedString(string: text, attributes: normalAttr)
+                
+                let roadTextFont = Typography.Subtitle3.attributes[.font]!
+                
+                let range = NSRange(text.range(of: roadAddress)!, in: text)
+                attrText.addAttribute(.font, value: roadTextFont, range: range)
+                
+                return WorkPlaceAndWorkerLocationMapRO(
+                    workPlaceRoadAddress: roadAddress,
+                    homeToworkPlaceText: attrText,
+                    distanceToWorkPlaceText: "\(bundle.distanceToWorkPlace)m",
+                    workPlaceLocation: workPlaceLocation,
+                    workerLocation: workerLocation
+                )
+            }
+            .asDriver(onErrorRecover: { _ in fatalError() })
         
         // Alert 처리 필요
         alert = getPostDetailFailure
@@ -110,5 +141,13 @@ public class PostDetailForWorkerVM: PostDetailForWorkerViewModelable {
                 self.coordinator?.showCenterProfileScreen(centerId: centerId)
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: Test
+    func getWorkerLocation() -> LocationInformation {
+        return .init(
+            longitude: 127.046425,
+            latitude: 37.504588
+        )
     }
 }
