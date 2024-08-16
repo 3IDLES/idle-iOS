@@ -13,6 +13,16 @@ import Entity
 import DSKit
 import NMapsMap
 
+public struct WorkPlaceAndWorkerLocationMapRO {
+    
+    let workPlaceRoadAddress: String
+    let homeToworkPlaceText: NSMutableAttributedString
+    let distanceToWorkPlaceText: String
+    
+    let workPlaceLocation: LocationInformation
+    let workerLocation: LocationInformation?
+}
+
 public class WorkPlaceAndWorkerLocationView: VStack {
     
     // Init
@@ -20,21 +30,27 @@ public class WorkPlaceAndWorkerLocationView: VStack {
     // View
     let walkToLocationLabel: UILabel = {
         let label = UILabel()
-        label.text = "거주지에서--"
         return label
     }()
     
-    let timeCostByWalkLabel: IdleLabel = {
+    let distanceLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle2)
-        label.textString = "걸어서 ~ 소요"
+        label.textString = ""
         label.textAlignment = .left
         return label
     }()
     
+    public let mapViewBackGround: TappableUIView = {
+        let view = TappableUIView()
+        view.backgroundColor = DSColor.gray050.color
+        return view
+    }()
     let mapView: NMFNaverMapView = {
         let view = NMFNaverMapView(frame: .zero)
+        view.backgroundColor = DSColor.gray050.color
         view.layer.cornerRadius = 8
         view.clipsToBounds = true
+        view.isUserInteractionEnabled = false
         return view
     }()
     
@@ -45,6 +61,7 @@ public class WorkPlaceAndWorkerLocationView: VStack {
         super.init([], spacing: 16, alignment: .fill)
         setAppearance()
         setLayout()
+        setObservable()
     }
     
     public required init(coder: NSCoder) { fatalError() }
@@ -56,40 +73,31 @@ public class WorkPlaceAndWorkerLocationView: VStack {
     private func setLayout() {
         
         let walkingImage = DSKitAsset.Icons.walkingHuman.image.toView()
-        let timeCostStack = HStack([walkingImage, timeCostByWalkLabel], spacing: 6, alignment: .center)
+        let timeCostStack = HStack([walkingImage, distanceLabel], spacing: 6, alignment: .center)
         
         let labelStack = VStack([walkToLocationLabel, timeCostStack], spacing: 4, alignment: .leading)
         
+        mapViewBackGround.addSubview(mapView)
+        mapView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            mapView.topAnchor.constraint(equalTo: mapViewBackGround.topAnchor),
+            mapView.leftAnchor.constraint(equalTo: mapViewBackGround.leftAnchor),
+            mapView.rightAnchor.constraint(equalTo: mapViewBackGround.rightAnchor),
+            mapView.bottomAnchor.constraint(equalTo: mapViewBackGround.bottomAnchor),
+        ])
+        
         [
             labelStack,
-            mapView
+            mapViewBackGround
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.addArrangedSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            mapView.heightAnchor.constraint(equalToConstant: 224),
+            mapViewBackGround.heightAnchor.constraint(equalToConstant: 224),
         ])
-    }
-    
-    private func setLocationLabel(roadAddress: String) {
-        let text = "거주지에서 \(roadAddress) 까지"
-        var normalAttr = Typography.Body2.attributes
-        normalAttr[.foregroundColor] = DSKitAsset.Colors.gray500.color
-        
-        let attrText = NSMutableAttributedString(string: text, attributes: normalAttr)
-        
-        let roadTextFont = Typography.Subtitle3.attributes[.font]!
-        
-        let range = NSRange(text.range(of: roadAddress)!, in: text)
-        attrText.addAttribute(.font, value: roadTextFont, range: range)
-        
-        walkToLocationLabel.attributedText = attrText
-    }
-    
-    private func configureMapAppearance() {
-        
     }
     
     private func setObservable() {
@@ -98,54 +106,11 @@ public class WorkPlaceAndWorkerLocationView: VStack {
     
     public func bind(locationRO: WorkPlaceAndWorkerLocationMapRO) {
         
-        // 마커 설정
-        let workPlacePos: NMGLatLng = .init(
-            lat: locationRO.workPlaceLocation.latitude,
-            lng: locationRO.workPlaceLocation.longitude
-        )
-        let workerPos: NMGLatLng = .init(
-            lat: locationRO.workerLocation.latitude,
-            lng: locationRO.workerLocation.longitude
-        )
+        walkToLocationLabel.attributedText = locationRO.homeToworkPlaceText
+        distanceLabel.textString = locationRO.distanceToWorkPlaceText
         
-        let workPlaceMarker = NMFMarker(
-            position: workPlacePos,
-            iconImage: .init(image: DSIcon.workPlaceMarker.image)
-        )
-        let workerMarker = NMFMarker(
-            position: workerPos,
-            iconImage: .init(image: DSIcon.workerMarker.image)
-        )
-        [
-            workPlaceMarker,
-            workerMarker
-        ].forEach { marker in
-            marker.mapView = self.mapView.mapView
-            marker.globalZIndex = 40001
-        }
-        // 근무지가 우선 표시도되도록
-        workPlaceMarker.zIndex = 1
-        workerMarker.zIndex = 0
-        
-        // 경로선
-        let pathOverlay = NMFPath()
-        pathOverlay.path = NMGLineString(points: [
-            workPlacePos,
-            workerPos
-        ])
-        pathOverlay.width = 3
-        pathOverlay.outlineWidth = 0
-        pathOverlay.progress = 0
-        pathOverlay.color = DSColor.orange400.color
-        
-        // 카메라 이동
-        let camerUpdate = NMFCameraUpdate(
-            fit: .init(
-                latLngs: [
-                    workPlacePos,
-                    workerPos,
-                ]
-            ),
+        mapView.bind(
+            locationRO: locationRO,
             paddingInsets: .init(
                 top: 42,
                 left: 59,
@@ -153,23 +118,103 @@ public class WorkPlaceAndWorkerLocationView: VStack {
                 right: 59
             )
         )
-        self.mapView.mapView.moveCamera(camerUpdate)
-        // 지도 Config
-        let map = mapView.mapView
-        map.mapType = .basic
-        map.symbolScale = 2
         
         // - 제스처 끄기
-        map.isScrollGestureEnabled = false
-        map.isZoomGestureEnabled = false
-        map.isTiltGestureEnabled = false
-        map.isRotateGestureEnabled = false
-        map.isStopGestureEnabled = false
+        mapView.mapView.isScrollGestureEnabled = false
+        mapView.mapView.isZoomGestureEnabled = false
+        mapView.mapView.isTiltGestureEnabled = false
+        mapView.mapView.isRotateGestureEnabled = false
+        mapView.mapView.isStopGestureEnabled = false
         
         // 지도 뷰 Config
         mapView.showCompass = false
         mapView.showScaleBar = false
         mapView.showZoomControls = false
         mapView.showLocationButton = false
+    }
+}
+
+
+extension NMFNaverMapView {
+    
+    func bind(
+        locationRO: WorkPlaceAndWorkerLocationMapRO,
+        paddingInsets: UIEdgeInsets
+    ) {
+        // 마커 설정
+        let workPlacePos: NMGLatLng = .init(
+            lat: locationRO.workPlaceLocation.latitude,
+            lng: locationRO.workPlaceLocation.longitude
+        )
+        
+        var posArr = [workPlacePos]
+        
+        var workerPos: NMGLatLng?
+        
+        if let workerLocation = locationRO.workerLocation {
+            workerPos = .init(
+                lat: workerLocation.latitude,
+                lng: workerLocation.longitude
+            )
+            posArr.append(workerPos!)
+        }
+        
+        let workPlaceMarker = NMFMarker(
+            position: workPlacePos,
+            iconImage: .init(image: DSIcon.workPlaceMarker.image)
+        )
+        workPlaceMarker.width = 41
+        workPlaceMarker.height = 56
+        
+        var markerArr = [workPlaceMarker]
+        
+        var workerMarker: NMFMarker?
+        
+        if let workerPos {
+            workerMarker = .init(
+                position: workerPos,
+                iconImage: .init(image: DSIcon.workerMarker.image)
+            )
+            workerMarker?.width = 33
+            workerMarker?.height = 44
+            
+            markerArr.append(workerMarker!)
+        }
+        
+        
+        markerArr.forEach { marker in
+            marker.mapView = self.mapView
+            marker.globalZIndex = 40001
+            marker.anchor = .init(x: 0.5, y: 1)
+        }
+        
+        // 경로선
+        if posArr.count == 2 {
+            let pathOverlay = NMFPath()
+            pathOverlay.path = .init(points: posArr)
+            pathOverlay.width = 3
+            pathOverlay.outlineWidth = 0
+            pathOverlay.color = DSColor.orange400.color
+            pathOverlay.mapView = self.mapView
+            pathOverlay.globalZIndex = 40001
+            pathOverlay.zIndex = 0
+        }
+        // 근무지가 우선 표시도되도록
+        workPlaceMarker.zIndex = 2
+        workerMarker?.zIndex = 1
+        
+        
+        // 카메라 이동
+        let camerUpdate = NMFCameraUpdate(
+            fit: .init(
+                latLngs: posArr
+            ),
+            paddingInsets: paddingInsets
+        )
+        self.mapView.moveCamera(camerUpdate)
+        // 지도 Config
+        let map = self.mapView
+        map.mapType = .basic
+        map.symbolScale = 2
     }
 }

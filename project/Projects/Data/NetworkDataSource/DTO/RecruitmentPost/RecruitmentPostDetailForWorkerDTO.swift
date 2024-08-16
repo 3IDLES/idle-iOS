@@ -17,6 +17,8 @@ public struct RecruitmentPostDTO: Codable {
     public let centerId: String
     public let centerName: String
     public let centerRoadNameAddress: String
+
+    public let distance: Int
     
     public let isMealAssistance: Bool
     public let isBowelAssistance: Bool
@@ -101,8 +103,8 @@ public struct RecruitmentPostDTO: Codable {
         )
         
         let jobLocation: LocationInformation = .init(
-            longitude: longitude,
-            latitude: latitude
+            longitude: Double(longitude)!,
+            latitude: Double(latitude)!
         )
         
         return .init(
@@ -112,7 +114,8 @@ public struct RecruitmentPostDTO: Codable {
             applicationDetail: applicationDetail,
             addressInfo: addressInfo,
             centerInfo: centerInfo,
-            jobLocation: jobLocation
+            jobLocation: jobLocation,
+            distanceToWorkPlace: distance
         )
     }
 }

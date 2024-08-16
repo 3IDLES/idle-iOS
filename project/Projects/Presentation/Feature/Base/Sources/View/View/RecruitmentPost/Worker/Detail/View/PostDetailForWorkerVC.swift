@@ -12,12 +12,6 @@ import RxSwift
 import Entity
 import DSKit
 
-public struct WorkPlaceAndWorkerLocationMapRO {
-    
-    let workPlaceLocation: LocationInformation
-    let workerLocation: LocationInformation
-}
-
 /// 센토도 요양보호사가 보는 공고화면을 볼 수 있기 때문에 해당뷰를 BaseFeature에 구현하였습니다.
 public class PostDetailForWorkerVC: BaseViewController {
     
@@ -181,15 +175,27 @@ public class PostDetailForWorkerVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
-        
-        viewModel
-            .locationInfo?
-            .drive(onNext: { bundle in
-                
-                // 위치정보 전달
-                
-            })
-            .disposed(by: disposeBag)
+        if let locationInfo = viewModel.locationInfo?.asObservable().share() {
+            
+            locationInfo
+                .subscribe(onNext: {
+                    [weak self] info in
+                    // 위치정보 전달
+                    self?.contentView.workPlaceAndWorkerLocationView.bind(locationRO: info)
+                })
+                .disposed(by: disposeBag)
+            
+            // 지도화면 클릭시
+            contentView.workPlaceAndWorkerLocationView.mapViewBackGround
+                .rx.tap
+                .withLatestFrom(locationInfo)
+                .subscribe { [weak self] locationInfo in
+                    let fullMapVC = WorkPlaceAndWorkerLocationFullVC()
+                    fullMapVC.bind(locationRO: locationInfo)
+                    self?.navigationController?.pushViewController(fullMapVC, animated: true)
+                }
+                .disposed(by: disposeBag)
+        }
         
         viewModel
             .alert?
@@ -244,7 +250,7 @@ public class PostDetailForWorkerContentView: UIView {
     }()
     
     /// 지도뷰
-    let workPlaceAndWorkerLocationView = WorkPlaceAndWorkerLocationView()
+    public let workPlaceAndWorkerLocationView = WorkPlaceAndWorkerLocationView()
     
     /// 공고 상세정보들
     let workConditionView = WorkConditionDisplayingView()
