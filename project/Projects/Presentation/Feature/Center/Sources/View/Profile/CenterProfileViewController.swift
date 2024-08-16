@@ -191,6 +191,7 @@ public class CenterProfileViewController: BaseViewController {
         ])
         
         let locationIcon = UIImageView.locationMark
+        locationIcon.tintColor = DSColor.gray700.color
         
         let centerLocationStack = HStack(
             [
@@ -326,7 +327,7 @@ public class CenterProfileViewController: BaseViewController {
         navigationBar
             .eventPublisher
             .subscribe { [weak coordinator] _ in
-                coordinator?.closeViewController()
+                coordinator?.coordinatorDidFinish()
             }
             .disposed(by: disposeBag)
     }

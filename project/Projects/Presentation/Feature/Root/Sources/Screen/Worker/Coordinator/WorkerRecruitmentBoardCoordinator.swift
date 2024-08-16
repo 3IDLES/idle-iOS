@@ -8,6 +8,7 @@
 import UIKit
 import WorkerFeature
 import BaseFeature
+import CenterFeature
 import PresentationCore
 import UseCaseInterface
 
@@ -71,7 +72,16 @@ extension WorkerRecruitmentBoardCoordinator {
         coodinator.start()
     }
     public func showCenterProfile(centerId: String) {
-        
+        let coordinator = CenterProfileCoordinator(
+            dependency: .init(
+                mode: .otherProfile(id: centerId),
+                profileUseCase: centerProfileUseCase,
+                navigationController: navigationController
+            )
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
     }
 }
 

@@ -12,36 +12,42 @@ import Entity
 
 /// 내센터, 다른 센터를 모두 불러올 수 있습니다.
 public class CenterProfileCoordinator: ChildCoordinator {
+    
+    public struct Dependency {
+        let mode: ProfileMode
+        let profileUseCase: CenterProfileUseCase
+        let navigationController: UINavigationController
+        
+        public init(mode: ProfileMode, profileUseCase: CenterProfileUseCase, navigationController: UINavigationController) {
+            self.mode = mode
+            self.profileUseCase = profileUseCase
+            self.navigationController = navigationController
+        }
+    }
 
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: CenterProfileRegisterCoordinatable?
+    public weak var parent: ParentCoordinator?
     
     public let navigationController: UINavigationController
+    let mode: ProfileMode
+    let profileUseCase: CenterProfileUseCase
     
-    public let viewModel: any CenterProfileViewModelable
-    
-    public init(
-        mode: ProfileMode,
-        profileUseCase: CenterProfileUseCase,
-        navigationController: UINavigationController
-    ) {
-        self.viewModel = CenterProfileViewModel(mode: mode, useCase: profileUseCase)
-        self.navigationController = navigationController
+    public init(dependency: Dependency) {
+        self.mode = dependency.mode
+        self.profileUseCase = dependency.profileUseCase
+        self.navigationController = dependency.navigationController
     }
     
     public func start() {
         let vc = CenterProfileViewController(coordinator: self)
-        vc.bind(viewModel: viewModel)
+        let vm = CenterProfileViewModel(mode: mode, useCase: profileUseCase)
+        vc.bind(viewModel: vm)
         self.viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
     }
     
     public func coordinatorDidFinish() {
-        parent?.removeChildCoordinator(self)
-    }
-    
-    func closeViewController() {
         popViewController()
-        coordinatorDidFinish()
+        parent?.removeChildCoordinator(self)
     }
 }
