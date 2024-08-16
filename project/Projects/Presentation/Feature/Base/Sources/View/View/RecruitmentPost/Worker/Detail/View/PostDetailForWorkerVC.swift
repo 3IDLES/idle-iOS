@@ -215,7 +215,7 @@ public class PostDetailForWorkerVC: BaseViewController {
         // 센터 프로필 보기 버튼
         contentView.centerInfoCard
             .rx.tap
-            .bind(to: viewModel.applyButtonClicked)
+            .bind(to: viewModel.centerCardClicked)
             .disposed(by: disposeBag)
         
         // 뒤로가기 버튼

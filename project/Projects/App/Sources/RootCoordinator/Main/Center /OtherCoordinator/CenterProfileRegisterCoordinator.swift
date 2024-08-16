@@ -64,9 +64,11 @@ extension CenterProfileRegisterCoordinator {
     
     func showMyCenterProfile() {
         let coordinator = CenterProfileCoordinator(
-            mode: .myProfile,
-            profileUseCase: injector.resolve(CenterProfileUseCase.self),
-            navigationController: navigationController
+            dependency: .init(
+                mode: .myProfile,
+                profileUseCase: injector.resolve(CenterProfileUseCase.self),
+                navigationController: navigationController
+            )
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self
