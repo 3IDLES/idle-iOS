@@ -79,7 +79,7 @@ public class PostDetailForWorkerVM: PostDetailForWorkerViewModelable {
         backButtonClicked
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
-                coordinator?.coordinatorDidFinish()
+                self.coordinator?.coordinatorDidFinish()
             })
             .disposed(by: disposeBag)
         
@@ -88,6 +88,13 @@ public class PostDetailForWorkerVM: PostDetailForWorkerViewModelable {
         // 즐겨찾기 버튼 클릭
         
         // 센터 프로필 조회 버튼클릭
-        
+        centerCardClicked
+            .withLatestFrom(getPostDetailSuccess)
+            .subscribe(onNext: { [weak self] bundle in
+                guard let self else { return }
+                let centerId = bundle.centerInfo.centerId
+                self.coordinator?.showCenterProfileScreen(centerId: centerId)
+            })
+            .disposed(by: disposeBag)
     }
 }
