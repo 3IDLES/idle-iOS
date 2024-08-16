@@ -13,39 +13,9 @@ import DSKit
 import Entity
 import BaseFeature
 
-public protocol CenterProfileViewModelable where Input: CenterProfileInputable, Output: CenterProfileOutputable {
-    associatedtype Input
-    associatedtype Output
-    var input: Input { get }
-    var output: Output? { get }
-    
-    var profileMode: ProfileMode { get }
-}
-
-public protocol CenterProfileInputable {
-    var readyToFetch: PublishRelay<Void> { get }
-    var editingButtonPressed: PublishRelay<Void> { get }
-    var editingFinishButtonPressed: PublishRelay<Void> { get }
-    var editingPhoneNumber: BehaviorRelay<String> { get }
-    var editingInstruction: BehaviorRelay<String> { get }
-    var selectedImage: PublishRelay<UIImage> { get }
-}
-
-public protocol CenterProfileOutputable: DefaultAlertOutputable {
-    var centerName: Driver<String> { get }
-    var centerLocation: Driver<String> { get }
-    var centerPhoneNumber: Driver<String> { get }
-    var centerIntroduction: Driver<String> { get }
-    var displayingImage: Driver<UIImage?> { get }
-    var isEditingMode: Driver<Bool> { get }
-    var editingValidation: Driver<Void> { get }
-}
-
 public class CenterProfileViewController: BaseViewController {
     
     var viewModel: (any CenterProfileViewModelable)?
-    
-    weak var coordinator: CenterProfileCoordinator?
     
     let navigationBar: NavigationBarType1 = {
         let bar = NavigationBarType1(navigationTitle: "내 센터 정보")
@@ -151,9 +121,7 @@ public class CenterProfileViewController: BaseViewController {
     
     private let disposeBag = DisposeBag()
     
-    public init(coordinator: CenterProfileCoordinator) {
-        
-        self.coordinator = coordinator
+    public init() {
         
         super.init(nibName: nil, bundle: nil)
         
@@ -323,13 +291,7 @@ public class CenterProfileViewController: BaseViewController {
     }
     
     private func setObservable() {
-        
-        navigationBar
-            .eventPublisher
-            .subscribe { [weak coordinator] _ in
-                coordinator?.coordinatorDidFinish()
-            }
-            .disposed(by: disposeBag)
+    
     }
     
     public func bind(viewModel: any CenterProfileViewModelable) {
@@ -374,6 +336,11 @@ public class CenterProfileViewController: BaseViewController {
                 .bind(to: input.selectedImage)
                 .disposed(by: disposeBag)
         }
+        
+        navigationBar
+            .eventPublisher
+            .bind(to: input.exitButtonClicked)
+            .disposed(by: disposeBag)
         
         // output
         guard let output = viewModel.output else { fatalError() }
@@ -456,6 +423,7 @@ public class CenterProfileViewController: BaseViewController {
         output
             .alert?
             .drive { [weak self] vo in
+                print("!!")
                 self?.showAlert(vo: vo)
             }
             .disposed(by: disposeBag)

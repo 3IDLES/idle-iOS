@@ -39,8 +39,12 @@ public class CenterProfileCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        let vc = CenterProfileViewController(coordinator: self)
-        let vm = CenterProfileViewModel(mode: mode, useCase: profileUseCase)
+        let vc = CenterProfileViewController()
+        let vm = CenterProfileViewModel(
+            mode: mode,
+            coordinator: self,
+            useCase: profileUseCase
+        )
         vc.bind(viewModel: vm)
         self.viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
