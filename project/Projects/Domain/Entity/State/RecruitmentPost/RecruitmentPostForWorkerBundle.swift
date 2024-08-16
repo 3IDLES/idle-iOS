@@ -9,10 +9,10 @@ import Foundation
  
 /// 위도경도 좌표를 담고 있습니다.
 public struct LocationInformation {
-    public let longitude: String
-    public let latitude: String
+    public let longitude: Double
+    public let latitude: Double
     
-    public init(longitude: String, latitude: String) {
+    public init(longitude: Double, latitude: Double) {
         self.longitude = longitude
         self.latitude = latitude
     }
