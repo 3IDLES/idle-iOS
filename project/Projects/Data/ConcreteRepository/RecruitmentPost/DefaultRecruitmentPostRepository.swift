@@ -60,6 +60,22 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             dto.toEntity()
         }
     }
+    
+    public func getPostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
+        
+        service
+            .request(
+                api: .postList(
+                    nextPageId: nextPageId,
+                    requestCnt: requestCnt
+                ),
+                with: .withToken
+            )
+            .map(RecruitmentPostListForWorkerDTO.self)
+            .map { dto in
+                dto.toEntity()
+            }
+    }
 }
 
 fileprivate extension RegisterRecruitmentPostBundle {
