@@ -12,14 +12,14 @@ public struct RecruitmentPostListForWorkerDTO: Codable {
 
     public let items: [RecruitmentPostForWorkerDTO]
     public let next: String?
-    public let fetchedPostCount: Int
+    public let total: Int
     
     public func toEntity() -> RecruitmentPostListForWorkerVO {
         
         return .init(
             posts: items.map { $0.toEntity() },
             nextPageId: next,
-            fetchedPostCount: fetchedPostCount
+            fetchedPostCount: total
         )
     }
 }
@@ -43,7 +43,7 @@ public struct RecruitmentPostForWorkerDTO: Codable {
     
     public func toEntity() -> RecruitmentPostForWorkerVO {
         
-        let weekDayList = weekdays.map({ dayText in
+        let workDayList = weekdays.map({ dayText in
             WorkDay.toEntity(text: dayText)
         })
         
@@ -56,22 +56,33 @@ public struct RecruitmentPostForWorkerDTO: Codable {
             formedPayAmount += String(char)
         }
         
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let deadlineDate = applyDeadline != nil ? dateFormatter.date(from: applyDeadline!) : nil
+        
+        // distance는 미터단위입니다.
+        var distanceText: String = "\(distance)m"
+        if distance >= 1000 {
+            let kilometers = Double(distance)/1000.0
+            distanceText = String(format: "%.1fkm", kilometers)
+        }
+        
         return .init(
             postId: id,
-            weekdays: weekDayList,
+            workDays: workDayList,
             startTime: startTime,
             endTime: endTime,
             roadNameAddress: roadNameAddress,
             lotNumberAddress: lotNumberAddress,
             gender: Gender.toEntity(text: gender),
             age: age,
-            careLevel: CareGrade(rawValue: careLevel-1)!,
+            cardGrade: CareGrade(rawValue: careLevel-1)!,
             isExperiencePreferred: isExperiencePreferred,
             applyDeadlineType: ApplyDeadlineType.toEntity(text: applyDeadlineType),
-            applyDeadline: applyDeadline,
+            applyDeadlineDate: deadlineDate,
             payType: PaymentType.toEntity(text: payType),
             payAmount: formedPayAmount,
-            distance: distance
+            distanceFromWorkPlace: distanceText
         )
     }
 }

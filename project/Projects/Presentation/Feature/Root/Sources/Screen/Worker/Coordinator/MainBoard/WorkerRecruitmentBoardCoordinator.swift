@@ -46,9 +46,11 @@ public class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinata
     public func start() {
         let vc = WorkerRecruitmentPostBoardVC()
         let vm = WorkerRecruitmentPostBoardVM(
-            coordinator: self
+            coordinator: self,
+            recruitmentPostUseCase: recruitmentPostUseCase
         )
         vc.bind(viewModel: vm)
+        viewControllerRef = vc
         navigationController.pushViewController(vc, animated: false)
     }
     

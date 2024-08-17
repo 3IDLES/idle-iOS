@@ -22,7 +22,7 @@ public enum RcruitmentPostAPI {
     case closePost(id: String)
     
     // Worker
-    case postList(nextPageId: String?, requestCnt: Int)
+    case nativePostList(nextPageId: String?, requestCnt: String)
 }
 
 extension RcruitmentPostAPI: BaseAPI {
@@ -43,7 +43,7 @@ extension RcruitmentPostAPI: BaseAPI {
             "/\(id)"
         case .closePost(let id):
             "/\(id)/end"
-        case .postList:
+        case .nativePostList:
             ""
         }
     }
@@ -60,7 +60,7 @@ extension RcruitmentPostAPI: BaseAPI {
             .delete
         case .closePost:
             .patch
-        case .postList:
+        case .nativePostList:
             .get
         }
     }
@@ -68,7 +68,7 @@ extension RcruitmentPostAPI: BaseAPI {
     var bodyParameters: Parameters? {
         var params: Parameters = [:]
         switch self {
-        case .postList(let nextPageId, let requestCnt):
+        case .nativePostList(let nextPageId, let requestCnt):
             if let nextPageId {
                 params["next"] = nextPageId
             }
@@ -81,6 +81,8 @@ extension RcruitmentPostAPI: BaseAPI {
     
     var parameterEncoding: ParameterEncoding {
         switch self {
+        case .nativePostList:
+            return URLEncoding.queryString
         default:
             return JSONEncoding.default
         }
@@ -88,7 +90,7 @@ extension RcruitmentPostAPI: BaseAPI {
     
     public var task: Moya.Task {
         switch self {
-        case .postList:
+        case .nativePostList:
             .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .registerPost(let bodyData):
             .requestData(bodyData)

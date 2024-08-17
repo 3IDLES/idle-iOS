@@ -56,4 +56,22 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
     public func getPostDetailForWorker(id: String) -> RxSwift.Single<Result<Entity.RecruitmentPostForWorkerBundle, Entity.RecruitmentPostError>> {
         convert(task: repository.getPostDetailForWorker(id: id))
     }
+    
+    public func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, RecruitmentPostError>> {
+        
+        let stream: Single<RecruitmentPostListForWorkerVO>!
+        
+        switch request {
+        case .native(let nextPageId):
+            stream = repository.getNativePostListForWorker(
+                nextPageId: nextPageId,
+                requestCnt: postCount
+            )
+        case .thirdParty(let nextPageId):
+            /// 미구현
+            fatalError()
+        }
+        
+        return convert(task: stream)
+    }
 }
