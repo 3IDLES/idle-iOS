@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class RecruitmentPostListForWorkerVO {
+public struct RecruitmentPostListForWorkerVO {
 
     public let posts: [RecruitmentPostForWorkerVO]
     public let nextPageId: String?
@@ -20,10 +20,10 @@ public class RecruitmentPostListForWorkerVO {
     }
 }
 
-public class RecruitmentPostForWorkerVO {
+public struct RecruitmentPostForWorkerVO {
     public let postId: String
     
-    public let weekdays: [WorkDay]
+    public let workDays: [WorkDay]
     public let startTime: String
     public let endTime: String
     
@@ -32,47 +32,47 @@ public class RecruitmentPostForWorkerVO {
     
     public let gender: Gender
     public let age: Int
-    public let careLevel: CareGrade
+    public let cardGrade: CareGrade
     
     public let isExperiencePreferred: Bool
     public let applyDeadlineType: ApplyDeadlineType
-    public let applyDeadline: String?
+    public let applyDeadlineDate: Date?
     public let payType: PaymentType
     public let payAmount: String
     
-    public let distance: Int
+    public let distanceFromWorkPlace: String
     
     public init(
         postId: String,
-        weekdays: [WorkDay],
+        workDays: [WorkDay],
         startTime: String,
         endTime: String,
         roadNameAddress: String,
         lotNumberAddress: String,
         gender: Gender,
         age: Int,
-        careLevel: CareGrade,
+        cardGrade: CareGrade,
         isExperiencePreferred: Bool,
         applyDeadlineType: ApplyDeadlineType,
-        applyDeadline: String?,
+        applyDeadlineDate: Date?,
         payType: PaymentType,
         payAmount: String,
-        distance: Int
+        distanceFromWorkPlace: String
     ) {
         self.postId = postId
-        self.weekdays = weekdays
+        self.workDays = workDays
         self.startTime = startTime
         self.endTime = endTime
         self.roadNameAddress = roadNameAddress
         self.lotNumberAddress = lotNumberAddress
         self.gender = gender
         self.age = age
-        self.careLevel = careLevel
+        self.cardGrade = cardGrade
         self.isExperiencePreferred = isExperiencePreferred
         self.applyDeadlineType = applyDeadlineType
-        self.applyDeadline = applyDeadline
+        self.applyDeadlineDate = applyDeadlineDate
         self.payType = payType
         self.payAmount = payAmount
-        self.distance = distance
+        self.distanceFromWorkPlace = distanceFromWorkPlace
     }
 }

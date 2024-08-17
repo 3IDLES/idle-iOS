@@ -31,4 +31,7 @@ public protocol RecruitmentPostUseCase: UseCaseBase {
     ///     - 근무지 위치(위경도)
     ///     - 센터정보(센터 id, 이름, 도로명 주소)
     func getPostDetailForWorker(id: String) -> Single<Result<RecruitmentPostForWorkerBundle, RecruitmentPostError>>
+    
+    /// 요양보호사가 메인화면에 사용할 공고리스트를 호출합니다.
+    func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, RecruitmentPostError>>
 }

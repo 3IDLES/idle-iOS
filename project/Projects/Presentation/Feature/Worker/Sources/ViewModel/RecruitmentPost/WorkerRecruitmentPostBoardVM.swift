@@ -12,45 +12,154 @@ import RxCocoa
 import RxSwift
 import Entity
 import DSKit
+import UseCaseInterface
 
 public protocol WorkerRecruitmentPostBoardVMable: DefaultAlertOutputable {
     
-    var ongoingPostCardVO: Driver<[WorkerEmployCardVO]>? { get }
-    var viewWillAppear: PublishRelay<Void> { get }
-    var locationTtitleText: PublishRelay<String> { get }
+    /// 다음 페이지를 요청합니다.
+    var requestNextPage: PublishRelay<Void> { get }
+    /// ViewDidLoad
+    var viewDidLoad: PublishRelay<Void> { get }
     
-    func createCellVM(postId: String, vo: WorkerEmployCardVO) -> WorkerEmployCardViewModelable
+    
+    /// 페이지요청에 대한 결과를 전달합니다.
+    var postBoardData: Driver<[WorkerEmployCardViewModelable]>? { get }
+    /// 요양보호사 위치 정보를 전달합니다.
+    var workerLocationTitleText: Driver<String>? { get }
 }
-
 
 public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     
+    // Output
+    public var postBoardData: Driver<[WorkerEmployCardViewModelable]>?
+    public var alert: Driver<DefaultAlertContentVO>?
+    public var workerLocationTitleText: Driver<String>?
+    
+    
+    
+    // Input
+    public var viewDidLoad: PublishRelay<Void> = .init()
+    public var requestNextPage: PublishRelay<Void> = .init()
+    
+    
+    
+    // Init
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?
+    let recruitmentPostUseCase: RecruitmentPostUseCase
     
-    public var ongoingPostCardVO: RxCocoa.Driver<[Entity.WorkerEmployCardVO]>?
-    public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    // Paging
+    /// 값이 nil이라면 요청을 보내지 않습니다.
+    var nextPagingRequest: PostPagingRequestForWorker?
+    /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
+    private let currentPostVO: BehaviorRelay<[RecruitmentPostForWorkerVO]> = .init(value: [])
     
-    public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
-    public var locationTtitleText: RxRelay.PublishRelay<String> = .init()
+    // Observable
+    let dispostBag = DisposeBag()
     
-    public init(coordinator: WorkerRecruitmentBoardCoordinatable) {
-        
+    public init(
+        coordinator: WorkerRecruitmentBoardCoordinatable,
+        recruitmentPostUseCase: RecruitmentPostUseCase
+        )
+    {
         self.coordinator = coordinator
+        self.recruitmentPostUseCase = recruitmentPostUseCase
+        self.nextPagingRequest = .native(nextPageId: nil)
         
-        let requestOngoingPostResult = viewWillAppear
-            .flatMap { [unowned self] _ in
-                publishOngoingPostMocks()
+        // 상단 위치정보
+        workerLocationTitleText = viewDidLoad
+            .compactMap { [weak self] _ in
+                self?.fetchWorkerLocation()
+            }
+            .asDriver(onErrorJustReturn: "반갑습니다.")
+        
+        
+        let postPageReqeustResult = Observable
+            .merge(
+                viewDidLoad.asObservable(),
+                requestNextPage.asObservable()
+            )
+            .compactMap { [weak self] _ in
+                // 요청이 없는 경우 요청을 보내지 않는다.
+                // ThirdPatry에서도 불러올 데이터가 없는 경우입니다.
+                self?.nextPagingRequest
             }
             .share()
+            .flatMap { [recruitmentPostUseCase] request in
+                recruitmentPostUseCase
+                    .getPostListForWorker(
+                        request: request,
+                        postCount: 10
+                    )
+            }
+            .share()
+  
         
-        let requestOngoingPostSuccess = requestOngoingPostResult.compactMap { $0.value }
-        let requestOngoingPostFailure = requestOngoingPostResult.compactMap { $0.error }
+        let requestPostListSuccess = postPageReqeustResult.compactMap { $0.value }
+        let requestPostListFailure = postPageReqeustResult.compactMap { $0.error }
         
-        ongoingPostCardVO = requestOngoingPostSuccess.asDriver(onErrorJustReturn: [])
+        postBoardData = Observable
+            .zip(
+                currentPostVO,
+                requestPostListSuccess
+            )
+            .compactMap { [weak self] (prevPostList, fetchedData) -> [WorkerEmployCardViewModelable]? in
+                
+                guard let self else { return nil }
+                
+                // 다음 요청설정
+                var nextRequest: PostPagingRequestForWorker?
+                if let prevRequest = self.nextPagingRequest {
+                    
+                    if let nextPageId = fetchedData.nextPageId {
+                        // 다음값이 있는 경우
+                        switch prevRequest {
+                        case .native:
+                            nextRequest = .native(nextPageId: nextPageId)
+                        case .thirdParty:
+                            nextRequest = .thirdParty(nextPageId: nextPageId)
+                        }
+                    } else {
+                        // 다음값이 없는 경우
+                        switch prevRequest {
+                        case .native:
+                            nextRequest = .thirdParty(nextPageId: nil)
+                        case .thirdParty:
+                            // 페이징 종료
+                            nextRequest = nil
+                        }
+                    }
+                }
+                self.nextPagingRequest = nextRequest
+                
+                // 화면에 표시할 전체리스트 도출
+                let fetchedPosts = fetchedData.posts
+                var mergedPosts = currentPostVO.value
+                mergedPosts.append(contentsOf: fetchedPosts)
+                
+                // 최근값 업데이트
+                self.currentPostVO.accept(mergedPosts)
+                
+                // ViewModel 생성
+                let viewModels = mergedPosts.map { vo in
+                    
+                    let cardVO: WorkerEmployCardVO = .create(vo: vo)
+                    
+                    let vm: WorkerEmployCardVM = .init(
+                        postId: vo.postId,
+                        vo: cardVO,
+                        coordinator: self.coordinator
+                    )
+                    
+                    return vm
+                }
+                
+                return viewModels
+            }
+            .asDriver(onErrorJustReturn: [])
         
-        alert = requestOngoingPostFailure
+        alert = requestPostListFailure
             .map { error in
-                DefaultAlertContentVO(
+                return DefaultAlertContentVO(
                     title: "시스템 오류",
                     message: error.message
                 )
@@ -58,16 +167,9 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
             .asDriver(onErrorJustReturn: .default)
     }
     
-    public func createCellVM(postId: String, vo: Entity.WorkerEmployCardVO) -> any DSKit.WorkerEmployCardViewModelable {
-        WorkerEmployCardVM(
-            postId: postId,
-            vo: vo,
-            coordinator: coordinator
-        )
-    }
-    
-    func publishOngoingPostMocks() -> Single<Result<[WorkerEmployCardVO], RecruitmentPostError>> {
-        return .just(.success((0...10).map { _ in WorkerEmployCardVO.mock }))
+    /// Test
+    func fetchWorkerLocation() -> String {
+        "서울시 영등포구"
     }
 }
 
