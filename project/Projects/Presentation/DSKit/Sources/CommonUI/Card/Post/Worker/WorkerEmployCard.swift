@@ -16,18 +16,18 @@ public class WorkerEmployCardRO {
     let showDayLeftTag: Bool
     let dayLeftTagText: String?
     let titleText: String
-    let timeTakenForWalkText: String
+    let distanceFromWorkPlace: String
     let targetInfoText: String
     let workDaysText: String
     let workTimeText: String
     let payText: String
     
-    init(showBiginnerTag: Bool, showDayLeftTag: Bool, dayLeftTagText: String?, titleText: String, timeTakenForWalkText: String, targetInfoText: String, workDaysText: String, workTimeText: String, payText: String) {
+    init(showBiginnerTag: Bool, showDayLeftTag: Bool, dayLeftTagText: String?, titleText: String, distanceFromWorkPlace: String, targetInfoText: String, workDaysText: String, workTimeText: String, payText: String) {
         self.showBiginnerTag = showBiginnerTag
         self.showDayLeftTag = showDayLeftTag
         self.dayLeftTagText = dayLeftTagText
         self.titleText = titleText
-        self.timeTakenForWalkText = timeTakenForWalkText
+        self.distanceFromWorkPlace = distanceFromWorkPlace
         self.targetInfoText = targetInfoText
         self.workDaysText = workDaysText
         self.workTimeText = workTimeText
@@ -58,7 +58,7 @@ public class WorkerEmployCardRO {
             showDayLeftTag: showDayLeftTag,
             dayLeftTagText: dayLeftTagText,
             titleText: vo.title,
-            timeTakenForWalkText: vo.timeTakenForWalk,
+            distanceFromWorkPlace: vo.distanceFromWorkPlace,
             targetInfoText: targetInfoText,
             workDaysText: workDaysText,
             workTimeText: workTimeText,
@@ -71,7 +71,7 @@ public class WorkerEmployCardRO {
         showDayLeftTag: true,
         dayLeftTagText: "D-14",
         titleText: "사울시 강남동",
-        timeTakenForWalkText: "도보 5분",
+        distanceFromWorkPlace: "1.1km",
         targetInfoText: "1등급 54세 여성",
         workDaysText: "",
         workTimeText: "월, 화, 수",
@@ -116,7 +116,7 @@ public class WorkerEmployCard: UIView {
         let label = IdleLabel(typography: .Subtitle2)
         return label
     }()
-    let timeTakenForWalkLabel: IdleLabel = {
+    let distanceFromWorkPlaceLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSKitAsset.Colors.gray500.color
         return label
@@ -184,7 +184,7 @@ public class WorkerEmployCard: UIView {
         let titleStack = HStack(
             [
                 titleLabel,
-                timeTakenForWalkLabel
+                distanceFromWorkPlaceLabel
             ],
             spacing: 8,
             alignment: .bottom
@@ -296,7 +296,7 @@ public class WorkerEmployCard: UIView {
     
     public func setToPostAppearance() {
         titleLabel.typography = .Subtitle1
-        timeTakenForWalkLabel.isHidden = true
+        distanceFromWorkPlaceLabel.isHidden = true
         serviceTargetInfoLabel.typography = .Body3
         workDaysLabel.typography = .Body2
         workTimeLabel.typography = .Body2
@@ -309,7 +309,7 @@ public class WorkerEmployCard: UIView {
         dayLeftTag.isHidden = !ro.showDayLeftTag
         dayLeftTag.textString = ro.dayLeftTagText ?? ""
         titleLabel.textString = ro.titleText
-        timeTakenForWalkLabel.textString = ro.timeTakenForWalkText
+        distanceFromWorkPlaceLabel.textString = ro.distanceFromWorkPlace
         serviceTargetInfoLabel.textString = ro.targetInfoText
         workDaysLabel.textString = ro.workDaysText
         workTimeLabel.textString = ro.workTimeText

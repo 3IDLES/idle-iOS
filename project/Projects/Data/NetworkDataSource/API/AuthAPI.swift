@@ -29,7 +29,7 @@ public enum AuthAPI {
 
 extension AuthAPI: BaseAPI {
 
-    public var apiType: APIType { .auth}
+    public var apiType: APIType { .auth }
     
     public var method: Moya.Method {
         

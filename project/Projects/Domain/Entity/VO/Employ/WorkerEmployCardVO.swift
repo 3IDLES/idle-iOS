@@ -11,7 +11,7 @@ public struct WorkerEmployCardVO {
     
     public let dayLeft: Int
     public let isBeginnerPossible: Bool
-    public let timeTakenForWalk: String
+    public let distanceFromWorkPlace: String
     public let title: String
     public let targetAge: Int
     public let careGrade: CareGrade
@@ -20,13 +20,26 @@ public struct WorkerEmployCardVO {
     public let startTime: String
     public let endTime: String
     public let paymentType: PaymentType
-    public let paymentAmount: Int
+    public let paymentAmount: String
     
-    public init(dayLeft: Int, isBeginnerPossible: Bool, timeTakenForWalk: String, title: String, targetAge: Int, careGrade: CareGrade, targetGender: Gender, days: [WorkDay], startTime: String, endTime: String, paymentType: PaymentType, paymentAmount: Int) {
+    public init(
+        dayLeft: Int,
+        isBeginnerPossible: Bool,
+        distanceFromWorkPlace: String,
+        title: String,
+        targetAge: Int,
+        careGrade: CareGrade,
+        targetGender: Gender,
+        days: [WorkDay],
+        startTime: String,
+        endTime: String,
+        paymentType: PaymentType,
+        paymentAmount: String
+    ) {
         
         self.dayLeft = dayLeft
         self.isBeginnerPossible = isBeginnerPossible
-        self.timeTakenForWalk = timeTakenForWalk
+        self.distanceFromWorkPlace = distanceFromWorkPlace
         self.title = title
         self.targetAge = targetAge
         self.careGrade = careGrade
@@ -38,6 +51,7 @@ public struct WorkerEmployCardVO {
         self.paymentAmount = paymentAmount
     }
       
+    /// 서버가 입력중인 공고의 확인화면에 사용됩니다.
     public static func create(
         workTimeAndPay: WorkTimeAndPayStateObject,
         customerRequirement: CustomerRequirementStateObject,
@@ -63,9 +77,6 @@ public struct WorkerEmployCardVO {
         // 제목(=도로명주소)
         let title = addressInfo.addressInfo?.roadAddress.emptyDefault("위치정보 표기 오류") ?? ""
         
-        // 도보시간
-        let timeTakenForWalk = "도보 n분"
-        
         // 생년
         let birthYear = Int(customerInformation.birthYear) ?? 1950
         let currentYear = calendar.component(.year, from: currentDate)
@@ -88,12 +99,12 @@ public struct WorkerEmployCardVO {
         
         // 급여타입및 양
         let paymentType = workTimeAndPay.paymentType ?? .hourly
-        let paymentAmount = Int(workTimeAndPay.paymentAmount) ?? 0
+        let paymentAmount = workTimeAndPay.paymentAmount
         
         return WorkerEmployCardVO(
-            dayLeft: leftDay ?? 0,
+            dayLeft: leftDay ?? 31,
             isBeginnerPossible: isBeginnerPossible,
-            timeTakenForWalk: timeTakenForWalk,
+            distanceFromWorkPlace: "500m",
             title: title,
             targetAge: targetAge,
             careGrade: careGrade,
@@ -103,6 +114,35 @@ public struct WorkerEmployCardVO {
             endTime: workEndTime,
             paymentType: paymentType,
             paymentAmount: paymentAmount
+        )
+    }
+    
+    public static func create(vo: RecruitmentPostForWorkerVO) -> WorkerEmployCardVO {
+        
+        // 남은 일수
+        var leftDay: Int? = nil
+        let calendar = Calendar.current
+        let currentDate = Date()
+        
+        if vo.applyDeadlineType == .specificDate, let deadlineDate = vo.applyDeadlineDate {
+            
+            let component = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
+            leftDay = component.day
+        }
+        
+        return .init(
+            dayLeft: leftDay ?? 31,
+            isBeginnerPossible: !vo.isExperiencePreferred,
+            distanceFromWorkPlace: vo.distanceFromWorkPlace,
+            title: vo.roadNameAddress,
+            targetAge: vo.age,
+            careGrade: vo.cardGrade,
+            targetGender: vo.gender,
+            days: vo.workDays,
+            startTime: vo.startTime,
+            endTime: vo.endTime,
+            paymentType: vo.payType,
+            paymentAmount: vo.payAmount
         )
     }
 }
@@ -120,7 +160,7 @@ public extension WorkerEmployCardVO {
     static let mock = WorkerEmployCardVO(
         dayLeft: 10,
         isBeginnerPossible: true,
-        timeTakenForWalk: "도보 15분",
+        distanceFromWorkPlace: "500m",
         title: "서울특별시 강남구 신사동",
         targetAge: 78,
         careGrade: .four,
@@ -129,13 +169,13 @@ public extension WorkerEmployCardVO {
         startTime: "09:00",
         endTime: "15:00",
         paymentType: .hourly,
-        paymentAmount: 12500
+        paymentAmount: "12,500"
     )
     
     static let `default` = WorkerEmployCardVO(
         dayLeft: 0,
         isBeginnerPossible: true,
-        timeTakenForWalk: "도보 15분",
+        distanceFromWorkPlace: "8km",
         title: "기본값",
         targetAge: 10,
         careGrade: .one,
@@ -144,6 +184,6 @@ public extension WorkerEmployCardVO {
         startTime: "00:00",
         endTime: "00:00",
         paymentType: .hourly,
-        paymentAmount: 0
+        paymentAmount: "12,500"
     )
 }

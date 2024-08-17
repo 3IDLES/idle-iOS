@@ -30,12 +30,15 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         tableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
         return tableView
     }()
-    
     let tableHeader = BoardSortigHeaderView()
     
-    let ongoingPostCardVO: BehaviorRelay<[WorkerEmployCardVO]> = .init(value: [])
+    // Paging
+    var isPaging = true
     
     // Observable
+    let postViewModels: BehaviorRelay<[WorkerEmployCardViewModelable]> = .init(value: [])
+    let requestNextPage: PublishRelay<Void> = .init()
+    
     private let disposeBag = DisposeBag()
     
     public init() {
@@ -54,18 +57,38 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         
         self.viewModel = viewModel
         
-        topContainer.locationLabel.textString = "서울시 영등포구(미구현)"
-        
         // Output
         viewModel
-            .ongoingPostCardVO?
-            .drive(ongoingPostCardVO)
+            .workerLocationTitleText?
+            .drive(onNext: { [weak self] titleText in
+                self?.topContainer.locationLabel.textString = titleText
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .postBoardData?
+            .drive(onNext: { [weak self] viewModels in
+                guard let self else { return }
+                self.postViewModels.accept(viewModels)
+                self.postTableView.reloadData()
+                self.isPaging = false
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .alert?
+            .drive(onNext: { [weak self] alertVO in
+                self?.showAlert(vo: alertVO)
+            })
             .disposed(by: disposeBag)
         
         // Input
-        rx.viewWillAppear
-            .map { _ in () }
-            .bind(to: viewModel.viewWillAppear)
+        self.rx.viewDidLoad
+            .bind(to: viewModel.viewDidLoad)
+            .disposed(by: disposeBag)
+        
+        self.requestNextPage
+            .bind(to: viewModel.requestNextPage)
             .disposed(by: disposeBag)
     }
     
@@ -113,7 +136,7 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
 extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        ongoingPostCardVO.value.count
+        postViewModels.value.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -121,18 +144,27 @@ extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelega
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
         cell.selectionStyle = .none
         
-        // MARK: TODO: PostId를 가져오기
-        
-        if let viewModel = self.viewModel {
-            let vo = ongoingPostCardVO.value[indexPath.row]
-            let vm = viewModel.createCellVM(
-                postId: "00-00000-00000",
-                vo: vo
-            )
-            cell.bind(viewModel: vm)
-        }
+        let vm = postViewModels.value[indexPath.row]
+        cell.bind(viewModel: vm)
         
         return cell
+    }
+}
+
+// MARK: ScrollView관련
+extension WorkerRecruitmentPostBoardVC {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.height
+        
+        // 스크롤이 테이블 뷰 Offset의 끝에 가게 되면 다음 페이지를 호출
+        if offsetY > (contentHeight - height) {
+            if !isPaging {
+                isPaging = true
+                requestNextPage.accept(())
+            }
+        }
     }
 }
 

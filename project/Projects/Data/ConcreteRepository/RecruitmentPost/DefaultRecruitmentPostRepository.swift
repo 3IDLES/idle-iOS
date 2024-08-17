@@ -10,6 +10,7 @@ import RxSwift
 import Entity
 import NetworkDataSource
 import Foundation
+import Moya
 
 public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     
@@ -61,20 +62,22 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         }
     }
     
-    public func getPostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
+    public func getNativePostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
         
-        service
-            .request(
-                api: .postList(
-                    nextPageId: nextPageId,
-                    requestCnt: requestCnt
-                ),
-                with: .withToken
-            )
-            .map(RecruitmentPostListForWorkerDTO.self)
-            .map { dto in
-                dto.toEntity()
+        service.request(
+            api: .nativePostList(nextPageId: nextPageId, requestCnt: String(requestCnt)),
+            with: .withToken
+        )
+        .map(RecruitmentPostListForWorkerDTO.self)
+        .catch({ error in
+            if let moyaError = error as? MoyaError, case .objectMapping(let error, let response) = moyaError {
+                print(error.localizedDescription)
             }
+            return .error(error)
+        })
+        .map { dto in
+            dto.toEntity()
+        }
     }
 }
 
