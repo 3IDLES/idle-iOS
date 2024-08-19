@@ -10,38 +10,32 @@ import RxSwift
 import RxCocoa
 import Entity
 
+public protocol IdleAlertViewModelable {
+    
+    var acceptButtonClicked: PublishRelay<Void> { get }
+    var cancelButtonClicked: PublishRelay<Void> { get }
+    var acceptButtonLabelText: String { get }
+    var cancelButtonLabelText: String { get }
+    var title: String { get }
+    var description: String { get }
+}
+
 public class IdleBigAlertController: UIViewController {
     
-    // Init values
-    let titleText: String
-    let descriptionText: String
-    
-    public init(titleText: String, descriptionText: String) {
-        self.titleText = titleText
-        self.descriptionText = descriptionText
-        
-        super.init(nibName: nil, bundle: nil)
-        
-        setAppearance()
-        setAutoLayout()
-    }
-    
-    public required init?(coder: NSCoder) { fatalError() }
+    let customTranstionDelegate = CustomTransitionDelegate()
     
     // Not init
     private let disposeBag = DisposeBag()
     
     // View
-    private(set) lazy var titleLabel: IdleLabel = {
+    let titleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle1)
-        label.textString = titleText
         label.textAlignment = .center
         return label
     }()
     
-    private(set) lazy var descriptionLabel: IdleLabel = {
+    let descriptionLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
-        label.textString = descriptionText
         label.attrTextColor = DSKitAsset.Colors.gray500.color
         label.lineBreakMode = .byWordWrapping
         label.textAlignment = .center
@@ -49,16 +43,29 @@ public class IdleBigAlertController: UIViewController {
         return label
     }()
     
-    private(set) lazy var cancelButton: IdleThirdinaryButton = {
+    public let cancelButton: IdleThirdinaryButton = {
         let button = IdleThirdinaryButton(level: .medium)
         button.label.textString = ""
         return button
     }()
-    private(set) lazy var acceptButton: IdlePrimaryButton = {
+    public let acceptButton: IdlePrimaryButton = {
         let button = IdlePrimaryButton(level: .mediumRed)
         button.label.textString = ""
         return button
     }()
+    
+    public init() {
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        self.transitioningDelegate = customTranstionDelegate
+        
+        setAppearance()
+        setAutoLayout()
+        setObservable()
+    }
+    
+    public required init?(coder: NSCoder) { fatalError() }
     
     private func setAppearance() {
         view.backgroundColor = DSKitAsset.Colors.gray500.color.withAlphaComponent(0.5)
@@ -70,23 +77,14 @@ public class IdleBigAlertController: UIViewController {
     private func setAutoLayout() {
         
         // 라벨 스택
-        let labels = [
-            titleLabel,
-            descriptionLabel
-        ]
         let textStack = VStack(
-            labels,
+            [
+                Spacer(height: 8),
+                titleLabel
+            ],
             spacing: 8,
             alignment: .center
         )
-        labels.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-        NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: textStack.topAnchor, constant: 8),
-            descriptionLabel.bottomAnchor.constraint(equalTo: textStack.bottomAnchor, constant: -8),
-            
-            descriptionLabel.leftAnchor.constraint(equalTo: textStack.leftAnchor, constant: 38),
-            descriptionLabel.rightAnchor.constraint(equalTo: textStack.rightAnchor, constant: -38),
-        ])
         
         // 버튼 스택
         let buttonStack = HStack(
@@ -102,10 +100,14 @@ public class IdleBigAlertController: UIViewController {
         // 라벨 + 버튼 스택
         let alertContentsStack = VStack(
             [
-                textStack,
+                HStack([
+                    Spacer(width: 41.5),
+                    textStack,
+                    Spacer(width: 41.5)
+                ], alignment: .fill),
                 buttonStack
             ],
-            spacing: 16,
+            spacing: 24,
             alignment: .fill
         )
 
@@ -121,7 +123,7 @@ public class IdleBigAlertController: UIViewController {
         alertContainer.layer.cornerRadius = 12
         alertContainer.clipsToBounds = true
         
-        alertContainer.layoutMargins = .init(top: 12, left: 12, bottom: 12, right: 12)
+        alertContainer.layoutMargins = .init(top: 20, left: 12, bottom: 12, right: 12)
         
         [
             alertContentsStack
@@ -151,4 +153,103 @@ public class IdleBigAlertController: UIViewController {
             alertContainer.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
+    
+    private func setObservable() {
+        cancelButton.rx.tap
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                modalPresentationStyle = .custom
+                dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    public func bind(viewModel vm: IdleAlertViewModelable) {
+        
+        titleLabel.textString = vm.title
+        descriptionLabel.textString = vm.description
+        
+        acceptButton.label.textString = vm.acceptButtonLabelText
+        cancelButton.label.textString = vm.cancelButtonLabelText
+        
+        acceptButton.rx.tap
+            .bind(to: vm.acceptButtonClicked)
+            .disposed(by: disposeBag)
+        
+        cancelButton
+            .rx.tap
+            .bind(to: vm.cancelButtonClicked)
+            .disposed(by: disposeBag)
+    }
+}
+
+class FadeInAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+    
+    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return 0.35 // 애니메이션 지속 시간
+    }
+    
+    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        guard let fromView = transitionContext.view(forKey: .from) else { return }
+        
+        let containerView = transitionContext.containerView
+        containerView.addSubview(fromView)
+        
+        // 애니메이션 시작 상태 설정
+        fromView.alpha = 1.0
+        
+        let duration = transitionDuration(using: transitionContext)
+        UIView.animate(withDuration: duration, animations: {
+            // 애니메이션 적용
+            fromView.alpha = 0.0
+        }) { _ in
+            // 애니메이션 완료 후 처리
+            fromView.removeFromSuperview()
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+        }
+    }
+}
+
+class FadeOutAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+    
+    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return 0.35 // 애니메이션 지속 시간
+    }
+    
+    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        guard let toView = transitionContext.view(forKey: .to) else { return }
+        
+        let containerView = transitionContext.containerView
+        containerView.addSubview(toView)
+        
+        // 애니메이션 시작 상태 설정
+        toView.alpha = 0.0
+        
+        let duration = transitionDuration(using: transitionContext)
+        UIView.animate(withDuration: duration, animations: {
+            // 애니메이션 적용
+            toView.alpha = 1.0
+        }) { _ in
+            // 애니메이션 완료 후 처리
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+        }
+    }
+}
+
+class CustomTransitionDelegate: NSObject, UIViewControllerTransitioningDelegate {
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return FadeInAnimator() // 우리가 만든 사용자 정의 애니메이터를 반환
+    }
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> (any UIViewControllerAnimatedTransitioning)? {
+        return FadeOutAnimator()
+    }
+}
+
+
+@available(iOS 17.0, *)
+#Preview("Preview", traits: .defaultLayout) {
+    
+    IdleBigAlertController()
 }

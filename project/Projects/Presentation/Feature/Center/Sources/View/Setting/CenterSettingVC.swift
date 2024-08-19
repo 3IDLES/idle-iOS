@@ -15,6 +15,8 @@ import DSKit
 
 public class CenterSettingVC: BaseViewController {
     
+    var viewModel: CenterSettingVMable?
+    
     // Init
     
     // View
@@ -76,6 +78,8 @@ public class CenterSettingVC: BaseViewController {
     public required init?(coder: NSCoder) { fatalError() }
     
     public func bind(viewModel: CenterSettingVMable) {
+        
+        self.viewModel = viewModel
         
         // Input
         Observable.merge(
@@ -214,7 +218,6 @@ public class CenterSettingVC: BaseViewController {
     private func setObservable() {
         
         // 설정화면에 종속적인 뷰들입니다.
-        
         frequentQuestionButton.rx.tap
             .subscribe(onNext: {
                 
@@ -244,6 +247,15 @@ public class CenterSettingVC: BaseViewController {
                 
                 // 개인정보 처리방침
                 
+            })
+            .disposed(by: disposeBag)
+        
+        signOutButton
+            .rx.tap
+            .subscribe(onNext: { [weak self] _ in
+                guard let self, let vm = viewModel else { return }
+                let signOutVM = vm.createSingOutVM()
+                showIdleModal(viewModel: signOutVM)
             })
             .disposed(by: disposeBag)
     }

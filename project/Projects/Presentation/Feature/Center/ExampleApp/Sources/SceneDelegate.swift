@@ -47,9 +47,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //            )
 //        )
 //        
-        let vc = WorkerSettingVC()
+        let vc = CenterSettingVC()
+        let vm = CenterSettingVM(
+            coordinator: nil,
+            settingUseCase: DefaultSettingUseCase(),
+            centerProfileUseCase: DefaultCenterProfileUseCase(
+                repository: DefaultUserProfileRepository()
+            )
+            
+        )
         
-//        vc.bind(viewModel: vm)
+        vc.bind(viewModel: vm)
         
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = vc

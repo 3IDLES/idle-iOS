@@ -18,17 +18,7 @@ class AlertViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         let alertVC = IdleSmallAlertController(
-            titleText: "정말 탈퇴하시겠어요?",
-            button1Info: .init(
-                text: "취소하기",
-                backgroundColor: .white,
-                accentColor: DSKitAsset.Colors.gray100.color
-            ),
-            button2Info: .init(
-                text: "탈퇴하기",
-                backgroundColor: DSKitAsset.Colors.orange500.color,
-                accentColor: DSKitAsset.Colors.orange700.color
-            )
+            titleText: "정말 탈퇴하시겠어요?"
         )
         
         alertVC.modalPresentationStyle = .fullScreen

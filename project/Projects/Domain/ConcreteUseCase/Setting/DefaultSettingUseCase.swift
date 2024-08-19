@@ -1,6 +1,6 @@
 //
 //  DefaultSettingUseCase.swift
-//  UseCaseInterface
+//  ConcreteUseCase
 //
 //  Created by choijunios on 8/19/24.
 //
@@ -8,14 +8,11 @@
 import Foundation
 import RxSwift
 import UserNotifications
-
-public enum NotificationApproveAction: Equatable {
-    case openSystemSetting
-    case granted
-    case error(message: String)
-}
+import UseCaseInterface
 
 public class DefaultSettingUseCase: SettingScreenUseCase {
+    
+    public init() { }
     
     public func checkPushNotificationApproved() -> Single<Bool> {
         Single<Bool>.create { single in
@@ -30,6 +27,8 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
                     single(.success(false))
                 }
             }
+            
+            return Disposables.create { }
         }
     }
     
@@ -43,7 +42,7 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
                 case .notDetermined:
                     // Request permission since the user hasn't decided yet.
                     current.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-                        if let error = error {
+                        if error != nil {
                             maybe(.success(.error(message: "알람동의를 수행할 수 없습니다.")))
                         } else {
                             maybe(.success(.granted))
@@ -66,10 +65,10 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
     }
     
     public func getPersonalDataUsageDescriptionUrl() -> URL {
-        <#code#>
+        URL(string: "")!
     }
     
     public func getApplicationPolicyUrl() -> URL {
-        <#code#>
+        URL(string: "")!
     }
 }

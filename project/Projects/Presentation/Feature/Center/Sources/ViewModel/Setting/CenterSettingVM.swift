@@ -38,8 +38,10 @@ public protocol CenterSettingVMable {
     var showSettingAlert: Driver<Void>? { get }
     var centerInfo: Driver<(name: String, location: String)>? { get }
     var alert: Driver<AlertWithCompletionVO>? { get }
+    
+    // SignOut
+    func createSingOutVM() -> IdleAlertViewModelable
 }
-
 
 public class CenterSettingVM: CenterSettingVMable {
     
@@ -150,5 +152,45 @@ public class CenterSettingVM: CenterSettingVMable {
             )
         })
         .asDriver(onErrorJustReturn: .default)
+    }
+    
+    public func createSingOutVM() -> any DSKit.IdleAlertViewModelable {
+        let viewModel = CenterSingOutVM(
+            title: "로그아웃하시겠어요?",
+            description: "",
+            acceptButtonLabelText: "로그아웃",
+            cancelButtonLabelText: "취소하기"
+        )
+        
+        viewModel
+            .acceptButtonClicked
+            .bind(to: signOutButtonComfirmed)
+            .disposed(by: disposeBag)
+        
+        return viewModel
+    }
+}
+
+class CenterSingOutVM: IdleAlertViewModelable {
+    
+    var acceptButtonLabelText: String
+    var cancelButtonLabelText: String
+    
+    var acceptButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    var cancelButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    
+    var title: String
+    var description: String
+    
+    init(
+        title: String,
+        description: String,
+        acceptButtonLabelText: String,
+        cancelButtonLabelText: String
+    ) {
+        self.title = title
+        self.description = description
+        self.acceptButtonLabelText = acceptButtonLabelText
+        self.cancelButtonLabelText = cancelButtonLabelText
     }
 }
