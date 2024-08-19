@@ -1,5 +1,5 @@
 //
-//  StarredBoardVC.swift
+//  WorkerStaticPostBoardVC.swift
 //  WorkerFeature
 //
 //  Created by choijunios on 8/16/24.
@@ -13,11 +13,11 @@ import RxSwift
 import Entity
 import DSKit
 
-public class StarredBoardVC: BaseViewController {
+public class WorkerStaticPostBoardVC: BaseViewController {
     
     typealias Cell = WorkerEmployCardCell
     
-//    var viewModel: StarredPostViewModelable?
+    var viewModel: WorkerStaticPostBoardVMable?
     
     // View
     let postTableView: UITableView = {
@@ -29,7 +29,7 @@ public class StarredBoardVC: BaseViewController {
     
     let tableHeader = BoardSortigHeaderView()
     
-    let starredPostCardVO: BehaviorRelay<[WorkerEmployCardVO]> = .init(value: [.mock])
+    let postViewModels: BehaviorRelay<[WorkerEmployCardViewModelable]> = .init(value: [])
     
     // Observable
     private let disposeBag = DisposeBag()
@@ -87,44 +87,41 @@ public class StarredBoardVC: BaseViewController {
         
     }
     
-    public func bind(viewModel: StarredPostViewModelable) {
+    func bind(viewModel: WorkerStaticPostBoardVMable) {
         
-//        self.viewModel = viewModel
-//        
-//        // Output
-//        viewModel
-//            .starredPostCardVO?
-//            .drive(onNext: { [weak self] vos in
-//                guard let self else { return }
-//                starredPostCardVO.accept(vos)
-//                postTableView.reloadData()
-//            })
-//            .disposed(by: disposeBag)
-//        
-//        // Input
-//        rx.viewWillAppear
-//            .map { _ in }
-//            .bind(to: viewModel.requestAppliedPost)
-//            .disposed(by: disposeBag)
+        self.viewModel = viewModel
+        
+        // Output
+        viewModel
+            .postBoardData?
+            .drive(onNext: { [weak self] viewModels in
+                guard let self else { return }
+                self.postViewModels.accept(viewModels)
+                self.postTableView.reloadData()
+            })
+            .disposed(by: disposeBag)
+        
+        // Input
+        rx.viewWillAppear
+            .map { _ in }
+            .bind(to: viewModel.postViewWillAppear)
+            .disposed(by: disposeBag)
     }
 }
 
-extension StarredBoardVC: UITableViewDataSource, UITableViewDelegate {
+extension WorkerStaticPostBoardVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        starredPostCardVO.value.count
+        postViewModels.value.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
         cell.selectionStyle = .none
-//        
-//        if let viewModel = self.viewModel {
-//            let vo = starredPostCardVO.value[indexPath.row]
-//            let vm = viewModel.createCellVM(vo: vo)
-//            cell.bind(viewModel: vm)
-//        }
+        
+        let vm = postViewModels.value[indexPath.row]
+        cell.bind(viewModel: vm)
         
         return cell
     }

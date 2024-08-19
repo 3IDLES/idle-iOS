@@ -75,4 +75,22 @@ public struct RecruitmentPostForWorkerVO {
         self.payAmount = payAmount
         self.distanceFromWorkPlace = distanceFromWorkPlace
     }
+    
+    public static let mock = RecruitmentPostForWorkerVO(
+        postId: "test-post-id",
+        workDays: [.mon, .wed, .fri],
+        startTime: "09:00",
+        endTime: "17:00",
+        roadNameAddress: "서울시 영등포구 여등포동",
+        lotNumberAddress: "서울시 영등포구 여등포동",
+        gender: .female,
+        age: 54,
+        cardGrade: .three,
+        isExperiencePreferred: true,
+        applyDeadlineType: .specificDate,
+        applyDeadlineDate: Calendar.current.date(byAdding: .day, value: 7, to: Date()),
+        payType: .hourly,
+        payAmount: "15,000",
+        distanceFromWorkPlace: "2.5km"
+    )
 }
