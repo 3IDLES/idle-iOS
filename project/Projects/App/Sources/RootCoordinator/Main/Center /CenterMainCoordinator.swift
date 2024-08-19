@@ -81,7 +81,7 @@ class CenterMainCoordinator: CenterMainCoordinatable {
             )
             
         case .setting:
-            coordinator = SettingCoordinator(
+            coordinator = CenterSettingCoordinator(
                 navigationController: navigationController
             )
         }

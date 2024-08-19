@@ -87,7 +87,7 @@ class WorkerMainCoordinator: ParentCoordinator {
                 )
             )
         case .setting:
-            coordinator = SettingCoordinator(
+            coordinator = WorkerSettingCoordinator(
                 navigationController: navigationController
             )
         }
