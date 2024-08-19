@@ -14,17 +14,11 @@ import Entity
 import DSKit
 import CenterFeature
 
-public protocol AppliedPostViewModelable {
+protocol WorkerStaticPostBoardVMable {
     
+    var postBoardData: Driver<[WorkerEmployCardViewModelable]>? { get }
+    var postViewWillAppear: PublishRelay<Void> { get }
     
-}
-
-public protocol StarredPostViewModelable {
-    
-
-}
-
-public protocol StarredAndAppliedVVMable: AppliedPostViewModelable & StarredPostViewModelable {
     var alert: Driver<DefaultAlertContentVO>? { get }
 }
 
@@ -52,12 +46,10 @@ public class StarredAndAppliedVC: BaseViewController {
         }
     }
     
-    var viewModel: StarredAndAppliedVVMable?
-    
     private var currentState: TabBarState = .applied
-    private let viewControllerDict: [TabBarState: UIViewController] = [
-        .applied : UIViewController(),
-        .starred : UIViewController()
+    private let viewControllerDict: [TabBarState: WorkerStaticPostBoardVC] = [
+        .applied : WorkerStaticPostBoardVC(),
+        .starred : WorkerStaticPostBoardVC()
     ]
     
     // Init
@@ -174,19 +166,23 @@ public class StarredAndAppliedVC: BaseViewController {
         ])
     }
     
-    public func bind(viewModel: StarredAndAppliedVVMable) {
-        
-        self.viewModel = viewModel
+    func bind(
+        appliedPostVM: WorkerStaticPostBoardVMable,
+        starredPostVM: WorkerStaticPostBoardVMable
+    ) {
          
-//        (viewControllerDict[.applied] as? AppliedBoardVC)?.bind(viewModel: viewModel)
-//        (viewControllerDict[.closedPost] as? StarredBoardVC)?.bind(viewModel: viewModel)
-//        
-//        viewModel
-//            .alert?
-//            .drive(onNext: { [weak self] alertVO in
-//                self?.showAlert(vo: alertVO)
-//            })
-//            .disposed(by: disposeBag)
+        viewControllerDict[.applied]?.bind(viewModel: appliedPostVM)
+        viewControllerDict[.applied]?.bind(viewModel: starredPostVM)
+        
+        Observable
+            .merge(
+                appliedPostVM.alert?.asObservable() ?? .empty(),
+                starredPostVM.alert?.asObservable() ?? .empty()
+            )
+            .subscribe(onNext: { [weak self] alertVO in
+                self?.showAlert(vo: alertVO)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
