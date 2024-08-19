@@ -1,14 +1,14 @@
 //
-//  SettingCoordinator.swift
+//  CenterSettingCoordinator.swift
 //  RootFeature
 //
-//  Created by choijunios on 7/25/24.
+//  Created by choijunios on 8/19/24.
 //
 
 import UIKit
 import PresentationCore
 
-public class SettingCoordinator: ChildCoordinator {
+public class CenterSettingCoordinator: ChildCoordinator {
     
     public weak var viewControllerRef: UIViewController?
     
@@ -19,7 +19,7 @@ public class SettingCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        let vc = SettingVC()
+        let vc = TestSettingVC()
         
         navigationController.pushViewController(vc, animated: false)
     }

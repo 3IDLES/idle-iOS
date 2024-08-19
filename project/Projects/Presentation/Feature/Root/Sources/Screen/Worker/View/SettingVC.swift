@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class SettingVC: UIViewController {
+public class TestSettingVC: UIViewController {
     
     public init() {
         super.init(nibName: nil, bundle: nil)
