@@ -144,7 +144,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                     
                     let cardVO: WorkerEmployCardVO = .create(vo: vo)
                     
-                    let vm: WorkerEmployCardVM = .init(
+                    let vm: OngoindWorkerEmployCardVM = .init(
                         postId: vo.postId,
                         vo: cardVO,
                         coordinator: self.coordinator
@@ -173,7 +173,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     }
 }
 
-public class WorkerEmployCardVM: WorkerEmployCardViewModelable {
+class OngoindWorkerEmployCardVM: WorkerEmployCardViewModelable {
     
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?
     
