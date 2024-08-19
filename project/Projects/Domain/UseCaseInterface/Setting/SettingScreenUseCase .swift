@@ -8,6 +8,12 @@
 import Foundation
 import RxSwift
 
+public enum NotificationApproveAction: Equatable {
+    case openSystemSetting
+    case granted
+    case error(message: String)
+}
+
 public protocol SettingScreenUseCase {
     
     /// 현재 알람수신 동의 여부를 확인합니다.

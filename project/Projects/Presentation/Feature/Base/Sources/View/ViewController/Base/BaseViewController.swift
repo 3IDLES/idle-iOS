@@ -7,6 +7,7 @@
 
 import UIKit
 import Entity
+import DSKit
 
 open class BaseViewController: UIViewController { }
 
@@ -14,23 +15,32 @@ open class BaseViewController: UIViewController { }
 public extension BaseViewController {
     
     func showAlert(vo: DefaultAlertContentVO, onClose: (() -> ())? = nil) {
-        let alret = UIAlertController(title: vo.title, message: vo.message, preferredStyle: .alert)
+        let alert = UIAlertController(title: vo.title, message: vo.message, preferredStyle: .alert)
         let close = UIAlertAction(title: "닫기", style: .default) { _ in
             onClose?()
         }
-        alret.addAction(close)
-        present(alret, animated: true, completion: nil)
+        alert.addAction(close)
+        present(alert, animated: true, completion: nil)
     }
     
     func showAlert(vo: AlertWithCompletionVO) {
-        let alret = UIAlertController(title: vo.title, message: vo.message, preferredStyle: .alert)
+        let alert = UIAlertController(title: vo.title, message: vo.message, preferredStyle: .alert)
         
         vo.buttonInfo.forEach { (buttonTitle: String, completion: AlertWithCompletionVO.AlertCompletion?) in
             let button = UIAlertAction(title: buttonTitle, style: .default) { _ in
                 completion?()
             }
-            alret.addAction(button)
+            alert.addAction(button)
         }
-        present(alret, animated: true, completion: nil)
+        present(alert, animated: true, completion: nil)
+    }
+    
+    func showIdleModal(
+        viewModel: IdleAlertViewModelable
+    ) {
+        let alertVC = IdleBigAlertController()
+        alertVC.bind(viewModel: viewModel)
+        alertVC.modalPresentationStyle = .custom
+        present(alertVC, animated: true, completion: nil)
     }
 }

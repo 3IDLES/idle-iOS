@@ -12,27 +12,11 @@ import Entity
 
 public class IdleSmallAlertController: UIViewController {
     
-    public struct ButtonInfo {
-        let text: String
-        let backgroundColor: UIColor
-        let accentColor: UIColor
-        
-        public init(text: String, backgroundColor: UIColor, accentColor: UIColor) {
-            self.text = text
-            self.backgroundColor = backgroundColor
-            self.accentColor = accentColor
-        }
-    }
-    
     // Init values
     let titleText: String
-    let button1Info: ButtonInfo
-    let button2Info: ButtonInfo
     
-    public init(titleText: String, button1Info: ButtonInfo, button2Info: ButtonInfo) {
+    public init(titleText: String) {
         self.titleText = titleText
-        self.button1Info = button1Info
-        self.button2Info = button2Info
         
         super.init(nibName: nil, bundle: nil)
         
@@ -43,7 +27,6 @@ public class IdleSmallAlertController: UIViewController {
     public required init?(coder: NSCoder) { fatalError() }
     
     // Not init
-    private var viewModel: IdleAlertViewModelable?
     private let disposeBag = DisposeBag()
     
     // View
@@ -54,26 +37,15 @@ public class IdleSmallAlertController: UIViewController {
         return label
     }()
     
-    
-    private(set) lazy var button1: TextButtonType1 = {
-       let btn = TextButtonType1(
-        labelText: button1Info.text,
-        originBackground: button1Info.backgroundColor,
-        accentBackgroundColor: button1Info.accentColor
-       )
-        btn.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
-        btn.layer.borderWidth = 1
-        btn.label.typography = .Heading4
-        return btn
+    private(set) lazy var cancelButton: IdleThirdinaryButton = {
+        let button = IdleThirdinaryButton(level: .medium)
+        button.label.textString = ""
+        return button
     }()
-    private(set) lazy var button2: TextButtonType1 = {
-       let btn = TextButtonType1(
-        labelText: button2Info.text,
-        originBackground: button2Info.backgroundColor,
-        accentBackgroundColor: button2Info.accentColor
-       )
-        btn.label.typography = .Heading4
-        return btn
+    private(set) lazy var acceptButton: IdlePrimaryButton = {
+        let button = IdlePrimaryButton(level: .mediumRed)
+        button.label.textString = ""
+        return button
     }()
     
     private func setAppearance() {
@@ -89,8 +61,8 @@ public class IdleSmallAlertController: UIViewController {
         // 버튼 스택
         let buttonStack = HStack(
             [
-                button1,
-                button2
+                cancelButton,
+                acceptButton
             ],
             spacing: 8,
             alignment: .fill,
@@ -148,22 +120,5 @@ public class IdleSmallAlertController: UIViewController {
             alertContainer.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             alertContainer.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
-    }
-    
-    public func bind(viewModel vm: IdleAlertViewModelable) {
-        // RC=1
-        self.viewModel = vm
-        
-        button1
-            .eventPublisher
-            .map { _ in () }
-            .bind(to: vm.button1Tapped)
-            .disposed(by: disposeBag)
-        
-        button2
-            .eventPublisher
-            .map { _ in () }
-            .bind(to: vm.button2Tapped)
-            .disposed(by: disposeBag)
     }
 }
