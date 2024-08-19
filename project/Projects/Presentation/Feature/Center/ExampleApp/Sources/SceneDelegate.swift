@@ -47,7 +47,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //            )
 //        )
 //        
-        let vc = CenterRecruitmentPostBoardVC()
+        let vc = WorkerSettingVC()
         
 //        vc.bind(viewModel: vm)
         
