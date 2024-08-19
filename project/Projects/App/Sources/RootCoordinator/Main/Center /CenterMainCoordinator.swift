@@ -32,25 +32,27 @@ class CenterMainCoordinator: CenterMainCoordinatable {
     
     func start() {
         
-        let tabInfo = CenterMainScreen.allCases.map { tab in
+        let pageInfo = IdleCenterMainPage.allCases.map { page in
             
-            TabBarInfo(
-                viewController: createNavForTab(tab: tab),
-                tabBarItem: .init(
-                    name: tab.name
-                )
+            let navigationController = createNavForTab(tab: page)
+            
+            return IdleTabBar.PageTabItemInfo(
+                page: page,
+                navigationController: navigationController
             )
         }
         
-        let tabController = IdleTabBarProto()
-        tabController.setViewControllers(info: tabInfo)
-        tabController.selectedIndex = 0
+        let tabController = IdleTabBar(
+            initialPage: IdleCenterMainPage.home,
+            info: pageInfo
+        )
+        
         
         navigationController.pushViewController(tabController, animated: false)
     }
     
     // #1. Tab별 네비게이션 컨트롤러 생성
-    func createNavForTab(tab: CenterMainScreen) -> UINavigationController {
+    func createNavForTab(tab: IdleCenterMainPage) -> UINavigationController {
         
         let tabNavController = UINavigationController()
         tabNavController.setNavigationBarHidden(true, animated: false)
@@ -63,12 +65,12 @@ class CenterMainCoordinator: CenterMainCoordinatable {
         return tabNavController
     }
     // #2. 생성한 컨트롤러를 각 탭별 Coordinator에 전달
-    func startTabCoordinator(tab: CenterMainScreen, navigationController: UINavigationController) {
+    func startTabCoordinator(tab: IdleCenterMainPage, navigationController: UINavigationController) {
         
         var coordinator: Coordinator!
         
         switch tab {
-        case .recruitmentManage:
+        case .home:
             coordinator = RecruitmentManagementCoordinator(
                 dependency: .init(
                     parent: self,
@@ -89,21 +91,6 @@ class CenterMainCoordinator: CenterMainCoordinatable {
         coordinator.start()
     }
     
-}
-
-// MARK: Center 탭의 구성요소들
-enum CenterMainScreen: Int, CaseIterable {
-    case recruitmentManage = 0
-    case setting = 1
-    
-    var name: String {
-        switch self {
-        case .recruitmentManage:
-            "채용"
-        case .setting:
-            "설정"
-        }
-    }
 }
 
 // Test
