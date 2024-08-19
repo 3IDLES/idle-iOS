@@ -1,5 +1,5 @@
 //
-//  WorkerSettingVC.swift
+//  CenterSettingVC.swift
 //  CenterFeature
 //
 //  Created by choijunios on 8/19/24.
@@ -13,7 +13,7 @@ import RxSwift
 import Entity
 import DSKit
 
-public class WorkerSettingVC: BaseViewController {
+public class CenterSettingVC: BaseViewController {
     
     // Init
     
@@ -31,6 +31,10 @@ public class WorkerSettingVC: BaseViewController {
         let view = CenterInfoCardView()
         view.chevronLeftImage.isHidden = true
         return view
+    }()
+    let pushNotificationAuthRow: PushNotificationAuthRow = {
+        let row = PushNotificationAuthRow()
+        return row
     }()
     let frequentQuestionButton: FullRowButton = {
         let button = FullRowButton(labelText: "자주 묻는 질문")
@@ -61,6 +65,8 @@ public class WorkerSettingVC: BaseViewController {
     
     
     // Observable
+    private let signOutComfirmed: PublishRelay<Void> = .init()
+    
     private let disposeBag = DisposeBag()
     
     public init() {
@@ -68,6 +74,57 @@ public class WorkerSettingVC: BaseViewController {
     }
     
     public required init?(coder: NSCoder) { fatalError() }
+    
+    public func bind(viewModel: CenterSettingVMable) {
+        
+        // Input
+        Observable.merge(
+            myCenterInfoButton.rx.tap.asObservable(),
+            centerInfoCard.rx.tap.asObservable()
+        )
+            .bind(to: viewModel.myCenterProfileButtonClicked)
+            .disposed(by: disposeBag)
+        
+        pushNotificationAuthRow.`switch`.rx.isOn
+            .map({ [pushNotificationAuthRow] isOn in
+                if isOn {
+                    // On여부는 아웃풋에 한해서만 설정되도록한다.
+                    pushNotificationAuthRow.`switch`.setOn(false, animated: false)
+                }
+                return isOn
+            })
+            .bind(to: viewModel.approveToPushNotification)
+            .disposed(by: disposeBag)
+        
+        signOutComfirmed
+            .bind(to: viewModel.signOutButtonComfirmed)
+            .disposed(by: disposeBag)
+        
+        removeAccountButton.rx.tap
+            .bind(to: viewModel.removeAccountButtonClicked)
+            .disposed(by: disposeBag)
+        
+        // Output
+        viewModel
+            .pushNotificationApproveState?
+            .drive(onNext: { [weak self] isOn in
+                self?.pushNotificationAuthRow.`switch`.setOn(isOn, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .centerInfo?
+            .drive(onNext: { [weak self] info in
+                self?.centerInfoCard.bind(nameText: info.name, locationText: info.location)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.alert?
+            .drive(onNext: { [weak self] alertVO in
+                self?.showAlert(vo: alertVO)
+            })
+            .disposed(by: disposeBag)
+    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -102,6 +159,8 @@ public class WorkerSettingVC: BaseViewController {
         
         let viewList = [
             myCenterInfoContainer,
+            Spacer(height: 8),
+            pushNotificationAuthRow,
             Spacer(height: 8),
             frequentQuestionButton,
             askButton,
@@ -154,6 +213,39 @@ public class WorkerSettingVC: BaseViewController {
     
     private func setObservable() {
         
+        // 설정화면에 종속적인 뷰들입니다.
+        
+        frequentQuestionButton.rx.tap
+            .subscribe(onNext: {
+                
+                // 자주하는 질문뷰
+                
+            })
+            .disposed(by: disposeBag)
+        
+        askButton.rx.tap
+            .subscribe(onNext: {
+                
+                // 문의하기 뷰
+                
+            })
+            .disposed(by: disposeBag)
+        
+        applicationPolicyButton.rx.tap
+            .subscribe(onNext: {
+                
+                // 약관및 정책
+                
+            })
+            .disposed(by: disposeBag)
+        
+        personalDataProcessingPolicyButton.rx.tap
+            .subscribe(onNext: {
+                
+                // 개인정보 처리방침
+                
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -161,5 +253,5 @@ public class WorkerSettingVC: BaseViewController {
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
     
-    WorkerSettingVC()
+    CenterSettingVC()
 }
