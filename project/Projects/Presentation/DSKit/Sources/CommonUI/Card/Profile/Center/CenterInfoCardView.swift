@@ -45,10 +45,17 @@ public class CenterInfoCardView: TappableUIView {
         
     }
     
+    public let chevronLeftImage: UIImageView = {
+        let view = DSKitAsset.Icons.chevronRight.image.toView()
+        view.tintColor = DSKitAsset.Colors.gray200.color
+        return view
+    }()
+    
     private func setLayout() {
         
         let locationImageView = DSKitAsset.Icons.location.image.toView()
         locationImageView.tintColor = DSColor.gray400.color
+        
         let locationStack = HStack(
             [
                 locationImageView,
@@ -58,9 +65,6 @@ public class CenterInfoCardView: TappableUIView {
         )
         
         let labelStack = VStack([nameLabel,locationStack], spacing: 4, alignment: .leading)
-        
-        let chevronLeftImage = DSKitAsset.Icons.chevronRight.image.toView()
-        chevronLeftImage.tintColor = DSKitAsset.Colors.gray200.color
         
         NSLayoutConstraint.activate([
             locationImageView.widthAnchor.constraint(equalToConstant: 20),
