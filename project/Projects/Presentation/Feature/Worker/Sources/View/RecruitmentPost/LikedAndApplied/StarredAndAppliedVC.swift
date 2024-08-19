@@ -14,7 +14,7 @@ import Entity
 import DSKit
 import CenterFeature
 
-protocol WorkerStaticPostBoardVMable {
+public protocol WorkerStaticPostBoardVMable {
     
     var postBoardData: Driver<[WorkerEmployCardViewModelable]>? { get }
     var postViewWillAppear: PublishRelay<Void> { get }
@@ -166,13 +166,13 @@ public class StarredAndAppliedVC: BaseViewController {
         ])
     }
     
-    func bind(
+    public func bind(
         appliedPostVM: WorkerStaticPostBoardVMable,
         starredPostVM: WorkerStaticPostBoardVMable
     ) {
          
         viewControllerDict[.applied]?.bind(viewModel: appliedPostVM)
-        viewControllerDict[.applied]?.bind(viewModel: starredPostVM)
+        viewControllerDict[.starred]?.bind(viewModel: starredPostVM)
         
         Observable
             .merge(

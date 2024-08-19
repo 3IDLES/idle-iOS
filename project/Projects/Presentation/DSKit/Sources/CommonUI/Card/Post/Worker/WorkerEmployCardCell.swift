@@ -19,6 +19,11 @@ public struct ApplicationInfo {
         isApplied: true,
         applicationDateText: "2024. 10. 22"
     )
+    
+    public init(isApplied: Bool, applicationDateText: String) {
+        self.isApplied = isApplied
+        self.applicationDateText = applicationDateText
+    }
 }
 
 public protocol WorkerEmployCardViewModelable {
