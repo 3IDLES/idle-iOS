@@ -19,7 +19,7 @@ public enum AuthError: String, DomainError {
         case .accountAlreadyExist:
             "이미 존재하는 계정입니다."
         case .undefinedError:
-            "❌ 정의되지 않은 에러타입입니다. ❌"
+            "알 수 없는 에러가 발생했습니다."
         }
     }
 }
