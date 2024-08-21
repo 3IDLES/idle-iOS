@@ -15,7 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
-    var coordinator: RegisterRecruitmentPostCoordinator!
+    var coordinator: DeRegisterCoordinator!
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -31,12 +31,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let nav = UINavigationController()
         nav.setNavigationBarHidden(true, animated: false)
         
-        self.coordinator = RegisterRecruitmentPostCoordinator(
+        self.coordinator = DeRegisterCoordinator(
             dependency: .init(
-                navigationController: nav,
-                recruitmentPostUseCase: DefaultRecruitmentPostUseCase(
-                    repository: DefaultRecruitmentPostRepository(store)
-                )
+                userType: .center,
+                authUseCase: DefaultAuthUseCase(
+                    repository: DefaultAuthRepository()
+                ),
+                navigationController: nav
             )
         )
         
