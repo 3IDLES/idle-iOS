@@ -96,7 +96,19 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
         
         if let httpResponse = request.response {
             
-            if httpResponse.statusCode == 401 {
+            if httpResponse.statusCode == 401, let body = request.request?.httpBody {
+                
+                // 401이며, JWT오류인 경우만 토큰리프래쉬를 진행
+                
+                guard let decodedError = try? JSONDecoder().decode(ErrorDTO.self, from: body),
+                      let errorCode = decodedError.code
+                else {
+                    return completion(.doNotRetry)
+                }
+                
+                guard let jwtError = JWTError(rawValue: errorCode) else {
+                    return completion(.doNotRetry)
+                }
                 
                 guard let self else { fatalError() }
                 
