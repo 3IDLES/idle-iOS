@@ -20,9 +20,9 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
             center.getNotificationSettings { settings in
                 switch settings.authorizationStatus {
                 case .notDetermined, .denied:
-                    single(.success(true))
-                case .authorized, .provisional, .ephemeral:
                     single(.success(false))
+                case .authorized, .provisional, .ephemeral:
+                    single(.success(true))
                 @unknown default:
                     single(.success(false))
                 }

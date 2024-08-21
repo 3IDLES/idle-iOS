@@ -91,10 +91,10 @@ public class CenterSettingVC: BaseViewController {
         
         pushNotificationAuthRow.`switch`.rx.isOn
             .map({ [pushNotificationAuthRow] isOn in
-                if isOn {
-                    // On여부는 아웃풋에 한해서만 설정되도록한다.
-                    pushNotificationAuthRow.`switch`.setOn(false, animated: false)
-                }
+                
+                // On / Off 여부는 ViewModel이 설정한다.
+                pushNotificationAuthRow.`switch`.setOn(false, animated: false)
+                
                 return isOn
             })
             .bind(to: viewModel.approveToPushNotification)
@@ -123,11 +123,24 @@ public class CenterSettingVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        // MARK: 세팅화면으로 이동
+        viewModel
+            .showSettingAlert?
+            .drive(onNext: {
+                if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                    if UIApplication.shared.canOpenURL(settingsUrl) {
+                        UIApplication.shared.open(settingsUrl, options: [:], completionHandler: nil)
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
+        
         viewModel.alert?
             .drive(onNext: { [weak self] alertVO in
                 self?.showAlert(vo: alertVO)
             })
             .disposed(by: disposeBag)
+        
     }
     
     public override func viewDidLoad() {
