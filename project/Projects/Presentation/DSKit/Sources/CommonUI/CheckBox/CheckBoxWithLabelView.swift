@@ -9,15 +9,16 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-public class CheckBoxWithLabelView: HStack {
+public class CheckBoxWithLabelView<Item>: HStack {
     
     public enum State {
-        case idle
-        case checked(text: String)
+        case idle(item: Item)
+        case checked(item: Item)
     }
-    var currentState: State = .idle
+    var currentState: State?
     
     // Init
+    let item: Item
     let labelText: String
     
     // View
@@ -53,7 +54,8 @@ public class CheckBoxWithLabelView: HStack {
     public lazy var opTap: PublishRelay<State> = .init()
     let disposeBag = DisposeBag()
     
-    public init(labelText: String) {
+    public init(item: Item, labelText: String) {
+        self.item = item
         self.labelText = labelText
         self.label.textString = labelText
         super.init([], spacing: 12, alignment: .center)
@@ -62,7 +64,7 @@ public class CheckBoxWithLabelView: HStack {
         setObservable()
         
         // 초기상태
-        currentState = .idle
+        currentState = .idle(item: item)
         toIdle()
     }
     public required init(coder: NSCoder) { fatalError() }
@@ -106,13 +108,15 @@ public class CheckBoxWithLabelView: HStack {
                 guard let self else { return nil }
                 
                 UIView.animate(withDuration: 0.2) {
-                    switch self.currentState {
-                    case .idle:
-                        self.currentState = .checked(text: self.labelText)
-                        self.toChecked()
-                    case .checked:
-                        self.currentState = .idle
-                        self.toIdle()
+                    if let currentState = self.currentState {
+                        switch currentState {
+                        case .idle:
+                            self.currentState = .checked(item: self.item)
+                            self.toChecked()
+                        case .checked:
+                            self.currentState = .idle(item: self.item)
+                            self.toIdle()
+                        }
                     }
                 }
                 return self.currentState
@@ -125,5 +129,8 @@ public class CheckBoxWithLabelView: HStack {
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
     
-    CheckBoxWithLabelView(labelText: "매칭매칭매칭매칭매칭매칭매칭")
+    CheckBoxWithLabelView(
+        item: "",
+        labelText: "매칭매칭매칭매칭매칭매칭매칭"
+    )
 }
