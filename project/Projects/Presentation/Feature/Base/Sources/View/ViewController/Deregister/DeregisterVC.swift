@@ -13,6 +13,8 @@ import Entity
 import DSKit
 import Entity
 
+
+
 public class DeregisterVC: BaseViewController {
     
     // Init
@@ -36,7 +38,14 @@ public class DeregisterVC: BaseViewController {
         label.attrTextColor = DSColor.gray300.color
         return label
     }()
-    var itemViewList: [CheckBoxWithLabelView] = []
+    var itemViewList: [CheckBoxWithLabelView] = {
+        DeregisterReasonVO.allCases.map { vo in
+            return CheckBoxWithLabelView(
+                item: vo,
+                labelText: vo.reasonText
+            )
+        }
+    }()
     
     let finalWarningLabel: IdleLabel = {
         let label = IdleLabel(typography: .caption)
@@ -54,6 +63,7 @@ public class DeregisterVC: BaseViewController {
     let acceptDeregisterButton: IdlePrimaryButton = {
         let button = IdlePrimaryButton(level: .mediumRed)
         button.label.textString = "탈퇴하기"
+        button.setEnabled(false)
         return button
     }()
     
@@ -65,6 +75,7 @@ public class DeregisterVC: BaseViewController {
         }
         return dict
     }()
+    
     private let disposeBag = DisposeBag()
     
     public init() {
@@ -76,7 +87,6 @@ public class DeregisterVC: BaseViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         setAppearance()
-        setCheckListView()
         setLayout()
         setObservable()
     }
@@ -153,29 +163,27 @@ public class DeregisterVC: BaseViewController {
     
     private func setObservable() {
         
-    }
-    
-    private func setCheckListView() {
-        
-        self.itemViewList = DeregisterReasonVO.allCases.map { vo in
-            let itemView = CheckBoxWithLabelView(
-                labelText: vo.reasonText
-            )
+        itemViewList.forEach { itemView in
             
             itemView
                 .opTap
                 .observe(on: MainScheduler.instance)
-                .subscribe(onNext: { [weak self] state in
+                .map({ [weak self] state in
+                    
                     switch state {
-                    case .idle:
-                        self?.selectedReasons[vo] = false
-                    case .checked:
-                        self?.selectedReasons[vo] = true
+                    case .idle(let item):
+                        self?.selectedReasons[item] = false
+                    case .checked(let item):
+                        self?.selectedReasons[item] = true
                     }
+                    return state
+                })
+                .subscribe(onNext: { [weak self] _ in
+                    guard let self else { return }
+                    let selectCount = selectedReasons.values.filter { $0 }.count
+                    acceptDeregisterButton.setEnabled(selectCount > 0)
                 })
                 .disposed(by: disposeBag)
-            
-            return itemView
         }
     }
 }
