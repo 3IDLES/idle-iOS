@@ -1,23 +1,30 @@
 //
-//  DeregisterVC.swift
-//  BaseFeature
+//  DeregisterReasonVC.swift
+//  RootFeature
 //
 //  Created by choijunios on 8/21/24.
 //
 
 import UIKit
 import PresentationCore
+import BaseFeature
 import RxCocoa
 import RxSwift
 import Entity
 import DSKit
 import Entity
 
+public protocol DeregisterReasonVMable {
+    var coordinator: DeregisterCoordinator? { get }
+    var acceptDeregisterButonClicked: PublishRelay<[DeregisterReasonVO]> { get }
+}
 
-
-public class DeregisterVC: BaseViewController {
+public class DeregisterReasonVC: BaseViewController {
     
     // Init
+    
+    // Not init
+    var viewModel: DeregisterReasonVMable?
     
     // View
     let navigationBar: IdleNavigationBar = {
@@ -185,6 +192,21 @@ public class DeregisterVC: BaseViewController {
                 })
                 .disposed(by: disposeBag)
         }
+    }
+    
+    public func bind(viewModel: DeregisterReasonVMable) {
+        
+        acceptDeregisterButton
+            .rx.tap
+            .map { [weak self] _ in
+                let reasons = self?.selectedReasons.filter({ (reason, isActive) in isActive}).map { (key, _) in
+                    key
+                }
+                return reasons ?? []
+            }
+            .bind(to: viewModel.acceptDeregisterButonClicked)
+            .disposed(by: disposeBag)
+        
     }
 }
 
