@@ -375,3 +375,9 @@ public extension IdleOneLineInputField {
 }
 
 extension IdleOneLineInputField: IdleKeyboardAvoidable { }
+
+@available(iOS 17.0, *)
+#Preview("Preview", traits: .defaultLayout) {
+    
+    IdleOneLineInputField(placeHolderText: "비밀번호를 입력해주세요")
+}

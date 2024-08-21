@@ -21,6 +21,8 @@ public enum AuthAPI {
     case registerCenterAccount(data: Data)
     case centerLogin(id: String, password: String)
     case reissueToken(refreshToken: String)
+    case deregisterCenterAccount(reason: String, password: String)
+    case signoutCenterAccount
     
     // Worker
     case registerWorkerAccount(data: Data)
@@ -46,6 +48,10 @@ extension AuthAPI: BaseAPI {
             return .post
         case .centerLogin:
             return .post
+        case .signoutCenterAccount:
+            return .post
+        case .deregisterCenterAccount:
+            return .post
         case .reissueToken:
             return .post
         case .registerWorkerAccount:
@@ -69,6 +75,10 @@ extension AuthAPI: BaseAPI {
             "center/join"
         case .centerLogin:
             "center/login"
+        case .signoutCenterAccount:
+            "center/logout"
+        case .deregisterCenterAccount:
+            "center/withdraw"
         case .reissueToken:
             "center/refresh"
         case .registerWorkerAccount:
@@ -88,6 +98,9 @@ extension AuthAPI: BaseAPI {
             params["verificationNumber"] = authNumber
         case .centerLogin(let id, let password):
             params["identifier"] = id
+            params["password"] = password
+        case .deregisterCenterAccount(let reason, let password):
+            params["reason"] = reason
             params["password"] = password
         case .reissueToken(let refreshToken):
             params["refreshToken"] = refreshToken
@@ -116,6 +129,8 @@ extension AuthAPI: BaseAPI {
         case .registerCenterAccount(let data):
             return .requestData(data)
         case .centerLogin:
+            return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
+        case .deregisterCenterAccount:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .reissueToken:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)

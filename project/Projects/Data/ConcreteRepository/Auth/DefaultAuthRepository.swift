@@ -47,6 +47,27 @@ public extension DefaultAuthRepository {
         return networkService.requestDecodable(api: .centerLogin(id: id, password: password), with: .plain)
             .flatMap { [unowned self] in saveTokenToStore(token: $0) }
     }
+    
+    func signoutCenterAccount() -> RxSwift.Single<Void> {
+        networkService
+            .request(api: .signoutCenterAccount, with: .withToken)
+            .map {  _ in }
+    }
+    
+    func deregisterCenterAccount(reasons: [DeregisterReasonVO], password: String) -> RxSwift.Single<Void> {
+        
+        let reasonString = reasons.map { $0.reasonText }.joined(separator: "|")
+        
+        return networkService
+            .request(
+                api: .deregisterCenterAccount(
+                    reason: reasonString,
+                    password: password
+                ),
+                with: .withToken
+            )
+            .map { _ in }
+    }
 }
 
 // MARK: Worker auth
