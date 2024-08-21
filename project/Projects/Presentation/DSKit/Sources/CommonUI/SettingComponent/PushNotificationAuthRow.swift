@@ -25,6 +25,8 @@ public class PushNotificationAuthRow: UIView {
         return view
     }()
     
+    private var onFirstLoad: Bool = true
+    
     public init() {
         super.init(frame: .zero)
         setApearance()
@@ -69,13 +71,17 @@ public class PushNotificationAuthRow: UIView {
    
     }
     
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+    }
+    
     public override func draw(_ rect: CGRect) {
-        if `switch`.bounds.height > label.bounds.height {
+        if onFirstLoad, `switch`.bounds.height > label.bounds.height {
+            onFirstLoad = false
             let per = label.bounds.height / `switch`.bounds.height
             `switch`.transform = `switch`.transform.scaledBy(x: per, y: per)
         }
     }
-
 }
 
 @available(iOS 17.0, *)

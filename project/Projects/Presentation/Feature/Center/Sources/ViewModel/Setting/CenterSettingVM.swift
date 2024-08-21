@@ -72,12 +72,18 @@ public class CenterSettingVM: CenterSettingVMable {
         self.settingUseCase = settingUseCase
         self.centerProfileUseCase = centerProfileUseCase
         
+        
         // 기존의 알람수신 동의 여부 확인
-        let currentNotificationAuthStatus = viewWillAppear
+        // 설정화면에서 다시돌아온 경우 이벤트 수신
+        let refreshNotificationStatusRequest = Observable.merge(
+            NotificationCenter.default.rx.notification(UIApplication.didBecomeActiveNotification).map {_ in },
+            viewWillAppear.asObservable()
+        )
+        
+        let currentNotificationAuthStatus = refreshNotificationStatusRequest
             .flatMap { [settingUseCase] _ in
                 settingUseCase.checkPushNotificationApproved()
             }
-            
         
         let requestApproveNotification = approveToPushNotification.filter { $0 }.map { _ in () }
         let requestDenyNotification = approveToPushNotification.filter { !$0 }.map { _ in () }
@@ -91,7 +97,10 @@ public class CenterSettingVM: CenterSettingVMable {
         let approveGranted = approveRequestResult.filter { $0 == .granted }
         let openSettingAppToApprove = approveRequestResult.filter { $0 == .openSystemSetting }.map { _ in () }
         let approveRequestError = approveRequestResult.filter {
-            if case let .error(message) = $0 { return true }
+            if case let .error(message) = $0 {
+                printIfDebug("알림동의 실패: \(message)")
+                return true
+            }
             return false
         }
         
@@ -133,7 +142,7 @@ public class CenterSettingVM: CenterSettingVMable {
         signOutButtonComfirmed
             .subscribe(onNext: { [weak self] _ in
                 
-                // ‼️ ‼️ 계정 정보 삭제 ‼️ ‼️
+                // ‼️ ‼️ 로컬에 저장된 계정 정보 삭제 ‼️ ‼️
                 
                 self?.coordinator?.showAuthScreen()
             })
