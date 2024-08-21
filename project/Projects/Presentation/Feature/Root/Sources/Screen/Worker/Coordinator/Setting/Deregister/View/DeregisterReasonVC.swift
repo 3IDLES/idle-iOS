@@ -16,6 +16,7 @@ import Entity
 
 public protocol DeregisterReasonVMable {
     var coordinator: DeregisterCoordinator? { get }
+    var exitButonClicked: PublishRelay<Void> { get }
     var acceptDeregisterButonClicked: PublishRelay<[DeregisterReasonVO]> { get }
 }
 
@@ -207,6 +208,10 @@ public class DeregisterReasonVC: BaseViewController {
             .bind(to: viewModel.acceptDeregisterButonClicked)
             .disposed(by: disposeBag)
         
+        navigationBar.backButton
+            .rx.tap
+            .bind(to: viewModel.exitButonClicked)
+            .disposed(by: disposeBag)
     }
 }
 

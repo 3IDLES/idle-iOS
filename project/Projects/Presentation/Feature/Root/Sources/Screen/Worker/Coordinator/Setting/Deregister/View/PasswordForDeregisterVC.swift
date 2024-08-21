@@ -8,26 +8,18 @@
 import UIKit
 import BaseFeature
 import PresentationCore
+import UseCaseInterface
 import RxCocoa
 import RxSwift
 import Entity
 import DSKit
 
-public class PasswordForDeregisterVM {
-    
-    let deregisterButtonClicked: PublishRelay<Void> = .init()
-    
-    
-    
-    init() {
-        
-        
-    }
-}
-
 public class PasswordForDeregisterVC: BaseViewController {
     
     // Init
+    
+    // Not init
+    var viewModel: PasswordForDeregisterVM?
     
     // View
     let navigationBar: IdleNavigationBar = {
@@ -148,7 +140,41 @@ public class PasswordForDeregisterVC: BaseViewController {
     }
     
     private func setObservable() {
+        passwordField
+            .eventPublisher
+            .map { password in
+                password.count > 0
+            }
+            .observe(on: MainScheduler.asyncInstance)
+            .subscribe(onNext: { [weak self] isValid in
+                self?.acceptDeregisterButton.setEnabled(isValid)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    public func bind(viewModel: PasswordForDeregisterVM) {
         
+        self.viewModel = viewModel
+        
+        // Input
+        acceptDeregisterButton
+            .rx.tap
+            .withLatestFrom(passwordField.eventPublisher)
+            .bind(to: viewModel.deregisterButtonClicked)
+            .disposed(by: disposeBag)
+        
+        navigationBar
+            .backButton.rx.tap
+            .bind(to: viewModel.exitButtonClicked)
+            .disposed(by: disposeBag)
+        
+        // Output
+        viewModel
+            .alert?
+            .drive(onNext: { [weak self] alertVO in
+                self?.showAlert(vo: alertVO)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
