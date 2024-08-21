@@ -11,18 +11,18 @@ import RxCocoa
 
 public class CenterDeregisterReasonsVM: DeregisterReasonVMable {
     
-    public weak var coordinator: (any DeregisterCoordinator)?
+    public weak var coordinator: SelectReasonCoordinator?
     public var exitButonClicked: RxRelay.PublishRelay<Void> = .init()
     public var acceptDeregisterButonClicked: PublishRelay<[DeregisterReasonVO]> = .init()
     
     let disposeBag = DisposeBag()
     
-    public init(coordinator: DeregisterCoordinator?) {
+    public init(coordinator: SelectReasonCoordinator) {
         self.coordinator = coordinator
         
         acceptDeregisterButonClicked
             .subscribe(onNext: { [weak self] reasons in
-                self?.coordinator?.showFinalPasswordScreen(reasons: reasons)
+                self?.coordinator?.showPasswordAuthScreen(reasons: reasons)
             })
             .disposed(by: disposeBag)
         

@@ -15,7 +15,7 @@ import DSKit
 import Entity
 
 public protocol DeregisterReasonVMable {
-    var coordinator: DeregisterCoordinator? { get }
+    var coordinator: SelectReasonCoordinator? { get }
     var exitButonClicked: PublishRelay<Void> { get }
     var acceptDeregisterButonClicked: PublishRelay<[DeregisterReasonVO]> { get }
 }
@@ -197,6 +197,8 @@ public class DeregisterReasonVC: BaseViewController {
     
     public func bind(viewModel: DeregisterReasonVMable) {
         
+        self.viewModel = viewModel
+        
         acceptDeregisterButton
             .rx.tap
             .map { [weak self] _ in
@@ -208,8 +210,11 @@ public class DeregisterReasonVC: BaseViewController {
             .bind(to: viewModel.acceptDeregisterButonClicked)
             .disposed(by: disposeBag)
         
-        navigationBar.backButton
-            .rx.tap
+        Observable
+            .merge(
+                cancelButton.rx.tap.asObservable(),
+                navigationBar.backButton.rx.tap.asObservable()
+            )
             .bind(to: viewModel.exitButonClicked)
             .disposed(by: disposeBag)
     }
