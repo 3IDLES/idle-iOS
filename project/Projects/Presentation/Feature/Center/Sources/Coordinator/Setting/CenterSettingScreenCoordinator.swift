@@ -65,5 +65,9 @@ public class CenterSettingScreenCoordinator: ChildCoordinator {
         /// Root까지 네비게이션을 제거합니다.
         NotificationCenter.default.post(name: .popToInitialVC, object: nil)
     }
+    
+    public func startRemoveCenterAccountFlow() {
+        parent?.startRemoveCenterAccountFlow()
+    }
 }
 
