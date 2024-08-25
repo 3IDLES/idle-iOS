@@ -50,11 +50,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let vc = CenterSettingVC()
         let vm = CenterSettingVM(
             coordinator: nil,
-            settingUseCase: DefaultSettingUseCase(),
+            settingUseCase: DefaultSettingUseCase(repository: DefaultAuthRepository()),
             centerProfileUseCase: DefaultCenterProfileUseCase(
                 repository: DefaultUserProfileRepository()
             )
-            
         )
         
         vc.bind(viewModel: vm)
