@@ -28,6 +28,8 @@ class RootCoordinator: ParentCoordinator {
     func start() {
         navigationController.setNavigationBarHidden(true, animated: false)
         
+        // 빈화면 VC + VM 구현 예정, 로직에 따라 Auth, CenterMain, WorkerMain을 display
+        
         centerMain()
     }
     

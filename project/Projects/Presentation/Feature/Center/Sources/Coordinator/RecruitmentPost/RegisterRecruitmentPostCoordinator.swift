@@ -1,6 +1,6 @@
 //
-//  asd.swift
-//  RootFeature
+//  RegisterRecruitmentPostCoordinator.swift
+//  CenterFeature
 //
 //  Created by choijunios on 8/14/24.
 //
@@ -9,8 +9,6 @@ import UIKit
 import PresentationCore
 import UseCaseInterface
 import Entity
-import CenterFeature
-import WorkerFeature
 import BaseFeature
 
 

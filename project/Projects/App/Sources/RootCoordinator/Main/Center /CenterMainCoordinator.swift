@@ -8,6 +8,7 @@
 import UIKit
 import DSKit
 import PresentationCore
+import CenterFeature
 import RootFeature
 import UseCaseInterface
 
@@ -74,15 +75,18 @@ class CenterMainCoordinator: CenterMainCoordinatable {
             coordinator = RecruitmentManagementCoordinator(
                 dependency: .init(
                     parent: self,
-                    navigationController: navigationController,
-                    workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self), 
-                    recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
+                    injector: injector,
+                    navigationController: navigationController
                 )
             )
             
         case .setting:
             coordinator = CenterSettingCoordinator(
-                navigationController: navigationController
+                dependency: .init(
+                    parent: self,
+                    injector: injector,
+                    navigationController: navigationController
+                )
             )
         }
         addChildCoordinator(coordinator)

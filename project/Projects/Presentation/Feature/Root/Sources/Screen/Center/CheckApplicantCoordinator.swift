@@ -8,9 +8,9 @@
 import UIKit
 import PresentationCore
 import UseCaseInterface
-import Entity
 import CenterFeature
 import WorkerFeature
+import Entity
 import BaseFeature
 
 public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
@@ -45,7 +45,7 @@ public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
     }
     
     deinit {
-        printIfDebug("\(String(describing: RegisterRecruitmentCoordinator.self))")
+        printIfDebug("\(String(describing: CheckApplicantCoordinator.self))")
     }
     
     public func start() {

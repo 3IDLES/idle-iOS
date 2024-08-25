@@ -12,44 +12,41 @@ import CenterFeature
 import PresentationCore
 import UseCaseInterface
 
-public class AppliedAndLikedBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
+class AppliedAndLikedBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
     
-    public struct Dependency {
+    struct Dependency {
+        let parent: WorkerMainCoordinator
+        let injector: Injector
         let navigationController: UINavigationController
-        let centerProfileUseCase: CenterProfileUseCase
-        let recruitmentPostUseCase: RecruitmentPostUseCase
         
-        public init(navigationController: UINavigationController, centerProfileUseCase: CenterProfileUseCase, recruitmentPostUseCase: RecruitmentPostUseCase) {
+        init(parent: WorkerMainCoordinator, injector: Injector, navigationController: UINavigationController) {
+            self.parent = parent
+            self.injector = injector
             self.navigationController = navigationController
-            self.centerProfileUseCase = centerProfileUseCase
-            self.recruitmentPostUseCase = recruitmentPostUseCase
         }
     }
     
-    public var childCoordinators: [any PresentationCore.Coordinator] = []
+    var childCoordinators: [any PresentationCore.Coordinator] = []
     
-    public weak var viewControllerRef: UIViewController?
+    weak var viewControllerRef: UIViewController?
     
-    public var navigationController: UINavigationController
-    
+    var navigationController: UINavigationController
     weak var parent: ParentCoordinator?
-    
-    let centerProfileUseCase: CenterProfileUseCase
-    let recruitmentPostUseCase: RecruitmentPostUseCase
+    let injector: Injector
     
     public init(depedency: Dependency) {
+        self.parent = depedency.parent
         self.navigationController = depedency.navigationController
-        self.centerProfileUseCase = depedency.centerProfileUseCase
-        self.recruitmentPostUseCase = depedency.recruitmentPostUseCase
+        self.injector = depedency.injector
     }
     
     public func start() {
         let vc = StarredAndAppliedVC()
         let appliedVM = AppliedPostBoardVM(
-            recruitmentPostUseCase: recruitmentPostUseCase
+            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
         )
         let starredVM = StarredPostBoardVM(
-            recruitmentPostUseCase: recruitmentPostUseCase
+            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
         )
         vc.bind(
             appliedPostVM: appliedVM,
@@ -72,7 +69,7 @@ extension AppliedAndLikedBoardCoordinator {
                 postId: postId,
                 parent: self,
                 navigationController: navigationController,
-                recruitmentPostUseCase: recruitmentPostUseCase
+                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
             )
         )
         addChildCoordinator(coodinator)
@@ -82,7 +79,7 @@ extension AppliedAndLikedBoardCoordinator {
         let coordinator = CenterProfileCoordinator(
             dependency: .init(
                 mode: .otherProfile(id: centerId),
-                profileUseCase: centerProfileUseCase,
+                profileUseCase: injector.resolve(CenterProfileUseCase.self),
                 navigationController: navigationController
             )
         )

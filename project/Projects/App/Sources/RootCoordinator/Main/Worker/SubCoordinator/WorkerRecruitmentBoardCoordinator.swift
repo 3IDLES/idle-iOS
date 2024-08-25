@@ -1,6 +1,6 @@
 //
 //  WorkerRecruitmentBoardCoordinator.swift
-//  RootFeature
+//  Idle-iOS
 //
 //  Created by choijunios on 7/25/24.
 //
@@ -12,51 +12,43 @@ import CenterFeature
 import PresentationCore
 import UseCaseInterface
 
-public class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
+class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
     
-    public struct Dependency {
+    struct Dependency {
+        let parent: WorkerMainCoordinator
+        let injector: Injector
         let navigationController: UINavigationController
-        let centerProfileUseCase: CenterProfileUseCase
-        let recruitmentPostUseCase: RecruitmentPostUseCase
         
-        public init(navigationController: UINavigationController, centerProfileUseCase: CenterProfileUseCase, recruitmentPostUseCase: RecruitmentPostUseCase) {
+        init(parent: WorkerMainCoordinator, injector: Injector, navigationController: UINavigationController) {
+            self.parent = parent
+            self.injector = injector
             self.navigationController = navigationController
-            self.centerProfileUseCase = centerProfileUseCase
-            self.recruitmentPostUseCase = recruitmentPostUseCase
         }
     }
     
-    public var childCoordinators: [any PresentationCore.Coordinator] = []
+    var childCoordinators: [any PresentationCore.Coordinator] = []
     
-    public weak var viewControllerRef: UIViewController?
+    weak var viewControllerRef: UIViewController?
     
-    public var navigationController: UINavigationController
-    
+    var navigationController: UINavigationController
     weak var parent: ParentCoordinator?
+    let injector: Injector
     
-    let centerProfileUseCase: CenterProfileUseCase
-    let recruitmentPostUseCase: RecruitmentPostUseCase
-    
-    public init(depedency: Dependency) {
+    init(depedency: Dependency) {
         self.navigationController = depedency.navigationController
-        self.centerProfileUseCase = depedency.centerProfileUseCase
-        self.recruitmentPostUseCase = depedency.recruitmentPostUseCase
+        self.parent = depedency.parent
+        self.injector = depedency.injector
     }
     
-    public func start() {
+    func start() {
         let vc = WorkerRecruitmentPostBoardVC()
         let vm = WorkerRecruitmentPostBoardVM(
             coordinator: self,
-            recruitmentPostUseCase: recruitmentPostUseCase
+            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
         )
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: false)
-    }
-    
-    public func coordinatorDidFinish() {
-        popViewController()
-        parent?.removeChildCoordinator(self)
     }
 }
 
@@ -67,7 +59,7 @@ extension WorkerRecruitmentBoardCoordinator {
                 postId: postId,
                 parent: self,
                 navigationController: navigationController,
-                recruitmentPostUseCase: recruitmentPostUseCase
+                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
             )
         )
         addChildCoordinator(coodinator)
@@ -77,7 +69,7 @@ extension WorkerRecruitmentBoardCoordinator {
         let coordinator = CenterProfileCoordinator(
             dependency: .init(
                 mode: .otherProfile(id: centerId),
-                profileUseCase: centerProfileUseCase,
+                profileUseCase: injector.resolve(CenterProfileUseCase.self),
                 navigationController: navigationController
             )
         )
