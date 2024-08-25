@@ -29,6 +29,14 @@ public protocol SettingScreenUseCase: UseCaseBase {
     /// 어플리케이션 이용약관을 가져옵니다.
     func getApplicationPolicyUrl() -> URL
     
+    /// 요양보호사 회원 탈퇴
+    func deregisterWorkerAccount(
+        reasons: [DeregisterReasonVO]
+    ) -> Single<Result<Void, DomainError>>
+    
+    /// 요양보호사 로그아웃
+    func signoutWorkerAccount() -> Single<Result<Void, DomainError>>
+    
     /// 센터 회원 탈퇴
     func deregisterCenterAccount(
         reasons: [DeregisterReasonVO],

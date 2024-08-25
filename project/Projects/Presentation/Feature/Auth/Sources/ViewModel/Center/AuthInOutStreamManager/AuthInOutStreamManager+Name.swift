@@ -12,7 +12,7 @@ import PresentationCore
 import UseCaseInterface
 import Entity
 
-enum AuthInOutStreamManager { }
+public enum AuthInOutStreamManager { }
 
 extension AuthInOutStreamManager {
     

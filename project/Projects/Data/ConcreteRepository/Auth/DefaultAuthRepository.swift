@@ -12,7 +12,7 @@ import NetworkDataSource
 import Entity
 
 public class DefaultAuthRepository: AuthRepository {
-
+    
     let networkService = AuthService()
     
     public init() { }
@@ -93,6 +93,25 @@ public extension DefaultAuthRepository {
     func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Void> {
         return networkService.requestDecodable(api: .workerLogin(phoneNumber: phoneNumber, verificationNumber: authNumber), with: .plain)
             .flatMap { [unowned self] in saveTokenToStore(token: $0) }
+    }
+    
+    func signoutWorkerAccount() -> RxSwift.Single<Void> {
+        networkService
+            .request(api: .signoutWorkerAccount, with: .withToken)
+            .map {  _ in }
+    }
+    
+    func deregisterWorkerAccount(reasons: [Entity.DeregisterReasonVO]) -> RxSwift.Single<Void> {
+        let reasonString = reasons.map { $0.reasonText }.joined(separator: "|")
+        
+        return networkService
+            .request(
+                api: .deregisterWorkerAccount(
+                    reason: reasonString
+                ),
+                with: .withToken
+            )
+            .map { _ in }
     }
 }
 

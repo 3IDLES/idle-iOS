@@ -27,6 +27,8 @@ public enum AuthAPI {
     // Worker
     case registerWorkerAccount(data: Data)
     case workerLogin(phoneNumber: String, verificationNumber: String)
+    case signoutWorkerAccount
+    case deregisterWorkerAccount(reason: String)
 }
 
 extension AuthAPI: BaseAPI {
@@ -57,6 +59,10 @@ extension AuthAPI: BaseAPI {
         case .registerWorkerAccount:
             return .post
         case .workerLogin:
+            return .post
+        case .signoutWorkerAccount:
+            return .post
+        case .deregisterWorkerAccount:
             return .post
         }
     }
@@ -91,6 +97,10 @@ extension AuthAPI: BaseAPI {
             "carer/join"
         case .workerLogin:
             "carer/login"
+        case .signoutWorkerAccount:
+            "carer/logout"
+        case .deregisterWorkerAccount:
+            "carer/withdraw"
         }
     }
     
@@ -113,6 +123,8 @@ extension AuthAPI: BaseAPI {
         case .workerLogin(let phoneNumber, let verificationNumber):
             params["phoneNumber"] = phoneNumber
             params["verificationNumber"] = verificationNumber
+        case .deregisterWorkerAccount(let reason):
+            params["reason"] = reason
         default:
             break
         }
@@ -147,6 +159,8 @@ extension AuthAPI: BaseAPI {
         case .registerWorkerAccount(let data):
             return .requestData(data)
         case .workerLogin:
+            return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
+        case .deregisterWorkerAccount:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         default:
             return .requestPlain

@@ -52,6 +52,7 @@ class CenterSettingCoordinator: CenterSettingScreenCoordinatable {
             dependency: .init(
                 userType: .center,
                 settingUseCase: injector.resolve(SettingScreenUseCase.self),
+                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self),
                 navigationController: navigationController
             )
         )

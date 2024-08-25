@@ -113,7 +113,7 @@ public class WorkerSettingVM: WorkerSettingVMable {
         
         // MARK: 로그아웃
         let signOutRequestResult = signOutButtonComfirmed.flatMap({ [settingUseCase] _ in
-            settingUseCase.signoutCenterAccount()
+            settingUseCase.signoutWorkerAccount()
         })
             .share()
         

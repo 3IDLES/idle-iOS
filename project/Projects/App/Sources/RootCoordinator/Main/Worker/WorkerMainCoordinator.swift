@@ -87,7 +87,13 @@ class WorkerMainCoordinator: ParentCoordinator {
                 )
             )
         case .setting:
-            fatalError()
+            coordinator = WorkerSettingCoordinaator(
+                dependency: .init(
+                    parent: self,
+                    injector: injector,
+                    navigationController: navigationController
+                )
+            )
         }
         
         addChildCoordinator(coordinator)

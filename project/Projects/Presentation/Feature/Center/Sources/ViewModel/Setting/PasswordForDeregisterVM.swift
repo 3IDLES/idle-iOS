@@ -16,7 +16,8 @@ public class PasswordForDeregisterVM: DefaultAlertOutputable {
     public weak var coordinator: PasswordForDeregisterCoordinator?
     
     public let deregisterButtonClicked: PublishRelay<String> = .init()
-    public let exitButtonClicked: PublishRelay<Void> = .init()
+    public let backButtonClicked: PublishRelay<Void> = .init()
+    public let cancelButtonClicked: PublishRelay<Void> = .init()
     public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     
     let settingUseCase: SettingScreenUseCase
@@ -33,10 +34,7 @@ public class PasswordForDeregisterVM: DefaultAlertOutputable {
         
         let deregisterResult = deregisterButtonClicked
             .flatMap { [settingUseCase] password in
-                settingUseCase.deregisterCenterAccount(
-                    reasons: deregisterReasons,
-                    password: password
-                )
+                settingUseCase.deregisterWorkerAccount(reasons: deregisterReasons)
             }
             .share()
         
@@ -54,10 +52,17 @@ public class PasswordForDeregisterVM: DefaultAlertOutputable {
             })
             .disposed(by: disposeBag)
         
-        exitButtonClicked
+        backButtonClicked
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 self?.coordinator?.coordinatorDidFinish()
+            })
+            .disposed(by: disposeBag)
+        
+        cancelButtonClicked
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                self?.coordinator?.cancelDeregister()
             })
             .disposed(by: disposeBag)
         

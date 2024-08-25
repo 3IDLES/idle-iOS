@@ -38,7 +38,7 @@ public class IdleNavigationBar: UIView {
     
     public init(
         titleText: String = "",
-        innerViews: [UIView]
+        innerViews: [UIView] = []
     ) {
         super.init(frame: .zero)
         

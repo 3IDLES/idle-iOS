@@ -16,11 +16,13 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     public struct Dependency {
         let userType: UserType
         let settingUseCase: SettingScreenUseCase
+        let inputValidationUseCase: AuthInputValidationUseCase
         let navigationController: UINavigationController
         
-        public init(userType: UserType, settingUseCase: SettingScreenUseCase, navigationController: UINavigationController) {
+        public init(userType: UserType, settingUseCase: SettingScreenUseCase, inputValidationUseCase: AuthInputValidationUseCase, navigationController: UINavigationController) {
             self.userType = userType
             self.settingUseCase = settingUseCase
+            self.inputValidationUseCase = inputValidationUseCase
             self.navigationController = navigationController
         }
     }
@@ -34,10 +36,12 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     var viewControllerRef: UIViewController?
     let userType: UserType
     let settingUseCase: SettingScreenUseCase
+    let inputValidationUseCase: AuthInputValidationUseCase
     
     public init(dependency: Dependency) {
         self.userType = dependency.userType
         self.settingUseCase = dependency.settingUseCase
+        self.inputValidationUseCase = dependency.inputValidationUseCase
         self.navigationController = dependency.navigationController
     }
     
@@ -73,11 +77,25 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     }
     
     public func showFinalPhoneAuthScreen(reasons: [Entity.DeregisterReasonVO]) {
-        
+        let coordinator = PhoneNumberValidationForDeregisterCoordinator(
+            dependency: .init(
+                settingUseCase: settingUseCase,
+                inputValidationUseCase: inputValidationUseCase,
+                reasons: reasons,
+                navigationController: navigationController
+            )
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
     }
     
     public func cancelDeregister() {
         clearChildren()
         parent?.removeChildCoordinator(self)
+    }
+    
+    public func popToRoot() {
+        NotificationCenter.default.post(name: .popToInitialVC, object: nil)
     }
 }

@@ -91,4 +91,14 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
             task: repository.signoutCenterAccount()
         )
     }
+    
+    // 요양보호사 회원탈퇴
+    public func deregisterWorkerAccount(reasons: [Entity.DeregisterReasonVO]) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
+        convert(task: repository.deregisterWorkerAccount(reasons: reasons))
+    }
+    
+    // 요양보호사 로그아웃
+    public func signoutWorkerAccount() -> RxSwift.Single<Result<Void, Entity.DomainError>> {
+        convert(task: repository.signoutWorkerAccount())
+    }
 }

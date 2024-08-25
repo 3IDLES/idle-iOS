@@ -21,4 +21,7 @@ public protocol DeregisterCoordinatable: ParentCoordinator {
     
     /// 요양보호사: 마지막으로 전화번호를 입력합니다.
     func showFinalPhoneAuthScreen(reasons: [DeregisterReasonVO])
+    
+    /// 최초화면으로 돌아갑니다.
+    func popToRoot()
 }
