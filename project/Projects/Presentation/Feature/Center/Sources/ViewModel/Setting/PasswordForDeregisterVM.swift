@@ -46,14 +46,18 @@ public class PasswordForDeregisterVM: DefaultAlertOutputable {
         deregisterSuccess
             .observe(on: MainScheduler.asyncInstance)
             .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.flowFinished()
+                
+                // ‼️ ‼️ 로컬에 저장된 계정 정보 삭제 ‼️ ‼️
+                
+                // RootCoordinator로 이동
+                self?.coordinator?.popToRoot()
             })
             .disposed(by: disposeBag)
         
         exitButtonClicked
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
+                self?.coordinator?.cancelDeregister()
             })
             .disposed(by: disposeBag)
         

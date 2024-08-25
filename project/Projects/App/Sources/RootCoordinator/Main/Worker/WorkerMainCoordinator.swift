@@ -73,17 +73,17 @@ class WorkerMainCoordinator: ParentCoordinator {
         case .home:
             coordinator = WorkerRecruitmentBoardCoordinator(
                 depedency: .init(
-                    navigationController: navigationController,
-                    centerProfileUseCase: injector.resolve(CenterProfileUseCase.self),
-                    recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
+                    parent: self,
+                    injector: injector,
+                    navigationController: navigationController
                 )
             )
         case .preferredPost:
             coordinator = AppliedAndLikedBoardCoordinator(
                 depedency: .init(
-                    navigationController: navigationController,
-                    centerProfileUseCase: injector.resolve(CenterProfileUseCase.self),
-                    recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
+                    parent: self,
+                    injector: injector,
+                    navigationController: navigationController
                 )
             )
         case .setting:

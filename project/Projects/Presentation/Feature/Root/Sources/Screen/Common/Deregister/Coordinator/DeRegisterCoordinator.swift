@@ -1,14 +1,14 @@
 //
 //  DeRegisterCoordinator.swift
-//  RootFeature
+//  BaseFeature
 //
 //  Created by choijunios on 8/21/24.
 //
 
 import UIKit
 import Entity
-import CenterFeature
 import PresentationCore
+import CenterFeature
 import UseCaseInterface
 
 public class DeRegisterCoordinator: DeregisterCoordinatable {
@@ -45,10 +45,6 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
         showSelectReasonScreen()
     }
     
-    public func flowFinished() {
-        
-    }
-    
     public func showSelectReasonScreen() {
         let coordinator: SelectReasonCoordinator = .init(
             dependency: .init(
@@ -80,8 +76,8 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
         
     }
     
-    public func coordinatorDidFinish() {
-        popViewController()
+    public func cancelDeregister() {
+        clearChildren()
         parent?.removeChildCoordinator(self)
     }
 }

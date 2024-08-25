@@ -45,7 +45,6 @@ class CenterProfileRegisterCoordinator: CenterProfileRegisterCoordinatable {
     public func registerFinished() {
         
         clearChildren()
-        
         parent?.removeChildCoordinator(self)
     }
 }

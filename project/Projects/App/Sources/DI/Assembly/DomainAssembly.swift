@@ -45,5 +45,8 @@ public struct DomainAssembly: Assembly {
             return DefaultWorkerProfileUseCase(repository: repository)
         }
         
+        container.register(SettingScreenUseCase.self) { resolver in
+            return DefaultSettingUseCase()
+        }
     }
 }

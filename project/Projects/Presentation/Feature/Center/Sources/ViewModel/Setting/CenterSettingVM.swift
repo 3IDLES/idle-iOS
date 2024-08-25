@@ -15,14 +15,6 @@ import DSKit
 import UseCaseInterface
 import UserNotifications
 
-public protocol CenterSettingScreenCoordinatable: ParentCoordinator {
-    /// 로그인및 회원가입 화면으로 이동합니다.
-    func showAuthScreen()
-    
-    /// 시설 관리자 계정을 지우는 작업을 시작합니다.
-    func startRemoveCenterAccountFlow()
-}
-
 public protocol CenterSettingVMable {
     
     // Input
@@ -46,7 +38,7 @@ public protocol CenterSettingVMable {
 public class CenterSettingVM: CenterSettingVMable {
     
     // Init
-    weak var coordinator: CenterSettingScreenCoordinatable?
+    weak var coordinator: CenterSettingScreenCoordinator?
     let settingUseCase: SettingScreenUseCase
     let centerProfileUseCase: CenterProfileUseCase
     
@@ -65,7 +57,7 @@ public class CenterSettingVM: CenterSettingVMable {
     let disposeBag = DisposeBag()
     
     public init(
-        coordinator: CenterSettingScreenCoordinatable?,
+        coordinator: CenterSettingScreenCoordinator?,
         settingUseCase: SettingScreenUseCase,
         centerProfileUseCase: CenterProfileUseCase
         )
@@ -145,7 +137,7 @@ public class CenterSettingVM: CenterSettingVMable {
                 
                 // ‼️ ‼️ 로컬에 저장된 계정 정보 삭제 ‼️ ‼️
                 
-                self?.coordinator?.showAuthScreen()
+                self?.coordinator?.popToRoot()
             })
             .disposed(by: disposeBag)
         

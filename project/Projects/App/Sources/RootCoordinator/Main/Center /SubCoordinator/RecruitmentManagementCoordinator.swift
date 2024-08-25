@@ -1,11 +1,12 @@
 //
 //  RecruitmentManagementCoordinator.swift
-//  RootFeature
+//  Idle-iOS
 //
 //  Created by choijunios on 7/25/24.
 //
 
 import UIKit
+import RootFeature
 import CenterFeature
 import PresentationCore
 import UseCaseInterface
@@ -15,21 +16,14 @@ import Entity
 public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatable {
     
     public struct Dependency {
-        weak var parent: CenterMainCoordinatable?
+        let parent: CenterMainCoordinatable
+        let injector: Injector
         let navigationController: UINavigationController
-        let workerProfileUseCase: WorkerProfileUseCase
-        let recruitmentPostUseCase: RecruitmentPostUseCase
         
-        public init(
-            parent: CenterMainCoordinatable? = nil,
-            navigationController: UINavigationController,
-            workerProfileUseCase: WorkerProfileUseCase,
-            recruitmentPostUseCase: RecruitmentPostUseCase
-        ) {
+        init(parent: CenterMainCoordinatable, injector: Injector, navigationController: UINavigationController) {
             self.parent = parent
+            self.injector = injector
             self.navigationController = navigationController
-            self.workerProfileUseCase = workerProfileUseCase
-            self.recruitmentPostUseCase = recruitmentPostUseCase
         }
     }
     
@@ -37,20 +31,16 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
     
     public weak var viewControllerRef: UIViewController?
     
-    public var navigationController: UINavigationController
-    
     public weak var parent: CenterMainCoordinatable?
-    
-    let workerProfileUseCase: WorkerProfileUseCase
-    let recruitmentPostUseCase: RecruitmentPostUseCase
+    let injector: Injector
+    public var navigationController: UINavigationController
     
     public init(
         dependency: Dependency
     ) {
         self.parent = dependency.parent
+        self.injector = dependency.injector
         self.navigationController = dependency.navigationController
-        self.workerProfileUseCase = dependency.workerProfileUseCase
-        self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
     }
     
     public func start() {
@@ -74,7 +64,7 @@ public extension RecruitmentManagementCoordinator {
             dependency: .init(
                 navigationController: navigationController,
                 centerEmployCardVO: .mock,
-                workerProfileUseCase: workerProfileUseCase
+                workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
             )
         )
         addChildCoordinator(coordinator)
@@ -89,7 +79,7 @@ public extension RecruitmentManagementCoordinator {
                 postId: postId,
                 applicantCount: applicantCount,
                 navigationController: navigationController,
-                recruitmentPostUseCase: recruitmentPostUseCase
+                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
             )
         )
         addChildCoordinator(coordinator)
@@ -101,7 +91,7 @@ public extension RecruitmentManagementCoordinator {
         
         let vm = EditPostVM(
             id: postId,
-            recruitmentPostUseCase: recruitmentPostUseCase
+            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
         )
         let coordinator = EditPostCoordinator(
             dependency: .init(
