@@ -19,7 +19,7 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         self.repository = repository
     }
     
-    public func registerRecruitmentPost(inputs: RegisterRecruitmentPostBundle) -> Single<Result<Void, RecruitmentPostError>> {
+    public func registerRecruitmentPost(inputs: RegisterRecruitmentPostBundle) -> Single<Result<Void, DomainError>> {
         
         // 마감기간이 지정되지 않는 경우 현재로 부터 한달 후로 설정
         if inputs.applicationDetail.applyDeadlineType == .untilApplicationFinished {
@@ -34,7 +34,7 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         )
     }
     
-    public func editRecruitmentPost(id: String, inputs: Entity.RegisterRecruitmentPostBundle) -> RxSwift.Single<Result<Void, Entity.RecruitmentPostError>> {
+    public func editRecruitmentPost(id: String, inputs: Entity.RegisterRecruitmentPostBundle) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
         
         if inputs.applicationDetail.applyDeadlineType == .untilApplicationFinished {
             let oneMonthLater = Calendar.current.date(byAdding: .month, value: 1, to: Date())
@@ -49,15 +49,15 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         )
     }
     
-    public func getPostDetailForCenter(id: String) -> RxSwift.Single<Result<Entity.RegisterRecruitmentPostBundle, Entity.RecruitmentPostError>> {
+    public func getPostDetailForCenter(id: String) -> RxSwift.Single<Result<Entity.RegisterRecruitmentPostBundle, Entity.DomainError>> {
         convert(task: repository.getPostDetailForCenter(id: id))
     }
     
-    public func getPostDetailForWorker(id: String) -> RxSwift.Single<Result<Entity.RecruitmentPostForWorkerBundle, Entity.RecruitmentPostError>> {
+    public func getPostDetailForWorker(id: String) -> RxSwift.Single<Result<Entity.RecruitmentPostForWorkerBundle, Entity.DomainError>> {
         convert(task: repository.getPostDetailForWorker(id: id))
     }
     
-    public func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, RecruitmentPostError>> {
+    public func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>> {
         
         let stream: Single<RecruitmentPostListForWorkerVO>!
         

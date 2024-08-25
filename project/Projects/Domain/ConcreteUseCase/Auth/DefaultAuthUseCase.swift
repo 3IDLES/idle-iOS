@@ -20,7 +20,7 @@ public class DefaultAuthUseCase: AuthUseCase {
     }
     
     // 센터 회원가입 실행
-    public func registerCenterAccount(registerState: CenterRegisterState) -> Single<Result<Void, AuthError>> {
+    public func registerCenterAccount(registerState: CenterRegisterState) -> Single<Result<Void, DomainError>> {
         convert(
             task: repository.requestRegisterCenterAccount(
                 managerName: registerState.name,
@@ -32,32 +32,32 @@ public class DefaultAuthUseCase: AuthUseCase {
     }
     
     // 센터 로그인 실행
-    public func loginCenterAccount(id: String, password: String) -> Single<Result<Void, AuthError>> {
+    public func loginCenterAccount(id: String, password: String) -> Single<Result<Void, DomainError>> {
         convert(task: repository.requestCenterLogin(id: id, password: password))
     }
     
     // 센터 회원탈퇴
-    public func deregisterCenterAccount(reasons: [Entity.DeregisterReasonVO], password: String) -> RxSwift.Single<Result<Void, Entity.AuthError>> {
+    public func deregisterCenterAccount(reasons: [Entity.DeregisterReasonVO], password: String) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
         convert(
             task: repository.deregisterCenterAccount(reasons: reasons, password: password)
         )
     }
     
     // 센터 로그아웃
-    public func signoutCenterAccount() -> RxSwift.Single<Result<Void, Entity.AuthError>> {
+    public func signoutCenterAccount() -> RxSwift.Single<Result<Void, Entity.DomainError>> {
         convert(
             task: repository.signoutCenterAccount()
         )
     }
     
     // 요양 보호사 회원가입 실행
-    public func registerWorkerAccount(registerState: WorkerRegisterState) -> Single<Result<Void, AuthError>> {
+    public func registerWorkerAccount(registerState: WorkerRegisterState) -> Single<Result<Void, DomainError>> {
         convert(
             task: repository.requestRegisterWorkerAccount(registerState: registerState))
     }
     
     // 요양 보호사 로그인 실행
-    public func loginWorkerAccount(phoneNumber: String, authNumber: String) -> Single<Result<Void, AuthError>> {
+    public func loginWorkerAccount(phoneNumber: String, authNumber: String) -> Single<Result<Void, DomainError>> {
         convert(
             task: repository.requestWorkerLogin(phoneNumber: phoneNumber, authNumber: authNumber))
     }

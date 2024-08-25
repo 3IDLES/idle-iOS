@@ -26,7 +26,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
     
     
     // MARK: 전화번호 인증
-    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<String, InputValidationError>> {
+    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<String, DomainError>> {
         convert(task: self.repository
             .requestPhoneNumberAuthentication(phoneNumber: phoneNumber)
             .map { _ in phoneNumber }
@@ -40,7 +40,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         return predicate.evaluate(with: phoneNumber)
     }
     
-    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<String, InputValidationError>> {
+    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<String, DomainError>> {
         convert(task: repository
             .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
             .map({ _ in phoneNumber })
@@ -48,7 +48,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
     }
     
     // MARK: 사업자 번호 인증
-    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<(businessNumber: String, vo: BusinessInfoVO), InputValidationError>> {
+    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<(businessNumber: String, vo: BusinessInfoVO), DomainError>> {
         convert(task: repository
             .requestBusinessNumberAuthentication(businessNumber: businessNumber)
             .map({ vo in (businessNumber, vo) })
@@ -70,7 +70,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         return predicate.evaluate(with: id)
     }
     
-    public func requestCheckingIdDuplication(id: String) -> Single<Result<String, InputValidationError>> {
+    public func requestCheckingIdDuplication(id: String) -> Single<Result<String, DomainError>> {
         convert(task: repository
             .requestCheckingIdDuplication(id: id)
             .map({ _ in id })

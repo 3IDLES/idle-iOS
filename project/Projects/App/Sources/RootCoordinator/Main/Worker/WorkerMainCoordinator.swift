@@ -87,9 +87,7 @@ class WorkerMainCoordinator: ParentCoordinator {
                 )
             )
         case .setting:
-            coordinator = WorkerSettingCoordinator(
-                navigationController: navigationController
-            )
+            fatalError()
         }
         
         addChildCoordinator(coordinator)

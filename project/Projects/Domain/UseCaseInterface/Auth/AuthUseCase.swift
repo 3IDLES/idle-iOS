@@ -28,7 +28,7 @@ public protocol AuthUseCase: UseCaseBase {
     ///     - registerState: CenterRegisterState
     func registerCenterAccount(
         registerState: CenterRegisterState
-    ) -> Single<Result<Void, AuthError>>
+    ) -> Single<Result<Void, DomainError>>
     
     // #2.
     /// 센터 로그인 실행
@@ -38,26 +38,26 @@ public protocol AuthUseCase: UseCaseBase {
     func loginCenterAccount(
         id: String,
         password: String
-    ) -> Single<Result<Void, AuthError>>
+    ) -> Single<Result<Void, DomainError>>
     
     /// 센터 회원 탈퇴
     func deregisterCenterAccount(
         reasons: [DeregisterReasonVO],
         password: String
-    ) -> Single<Result<Void, AuthError>>
+    ) -> Single<Result<Void, DomainError>>
     
     /// 센터 로그아웃
-    func signoutCenterAccount() -> Single<Result<Void, AuthError>>
+    func signoutCenterAccount() -> Single<Result<Void, DomainError>>
     
     // #5
     /// 요양 보호사 회원가입 실행
     func registerWorkerAccount(
         registerState: WorkerRegisterState
-    ) -> Single<Result<Void, AuthError>>
+    ) -> Single<Result<Void, DomainError>>
     // #6
     /// 요양 보호사 로그인 실행
     func loginWorkerAccount(
         phoneNumber: String,
         authNumber: String
-    ) -> Single<Result<Void, AuthError>>
+    ) -> Single<Result<Void, DomainError>>
 }

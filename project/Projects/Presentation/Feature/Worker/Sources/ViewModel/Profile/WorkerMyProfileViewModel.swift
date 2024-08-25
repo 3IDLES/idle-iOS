@@ -188,12 +188,12 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
         profileRenderObject = rederingState.asDriver(onErrorRecover: { _ in fatalError() })
     }
     
-    private func fetchProfileVO() -> Single<Result<WorkerProfileVO, UserInfoError>> {
+    private func fetchProfileVO() -> Single<Result<WorkerProfileVO, DomainError>> {
         workerProfileUseCase
             .getProfile(mode: .myProfile)
     }
     
-    public func requestUpload(editObject: WorkerProfileStateObject) -> Single<Result<Void, UserInfoError>> {
+    public func requestUpload(editObject: WorkerProfileStateObject) -> Single<Result<Void, DomainError>> {
         
         var submitObject: WorkerProfileStateObject = .init()
         

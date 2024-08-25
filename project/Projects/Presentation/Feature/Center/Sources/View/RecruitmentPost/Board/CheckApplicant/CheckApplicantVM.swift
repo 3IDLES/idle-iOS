@@ -77,7 +77,7 @@ public class CheckApplicantVM: CheckApplicantViewModelable {
         .init(vo: vo, coordinator: coorindator)
     }
     
-    func publishPostApplicantVOMocks() -> Single<Result<[PostApplicantVO], RecruitmentPostError>> {
+    func publishPostApplicantVOMocks() -> Single<Result<[PostApplicantVO], DomainError>> {
         
         .just(.success((0...10).map { _ in PostApplicantVO.mock }))
     }

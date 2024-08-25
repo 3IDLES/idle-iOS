@@ -27,7 +27,7 @@ public protocol AuthInputValidationUseCase: UseCaseBase {
     ///     - PhoneNumber : "000-0000-0000"
     /// - returns:
     ///     - Observable<BoolResult>
-    func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<String, InputValidationError>>
+    func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<String, DomainError>>
     
     // #2.
     /// 전화번호 유효성 로직
@@ -44,7 +44,7 @@ public protocol AuthInputValidationUseCase: UseCaseBase {
     ///     - authNumber : String 예시 "000000"
     /// - returns:
     ///     - Observable<BoolResult>
-    func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<String, InputValidationError>>
+    func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<String, DomainError>>
     
     // #4.
     /// 사업자 번호로 해당 사업장 정보 조회
@@ -54,7 +54,7 @@ public protocol AuthInputValidationUseCase: UseCaseBase {
     ///     - Observable<BusinessNumberAuthResult>
     
     // MARK: 사업자 번호 조회
-    func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<(businessNumber: String, vo: BusinessInfoVO), InputValidationError>>
+    func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<(businessNumber: String, vo: BusinessInfoVO), DomainError>>
     
     // #5.
     /// 사업자 번호 유효성 로직
@@ -78,7 +78,7 @@ public protocol AuthInputValidationUseCase: UseCaseBase {
     ///     - id : "idle1234"
     /// - returns:
     ///     - Bool, true: 가능, flase: 증복
-    func requestCheckingIdDuplication(id: String) -> Single<Result<String, InputValidationError>>
+    func requestCheckingIdDuplication(id: String) -> Single<Result<String, DomainError>>
     
     // #8.
     /// 아이디 유효성확인 로직

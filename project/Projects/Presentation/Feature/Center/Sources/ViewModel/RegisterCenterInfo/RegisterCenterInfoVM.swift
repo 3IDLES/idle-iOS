@@ -115,7 +115,7 @@ public class RegisterCenterInfoVM: RegisterCenterInfoViewModelable {
         let profileRegisterResult = self.completeButtonPressed
             .flatMap { [useCase, stateObject] _ in
 #if DEBUG
-                return Single<Result<Void, UserInfoError>>.just(.success(()))
+                return Single<Result<Void, DomainError>>.just(.success(()))
 #endif
                 return useCase.registerCenterProfile(state: stateObject)
             }

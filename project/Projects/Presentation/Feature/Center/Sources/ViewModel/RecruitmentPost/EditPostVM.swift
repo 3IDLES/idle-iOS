@@ -389,7 +389,7 @@ public class EditPostVM: EditPostViewModelable {
         let inputValidationFailure = inputValidationResult.compactMap { $0 }
         
         let editingRequestResult = inputValidationSuccess
-            .flatMap { [weak self] _ -> Single<Result<Void, RecruitmentPostError>> in
+            .flatMap { [weak self] _ -> Single<Result<Void, DomainError>> in
                 guard let self else { return .never() }
                 
                 return recruitmentPostUseCase.editRecruitmentPost(

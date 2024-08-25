@@ -69,11 +69,11 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
         .asDriver(onErrorJustReturn: .default)
     }
     
-    func publishOngoingPostMocks() -> Single<Result<[CenterEmployCardVO], RecruitmentPostError>> {
+    func publishOngoingPostMocks() -> Single<Result<[CenterEmployCardVO], DomainError>> {
         return .just(.success((0...10).map { _ in CenterEmployCardVO.mock }))
     }
     
-    func publishClosedPostMocks() -> Single<Result<[CenterEmployCardVO], RecruitmentPostError>> {
+    func publishClosedPostMocks() -> Single<Result<[CenterEmployCardVO], DomainError>> {
         return .just(.success((0...10).map { _ in CenterEmployCardVO.mock }))
     }
     

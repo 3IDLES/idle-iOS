@@ -106,7 +106,7 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
         profileRenderObject = rederingState.asDriver(onErrorRecover: { _ in fatalError() })
     }
     
-    private func fetchProfileVO() -> Single<Result<WorkerProfileVO, UserInfoError>> {
+    private func fetchProfileVO() -> Single<Result<WorkerProfileVO, DomainError>> {
         workerProfileUseCase
             .getProfile(mode: .otherProfile(id: self.workerId))
     }

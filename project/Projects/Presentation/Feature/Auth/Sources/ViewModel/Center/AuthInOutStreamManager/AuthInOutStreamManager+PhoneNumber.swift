@@ -50,7 +50,7 @@ extension AuthInOutStreamManager {
                 let formatted = Self.formatPhoneNumber(phoneNumber: input.editingPhoneNumber.value)
 #if DEBUG
                 print("✅ 디버그모드에서 번호인증 요청 무조건 통과")
-                return Single.just(Result<String, InputValidationError>.success(formatted))
+                return Single.just(Result<String, DomainError>.success(formatted))
 #endif
                 return useCase.requestPhoneNumberAuthentication(phoneNumber: formatted)
             }
@@ -111,7 +111,7 @@ extension AuthInOutStreamManager {
     #if DEBUG
                     // 디버그시 인증번호 무조건 통과
                     print("✅ 디버그모드에서 번호인증 무조건 통과")
-                    return Single.just(Result<String, InputValidationError>.success(phoneNumber))
+                    return Single.just(Result<String, DomainError>.success(phoneNumber))
     #endif
                     
                     return useCase.authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
@@ -141,7 +141,7 @@ extension AuthInOutStreamManager {
     #if DEBUG
                     // 디버그시 인증번호 무조건 통과
                     print("✅ 디버그모드에서 번호인증 무조건 통과")
-                    return Single.just(Result<String, InputValidationError>.success(phoneNumber))
+                    return Single.just(Result<String, DomainError>.success(phoneNumber))
     #endif
                     
                     return useCase.authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
