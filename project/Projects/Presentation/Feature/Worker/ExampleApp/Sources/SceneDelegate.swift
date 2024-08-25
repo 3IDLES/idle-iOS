@@ -44,7 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let nav = UINavigationController(rootViewController: vc)
         nav.setNavigationBarHidden(true, animated: false)
         
-        window?.rootViewController = nav
+        window?.rootViewController = WorkerSettingVC()
         window?.makeKeyAndVisible()
     }
 }
