@@ -1,6 +1,6 @@
 //
 //  PasswordForDeregisterVM.swift
-//  RootFeature
+//  CenterFeature
 //
 //  Created by choijunios on 8/21/24.
 //
@@ -13,7 +13,7 @@ import Entity
 
 public class PasswordForDeregisterVM: DefaultAlertOutputable {
 
-    public weak var coordinator: FinalPasswordAuhCoordinator?
+    public weak var coordinator: PasswordForDeregisterCoordinator?
     
     public let deregisterButtonClicked: PublishRelay<String> = .init()
     public let exitButtonClicked: PublishRelay<Void> = .init()
@@ -25,7 +25,7 @@ public class PasswordForDeregisterVM: DefaultAlertOutputable {
     
     public init(
         deregisterReasons: [DeregisterReasonVO],
-        coordinator: FinalPasswordAuhCoordinator,
+        coordinator: PasswordForDeregisterCoordinator,
         authUseCase: AuthUseCase
     ) {
         self.coordinator = coordinator

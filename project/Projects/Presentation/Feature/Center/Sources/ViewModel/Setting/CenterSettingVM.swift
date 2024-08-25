@@ -45,6 +45,11 @@ public protocol CenterSettingVMable {
 
 public class CenterSettingVM: CenterSettingVMable {
     
+    // Init
+    weak var coordinator: CenterSettingScreenCoordinatable?
+    let settingUseCase: SettingScreenUseCase
+    let centerProfileUseCase: CenterProfileUseCase
+    
     public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
     public var myCenterProfileButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var approveToPushNotification: RxRelay.PublishRelay<Bool> = .init()
@@ -58,10 +63,6 @@ public class CenterSettingVM: CenterSettingVMable {
     public var alert: RxCocoa.Driver<Entity.AlertWithCompletionVO>?
     
     let disposeBag = DisposeBag()
-    
-    weak var coordinator: CenterSettingScreenCoordinatable?
-    let settingUseCase: SettingScreenUseCase
-    let centerProfileUseCase: CenterProfileUseCase
     
     public init(
         coordinator: CenterSettingScreenCoordinatable?,

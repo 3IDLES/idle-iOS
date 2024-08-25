@@ -1,6 +1,6 @@
 //
-//  FinalPasswordAuhCoordinator.swift
-//  RootFeature
+//  PasswordForDeregisterCoordinator.swift
+//  CenterFeature
 //
 //  Created by choijunios on 8/21/24.
 //
@@ -10,16 +10,22 @@ import PresentationCore
 import UseCaseInterface
 import Entity
 
-public class FinalPasswordAuhCoordinator: ChildCoordinator {
+public class PasswordForDeregisterCoordinator: ChildCoordinator {
     
     public struct Dependency {
         let authUseCase: AuthUseCase
         let reasons: [DeregisterReasonVO]
         let navigationController: UINavigationController
+        
+        public init(authUseCase: AuthUseCase, reasons: [DeregisterReasonVO], navigationController: UINavigationController) {
+            self.authUseCase = authUseCase
+            self.reasons = reasons
+            self.navigationController = navigationController
+        }
     }
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: DeRegisterCoordinator?
+    public weak var parent: DeregisterCoordinatable?
     
     public let navigationController: UINavigationController
     let authUseCase: AuthUseCase
@@ -34,7 +40,7 @@ public class FinalPasswordAuhCoordinator: ChildCoordinator {
     }
     
     deinit {
-        printIfDebug("\(String(describing: FinalPasswordAuhCoordinator.self))")
+        printIfDebug("\(String(describing: PasswordForDeregisterCoordinator.self))")
     }
     
     public func start() {
