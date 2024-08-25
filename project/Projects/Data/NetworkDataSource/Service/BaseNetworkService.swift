@@ -96,9 +96,8 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
         
         if let httpResponse = request.response {
             
-            if httpResponse.statusCode == 401 {
+            if httpResponse.statusCode == 401, request.retryCount < 1 {
                 
-                // 401이며
                 guard let self else { return completion(.doNotRetry) }
                 
                 guard let refreshToken = self.keyValueStore.getAuthToken()?.refreshToken else {
