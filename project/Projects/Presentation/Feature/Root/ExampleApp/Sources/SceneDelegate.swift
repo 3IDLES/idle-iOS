@@ -31,16 +31,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let nav = UINavigationController()
         nav.setNavigationBarHidden(true, animated: false)
         
-        self.coordinator = DeRegisterCoordinator(
-            dependency: .init(
-                userType: .center,
-                authUseCase: DefaultAuthUseCase(
-                    repository: DefaultAuthRepository()
-                ),
-                navigationController: nav
-            )
-        )
-        
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = nav
         window?.makeKeyAndVisible()
