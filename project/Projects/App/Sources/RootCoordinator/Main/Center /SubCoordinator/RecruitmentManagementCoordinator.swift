@@ -44,11 +44,12 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
     }
     
     public func start() {
-        let vc = CenterRecruitmentPostBoardVC()
-        let vm = CenterRecruitmentPostBoardVM(coordinator: self)
-        vc.bind(viewModel: vm)
-        viewControllerRef = vc
-        navigationController.pushViewController(vc, animated: false)
+        let coordinator = CenterRecruitmentPostBoardScreenCoordinator(
+            navigationController: navigationController
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
     }
     
     public func coordinatorDidFinish() {

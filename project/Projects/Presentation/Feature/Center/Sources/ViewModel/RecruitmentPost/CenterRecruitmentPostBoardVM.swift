@@ -21,7 +21,7 @@ public protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelabl
 
 public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelable {
     
-    weak var coordinator: RecruitmentManagementCoordinatable?
+    weak var coordinator: CenterRecruitmentPostBoardScreenCoordinator?
 
     public var requestOngoingPost: PublishRelay<Void> = .init()
     public var requestClosedPost: PublishRelay<Void> = .init()
@@ -31,7 +31,7 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
     
     public var alert: Driver<DefaultAlertContentVO>?
     
-    public init(coordinator: RecruitmentManagementCoordinatable?) {
+    public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?) {
         self.coordinator = coordinator
         
         let requestOngoingPostResult = requestOngoingPost
@@ -88,7 +88,7 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
 // MARK: 카드 뷰에 사용될 ViewModel
 class CenterEmployCardVM: CenterEmployCardViewModelable {
     
-    weak var coordinator: RecruitmentManagementCoordinatable?
+    weak var coordinator: CenterRecruitmentPostBoardScreenCoordinator?
     
     // Init
     let id: String
@@ -104,7 +104,7 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
     
     let disposeBag = DisposeBag()
     
-    init(vo: CenterEmployCardVO, coordinator: RecruitmentManagementCoordinatable? = nil) {
+    init(vo: CenterEmployCardVO, coordinator: CenterRecruitmentPostBoardScreenCoordinator?) {
         self.id = vo.postId
         self.coordinator = coordinator
         
