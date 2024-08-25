@@ -67,10 +67,16 @@ extension AuthAPI: BaseAPI {
             "common/send"
         case .checkAuthNumber:
             "common/confirm"
+        case .reissueToken:
+            "common/refresh"
+            
+            
         case .authenticateBusinessNumber(let businessNumber):
             "center/authentication/\(businessNumber)"
         case .checkIdDuplication(id: let id):
             "center/validation/\(id)"
+            
+            
         case .registerCenterAccount:
             "center/join"
         case .centerLogin:
@@ -79,12 +85,12 @@ extension AuthAPI: BaseAPI {
             "center/logout"
         case .deregisterCenterAccount:
             "center/withdraw"
-        case .reissueToken:
-            "center/refresh"
+            
+            
         case .registerWorkerAccount:
-            "auth/carer/join"
+            "carer/join"
         case .workerLogin:
-            "auth/carer/login"
+            "carer/login"
         }
     }
     
