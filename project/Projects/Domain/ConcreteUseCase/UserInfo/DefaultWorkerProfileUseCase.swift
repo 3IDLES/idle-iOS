@@ -19,11 +19,11 @@ public class DefaultWorkerProfileUseCase: WorkerProfileUseCase {
         self.repository = repository
     }
     
-    public func getProfile(mode: ProfileMode) -> Single<Result<WorkerProfileVO, UserInfoError>> {
+    public func getProfile(mode: ProfileMode) -> Single<Result<WorkerProfileVO, DomainError>> {
         convert(task: repository.getWorkerProfile(mode: mode))
     }
     
-    public func updateProfile(stateObject: WorkerProfileStateObject, imageInfo: ImageUploadInfo?) -> Single<Result<Void, UserInfoError>> {
+    public func updateProfile(stateObject: WorkerProfileStateObject, imageInfo: ImageUploadInfo?) -> Single<Result<Void, DomainError>> {
 
         var updateText: Single<Void>!
         var updateImage: Single<Void>!

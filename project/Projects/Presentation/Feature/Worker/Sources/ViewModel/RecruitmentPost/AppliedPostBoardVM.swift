@@ -70,7 +70,7 @@ public class AppliedPostBoardVM: WorkerStaticPostBoardVMable {
     }
     
     
-    func publishAppliedPostMocks() -> Single<Result<[RecruitmentPostForWorkerVO], RecruitmentPostError>> {
+    func publishAppliedPostMocks() -> Single<Result<[RecruitmentPostForWorkerVO], DomainError>> {
         return .just(.success((0..<10).map { _ in .mock }))
     }
 }

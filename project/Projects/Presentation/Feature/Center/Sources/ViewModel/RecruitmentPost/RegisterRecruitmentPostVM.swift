@@ -460,7 +460,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         // MARK: -----------------
         let registerPostResult = registerButtonClicked
-            .flatMap { [weak self] _ -> Single<Result<Void, RecruitmentPostError>> in
+            .flatMap { [weak self] _ -> Single<Result<Void, DomainError>> in
                 guard let self else { return .never() }
                 
                 // 공고를 등록합니다.

@@ -14,13 +14,13 @@ public protocol RecruitmentPostUseCase: UseCaseBase {
     // MARK: Center
     
     /// 센터측이 공고를 등록하는 액션입니다.
-    func registerRecruitmentPost(inputs: RegisterRecruitmentPostBundle) -> Single<Result<Void, RecruitmentPostError>>
+    func registerRecruitmentPost(inputs: RegisterRecruitmentPostBundle) -> Single<Result<Void, DomainError>>
     
     /// 센터측이 공고를 수정하는 액션입니다.
-    func editRecruitmentPost(id: String, inputs: RegisterRecruitmentPostBundle) -> Single<Result<Void, RecruitmentPostError>>
+    func editRecruitmentPost(id: String, inputs: RegisterRecruitmentPostBundle) -> Single<Result<Void, DomainError>>
     
     /// 센터측이 공고를 조회하는 액션입니다.
-    func getPostDetailForCenter(id: String) -> Single<Result<RegisterRecruitmentPostBundle, RecruitmentPostError>>
+    func getPostDetailForCenter(id: String) -> Single<Result<RegisterRecruitmentPostBundle, DomainError>>
     
     
     // MARK: Worker
@@ -30,8 +30,8 @@ public protocol RecruitmentPostUseCase: UseCaseBase {
     ///     - 공고상세정보(센터와 달리 고객 이름 배제)
     ///     - 근무지 위치(위경도)
     ///     - 센터정보(센터 id, 이름, 도로명 주소)
-    func getPostDetailForWorker(id: String) -> Single<Result<RecruitmentPostForWorkerBundle, RecruitmentPostError>>
+    func getPostDetailForWorker(id: String) -> Single<Result<RecruitmentPostForWorkerBundle, DomainError>>
     
     /// 요양보호사가 메인화면에 사용할 공고리스트를 호출합니다.
-    func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, RecruitmentPostError>>
+    func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>>
 }

@@ -69,7 +69,7 @@ public class StarredPostBoardVM: WorkerStaticPostBoardVMable {
     }
     
     
-    func publishStarredPostMocks() -> Single<Result<[RecruitmentPostForWorkerVO], RecruitmentPostError>> {
+    func publishStarredPostMocks() -> Single<Result<[RecruitmentPostForWorkerVO], DomainError>> {
         return .just(.success((0..<10).map { _ in .mock }))
     }
 }

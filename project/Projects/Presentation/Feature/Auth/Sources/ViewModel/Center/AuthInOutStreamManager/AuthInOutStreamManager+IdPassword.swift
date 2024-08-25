@@ -43,7 +43,7 @@ extension AuthInOutStreamManager {
                 print("✅ 디버그모드에서 아이디 중복검사 미실시")
                 // ☑️ 상태추적 ☑️
                 stateTracker(id)
-                return Single.just(Result<String, InputValidationError>.success(id))
+                return Single.just(Result<String, DomainError>.success(id))
                 #endif
                 
                 return useCase.requestCheckingIdDuplication(id: id)
