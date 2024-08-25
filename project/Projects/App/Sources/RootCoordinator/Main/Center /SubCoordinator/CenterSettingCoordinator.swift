@@ -7,6 +7,7 @@
 
 import UIKit
 import CenterFeature
+import RootFeature
 import PresentationCore
 import UseCaseInterface
 
@@ -47,6 +48,15 @@ class CenterSettingCoordinator: CenterSettingScreenCoordinatable {
     }
     
     public func startRemoveCenterAccountFlow() {
-        
+        let coordinator = DeRegisterCoordinator(
+            dependency: .init(
+                userType: .center,
+                settingUseCase: injector.resolve(SettingScreenUseCase.self),
+                navigationController: navigationController
+            )
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
     }
 }

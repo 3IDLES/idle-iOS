@@ -151,6 +151,15 @@ public class CenterSettingVM: CenterSettingVMable {
             .disposed(by: disposeBag)
         
         
+        // MARK: 회원 탈퇴
+        removeAccountButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                
+                self?.coordinator?.startRemoveCenterAccountFlow()
+            })
+            .disposed(by: disposeBag)
+        
+        
         // MARK: Alert
         alert = Observable.merge(
             approveRequestError.map { _ in "알람수신 동의 실패" },

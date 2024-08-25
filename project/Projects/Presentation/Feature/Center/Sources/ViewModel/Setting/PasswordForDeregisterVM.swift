@@ -57,7 +57,7 @@ public class PasswordForDeregisterVM: DefaultAlertOutputable {
         exitButtonClicked
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.cancelDeregister()
+                self?.coordinator?.coordinatorDidFinish()
             })
             .disposed(by: disposeBag)
         
