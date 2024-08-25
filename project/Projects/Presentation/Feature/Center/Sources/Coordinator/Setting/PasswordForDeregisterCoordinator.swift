@@ -13,12 +13,12 @@ import Entity
 public class PasswordForDeregisterCoordinator: ChildCoordinator {
     
     public struct Dependency {
-        let authUseCase: AuthUseCase
+        let settingUseCase: SettingScreenUseCase
         let reasons: [DeregisterReasonVO]
         let navigationController: UINavigationController
         
-        public init(authUseCase: AuthUseCase, reasons: [DeregisterReasonVO], navigationController: UINavigationController) {
-            self.authUseCase = authUseCase
+        public init(settingUseCase: SettingScreenUseCase, reasons: [DeregisterReasonVO], navigationController: UINavigationController) {
+            self.settingUseCase = settingUseCase
             self.reasons = reasons
             self.navigationController = navigationController
         }
@@ -28,13 +28,13 @@ public class PasswordForDeregisterCoordinator: ChildCoordinator {
     public weak var parent: DeregisterCoordinatable?
     
     public let navigationController: UINavigationController
-    let authUseCase: AuthUseCase
+    let settingUseCase: SettingScreenUseCase
     let reasons: [DeregisterReasonVO]
     
     public init(
         dependency: Dependency
     ) {
-        self.authUseCase = dependency.authUseCase
+        self.settingUseCase = dependency.settingUseCase
         self.reasons = dependency.reasons
         self.navigationController = dependency.navigationController
     }
@@ -48,7 +48,7 @@ public class PasswordForDeregisterCoordinator: ChildCoordinator {
         let vm = PasswordForDeregisterVM(
             deregisterReasons: reasons,
             coordinator: self,
-            authUseCase: authUseCase
+            settingUseCase: settingUseCase
         )
         vc.bind(viewModel: vm)
         viewControllerRef = vc

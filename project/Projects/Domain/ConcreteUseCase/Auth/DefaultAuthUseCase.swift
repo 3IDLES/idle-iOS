@@ -36,20 +36,6 @@ public class DefaultAuthUseCase: AuthUseCase {
         convert(task: repository.requestCenterLogin(id: id, password: password))
     }
     
-    // 센터 회원탈퇴
-    public func deregisterCenterAccount(reasons: [Entity.DeregisterReasonVO], password: String) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
-        convert(
-            task: repository.deregisterCenterAccount(reasons: reasons, password: password)
-        )
-    }
-    
-    // 센터 로그아웃
-    public func signoutCenterAccount() -> RxSwift.Single<Result<Void, Entity.DomainError>> {
-        convert(
-            task: repository.signoutCenterAccount()
-        )
-    }
-    
     // 요양 보호사 회원가입 실행
     public func registerWorkerAccount(registerState: WorkerRegisterState) -> Single<Result<Void, DomainError>> {
         convert(

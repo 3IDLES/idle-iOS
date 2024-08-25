@@ -66,9 +66,6 @@ public class CenterSettingVC: BaseViewController {
     }()
     
     
-    // Observable
-    private let signOutComfirmed: PublishRelay<Void> = .init()
-    
     private let disposeBag = DisposeBag()
     
     public init() {
@@ -98,10 +95,6 @@ public class CenterSettingVC: BaseViewController {
                 return isOn
             })
             .bind(to: viewModel.approveToPushNotification)
-            .disposed(by: disposeBag)
-        
-        signOutComfirmed
-            .bind(to: viewModel.signOutButtonComfirmed)
             .disposed(by: disposeBag)
         
         removeAccountButton.rx.tap

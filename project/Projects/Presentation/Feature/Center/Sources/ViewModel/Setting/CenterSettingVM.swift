@@ -62,6 +62,7 @@ public class CenterSettingVM: CenterSettingVMable {
         centerProfileUseCase: CenterProfileUseCase
         )
     {
+        self.coordinator = coordinator
         self.settingUseCase = settingUseCase
         self.centerProfileUseCase = centerProfileUseCase
         
@@ -131,8 +132,16 @@ public class CenterSettingVM: CenterSettingVMable {
             }
             .asDriver(onErrorJustReturn: ("재가요양센터", "대한민국"))
         
-        // MARK: 로그아웃 확인됨
-        signOutButtonComfirmed
+        // MARK: 로그아웃
+        let signOutRequestResult = signOutButtonComfirmed.flatMap({ [settingUseCase] _ in
+            settingUseCase.signoutCenterAccount()
+        })
+            .share()
+        
+        let signOutSuccess = signOutRequestResult.compactMap { $0.value }
+        let signOutFailure = signOutRequestResult.compactMap { $0.error }
+        
+        signOutSuccess
             .subscribe(onNext: { [weak self] _ in
                 
                 // ‼️ ‼️ 로컬에 저장된 계정 정보 삭제 ‼️ ‼️
@@ -145,7 +154,8 @@ public class CenterSettingVM: CenterSettingVMable {
         // MARK: Alert
         alert = Observable.merge(
             approveRequestError.map { _ in "알람수신 동의 실패" },
-            fetchCenterProfileFailure.map { $0.message }
+            fetchCenterProfileFailure.map { $0.message },
+            signOutFailure.map { $0.message }
         )
         .map({ message in
             AlertWithCompletionVO(
@@ -174,12 +184,14 @@ public class CenterSettingVM: CenterSettingVMable {
 }
 
 class CenterSingOutVM: IdleAlertViewModelable {
-    
+
     var acceptButtonLabelText: String
     var cancelButtonLabelText: String
     
     var acceptButtonClicked: RxRelay.PublishRelay<Void> = .init()
     var cancelButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    
+    var dismiss: RxCocoa.Driver<Void>?
     
     var title: String
     var description: String
@@ -194,5 +206,12 @@ class CenterSingOutVM: IdleAlertViewModelable {
         self.description = description
         self.acceptButtonLabelText = acceptButtonLabelText
         self.cancelButtonLabelText = cancelButtonLabelText
+        
+        dismiss = Observable
+            .merge(
+                acceptButtonClicked.asObservable(),
+                cancelButtonClicked.asObservable()
+            )
+            .asDriver(onErrorDriveWith: .never())
     }
 }

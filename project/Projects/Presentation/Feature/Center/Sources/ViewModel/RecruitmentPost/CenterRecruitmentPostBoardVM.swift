@@ -119,7 +119,7 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
                 
-                coordinator?.showCheckingApplicantScreen(postId: id)
+                self.coordinator?.showCheckingApplicantScreen(postId: id)
             })
             .disposed(by: disposeBag)
         
@@ -127,7 +127,7 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
                 
-                coordinator?.showPostDetailScreenForCenter(postId: id, applicantCount: vo.applicantCount)
+                self.coordinator?.showPostDetailScreenForCenter(postId: id, applicantCount: vo.applicantCount)
             })
             .disposed(by: disposeBag)
         
@@ -135,7 +135,7 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
                 
-                coordinator?.showEditScreen(postId: id)
+                self.coordinator?.showEditScreen(postId: id)
             })
             .disposed(by: disposeBag)
     }

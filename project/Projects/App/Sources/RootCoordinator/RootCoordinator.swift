@@ -7,8 +7,9 @@
 
 import UIKit
 import PresentationCore
+import RootFeature
 
-class RootCoordinator: ParentCoordinator {
+class RootCoordinator {
     
     struct Dependency {
         let navigationController: UINavigationController
@@ -28,7 +29,13 @@ class RootCoordinator: ParentCoordinator {
     func start() {
         navigationController.setNavigationBarHidden(true, animated: false)
         
-        // 빈화면 VC + VM 구현 예정, 로직에 따라 Auth, CenterMain, WorkerMain을 display
+        // Root VC
+        let vc = InitialScreenVC()
+        let vm = InitialScreenVM(coordinator: self)
+        
+        vc.bind(viewModel: vm)
+        
+        navigationController.pushViewController(vc, animated: false)
         
         centerMain()
     }

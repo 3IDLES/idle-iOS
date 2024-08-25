@@ -46,7 +46,9 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(SettingScreenUseCase.self) { resolver in
-            return DefaultSettingUseCase()
+            let repository = resolver.resolve(AuthRepository.self)!
+            
+            return DefaultSettingUseCase(repository: repository)
         }
     }
 }
