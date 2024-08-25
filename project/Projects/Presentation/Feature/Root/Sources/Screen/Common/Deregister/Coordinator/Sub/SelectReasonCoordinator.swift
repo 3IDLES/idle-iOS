@@ -47,7 +47,7 @@ public class SelectReasonCoordinator: ChildCoordinator {
         case .center:
             vm = CenterDeregisterReasonsVM(coordinator: self)
         case .worker:
-            fatalError()
+            vm = WorkerDeregisterReasonsVM(coordinator: self)
         }
         
         let vc = DeregisterReasonVC()
@@ -65,8 +65,8 @@ public class SelectReasonCoordinator: ChildCoordinator {
         parent?.showFinalPasswordScreen(reasons: reasons)
     }
     
-    public func showPhoneNumberAuthScreen() {
-        
+    public func showPhoneNumberAuthScreen(reasons: [DeregisterReasonVO]) {
+        parent?.showFinalPhoneAuthScreen(reasons: reasons)
     }
 }
 

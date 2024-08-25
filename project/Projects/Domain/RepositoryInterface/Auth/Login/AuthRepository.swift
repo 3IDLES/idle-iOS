@@ -19,4 +19,6 @@ public protocol AuthRepository: RepositoryBase {
     // MARK: Worker
     func requestRegisterWorkerAccount(registerState: WorkerRegisterState) -> Single<Void>
     func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Void>
+    func signoutWorkerAccount() -> Single<Void>
+    func deregisterWorkerAccount(reasons: [DeregisterReasonVO]) -> Single<Void>
 }

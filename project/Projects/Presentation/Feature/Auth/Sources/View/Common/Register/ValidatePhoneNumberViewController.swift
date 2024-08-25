@@ -104,15 +104,12 @@ where
         return textField
     }()
         
-    private let authSuccessText: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.medium.font(size: 12)
-        label.text = "인증이 완료되었습니다."
+    private let authSuccessText: IdleLabel = {
+        let label = IdleLabel(typography: .caption)
+        label.textString = "* 인증이 완료되었습니다."
         label.textAlignment = .left
-        label.textColor = DSKitAsset.Colors.gray300.color
+        label.attrTextColor = DSKitAsset.Colors.gray300.color
         label.isHidden = true
-        
         return label
     }()
     

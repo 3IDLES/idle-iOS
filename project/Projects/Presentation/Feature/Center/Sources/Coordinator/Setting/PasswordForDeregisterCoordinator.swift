@@ -61,8 +61,11 @@ public class PasswordForDeregisterCoordinator: ChildCoordinator {
     }
     
     public func popToRoot() {
-        
-        /// Root까지 네비게이션을 제거합니다.
+        parent?.popToRoot()
+    }
+    
+    public func cancelDeregister() {
+        parent?.cancelDeregister()
     }
 }
 

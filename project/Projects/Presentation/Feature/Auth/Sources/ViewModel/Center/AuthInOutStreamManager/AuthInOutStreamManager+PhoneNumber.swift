@@ -12,7 +12,7 @@ import PresentationCore
 import UseCaseInterface
 import Entity
 
-extension AuthInOutStreamManager {
+public extension AuthInOutStreamManager {
     
     static func validatePhoneNumberInOut(
         input: AuthPhoneNumberInputable & AnyObject,
@@ -28,7 +28,7 @@ extension AuthInOutStreamManager {
         output.canSubmitPhoneNumber = input
             .editingPhoneNumber
             .map({ [unowned useCase] phoneNumber in
-                printIfDebug("[CenterRegisterViewModel] 전달받은 전화번호: \(phoneNumber)")
+                printIfDebug("전달받은 전화번호: \(phoneNumber)")
                 return useCase.checkPhoneNumberIsValid(phoneNumber: phoneNumber)
             })
             .asDriver(onErrorJustReturn: false)
@@ -37,7 +37,7 @@ extension AuthInOutStreamManager {
             .editingAuthNumber
             .compactMap({ $0 })
             .map { authNumber in
-                printIfDebug("[CenterRegisterViewModel] 전달받은 인증번호: \(authNumber)")
+                printIfDebug("전달받은 인증번호: \(authNumber)")
                 
                 return authNumber.count == 6
             }
@@ -45,7 +45,7 @@ extension AuthInOutStreamManager {
         
         let phoneNumberAuthRequestResult = input
             .requestAuthForPhoneNumber
-            .flatMap { [unowned useCase, input] _ in
+            .flatMap { [useCase, input] _ in
 
                 let formatted = Self.formatPhoneNumber(phoneNumber: input.editingPhoneNumber.value)
 #if DEBUG

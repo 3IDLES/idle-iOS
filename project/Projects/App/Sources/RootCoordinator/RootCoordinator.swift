@@ -37,7 +37,7 @@ class RootCoordinator {
         
         navigationController.pushViewController(vc, animated: false)
         
-        centerMain()
+        workerMain()
     }
     
     func popViewController() {

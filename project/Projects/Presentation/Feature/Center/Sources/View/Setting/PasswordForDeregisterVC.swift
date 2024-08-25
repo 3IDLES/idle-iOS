@@ -162,10 +162,13 @@ public class PasswordForDeregisterVC: BaseViewController {
             .withLatestFrom(passwordField.eventPublisher)
             .bind(to: viewModel.deregisterButtonClicked)
             .disposed(by: disposeBag)
+    
+        cancelButton.rx.tap
+            .bind(to: viewModel.cancelButtonClicked)
+            .disposed(by: disposeBag)
         
-        navigationBar
-            .backButton.rx.tap
-            .bind(to: viewModel.exitButtonClicked)
+        navigationBar.backButton.rx.tap
+            .bind(to: viewModel.backButtonClicked)
             .disposed(by: disposeBag)
         
         // Output

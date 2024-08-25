@@ -50,8 +50,9 @@ class WorkerSettingCoordinaator: WorkerSettingScreenCoordinatable {
     public func startRemoveWorkerAccountFlow() {
         let coordinator = DeRegisterCoordinator(
             dependency: .init(
-                userType: .center,
+                userType: .worker,
                 settingUseCase: injector.resolve(SettingScreenUseCase.self),
+                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self),
                 navigationController: navigationController
             )
         )
