@@ -12,7 +12,6 @@ import RxCocoa
 import RxSwift
 import Entity
 import DSKit
-import CenterFeature
 
 public protocol WorkerStaticPostBoardVMable {
     

@@ -1,6 +1,6 @@
 //
 //  DeRegisterCoordinator.swift
-//  BaseFeature
+//  RootFeature
 //
 //  Created by choijunios on 8/21/24.
 //
@@ -15,12 +15,12 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     
     public struct Dependency {
         let userType: UserType
-        let authUseCase: AuthUseCase
+        let settingUseCase: SettingScreenUseCase
         let navigationController: UINavigationController
         
-        public init(userType: UserType, authUseCase: AuthUseCase, navigationController: UINavigationController) {
+        public init(userType: UserType, settingUseCase: SettingScreenUseCase, navigationController: UINavigationController) {
             self.userType = userType
-            self.authUseCase = authUseCase
+            self.settingUseCase = settingUseCase
             self.navigationController = navigationController
         }
     }
@@ -33,11 +33,11 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     
     var viewControllerRef: UIViewController?
     let userType: UserType
-    let authUseCase: AuthUseCase
+    let settingUseCase: SettingScreenUseCase
     
     public init(dependency: Dependency) {
         self.userType = dependency.userType
-        self.authUseCase = dependency.authUseCase
+        self.settingUseCase = dependency.settingUseCase
         self.navigationController = dependency.navigationController
     }
     
@@ -49,7 +49,7 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
         let coordinator: SelectReasonCoordinator = .init(
             dependency: .init(
                 userType: userType,
-                authUseCase: authUseCase,
+                settingUseCase: settingUseCase,
                 navigationController: navigationController
             )
         )
@@ -62,7 +62,7 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     
         let coordinator = PasswordForDeregisterCoordinator(
             dependency: .init(
-                authUseCase: authUseCase,
+                settingUseCase: settingUseCase,
                 reasons: reasons,
                 navigationController: navigationController
             )

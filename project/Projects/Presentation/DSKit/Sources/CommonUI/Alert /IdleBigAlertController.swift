@@ -16,6 +16,7 @@ public protocol IdleAlertViewModelable {
     var cancelButtonClicked: PublishRelay<Void> { get }
     var acceptButtonLabelText: String { get }
     var cancelButtonLabelText: String { get }
+    var dismiss: Driver<Void>? { get }
     var title: String { get }
     var description: String { get }
 }
@@ -62,7 +63,6 @@ public class IdleBigAlertController: UIViewController {
         
         setAppearance()
         setAutoLayout()
-        setObservable()
     }
     
     public required init?(coder: NSCoder) { fatalError() }
@@ -154,16 +154,6 @@ public class IdleBigAlertController: UIViewController {
         ])
     }
     
-    private func setObservable() {
-        cancelButton.rx.tap
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                modalPresentationStyle = .custom
-                dismiss(animated: true)
-            })
-            .disposed(by: disposeBag)
-    }
-    
     public func bind(viewModel vm: IdleAlertViewModelable) {
         
         titleLabel.textString = vm.title
@@ -171,6 +161,15 @@ public class IdleBigAlertController: UIViewController {
         
         acceptButton.label.textString = vm.acceptButtonLabelText
         cancelButton.label.textString = vm.cancelButtonLabelText
+        
+        vm.dismiss?
+            .drive(onNext: { [weak self] in
+                
+                guard let self else { return }
+                modalPresentationStyle = .custom
+                dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
         
         acceptButton.rx.tap
             .bind(to: vm.acceptButtonClicked)

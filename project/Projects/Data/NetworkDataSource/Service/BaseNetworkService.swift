@@ -98,7 +98,9 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
             
             if httpResponse.statusCode == 401, request.retryCount < 1 {
                 
-                guard let self else { return completion(.doNotRetry) }
+                guard let self else {
+                    return completion(.doNotRetry)
+                }
                 
                 guard let refreshToken = self.keyValueStore.getAuthToken()?.refreshToken else {
                     completion(.doNotRetry)
@@ -114,6 +116,11 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
                 
                 provider.rx
                     .request(.reissueToken(refreshToken: refreshToken))
+                    .catch({ error in
+                        // 토큰 리프래쉬 실패 -> 재로그인 필요
+                        completion(.doNotRetryWithError(error))
+                        return .error(error)
+                    })
                     .subscribe { [weak self] response in
                         
                         guard let self else { fatalError() }
@@ -141,7 +148,7 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
                     .disposed(by: self.disposeBag)
                     
             } else {
-                completion(.doNotRetry)
+                completion(.doNotRetryWithError(error))
             }
         }
     }

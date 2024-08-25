@@ -126,6 +126,10 @@ extension AuthAPI: BaseAPI {
         }
     }
     
+    public var validationType: ValidationType {
+        .successCodes
+    }
+    
     public var task: Task {
         switch self {
         case .startPhoneNumberAuth:

@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import Entity
 
 public enum NotificationApproveAction: Equatable {
     case openSystemSetting
@@ -14,7 +15,7 @@ public enum NotificationApproveAction: Equatable {
     case error(message: String)
 }
 
-public protocol SettingScreenUseCase {
+public protocol SettingScreenUseCase: UseCaseBase {
     
     /// 현재 알람수신 동의 여부를 확인합니다.
     func checkPushNotificationApproved() -> Single<Bool>
@@ -27,4 +28,13 @@ public protocol SettingScreenUseCase {
     
     /// 어플리케이션 이용약관을 가져옵니다.
     func getApplicationPolicyUrl() -> URL
+    
+    /// 센터 회원 탈퇴
+    func deregisterCenterAccount(
+        reasons: [DeregisterReasonVO],
+        password: String
+    ) -> Single<Result<Void, DomainError>>
+    
+    /// 센터 로그아웃
+    func signoutCenterAccount() -> Single<Result<Void, DomainError>>
 }

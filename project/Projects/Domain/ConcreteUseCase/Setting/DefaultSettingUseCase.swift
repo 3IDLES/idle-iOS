@@ -9,10 +9,16 @@ import Foundation
 import RxSwift
 import UserNotifications
 import UseCaseInterface
+import RepositoryInterface
+import Entity
 
 public class DefaultSettingUseCase: SettingScreenUseCase {
     
-    public init() { }
+    let repository: AuthRepository
+    
+    public init(repository: AuthRepository) {
+        self.repository = repository
+    }
     
     public func checkPushNotificationApproved() -> Single<Bool> {
         Single<Bool>.create { single in
@@ -70,5 +76,19 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
     
     public func getApplicationPolicyUrl() -> URL {
         URL(string: "")!
+    }
+    
+    // 센터 회원탈퇴
+    public func deregisterCenterAccount(reasons: [Entity.DeregisterReasonVO], password: String) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
+        convert(
+            task: repository.deregisterCenterAccount(reasons: reasons, password: password)
+        )
+    }
+    
+    // 센터 로그아웃
+    public func signoutCenterAccount() -> RxSwift.Single<Result<Void, Entity.DomainError>> {
+        convert(
+            task: repository.signoutCenterAccount()
+        )
     }
 }

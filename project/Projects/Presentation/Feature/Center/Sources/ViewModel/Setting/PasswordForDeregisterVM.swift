@@ -19,21 +19,21 @@ public class PasswordForDeregisterVM: DefaultAlertOutputable {
     public let exitButtonClicked: PublishRelay<Void> = .init()
     public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     
-    let authUseCase: AuthUseCase
+    let settingUseCase: SettingScreenUseCase
     
     let disposeBag = DisposeBag()
     
     public init(
         deregisterReasons: [DeregisterReasonVO],
         coordinator: PasswordForDeregisterCoordinator,
-        authUseCase: AuthUseCase
+        settingUseCase: SettingScreenUseCase
     ) {
         self.coordinator = coordinator
-        self.authUseCase = authUseCase
+        self.settingUseCase = settingUseCase
         
         let deregisterResult = deregisterButtonClicked
-            .flatMap { [authUseCase] password in
-                authUseCase.deregisterCenterAccount(
+            .flatMap { [settingUseCase] password in
+                settingUseCase.deregisterCenterAccount(
                     reasons: deregisterReasons,
                     password: password
                 )

@@ -40,15 +40,6 @@ public protocol AuthUseCase: UseCaseBase {
         password: String
     ) -> Single<Result<Void, DomainError>>
     
-    /// 센터 회원 탈퇴
-    func deregisterCenterAccount(
-        reasons: [DeregisterReasonVO],
-        password: String
-    ) -> Single<Result<Void, DomainError>>
-    
-    /// 센터 로그아웃
-    func signoutCenterAccount() -> Single<Result<Void, DomainError>>
-    
     // #5
     /// 요양 보호사 회원가입 실행
     func registerWorkerAccount(
