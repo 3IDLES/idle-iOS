@@ -52,8 +52,8 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
         )
         
         self.stageViewControllers = [
-            EntetPersonalInfoViewController(coordinator: self, viewModel: vm),
             ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
+            EntetPersonalInfoViewController(coordinator: self, viewModel: vm),
             EnterAddressViewController(coordinator: self, viewModel: vm),
         ]
     }
