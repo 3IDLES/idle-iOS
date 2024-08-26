@@ -27,7 +27,7 @@ let project = Project(
             sources: ["ConcreteRepository/**"],
             dependencies: [
                 D.Domain.RepositoryInterface,
-                D.Data.NetworkDataSource,
+                D.Data.DataSource,
                 
                 // ThirdParty
                 D.ThirdParty.RxSwift
@@ -47,22 +47,22 @@ let project = Project(
             sources: ["ConcretesTests/**"],
             dependencies: [
                 D.Data.ConcreteRepository,
-                D.Data.NetworkDataSource,
+                D.Data.DataSource,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.dataConfigurations
             )
         ),
         
-        /// NetworkDataSource
+        /// DataSource
         .target(
-            name: "NetworkDataSource",
+            name: "DataSource",
             destinations: DeploymentSettings.platform,
             product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: [
-                "NetworkDataSource/**",
+                "DataSource/**",
                 SecretSource.networkDataSource,
             ],
             dependencies: [

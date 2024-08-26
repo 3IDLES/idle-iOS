@@ -51,7 +51,7 @@ let project = Project(
                 
                 // for test
                 D.Data.ConcreteRepository,
-                D.Data.NetworkDataSource
+                D.Data.DataSource
             ],
             settings: .settings(
                 configurations: IdleConfiguration.domainConfigurations

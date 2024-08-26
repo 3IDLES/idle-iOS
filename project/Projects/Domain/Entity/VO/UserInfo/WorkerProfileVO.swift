@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct WorkerProfileVO {
+public struct WorkerProfileVO: Codable {
     
     public let profileImageURL: String?
     
