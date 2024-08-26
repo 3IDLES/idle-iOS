@@ -26,7 +26,7 @@ public class WorkerRegisterState {
     }
 }
 
-public class AddressInformation {
+public class AddressInformation: Codable {
     public var roadAddress: String
     public var jibunAddress: String
     

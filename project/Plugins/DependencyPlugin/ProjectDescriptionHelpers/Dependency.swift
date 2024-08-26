@@ -21,7 +21,7 @@ public enum ModuleDependency {
     
     public enum Data {
         public static let ConcreteRepository: TargetDependency = .project(target: "ConcreteRepository", path: .relativeToRoot("Projects/Data"))
-        public static let NetworkDataSource: TargetDependency = .project(target: "NetworkDataSource", path: .relativeToRoot("Projects/Data"))
+        public static let DataSource: TargetDependency = .project(target: "DataSource", path: .relativeToRoot("Projects/Data"))
     }
     
     public enum Presentation {
