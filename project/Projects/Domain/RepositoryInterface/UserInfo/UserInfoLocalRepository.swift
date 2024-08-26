@@ -24,4 +24,10 @@ public protocol UserInfoLocalRepository {
     
     /// 로그인중인 센터관리자 유저의 프로필을 로컬에서 빠르게 가져옵니다.
     func getCurrentCenterData() -> CenterProfileVO?
+    
+    /// 로컬에 저장될 유저정보를 업데이트합니다.
+    func updateCurrentCenterData(vo: CenterProfileVO)
+    
+    /// 유저타입, 정보를 모두 삭제합니다.
+    func removeAllData()
 }

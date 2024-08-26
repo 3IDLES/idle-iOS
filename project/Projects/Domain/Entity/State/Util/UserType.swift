@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum UserType {
+public enum UserType: String {
     case center
     case worker
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 import RxSwift
-@testable import NetworkDataSource
+@testable import DataSource
 
 // TestKeyValueStore
 public class TestKeyValueStore: KeyValueStore {

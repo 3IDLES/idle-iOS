@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 import Entity
 import RepositoryInterface
-import NetworkDataSource
+import DataSource
 
 public class DefaultUserProfileRepository: UserProfileRepository {
 

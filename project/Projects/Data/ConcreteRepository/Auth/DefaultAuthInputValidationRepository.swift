@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 import RepositoryInterface
-import NetworkDataSource
+import DataSource
 import Entity
 
 public class DefaultAuthInputValidationRepository: AuthInputValidationRepository {

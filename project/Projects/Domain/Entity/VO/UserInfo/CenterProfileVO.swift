@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class CenterProfileVO {
+public class CenterProfileVO: Codable {
     public let centerName: String
     public let officeNumber: String
     public let roadNameAddress: String

@@ -8,7 +8,7 @@
 import RepositoryInterface
 import RxSwift
 import Entity
-import NetworkDataSource
+import DataSource
 import Foundation
 import Moya
 
