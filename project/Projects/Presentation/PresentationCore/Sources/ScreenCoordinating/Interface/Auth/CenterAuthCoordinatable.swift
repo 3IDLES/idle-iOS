@@ -7,10 +7,9 @@
 
 import Foundation
 
-public protocol CenterAuthCoordinatable: ParentCoordinator {
+public protocol CanterLoginCoordinatable: ParentCoordinator {
     
     func login()
     func setNewPassword()
-    func register()
     func authFinished()
 }

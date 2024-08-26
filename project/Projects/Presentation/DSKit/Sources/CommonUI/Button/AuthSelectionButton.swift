@@ -85,6 +85,8 @@ public class AuthSelectionButton: TappableUIView {
         let setting: StateSetting = state == .accent ? .accentDefault : .normalDefault
         self.layer.borderColor = setting.borderColor.cgColor
         self.backgroundColor = setting.backgroundColor
+        // 상태변경
+        self.currentState = state
     }
 }
 

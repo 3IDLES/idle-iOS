@@ -7,6 +7,7 @@
 
 import UIKit
 import PresentationCore
+import UseCaseInterface
 
 enum SetNewPasswordStage: Int {
     
@@ -18,34 +19,51 @@ enum SetNewPasswordStage: Int {
 
 public class CenterSetNewPasswordCoordinator: ChildCoordinator {
     
+    public struct Dependency {
+        let navigationController: UINavigationController
+        let authUseCase: AuthUseCase
+        let inputValidationUseCase: AuthInputValidationUseCase
+        public init(navigationController: UINavigationController, authUseCase: AuthUseCase, inputValidationUseCase: AuthInputValidationUseCase) {
+            self.navigationController = navigationController
+            self.authUseCase = authUseCase
+            self.inputValidationUseCase = inputValidationUseCase
+        }
+    }
+    
     public weak var viewControllerRef: UIViewController?
     public var navigationController: UINavigationController
     
     var stageViewControllers: [UIViewController] = []
     weak var pageViewController: UIPageViewController?
     
-    public var parent: CenterAuthCoordinatable?
+    public var parent: CanterLoginFlowable?
     
-    private var viewModel: CenterSetNewPasswordViewModel
+    let authUseCase: AuthUseCase
+    let inputValidationUseCase: AuthInputValidationUseCase
     
     var currentStage: SetNewPasswordStage!
     
     public init(
-        viewModel: CenterSetNewPasswordViewModel,
-        navigationController: UINavigationController
+        dependency: Dependency
     ) {
-        self.navigationController = navigationController
-        self.viewModel = viewModel
+        self.navigationController = dependency.navigationController
+        self.authUseCase = dependency.authUseCase
+        self.inputValidationUseCase = dependency.inputValidationUseCase
     }
     
     deinit { printIfDebug("deinit \(Self.self)") }
     
     public func start() {
         
+        let vm = CenterSetNewPasswordViewModel(
+            authUseCase: authUseCase,
+            inputValidationUseCase: inputValidationUseCase
+        )
+        
         // stageViewControllerss에 자기자신과 ViewModel할당
         self.stageViewControllers = [
-            ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
-            ValidateNewPasswordViewController(coordinator: self, viewModel: viewModel)
+            ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
+            ValidateNewPasswordViewController(coordinator: self, viewModel: vm)
         ]
         
         let pageViewController = UIPageViewController(

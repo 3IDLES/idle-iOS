@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UseCaseInterface
 import PresentationCore
 
 enum WorkerRegisterStage: Int {
@@ -19,29 +20,41 @@ enum WorkerRegisterStage: Int {
 
 public class WorkerRegisterCoordinator: ChildCoordinator {
 
-    public var parent: WorkerAuthCoordinatable?
+    public struct Dependency {
+        let navigationController: UINavigationController
+        let inputValidationUseCase: AuthInputValidationUseCase
+        let authUseCase: AuthUseCase
+        
+        public init(navigationController: UINavigationController, inputValidationUseCase: AuthInputValidationUseCase, authUseCase: AuthUseCase) {
+            self.navigationController = navigationController
+            self.inputValidationUseCase = inputValidationUseCase
+            self.authUseCase = authUseCase
+        }
+    }
+    
+    public var parent: AuthCoordinatable?
     
     public let navigationController: UINavigationController
-    
     public weak var viewControllerRef: UIViewController?
-    
     weak var pageViewController: UIPageViewController?
     
+    // MARK: Stage
     var stageViewControllers: [UIViewController] = []
-    
     private var currentStage: WorkerRegisterStage!
     
-    public init(
-        navigationController: UINavigationController,
-        viewModel: WorkerRegisterViewModel
-    ) {
+    public init(dependency: Dependency) {
     
-        self.navigationController = navigationController
+        self.navigationController = dependency.navigationController
+        
+        let vm = WorkerRegisterViewModel(
+            inputValidationUseCase: dependency.inputValidationUseCase,
+            authUseCase: dependency.authUseCase
+        )
         
         self.stageViewControllers = [
-            EntetPersonalInfoViewController(coordinator: self, viewModel: viewModel),
-            ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
-            EnterAddressViewController(coordinator: self, viewModel: viewModel),
+            EntetPersonalInfoViewController(coordinator: self, viewModel: vm),
+            ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
+            EnterAddressViewController(coordinator: self, viewModel: vm),
         ]
     }
     

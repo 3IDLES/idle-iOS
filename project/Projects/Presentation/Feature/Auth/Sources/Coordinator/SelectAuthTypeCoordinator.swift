@@ -21,10 +21,11 @@ public class SelectAuthTypeCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        let viewController = SelectAuthTypeViewController()
-        viewController.coordinator = self
-        viewControllerRef = viewController
-        navigationController.pushViewController(viewController, animated: true)
+        let vc = SelectAuthTypeViewController()
+        let vm = SelectAuthTypeViewModel(coordinator: self)
+        vc.bind(viewModel: vm)
+        viewControllerRef = vc
+        navigationController.pushViewController(vc, animated: true)
     }
     
     public func coordinatorDidFinish() {
@@ -39,13 +40,13 @@ public class SelectAuthTypeCoordinator: ChildCoordinator {
 
 extension SelectAuthTypeCoordinator {
     
-    func authWorker() {
-        
-        parent?.auth(type: .worker)
+    func startCenterLoginFlow() {
+        parent?.startCenterLoginFlow()
     }
-    
-    func authCenter() {
-        
-        parent?.auth(type: .center)
+    func registerAsCenter() {
+        parent?.registerAsCenter()
+    }
+    func registerAsWorker() {
+        parent?.registerAsWorker()
     }
 }
