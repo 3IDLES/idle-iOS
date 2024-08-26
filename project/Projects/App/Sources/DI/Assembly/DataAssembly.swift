@@ -9,9 +9,23 @@ import Foundation
 import RepositoryInterface
 import ConcreteRepository
 import Swinject
+import DataSource
 
 public struct DataAssembly: Assembly {
     public func assemble(container: Container) {
+        
+        // MARK: Service
+        container.register(LocalStorageService.self) { _ in
+            return DefaultLocalStorageService()
+        }
+        
+        // MARK: 로컬에 저장된 유저정보 레포지토리
+        container.register(UserInfoLocalRepository.self) { resolver in
+            let localStorageService = resolver.resolve(LocalStorageService.self)!
+            return DefaultUserInfoLocalRepository(
+                localStorageService: localStorageService
+            )
+        }
         
         // MARK: 회원가입 입력 검증 레포지토리
         container.register(AuthInputValidationRepository.self) { _ in

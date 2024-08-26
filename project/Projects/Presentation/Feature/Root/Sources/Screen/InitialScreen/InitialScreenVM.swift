@@ -25,7 +25,7 @@ public class InitialScreenVM {
     
     let disposeBag = DisposeBag()
     
-    init(
+    public init(
             coordinator: RootCoorinatable?,
             workerProfileUseCase: WorkerProfileUseCase,
             centerProfileUseCase: CenterProfileUseCase,
