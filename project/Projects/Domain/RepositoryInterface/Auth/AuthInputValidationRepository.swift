@@ -1,5 +1,5 @@
 //
-//  CenterRegisterRepository.swift
+//  AuthInputValidationRepository.swift
 //  RepositoryInterface
 //
 //  Created by choijunios on 7/8/24.
