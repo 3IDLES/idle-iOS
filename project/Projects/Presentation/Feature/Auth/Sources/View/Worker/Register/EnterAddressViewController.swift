@@ -55,23 +55,6 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
         return button
     }()
     
-//    private let detailAddressLabel: IdleLabel = {
-//        
-//        let label = IdleLabel(typography: .Subtitle4)
-//        label.textString = "상세주소"
-//        label.textAlignment = .left
-//        
-//        return label
-//    }()
-//    private let detailAddressTextField: IdleOneLineInputField = {
-//        
-//        let textField = IdleOneLineInputField(
-//            placeHolderText: "상세 주소를 입력해주세요. (예: 101동 101호)"
-//        )
-//        
-//        return textField
-//    }()
-    
     private let ctaButton: CTAButtonType1 = {
         
         let button = CTAButtonType1(labelText: "완료")
@@ -115,18 +98,9 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
             spacing: 6,
             alignment: .fill)
         
-//        let stack3 = VStack(
-//            [
-//                detailAddressLabel,
-//                detailAddressTextField
-//            ],
-//            spacing: 6,
-//            alignment: .fill)
-        
         [
             stack1,
             stack2,
-//            stack3,
             ctaButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -142,10 +116,6 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
             stack2.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             stack2.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         
-//            stack3.topAnchor.constraint(equalTo: stack2.bottomAnchor, constant: 28),
-//            stack3.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-//            stack3.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            
             ctaButton.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
             ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
@@ -168,11 +138,6 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
             })
             .bind(to: input.addressInformation)
             .disposed(by: disposeBag)
-        
-//        detailAddressTextField.textField.rx.attributedText
-//            .map { $0?.string }
-//            .bind(to: input.editingDetailAddress)
-//            .disposed(by: disposeBag)
         
         addressSearchButton
             .eventPublisher
@@ -208,7 +173,6 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
     }
     
     private func showDaumSearchView() {
-        
         let vc = DaumAddressSearchViewController()
         vc.delegate = self
         vc.modalPresentationStyle = .fullScreen
@@ -226,6 +190,7 @@ extension EnterAddressViewController: DaumAddressSearchDelegate {
         let roadAddress = addressData[.roadAddress] ?? "알 수 없는 도로명 주소"
         
         addressSearchButton.label.textString = address
+        addressSearchButton.label.attrTextColor = DSColor.gray900.color
         
         addressPublisher
             .accept(

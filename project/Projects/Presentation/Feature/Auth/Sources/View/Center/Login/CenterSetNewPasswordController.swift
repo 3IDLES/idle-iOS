@@ -34,16 +34,11 @@ class CenterSetNewPasswordController: DisposableViewController {
         setObservable()
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    required init?(coder: NSCoder) { nil}
     
     // View
-    private let navigationBar: NavigationBarType1 = {
-       
-        let bar = NavigationBarType1(
-            navigationTitle: "신규 비밀번호 발급"
-        )
+    private let navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(titleText: "신규 비밀번호 발급")
         return bar
     }()
     
@@ -68,9 +63,9 @@ class CenterSetNewPasswordController: DisposableViewController {
         
         NSLayoutConstraint.activate([
             
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
-            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            navigationBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             
             pageViewController.view.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 64),
             pageViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -82,7 +77,7 @@ class CenterSetNewPasswordController: DisposableViewController {
     func setObservable() {
         
         navigationBar
-            .eventPublisher
+            .backButton.rx.tap
             .subscribe { [weak self] _ in
                 self?.coordinator?.prev()
             }
