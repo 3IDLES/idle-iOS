@@ -20,7 +20,7 @@ enum CenterRegisterStage: Int {
 
 public class CenterRegisterCoordinator: ChildCoordinator {
     
-    public var parent: CenterAuthCoordinatable?
+    public var parent: AuthCoordinatable?
     
     public weak var viewControllerRef: UIViewController?
     

@@ -6,44 +6,50 @@
 //
 
 import Foundation
+import AuthFeature
 import PresentationCore
+import UseCaseInterface
+import RepositoryInterface
 
 extension AuthCoordinator: AuthCoordinatable {
     
-    public func auth(type: AuthType) {
+    public func registerAsWorker() {
         
-        switch type {
-        case .worker:
-            
-            let coordinator = WorkerAuthCoordinator(
-                dependency: .init(
-                    navigationController: navigationController,
-                    injector: injector
-                )
+        let coordinator = WorkerRegisterCoordinator(
+            dependency: .init(
+                navigationController: navigationController,
+                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self),
+                authUseCase: injector.resolve(AuthUseCase.self)
             )
-            
-            addChildCoordinator(coordinator)
-            
-            coordinator.parent = self
-            
-            coordinator.start()
-            
-        case .center:
-            
-            let coordinator = CenterAuthCoorinator(
-                dependency: .init(
-                    navigationController: navigationController,
-                    injector: injector
-                )
+        )
+        coordinator.parent = self
+        addChildCoordinator(coordinator)
+        coordinator.start()
+    }
+    
+    public func registerAsCenter() {
+        
+        let viewModel = injector.resolve(CenterRegisterViewModel.self)
+        
+        let coordinator = CenterRegisterCoordinator(viewModel: viewModel, navigationController: navigationController)
+        
+        coordinator.parent = self
+        addChildCoordinator(coordinator)
+        
+        coordinator.start()
+    }
+    
+    public func startCenterLoginFlow() {
+        
+        let coordinator = CanterLoginFlowCoordinator(
+            dependency: .init(
+                navigationController: navigationController,
+                injector: injector
             )
-            
-            addChildCoordinator(coordinator)
-            
-            coordinator.parent = self
-            
-            coordinator.start()
-            return
-        }
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
     }
 
     public func authFinished() {

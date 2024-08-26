@@ -38,14 +38,11 @@ class AuthCoordinator: ParentCoordinator {
             navigationController: navigationController
         )
         coordinator.parent = self
-        
         addChildCoordinator(coordinator)
-        
         coordinator.start()
     }
     
     public func popViewController() {
-        
         navigationController.popViewController(animated: true)
     }
 }
