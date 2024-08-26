@@ -7,33 +7,21 @@
 
 import Foundation
 
-/// UserDefaults에 저장가능한 키값을 나타냅니다.
-public enum UserInfoStorageKey: String, Hashable {
-    // UserType
-    case userType = "userType"
-    
-    // Worker
-    case currentWorker = "currentWorker"
-    
-    // Center
-    case currentCenter = "currentCenter"
-}
-
 public class DefaultLocalStorageService: LocalStorageService {
-    
-    public typealias T = UserInfoStorageKey
-    
+
     let userDefaults: UserDefaults = .init()
     
-    private init() { }
+    public init() { }
     
-    /// UserDefaults로 부터 데이터를 가져옵니다.
-    public func fetchData<Value>(key: T) -> Value? {
-        userDefaults.value(forKey: key.rawValue) as? Value
+    public func fetchData<Value>(key: String) -> Value? {
+        userDefaults.value(forKey: key) as? Value
     }
     
-    /// UserDefaults에 데이터를 저장합니다.
-    public func saveData<Value>(key: T, value: Value) {
-        userDefaults.setValue(value, forKey: key.rawValue)
+    public func saveData<Value>(key: String, value: Value) {
+        userDefaults.setValue(value, forKey: key)
+    }
+    
+    public func remove(key: String) {
+        userDefaults.removeObject(forKey: key)
     }
 }
