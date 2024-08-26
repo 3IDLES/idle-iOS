@@ -8,6 +8,8 @@
 import UIKit
 import PresentationCore
 import RootFeature
+import UseCaseInterface
+import RepositoryInterface
 
 class RootCoordinator {
     
@@ -31,13 +33,16 @@ class RootCoordinator {
         
         // Root VC
         let vc = InitialScreenVC()
-        let vm = InitialScreenVM(coordinator: self)
+        let vm = InitialScreenVM(
+            coordinator: self,
+            workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self),
+            centerProfileUseCase: injector.resolve(CenterProfileUseCase.self),
+            userInfoLocalRepository: injector.resolve(UserInfoLocalRepository.self)
+        )
         
         vc.bind(viewModel: vm)
         
         navigationController.pushViewController(vc, animated: false)
-        
-        workerMain()
     }
     
     func popViewController() {
