@@ -30,20 +30,28 @@ public class InitialScreenVC: BaseViewController {
     
     public required init?(coder: NSCoder) { fatalError() }
     
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        setAppearance()
+        setLayout()
+        setObservable()
+    }
+    
     private func setAppearance() {
         view.backgroundColor = DSColor.gray0.color
     }
     
-    private func setLayout() {
-        
-    }
+    private func setLayout() { }
     
-    private func setObservable() {
-    }
+    private func setObservable() { }
     
     public func bind(viewModel: InitialScreenVM) {
         self.viewModel = viewModel
         
+        self.rx.viewWillAppear
+            .map { _ in () }
+            .bind(to: viewModel.viewWillAppear)
+            .disposed(by: disposeBag)
     }
 }
 
