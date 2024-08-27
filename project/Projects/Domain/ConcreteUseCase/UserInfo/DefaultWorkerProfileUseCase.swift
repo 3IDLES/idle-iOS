@@ -13,68 +13,47 @@ import RepositoryInterface
 
 public class DefaultWorkerProfileUseCase: WorkerProfileUseCase {
     
-    let repository: UserProfileRepository
+    let userProfileRepository: UserProfileRepository
+    let userInfoLocalRepository: UserInfoLocalRepository
     
-    public init(repository: UserProfileRepository) {
-        self.repository = repository
+    public init(userProfileRepository: UserProfileRepository, userInfoLocalRepository: UserInfoLocalRepository) {
+        self.userProfileRepository = userProfileRepository
+        self.userInfoLocalRepository = userInfoLocalRepository
     }
     
     public func getProfile(mode: ProfileMode) -> Single<Result<WorkerProfileVO, DomainError>> {
-        convert(task: repository.getWorkerProfile(mode: mode))
+        convert(task: userProfileRepository.getWorkerProfile(mode: mode))
     }
     
     public func updateProfile(stateObject: WorkerProfileStateObject, imageInfo: ImageUploadInfo?) -> Single<Result<Void, DomainError>> {
 
-        var updateText: Single<Void>!
-        var updateImage: Single<Void>!
+        var updateTextTask: Single<Void>!
+        var updateImageTask: Single<Void>!
         
-        updateText = repository.updateWorkerProfile(
+        updateTextTask = userProfileRepository.updateWorkerProfile(
             stateObject: stateObject
         )
         
         if let imageInfo {
-            updateImage = repository.uploadImage(
+            updateImageTask = userProfileRepository.uploadImage(
                 .center,
                 imageInfo: imageInfo
             )
         } else {
-            updateImage = .just(())
+            updateImageTask = .just(())
         }
-        
-        let updateTextResult = updateText
-            .catch { error in
-                if let httpExp = error as? HTTPResponseException {
-                    let newError = HTTPResponseException(
-                        status: httpExp.status,
-                        rawCode: "Err-001",
-                        timeStamp: httpExp.timeStamp
-                    )
-                    
-                    return .error(newError)
-                }
-                return .error(error)
-            }
-          
-        let uploadImageResult = updateImage
-            .catch { error in
-                if let httpExp = error as? HTTPResponseException {
-                    let newError = HTTPResponseException(
-                        status: httpExp.status,
-                        rawCode: "Err-002",
-                        timeStamp: httpExp.timeStamp
-                    )
-                    
-                    return .error(newError)
-                }
-                return .error(error)
-            }
         
         let task = Observable
             .zip(
-                updateTextResult.asObservable(),
-                uploadImageResult.asObservable()
+                updateTextTask.asObservable(),
+                updateImageTask.asObservable()
             )
-            .map { _ in () }
+            .flatMap { [userProfileRepository] _ in
+                userProfileRepository.getWorkerProfile(mode: .myProfile)
+            }
+            .map({ [userInfoLocalRepository] vo in
+                userInfoLocalRepository.updateCurrentWorkerData(vo: vo)
+            })
             .asSingle()
         
         return convert(task: task)
