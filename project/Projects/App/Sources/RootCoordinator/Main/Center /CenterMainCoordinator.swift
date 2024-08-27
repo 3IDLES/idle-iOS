@@ -49,7 +49,7 @@ class CenterMainCoordinator: CenterMainCoordinatable {
         )
         
         
-        navigationController.pushViewController(tabController, animated: false)
+        navigationController.pushViewController(tabController, animated: true)
     }
     
     // #1. Tab별 네비게이션 컨트롤러 생성

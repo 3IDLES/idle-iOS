@@ -123,6 +123,7 @@ public extension AuthInOutStreamManager {
                 .compactMap { $0.value }
                 .map { phoneNumber in
                     printIfDebug("✅ \(phoneNumber) 인증성공")
+                    stateTracker(phoneNumber)
                     return true
                 }
                 .asDriver(onErrorJustReturn: false)

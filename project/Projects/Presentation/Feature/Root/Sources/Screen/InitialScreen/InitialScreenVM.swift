@@ -113,6 +113,8 @@ public class InitialScreenVM {
                         coordinator?.centerMain()
                     })
                     .disposed(by: disposeBag)
+            } else {
+                coordinator?.centerMain()
             }
         } else {
             
@@ -159,6 +161,8 @@ public class InitialScreenVM {
                         coordinator?.workerMain()
                     })
                     .disposed(by: disposeBag)
+            } else {
+                coordinator?.workerMain()
             }
         }
     }

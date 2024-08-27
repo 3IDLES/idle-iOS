@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UseCaseInterface
 import PresentationCore
 
 enum CenterRegisterStage: Int {
@@ -20,6 +21,18 @@ enum CenterRegisterStage: Int {
 
 public class CenterRegisterCoordinator: ChildCoordinator {
     
+    public struct Dependency {
+        let navigationController: UINavigationController
+        let inputValidationUseCase: AuthInputValidationUseCase
+        let authUseCase: AuthUseCase
+        
+        public init(navigationController: UINavigationController, inputValidationUseCase: AuthInputValidationUseCase, authUseCase: AuthUseCase) {
+            self.navigationController = navigationController
+            self.inputValidationUseCase = inputValidationUseCase
+            self.authUseCase = authUseCase
+        }
+    }
+    
     public var parent: AuthCoordinatable?
     
     public weak var viewControllerRef: UIViewController?
@@ -33,17 +46,21 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     private var currentStage: CenterRegisterStage!
     
     public init(
-        viewModel: CenterRegisterViewModel,
-        navigationController: UINavigationController
+        dependency: Dependency
     ) {
-        self.navigationController = navigationController
+        self.navigationController = dependency.navigationController
+        
+        let vm = CenterRegisterViewModel(
+            inputValidationUseCase: dependency.inputValidationUseCase,
+            authUseCase: dependency.authUseCase
+        )
         
         // stageViewControllerss에 자기자신과 ViewModel할당
         self.stageViewControllers = [
-            EnterNameViewController(coordinator: self, viewModel: viewModel),
-            ValidatePhoneNumberViewController(coordinator: self, viewModel: viewModel),
-            AuthBusinessOwnerViewController(coordinator: self, viewModel: viewModel),
-            SetIdPasswordViewController(coordinator: self, viewModel: viewModel),
+            EnterNameViewController(coordinator: self, viewModel: vm),
+            ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
+            AuthBusinessOwnerViewController(coordinator: self, viewModel: vm),
+            SetIdPasswordViewController(coordinator: self, viewModel: vm),
         ]
     }
     

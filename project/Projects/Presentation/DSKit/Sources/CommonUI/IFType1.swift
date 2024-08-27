@@ -93,16 +93,11 @@ public class IFType1: UIStackView {
         
         button
             .eventPublisher
-            .subscribe { [weak self] _ in
-                
-                // 문자열 전송
-                self?.eventPublisher
-                    .onNext(
-                        self?.idleTextField.textField.text ?? ""
-                    )
-                
+            .map({ [weak self] _ in
                 _ = self?.idleTextField.resignFirstResponder()
-            }
+                return self?.idleTextField.textField.text ?? ""
+            })
+            .bind(to: eventPublisher)
             .disposed(by: disposeBag)
     }
     
@@ -147,5 +142,4 @@ public extension IFType1 {
             }
         }
     }
-    
 }
