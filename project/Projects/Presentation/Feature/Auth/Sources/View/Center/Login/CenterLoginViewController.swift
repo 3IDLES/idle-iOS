@@ -15,13 +15,9 @@ public class CenterLoginViewController: BaseViewController {
     
     let viewModel: CenterLoginViewModel
     
-    var coordinator: CenterLoginCoordinator?
-    
     // View
-    private let navigationBar: NavigationBarType1 = {
-       
-        let bar = NavigationBarType1(navigationTitle: "로그인")
-        
+    private let navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(titleText: "로그인")
         return bar
     }()
     
@@ -90,8 +86,7 @@ public class CenterLoginViewController: BaseViewController {
     
     private let disposeBag = DisposeBag()
     
-    public init(coordinator: CenterLoginCoordinator? = nil, viewModel: CenterLoginViewModel) {
-        self.coordinator = coordinator
+    public init(viewModel: CenterLoginViewModel) {
         self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
@@ -99,6 +94,7 @@ public class CenterLoginViewController: BaseViewController {
         setAppearance()
         setAutoLayout()
         setObservable()
+        setKeyboardAvoidance()
     }
     
     public required init?(coder: NSCoder) { fatalError() }
@@ -136,9 +132,9 @@ public class CenterLoginViewController: BaseViewController {
         
         NSLayoutConstraint.activate([
             
-            navigationBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor, constant: 20),
-            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
-            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 12),
+            navigationBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
             inputStack.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 125),
             inputStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
@@ -154,15 +150,15 @@ public class CenterLoginViewController: BaseViewController {
             ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
-        
     }
     
     private func setObservable() {
         
-        setKeyboardAvoidance()
-        
         // MARK: Input
         let input = viewModel.input
+        
+        navigationBar.backButton.rx.tap.bind(to: input.backButtonClicked)
+            .disposed(by: disposeBag)
         
         // 인풋 전달
         idField.uITextField.rx.text
@@ -175,6 +171,10 @@ public class CenterLoginViewController: BaseViewController {
             .bind(to: input.editingPassword)
             .disposed(by: disposeBag)
         
+        forgotPasswordButton.eventPublisher
+            .bind(to: input.setNewPasswordButtonClicked)
+            .disposed(by: disposeBag)
+        
         // 로그인 버튼 눌림
         ctaButton.eventPublisher
             .bind(to: input.loginButtonPressed)
@@ -184,110 +184,26 @@ public class CenterLoginViewController: BaseViewController {
         
         // 로그인 시도 결과 수신
         output
-            .loginValidation?
-            .drive(onNext: { [weak self] isSuccess in
-                if isSuccess {
-                    self?.onLoginSucceed()
-                } else {
-                    self?.onLoginFailed()
+            .alert?
+            .drive(onNext: { [weak self] alertVO in
+                guard let self else { return }
+                loginFailedText.isHidden = false
+                passwordField.idleTextField.onCustomState { textField in
+                    textField.layer.borderColor = DSKitColors.Color.red.cgColor
                 }
+                
+                //alert
+                showAlert(vo: alertVO)
             })
             .disposed(by: disposeBag)
-        
-        // MARK: ViewController 내부에서 진행되는 로직
-        navigationBar
-            .eventPublisher
-            .subscribe { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
-            }
-            .disposed(by: disposeBag)
-        
-        forgotPasswordButton
-            .eventPublisher
-            .subscribe { [weak self] _ in
-                self?.coordinator?.parent?.setNewPassword()
-            }
-            .disposed(by: disposeBag)
     }
-    
-    private func onLoginFailed() {
-        
-        loginFailedText.isHidden = false
-        passwordField
-            .idleTextField
-            .onCustomState { textField in
-                textField.layer.borderColor = DSKitColors.Color.red.cgColor
-            }
-    }
-    
-    private func onLoginSucceed() {
-        
-        loginFailedText.isHidden = true
-        passwordField
-            .idleTextField
-            .onCustomState { textField in
-                textField.layer.borderColor = textField.normalBorderColor.cgColor
-            }
-        
-        coordinator?.parent?.authFinished()
-    }
-    
-    public func cleanUp() {
-        
-    }
-}
-
-extension CenterLoginViewController {
-    
     
     private func setKeyboardAvoidance() {
-        
-        // 키보드 어보이던스 설정
-        NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardAction(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardAction(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    @objc
-    private func onKeyboardAction(_ notification: Notification) {
-        
-        guard let userInfo = notification.userInfo else { return }
-        
-        let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as! CGRect
-        let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as! TimeInterval
-        let curve = userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as! UInt
-        
-        UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: curve), animations: { [weak self] in
-            
-            guard let self else { return }
-            
-            if notification.name == UIResponder.keyboardWillShowNotification {
-                
-                let movingView: UIView!
-                
-                if self.idField.uITextField.isFirstResponder {
-                    // id field가 선택된 경우
-                    movingView = self.idField
-                } else if self.passwordField.uITextField.isFirstResponder {
-                    // password field가 선택된 경우
-                    movingView = self.passwordField
-                } else { return }
-                
-                let idFieldFrame = movingView.convert(movingView.bounds, to: nil)
-                let maxY = idFieldFrame.origin.y + idFieldFrame.height
-                
-                if maxY > keyboardFrame.origin.y {
-                    // 키보드가 field를 가리는 경우
-                    let diff = maxY - keyboardFrame.origin.y
-                    let inset: CGFloat = 10
-                    
-                    inputStack.transform = CGAffineTransform(translationX: 0, y: -(diff+inset))
-                }
-                
-            } else {
-                
-                // 키보드가 사라자니는 경우
-                self.inputStack.transform = .identity
-            }
-        }, completion: nil)
+        [
+            idField.idleTextField,
+            passwordField.idleTextField
+        ].forEach { (view: IdleKeyboardAvoidable) in
+            view.setKeyboardAvoidance(movingView: inputStack)
+        }
     }
 }

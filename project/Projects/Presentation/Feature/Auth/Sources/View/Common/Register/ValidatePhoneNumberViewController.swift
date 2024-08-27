@@ -59,13 +59,11 @@ where
     }()
     
     // MARK: 전화번호 입력
-    private let phoneNumberLabel: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
-        label.text = "전화번호"
+    private let phoneNumberLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Subtitle4)
+        label.textString = "전화번호"
+        label.attrTextColor = DSKitAsset.Colors.gray500.color
         label.textAlignment = .left
-        
         return label
     }()
     private let phoneNumberField: IFType1 = {
@@ -82,15 +80,14 @@ where
     }()
     
     // MARK: 인증번호 입력
-    private let authNumberLabel: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
-        label.text = "인증번호"
+    private let authNumberLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Subtitle4)
+        label.textString = "인증번호"
+        label.attrTextColor = DSKitAsset.Colors.gray500.color
         label.textAlignment = .left
-        
         return label
     }()
+        
     private let authNumberField: IFType1 = {
         
        let textField = IFType1(
@@ -247,7 +244,12 @@ where
             .canSubmitPhoneNumber?
             .compactMap { $0 }
             .asDriver(onErrorJustReturn: false)
-            .drive(onNext: { [weak self] in self?.phoneNumberField.button.setEnabled($0) })
+            .drive(onNext: { [weak self] in
+                
+                guard let self else { return }
+                
+                phoneNumberField.button.setEnabled($0)
+            })
             .disposed(by: disposeBag)
         
         // 입력중인 인증번호가 특정 조건(ex: 입력길이)을 만족한 경우 '확인'버튼 활성화

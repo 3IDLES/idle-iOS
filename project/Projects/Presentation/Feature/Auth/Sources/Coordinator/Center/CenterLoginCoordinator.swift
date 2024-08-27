@@ -37,8 +37,11 @@ public class CenterLoginCoordinator: ChildCoordinator {
     
     public func start() {
         
-        let vm = CenterLoginViewModel(authUseCase: authUseCase)
-        let vc = CenterLoginViewController(coordinator: self, viewModel: vm)
+        let vm = CenterLoginViewModel(
+            coordinator: self,
+            authUseCase: authUseCase
+        )
+        let vc = CenterLoginViewController(viewModel: vm)
         
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
@@ -52,9 +55,8 @@ public class CenterLoginCoordinator: ChildCoordinator {
 
 extension CenterLoginCoordinator {
     
-    /// 비밀번호 변경창을 종료한 경우
-    func findPasswordFinished() {
-        popViewController()
+    func showSetNewPasswordScreen() {
+        parent?.setNewPassword()
     }
     
     /// Auth가 종료된 경우

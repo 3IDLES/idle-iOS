@@ -20,9 +20,15 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(AuthUseCase.self) { resolver in
-            let repository = resolver.resolve(AuthRepository.self)!
+            let authRepository = resolver.resolve(AuthRepository.self)!
+            let userProfileRepository = resolver.resolve(UserProfileRepository.self)!
+            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
             
-            return DefaultAuthUseCase(repository: repository)
+            return DefaultAuthUseCase(
+                authRepository: authRepository,
+                userProfileRepository: userProfileRepository,
+                userInfoLocalRepository: userInfoLocalRepository
+            )
         }
         
         container.register(CenterProfileUseCase.self) { resolver in
@@ -46,9 +52,13 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(SettingScreenUseCase.self) { resolver in
-            let repository = resolver.resolve(AuthRepository.self)!
+            let authRepository = resolver.resolve(AuthRepository.self)!
+            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
             
-            return DefaultSettingUseCase(repository: repository)
+            return DefaultSettingUseCase(
+                authRepository: authRepository,
+                userInfoLocalRepository: userInfoLocalRepository
+            )
         }
     }
 }

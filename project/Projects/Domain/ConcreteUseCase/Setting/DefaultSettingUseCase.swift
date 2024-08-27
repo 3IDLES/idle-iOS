@@ -14,10 +14,12 @@ import Entity
 
 public class DefaultSettingUseCase: SettingScreenUseCase {
     
-    let repository: AuthRepository
+    let authRepository: AuthRepository
+    let userInfoLocalRepository: UserInfoLocalRepository
     
-    public init(repository: AuthRepository) {
-        self.repository = repository
+    public init(authRepository: AuthRepository, userInfoLocalRepository: UserInfoLocalRepository) {
+        self.authRepository = authRepository
+        self.userInfoLocalRepository = userInfoLocalRepository
     }
     
     public func checkPushNotificationApproved() -> Single<Bool> {
@@ -78,27 +80,48 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
         URL(string: "")!
     }
     
+    // MARK: 회원탈퇴 & 로그아웃
     // 센터 회원탈퇴
     public func deregisterCenterAccount(reasons: [Entity.DeregisterReasonVO], password: String) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
-        convert(
-            task: repository.deregisterCenterAccount(reasons: reasons, password: password)
-        )
+        let task = authRepository
+            .deregisterCenterAccount(reasons: reasons, password: password)
+            .map { [weak self] _ in 
+                self?.removeAllLocalData() ?? ()
+            }
+        return convert(task: task)
     }
     
     // 센터 로그아웃
     public func signoutCenterAccount() -> RxSwift.Single<Result<Void, Entity.DomainError>> {
-        convert(
-            task: repository.signoutCenterAccount()
-        )
+        let task = authRepository
+            .signoutCenterAccount()
+            .map { [weak self] _ in
+                self?.removeAllLocalData() ?? ()
+            }
+        return convert(task: task)
     }
     
     // 요양보호사 회원탈퇴
     public func deregisterWorkerAccount(reasons: [Entity.DeregisterReasonVO]) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
-        convert(task: repository.deregisterWorkerAccount(reasons: reasons))
+        let task = authRepository
+            .deregisterWorkerAccount(reasons: reasons)
+            .map { [weak self] _ in
+                self?.removeAllLocalData() ?? ()
+            }
+        return convert(task: task)
     }
     
     // 요양보호사 로그아웃
     public func signoutWorkerAccount() -> RxSwift.Single<Result<Void, Entity.DomainError>> {
-        convert(task: repository.signoutWorkerAccount())
+        let task = authRepository
+            .signoutWorkerAccount()
+            .map { [weak self] _ in
+                self?.removeAllLocalData() ?? ()
+            }
+        return convert(task: task)
+    }
+    
+    private func removeAllLocalData() {
+        userInfoLocalRepository.removeAllData()
     }
 }

@@ -28,14 +28,15 @@ extension AuthCoordinator: AuthCoordinatable {
     }
     
     public func registerAsCenter() {
-        
-        let viewModel = injector.resolve(CenterRegisterViewModel.self)
-        
-        let coordinator = CenterRegisterCoordinator(viewModel: viewModel, navigationController: navigationController)
-        
+        let coordinator = CenterRegisterCoordinator(
+            dependency: .init(
+                navigationController: navigationController,
+                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self),
+                authUseCase: injector.resolve(AuthUseCase.self)
+            )
+        )
         coordinator.parent = self
         addChildCoordinator(coordinator)
-        
         coordinator.start()
     }
     

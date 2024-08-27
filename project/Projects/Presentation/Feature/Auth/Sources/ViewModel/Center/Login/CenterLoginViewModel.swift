@@ -9,32 +9,62 @@ import RxSwift
 import BaseFeature
 import RxCocoa
 import UseCaseInterface
+import RepositoryInterface
 import Entity
 import PresentationCore
-import BaseFeature
 
 public class CenterLoginViewModel: ViewModelType {
     
     // Init
+    weak var coordinator: CenterLoginCoordinator?
     let authUseCase: AuthUseCase
     
     public var input: Input = .init()
     public var output: Output = .init()
     
-    var validPassword: String?
+    let disposeBag = DisposeBag()
     
-    public init(authUseCase: AuthUseCase) {
+    public init(coordinator: CenterLoginCoordinator?, authUseCase: AuthUseCase) {
+        self.coordinator = coordinator
         self.authUseCase = authUseCase
         
-        setObservable()
-    }
-    
-    deinit {
-        printIfDebug("deinit \(Self.self)")
-    }
-    
-    func setObservable() {
+        // MARK: input
+        input.backButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                self.coordinator?.coordinatorDidFinish()
+            })
+            .disposed(by: disposeBag)
         
+        input.setNewPasswordButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                self.coordinator?.showSetNewPasswordScreen()
+            })
+            .disposed(by: disposeBag)
+        
+        let loginResult = input.loginButtonPressed
+            .flatMap { [unowned self, input] _ in
+                let id = input.editingId.value
+                let password = input.editingPassword.value
+                return self.authUseCase
+                    .loginCenterAccount(id: id, password: password)
+            }
+            .share()
+        
+        let loginSuccess = loginResult.compactMap { $0.value }
+        let loginFailure = loginResult.compactMap { $0.error }
+        
+        
+        loginSuccess
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                
+                self.coordinator?.authFinished()
+            })
+            .disposed(by: disposeBag)
+        
+        // MARK: output
         output.canRequestLoginAction = Observable
             .combineLatest(
                 input.editingId,
@@ -45,29 +75,18 @@ public class CenterLoginViewModel: ViewModelType {
             }
             .asDriver(onErrorJustReturn: false)
         
-        let loginResult = input
-            .loginButtonPressed
-            .flatMap { [unowned self, input] _ in
-                let id = input.editingId.value
-                let password = input.editingPassword.value
-                return self.authUseCase
-                    .loginCenterAccount(id: id, password: password)
+        output.alert = loginFailure
+            .map { error in
+                AlertWithCompletionVO(
+                    title: "로그인 실패",
+                    message: error.message
+                )
             }
-            .share()
-        
-        output.loginValidation = loginResult
-            .map { result in
-                
-                switch result {
-                case .success:
-                    printIfDebug("✅ 로그인 성공")
-                    return true
-                case .failure(let error):
-                    printIfDebug("❌ 로그인 실패: \(error.message)")
-                    return false
-                }
-            }
-            .asDriver(onErrorJustReturn: false)
+            .asDriver(onErrorJustReturn: .default)
+    }
+    
+    deinit {
+        printIfDebug("deinit \(Self.self)")
     }
 }
 
@@ -77,10 +96,12 @@ public extension CenterLoginViewModel {
         public let editingId: BehaviorRelay<String> = .init(value: "")
         public let editingPassword: BehaviorRelay<String> = .init(value: "")
         public let loginButtonPressed: PublishRelay<Void> = .init()
+        public let backButtonClicked: PublishRelay<Void> = .init()
+        public let setNewPasswordButtonClicked: PublishRelay<Void> = .init()
     }
     
     class Output {
         public var canRequestLoginAction: Driver<Bool>?
-        public var loginValidation: Driver<Bool>?
+        public var alert: Driver<AlertWithCompletionVO>?
     }
 }
