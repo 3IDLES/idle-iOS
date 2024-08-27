@@ -12,17 +12,25 @@ import Entity
 
 public enum RcruitmentPostAPI {
     
-    // Common
+    /// 요양보호사용 센터용 선택가능
     case postDetail(id: String, userType: UserType)
     
     // Center
+    // - 공고 CRUD
     case registerPost(postData: Data)
     case editPost(id: String, postData: Data)
     case removePost(id: String)
     case closePost(id: String)
+    // - 공고 상세조회
+    case getOnGoingPosts
+    case getClosedPosts
+    
+    // - 공고 지원자 관련
+    case getApplicantCountForWorker(id: String)
+    
     
     // Worker
-    case nativePostList(nextPageId: String?, requestCnt: String)
+    case getOnGoingNativePostListForWorker(nextPageId: String?, requestCnt: String)
 }
 
 extension RcruitmentPostAPI: BaseAPI {
@@ -35,6 +43,8 @@ extension RcruitmentPostAPI: BaseAPI {
         switch self {
         case .postDetail(let id, let userType):
             "/\(id)/\(userType.pathUri)"
+            
+            
         case .registerPost:
             ""
         case .editPost(let id, _):
@@ -43,7 +53,19 @@ extension RcruitmentPostAPI: BaseAPI {
             "/\(id)"
         case .closePost(let id):
             "/\(id)/end"
-        case .nativePostList:
+            
+            
+        case .getOnGoingPosts:
+            "/status/in-progress"
+        case .getClosedPosts:
+            "/status/completed"
+            
+            
+        case .getApplicantCountForWorker(let id):
+            "/\(id)/applicant-count"
+            
+            
+        case .getOnGoingNativePostListForWorker:
             ""
         }
     }
@@ -52,6 +74,8 @@ extension RcruitmentPostAPI: BaseAPI {
         switch self {
         case .postDetail:
             .get
+            
+            
         case .registerPost:
             .post
         case .editPost:
@@ -60,7 +84,19 @@ extension RcruitmentPostAPI: BaseAPI {
             .delete
         case .closePost:
             .patch
-        case .nativePostList:
+            
+            
+        case .getOnGoingPosts:
+            .get
+        case .getClosedPosts:
+            .get
+            
+            
+        case .getApplicantCountForWorker:
+            .get
+            
+            
+        case .getOnGoingNativePostListForWorker:
             .get
         }
     }
@@ -68,7 +104,7 @@ extension RcruitmentPostAPI: BaseAPI {
     var bodyParameters: Parameters? {
         var params: Parameters = [:]
         switch self {
-        case .nativePostList(let nextPageId, let requestCnt):
+        case .getOnGoingNativePostListForWorker(let nextPageId, let requestCnt):
             if let nextPageId {
                 params["next"] = nextPageId
             }
@@ -81,7 +117,7 @@ extension RcruitmentPostAPI: BaseAPI {
     
     var parameterEncoding: ParameterEncoding {
         switch self {
-        case .nativePostList:
+        case .getOnGoingNativePostListForWorker:
             return URLEncoding.queryString
         default:
             return JSONEncoding.default
@@ -90,7 +126,7 @@ extension RcruitmentPostAPI: BaseAPI {
     
     public var task: Moya.Task {
         switch self {
-        case .nativePostList:
+        case .getOnGoingNativePostListForWorker:
             .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .registerPost(let bodyData):
             .requestData(bodyData)

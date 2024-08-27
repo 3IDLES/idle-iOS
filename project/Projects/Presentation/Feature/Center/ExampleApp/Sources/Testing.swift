@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import NetworkDataSource
+import DataSource
 
 class TestStore: KeyValueStore {
     func save(key: String, value: String) throws {

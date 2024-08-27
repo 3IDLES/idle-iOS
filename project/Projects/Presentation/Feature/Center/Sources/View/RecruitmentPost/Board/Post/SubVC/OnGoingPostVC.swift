@@ -15,10 +15,10 @@ import DSKit
 
 public protocol OnGoingPostViewModelable {
     
-    var ongoingPostCardVO: Driver<[CenterEmployCardVO]>? { get }
+    var ongoingPostInfo: Driver<[RecruitmentPostInfoForCenterVO]>? { get }
     var requestOngoingPost: PublishRelay<Void> { get }
-    
-    func createCellVM(vo: CenterEmployCardVO) -> CenterEmployCardViewModelable
+
+    func createCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable
 }
 
 public class OnGoingPostVC: BaseViewController {
@@ -34,10 +34,10 @@ public class OnGoingPostVC: BaseViewController {
         tableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
         return tableView
     }()
-    
     let tableHeader = BoardSortigHeaderView()
     
-    let ongoingPostCardVO: BehaviorRelay<[CenterEmployCardVO]> = .init(value: [.mock])
+    // DataSource
+    private var postData: [RecruitmentPostInfoForCenterVO] = []
     
     // Observable
     private let disposeBag = DisposeBag()
@@ -101,10 +101,12 @@ public class OnGoingPostVC: BaseViewController {
         
         // Output
         viewModel
-            .ongoingPostCardVO?
-            .drive(onNext: { [weak self] vos in
+            .ongoingPostInfo?
+            .drive(onNext: { [weak self] postInfo in
                 guard let self else { return }
-                ongoingPostCardVO.accept(vos)
+                
+                self.postData = postInfo
+                
                 postTableView.reloadData()
             })
             .disposed(by: disposeBag)
@@ -120,7 +122,7 @@ public class OnGoingPostVC: BaseViewController {
 extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        ongoingPostCardVO.value.count
+        postData.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -128,9 +130,10 @@ extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
         cell.selectionStyle = .none
         
+        let data = postData[indexPath.item]
+        
         if let viewModel = self.viewModel {
-            let vo = ongoingPostCardVO.value[indexPath.row]
-            let vm = viewModel.createCellVM(vo: vo)
+            let vm = viewModel.createCellVM(postInfo: data)
             cell.bind(viewModel: vm)
         }
         

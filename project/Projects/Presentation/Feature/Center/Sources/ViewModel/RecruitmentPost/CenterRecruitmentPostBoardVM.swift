@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import BaseFeature
 import PresentationCore
+import UseCaseInterface
 import RxCocoa
 import RxSwift
 import Entity
@@ -21,41 +22,48 @@ public protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelabl
 
 public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelable {
     
+    // Init
     weak var coordinator: CenterRecruitmentPostBoardScreenCoordinator?
+    let recruitmentPostUseCase: RecruitmentPostUseCase
 
     public var requestOngoingPost: PublishRelay<Void> = .init()
     public var requestClosedPost: PublishRelay<Void> = .init()
     
-    public var ongoingPostCardVO: Driver<[CenterEmployCardVO]>?
-    public var closedPostCardVO: Driver<[CenterEmployCardVO]>?
+    public var ongoingPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
+    public var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
     
     public var alert: Driver<DefaultAlertContentVO>?
     
-    public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?) {
+    public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.coordinator = coordinator
+        self.recruitmentPostUseCase = recruitmentPostUseCase
         
         let requestOngoingPostResult = requestOngoingPost
-            .flatMap { [unowned self] _ in
-                publishOngoingPostMocks()
+            .flatMap { [recruitmentPostUseCase] _ in
+                recruitmentPostUseCase
+                    .getOngoingPosts()
             }
             .share()
         
         let requestOngoingPostSuccess = requestOngoingPostResult.compactMap { $0.value }
         let requestOngoingPostFailure = requestOngoingPostResult.compactMap { $0.error }
         
-        ongoingPostCardVO = requestOngoingPostSuccess.asDriver(onErrorJustReturn: [])
+        ongoingPostInfo = requestOngoingPostSuccess
+            .asDriver(onErrorJustReturn: [])
             
         
         let requestClosedPostResult = requestClosedPost
-            .flatMap { [unowned self] _ in
-                publishClosedPostMocks()
+            .flatMap { [recruitmentPostUseCase] _ in
+                recruitmentPostUseCase
+                    .getClosedPosts()
             }
             .share()
         
         let requestClosedPostSuccess = requestClosedPostResult.compactMap { $0.value }
         let requestClosedPostFailure = requestClosedPostResult.compactMap { $0.error }
         
-        closedPostCardVO = requestClosedPostSuccess.asDriver(onErrorJustReturn: [])
+        closedPostInfo = requestClosedPostSuccess
+            .asDriver(onErrorJustReturn: [])
         
         alert = Observable.merge(
             requestOngoingPostFailure,
@@ -69,18 +77,11 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
         .asDriver(onErrorJustReturn: .default)
     }
     
-    func publishOngoingPostMocks() -> Single<Result<[CenterEmployCardVO], DomainError>> {
-        return .just(.success((0...10).map { _ in CenterEmployCardVO.mock }))
-    }
-    
-    func publishClosedPostMocks() -> Single<Result<[CenterEmployCardVO], DomainError>> {
-        return .just(.success((0...10).map { _ in CenterEmployCardVO.mock }))
-    }
-    
-    public func createCellVM(vo: CenterEmployCardVO) -> any CenterEmployCardViewModelable {
+    public func createCellVM(postInfo: Entity.RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
         CenterEmployCardVM(
-            vo: vo,
-            coordinator: coordinator
+            postInfo: postInfo,
+            coordinator: coordinator,
+            recruitmentPostUseCase: recruitmentPostUseCase
         )
     }
 }
@@ -88,13 +89,14 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
 // MARK: 카드 뷰에 사용될 ViewModel
 class CenterEmployCardVM: CenterEmployCardViewModelable {
     
+    // Init
+    let postInfo: RecruitmentPostInfoForCenterVO
+    let recruitmentPostUseCase: RecruitmentPostUseCase
     weak var coordinator: CenterRecruitmentPostBoardScreenCoordinator?
     
-    // Init
-    let id: String
-    
     // Output
-    var renderObject: Driver<CenterEmployCardRO>?
+    let renderObject: CenterEmployCardRO
+    var applicantCountText: Driver<String>?
     
     // Input
     var cardClicked: PublishRelay<Void> = .init()
@@ -104,38 +106,60 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
     
     let disposeBag = DisposeBag()
     
-    init(vo: CenterEmployCardVO, coordinator: CenterRecruitmentPostBoardScreenCoordinator?) {
-        self.id = vo.postId
+    init(postInfo: RecruitmentPostInfoForCenterVO, coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
+        self.postInfo = postInfo
         self.coordinator = coordinator
+        self.recruitmentPostUseCase = recruitmentPostUseCase
         
         // MARK: RenderObject
-        let publishRelay: BehaviorRelay<CenterEmployCardRO> = .init(value: .mock)
-        renderObject = publishRelay.asDriver(onErrorJustReturn: .mock)
+        self.renderObject = CenterEmployCardRO.create(vo: postInfo)
         
-        publishRelay.accept(CenterEmployCardRO.create(vo))
+        // MARK: 지원자 수 조회
+        let getApplicantCountResult = recruitmentPostUseCase
+            .getApplicantCountForWorker(id: postInfo.id)
+            
+        let getApplicantCountSuccess = getApplicantCountResult.compactMap { $0.value }
+        let getApplicantCountFailure = getApplicantCountResult.compactMap { $0.error }
+        
+        applicantCountText = Observable
+            .merge(
+                getApplicantCountSuccess.map { cnt in "지원자 \(cnt)명 조회" }.asObservable(),
+                getApplicantCountFailure.map { error in
+                    printIfDebug("지원자수를 가져올 수 없음 \(error.message)")
+                    return "지원자 수 조회 실패"
+                }.asObservable()
+            )
+            .replay(1)
+            .asDriver(onErrorDriveWith: .never())
+        
         
         // MARK: 버튼 처리
-        checkApplicantBtnClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                self.coordinator?.showCheckingApplicantScreen(postId: id)
-            })
-            .disposed(by: disposeBag)
-        
         cardClicked
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
                 
-                self.coordinator?.showPostDetailScreenForCenter(postId: id, applicantCount: vo.applicantCount)
+                self.coordinator?.showPostDetailScreenForCenter(postId: postInfo.id)
             })
             .disposed(by: disposeBag)
+        
+        
+        if postInfo.state == .closed { return }
+        // 이전 공고인 경우 버튼 바인딩 하지 않음
+        
+        checkApplicantBtnClicked
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                
+                self.coordinator?.showCheckingApplicantScreen(postId: postInfo.id)
+            })
+            .disposed(by: disposeBag)
+        
         
         editPostBtnClicked
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
                 
-                self.coordinator?.showEditScreen(postId: id)
+                self.coordinator?.showEditScreen(postId: postInfo.id)
             })
             .disposed(by: disposeBag)
     }

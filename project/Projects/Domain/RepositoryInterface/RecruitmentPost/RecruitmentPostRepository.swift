@@ -11,7 +11,7 @@ import Entity
 
 public protocol RecruitmentPostRepository: RepositoryBase {
     
-    // MARK: Center
+    // MARK: Center - post crud
     /// 공고를 등록합니다.
     func registerPost(bundle: RegisterRecruitmentPostBundle) -> Single<Void>
     
@@ -20,6 +20,16 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     
     /// 센터가 등록한 공고의 상세정보를 수정합니다.
     func editPostDetail(id: String, bundle: RegisterRecruitmentPostBundle) -> Single<Void>
+    
+    // MARK: Center - check posts
+    /// 현재 진행중인 공고를 획득합니다.
+    func getOngoingPosts() -> Single<[RecruitmentPostInfoForCenterVO]>
+    
+    /// 현재 진행중인 공고를 획득합니다.
+    func getClosedPosts() -> Single<[RecruitmentPostInfoForCenterVO]>
+    
+    /// 특정 공고의 지원자 수를 확인합니다.
+    func getApplicantCountForWorker(id: String) -> Single<Int>
     
     // MARK: Worker
     /// 요양보호사 공고의 상세정보를 조회합니다.

@@ -15,10 +15,10 @@ import DSKit
 
 public protocol ClosedPostViewModelable {
     
-    var closedPostCardVO: Driver<[CenterEmployCardVO]>? { get }
+    var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>? { get }
     var requestClosedPost: PublishRelay<Void> { get }
     
-    func createCellVM(vo: CenterEmployCardVO) -> CenterEmployCardViewModelable
+    func createCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable
 }
 
 public class ClosedPostVC: BaseViewController {
@@ -34,13 +34,14 @@ public class ClosedPostVC: BaseViewController {
         tableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
         return tableView
     }()
-    
     let tableHeader = BoardSortigHeaderView()
+    
+    // DataSource
+    private var postData: [RecruitmentPostInfoForCenterVO] = []
     
     // Observable
     private let disposeBag = DisposeBag()
     
-    let closedPostCardVO: BehaviorRelay<[CenterEmployCardVO]> = .init(value: [])
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -100,10 +101,12 @@ public class ClosedPostVC: BaseViewController {
         
         // Output
         viewModel
-            .closedPostCardVO?
-            .drive(onNext: { [weak self] vos in
+            .closedPostInfo?
+            .drive(onNext: { [weak self] postInfo in
                 guard let self else { return }
-                closedPostCardVO.accept(vos)
+                
+                self.postData = postInfo
+                
                 postTableView.reloadData()
             })
             .disposed(by: disposeBag)
@@ -119,7 +122,7 @@ public class ClosedPostVC: BaseViewController {
 extension ClosedPostVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        closedPostCardVO.value.count
+        postData.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -127,11 +130,13 @@ extension ClosedPostVC: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
         cell.selectionStyle = .none
         
+        let data = postData[indexPath.item]
+        
         if let viewModel = self.viewModel {
-            let vo = closedPostCardVO.value[indexPath.row]
-            let vm = viewModel.createCellVM(vo: vo)
+            let vm = viewModel.createCellVM(postInfo: data)
             cell.bind(viewModel: vm)
         }
+        
         return cell
     }
 }

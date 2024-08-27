@@ -57,6 +57,30 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         convert(task: repository.getPostDetailForWorker(id: id))
     }
     
+    public func getOngoingPosts() -> RxSwift.Single<Result<[Entity.RecruitmentPostInfoForCenterVO], Entity.DomainError>> {
+        let task = repository
+            .getOngoingPosts()
+            .map { postInfo in
+                postInfo.forEach { vo in vo.state = .onGoing }
+                return postInfo
+            }
+        return convert(task: task)
+    }
+    
+    public func getClosedPosts() -> RxSwift.Single<Result<[Entity.RecruitmentPostInfoForCenterVO], Entity.DomainError>> {
+        let task = repository
+            .getClosedPosts()
+            .map { postInfo in
+                postInfo.forEach { vo in vo.state = .closed }
+                return postInfo
+            }
+        return convert(task: task)
+    }
+    
+    public func getApplicantCountForWorker(id: String) -> RxSwift.Single<Result<Int, Entity.DomainError>> {
+        convert(task: repository.getApplicantCountForWorker(id: id))
+    }
+    
     public func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>> {
         
         let stream: Single<RecruitmentPostListForWorkerVO>!

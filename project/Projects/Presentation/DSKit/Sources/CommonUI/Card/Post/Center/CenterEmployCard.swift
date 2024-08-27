@@ -18,9 +18,9 @@ public struct CenterEmployCardRO {
     public let careGradeText: String
     public let ageText: String
     public let genderText: String
-    public let applicantCount: Int
+    public let postState: PostState?
     
-    public init(startDay: String, endDay: String, postTitle: String, nameText: String, careGradeText: String, ageText: String, genderText: String, applicantCount: Int) {
+    public init(startDay: String, endDay: String, postTitle: String, nameText: String, careGradeText: String, ageText: String, genderText: String, postState: PostState? = nil) {
         self.startDay = startDay
         self.endDay = endDay
         self.postTitle = postTitle
@@ -28,7 +28,7 @@ public struct CenterEmployCardRO {
         self.careGradeText = careGradeText
         self.ageText = ageText
         self.genderText = genderText
-        self.applicantCount = applicantCount
+        self.postState = postState
     }
     
     public static let mock: CenterEmployCardRO = .init(
@@ -39,7 +39,7 @@ public struct CenterEmployCardRO {
         careGradeText: "1등급",
         ageText: "78세",
         genderText: "여성",
-        applicantCount: 2
+        postState: .closed
     )
     
     public static func create(_ vo: CenterEmployCardVO) -> CenterEmployCardRO {
@@ -50,8 +50,33 @@ public struct CenterEmployCardRO {
             nameText: vo.name,
             careGradeText: "\(vo.careGrade.textForCellBtn)등급",
             ageText: "\(vo.age)세",
+            genderText: vo.gender.twoLetterKoreanWord
+        )
+    }
+    
+    public static func create(vo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardRO {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let startDay = dateFormatter.string(from: vo.createdAt)
+        let endDay = vo.applyDeadline == nil ? "채용 시까지" : dateFormatter.string(from: vo.applyDeadline!)
+         
+        var splittedAddress = vo.roadNameAddress.split(separator: " ")
+        
+        if splittedAddress.count >= 3 {
+            splittedAddress = Array(splittedAddress[0..<3])
+        }
+        let addressTitle = splittedAddress.joined(separator: " ")
+        
+        return .init(
+            startDay: startDay,
+            endDay: endDay,
+            postTitle: addressTitle,
+            nameText: vo.clientName,
+            careGradeText: vo.careLevel.textForCellBtn,
+            ageText: String(vo.age),
             genderText: vo.gender.twoLetterKoreanWord,
-            applicantCount: vo.applicantCount
+            postState: vo.state
         )
     }
 }
@@ -59,7 +84,8 @@ public struct CenterEmployCardRO {
 public protocol CenterEmployCardViewModelable {
     
     // Output
-    var renderObject: Driver<CenterEmployCardRO>? { get }
+    var renderObject: CenterEmployCardRO { get }
+    var applicantCountText: Driver<String>? { get }
     
     // Input
     var cardClicked: PublishRelay<Void> { get }
@@ -71,13 +97,12 @@ public protocol CenterEmployCardViewModelable {
 }
 
 public class CenterEmployCard: TappableUIView {
-    
-    // Init
-    
+        
     // View
     
     // Row1, 2, 3 View
     let centerEmployCardInfoView = CenterEmployCardInfoView()
+    
     
     // Row4
     let checkApplicantsButton: IdlePrimaryCardButton = {
@@ -170,29 +195,5 @@ public class CenterEmployCard: TappableUIView {
         centerEmployCardInfoView.postTitleLabel.textString = ro.postTitle
         centerEmployCardInfoView.nameLabel.textString = ro.nameText
         centerEmployCardInfoView.informationLabel.textString = "\(ro.careGradeText) \(ro.ageText) \(ro.genderText)"
-        checkApplicantsButton.label.textString = "지원자 \(ro.applicantCount)명 조회"
     }
-}
-
-fileprivate class TextVM: CenterEmployCardViewModelable {
-
-    public let publishObect: PublishRelay<CenterEmployCardRO> = .init()
-    
-    var renderObject: RxCocoa.Driver<CenterEmployCardRO>?
-    
-    var cardClicked: RxRelay.PublishRelay<Void> = .init()
-    var checkApplicantBtnClicked: RxRelay.PublishRelay<Void> = .init()
-    var editPostBtnClicked: RxRelay.PublishRelay<Void> = .init()
-    var terminatePostBtnClicked: RxRelay.PublishRelay<Void> = .init()
-    
-    init() {
-        renderObject = publishObect.asDriver(onErrorJustReturn: .mock)
-    }
-}
-
-@available(iOS 17.0, *)
-#Preview("Preview", traits: .defaultLayout) {
-    let btn = CenterEmployCard()
-    btn.bind(ro: .mock)
-    return btn
 }
