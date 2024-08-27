@@ -13,73 +13,53 @@ import RepositoryInterface
 
 public class DefaultCenterProfileUseCase: CenterProfileUseCase {
     
-    let repository: UserProfileRepository
+    let userProfileRepository: UserProfileRepository
+    let userInfoLocalRepository: UserInfoLocalRepository
     
-    public init(repository: UserProfileRepository) {
-        self.repository = repository
+    public init(userProfileRepository: UserProfileRepository, userInfoLocalRepository: UserInfoLocalRepository) {
+        self.userProfileRepository = userProfileRepository
+        self.userInfoLocalRepository = userInfoLocalRepository
     }
     
     public func getProfile(mode: ProfileMode) -> Single<Result<CenterProfileVO, DomainError>> {
-        convert(task: repository.getCenterProfile(mode: mode))
+        convert(task: userProfileRepository.getCenterProfile(mode: mode))
     }
     
     public func updateProfile(phoneNumber: String?, introduction: String?, imageInfo: ImageUploadInfo?) -> Single<Result<Void, DomainError>> {
         
-        var updateText: Single<Void>!
-        var updateImage: Single<Void>!
+        var updateTextTask: Single<Void>!
+        var updateImageTask: Single<Void>!
         
         if let phoneNumber {
-            updateText = repository.updateCenterProfileForText(
+            updateTextTask = userProfileRepository.updateCenterProfileForText(
                 phoneNumber: phoneNumber,
                 introduction: introduction
             )
         } else {
-            updateText = .just(())
+            updateTextTask = .just(())
         }
         
         if let imageInfo {
-            updateImage = repository.uploadImage(
+            updateImageTask = userProfileRepository.uploadImage(
                 .center,
                 imageInfo: imageInfo
             )
         } else {
-            updateImage = .just(())
+            updateImageTask = .just(())
         }
-        
-        let updateTextResult = updateText
-            .catch { error in
-                if let httpExp = error as? HTTPResponseException {
-                    let newError = HTTPResponseException(
-                        status: httpExp.status,
-                        rawCode: "Err-001",
-                        timeStamp: httpExp.timeStamp
-                    )
-                    
-                    return .error(newError)
-                }
-                return .error(error)
-            }
-        
-        let uploadImageResult = updateImage
-            .catch { error in
-                if let httpExp = error as? HTTPResponseException {
-                    let newError = HTTPResponseException(
-                        status: httpExp.status,
-                        rawCode: "Err-002",
-                        timeStamp: httpExp.timeStamp
-                    )
-                    
-                    return .error(newError)
-                }
-                return .error(error)
-            }
         
         let task = Observable
             .zip(
-                updateTextResult.asObservable(),
-                uploadImageResult.asObservable()
+                updateTextTask.asObservable(),
+                updateImageTask.asObservable()
             )
-            .map { _ in () }
+            .flatMap { [userProfileRepository] _ in
+                // 등록성공후 내프로필 불러오기
+                userProfileRepository.getCenterProfile(mode: .myProfile)
+            }
+            .map({ [userInfoLocalRepository] vo in
+                userInfoLocalRepository.updateCurrentCenterData(vo: vo)
+            })
             .asSingle()
         
         return convert(task: task)
@@ -87,53 +67,33 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
     
     public func registerCenterProfile(state: CenterProfileRegisterState) -> Single<Result<Void, DomainError>> {
         
-        var registerImage: Single<Void>!
+        var registerImageTask: Single<Void>!
         
         let imageInfo = state.imageInfo
         
         if let imageInfo {
-            registerImage = repository.uploadImage(
+            registerImageTask = userProfileRepository.uploadImage(
                 .center,
                 imageInfo: imageInfo
             )
         } else {
-            registerImage = .just(())
+            registerImageTask = .just(())
         }
         
-        let registerTextResult = repository.registerCenterProfileForText(state: state)
-            .catch { error in
-                if let httpExp = error as? HTTPResponseException {
-                    let newError = HTTPResponseException(
-                        status: httpExp.status,
-                        rawCode: "Err-001",
-                        timeStamp: httpExp.timeStamp
-                    )
-                    
-                    return .error(newError)
-                }
-                return .error(error)
-            }
+        let registerTextTask = userProfileRepository.registerCenterProfileForText(state: state)
           
-        let uploadImageResult = registerImage
-            .catch { error in
-                if let httpExp = error as? HTTPResponseException {
-                    let newError = HTTPResponseException(
-                        status: httpExp.status,
-                        rawCode: "Err-002",
-                        timeStamp: httpExp.timeStamp
-                    )
-                    
-                    return .error(newError)
-                }
-                return .error(error)
-            }
-        
         let task = Observable
             .zip(
-                registerTextResult.asObservable(),
-                uploadImageResult.asObservable()
+                registerTextTask.asObservable(),
+                registerImageTask.asObservable()
             )
-            .map { _ in () }
+            .flatMap { [userProfileRepository] _ in
+                // 등록성공후 내프로필 불러오기
+                userProfileRepository.getCenterProfile(mode: .myProfile)
+            }
+            .map({ [userInfoLocalRepository] vo in
+                userInfoLocalRepository.updateCurrentCenterData(vo: vo)
+            })
             .asSingle()
         
         return convert(task: task)

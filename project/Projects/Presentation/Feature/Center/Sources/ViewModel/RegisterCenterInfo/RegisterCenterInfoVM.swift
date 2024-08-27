@@ -135,7 +135,7 @@ public class RegisterCenterInfoVM: RegisterCenterInfoViewModelable {
             .compactMap { $0.error }
             .map { error in
                 DefaultAlertContentVO(
-                    title: "센터정보 등록 싶패",
+                    title: "센터정보 등록 실패",
                     message: error.message
                 )
             }
