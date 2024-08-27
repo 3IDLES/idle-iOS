@@ -32,9 +32,12 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(CenterProfileUseCase.self) { resolver in
-            let repository = resolver.resolve(UserProfileRepository.self)!
-            
-            return DefaultCenterProfileUseCase(repository: repository)
+            let userProfileRepository = resolver.resolve(UserProfileRepository.self)!
+            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
+            return DefaultCenterProfileUseCase(
+                userProfileRepository: userProfileRepository,
+                userInfoLocalRepository: userInfoLocalRepository
+            )
         }
         
         container.register(RecruitmentPostUseCase.self) { resolver in
@@ -46,9 +49,12 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(WorkerProfileUseCase.self) { resolver in
-            let repository = resolver.resolve(UserProfileRepository.self)!
-            
-            return DefaultWorkerProfileUseCase(repository: repository)
+            let userProfileRepository = resolver.resolve(UserProfileRepository.self)!
+            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
+            return DefaultWorkerProfileUseCase(
+                userProfileRepository: userProfileRepository,
+                userInfoLocalRepository: userInfoLocalRepository
+            )
         }
         
         container.register(SettingScreenUseCase.self) { resolver in

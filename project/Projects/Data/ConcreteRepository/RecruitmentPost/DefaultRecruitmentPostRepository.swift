@@ -62,8 +62,8 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             .map({ $0.jobPostings.map { $0.toVO() } })
     }
     
-    public func getApplicantCountForWorker(id: String) -> RxSwift.Single<Int> {
-        service.request(api: .getApplicantCountForWorker(id: id), with: .withToken)
+    public func getPostApplicantCount(id: String) -> RxSwift.Single<Int> {
+        service.request(api: .getPostApplicantCount(id: id), with: .withToken)
             .map(PostApplicantCountDTO.self)
             .map { dto in
                 dto.applicantCount

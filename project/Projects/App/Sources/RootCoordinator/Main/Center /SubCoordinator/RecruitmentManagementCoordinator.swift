@@ -45,7 +45,10 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
     
     public func start() {
         let coordinator = CenterRecruitmentPostBoardScreenCoordinator(
-            navigationController: navigationController
+            dependency: .init(
+                navigationController: navigationController,
+                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
+            )
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self

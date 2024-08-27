@@ -26,7 +26,7 @@ public enum RcruitmentPostAPI {
     case getClosedPosts
     
     // - 공고 지원자 관련
-    case getApplicantCountForWorker(id: String)
+    case getPostApplicantCount(id: String)
     
     
     // Worker
@@ -61,7 +61,7 @@ extension RcruitmentPostAPI: BaseAPI {
             "/status/completed"
             
             
-        case .getApplicantCountForWorker(let id):
+        case .getPostApplicantCount(let id):
             "/\(id)/applicant-count"
             
             
@@ -92,7 +92,7 @@ extension RcruitmentPostAPI: BaseAPI {
             .get
             
             
-        case .getApplicantCountForWorker:
+        case .getPostApplicantCount:
             .get
             
             

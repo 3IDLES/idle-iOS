@@ -10,6 +10,21 @@ import RxSwift
 import RxCocoa
 import Entity
 
+public protocol CenterEmployCardViewModelable {
+    
+    // Output
+    var renderObject: CenterEmployCardRO { get }
+    var applicantCountText: Driver<String>? { get }
+    
+    // Input
+    var cardClicked: PublishRelay<Void> { get }
+    
+    // - Buttons
+    var checkApplicantBtnClicked: PublishRelay<Void> { get }
+    var editPostBtnClicked: PublishRelay<Void> { get }
+    var terminatePostBtnClicked: PublishRelay<Void> { get }
+}
+
 public class CenterEmployCardCell: UITableViewCell {
     
     var viewModel: CenterEmployCardViewModelable?
@@ -71,11 +86,14 @@ public class CenterEmployCardCell: UITableViewCell {
         contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 20, bottom: 8, right: 20))
     }
     
-    func setAppearance() { }
+    func setAppearance() { 
+        contentView.backgroundColor = DSColor.gray0.color
+        contentView.layer.setGrayBorder()
+    }
     
     func setLayout() {
         
-        self.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
+        contentView.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
         
         let buttonStack = HStack([
             editPostButton,
@@ -94,7 +112,7 @@ public class CenterEmployCardCell: UITableViewCell {
             contentStack
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            self.addSubview($0)
+            contentView.addSubview($0)
         }
         
         NSLayoutConstraint.activate([

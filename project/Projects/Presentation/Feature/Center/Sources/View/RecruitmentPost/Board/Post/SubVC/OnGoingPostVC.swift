@@ -28,12 +28,7 @@ public class OnGoingPostVC: BaseViewController {
     var viewModel: OnGoingPostViewModelable?
     
     // View
-    let postTableView: UITableView = {
-        let tableView = UITableView()
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
-        return tableView
-    }()
+    let postTableView: UITableView = .init()
     let tableHeader = BoardSortigHeaderView()
     
     // DataSource
@@ -61,6 +56,9 @@ public class OnGoingPostVC: BaseViewController {
         postTableView.delegate = self
         postTableView.separatorStyle = .none
         postTableView.delaysContentTouches = false
+        
+        postTableView.rowHeight = UITableView.automaticDimension
+        postTableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
         
         postTableView.tableHeaderView = tableHeader
         

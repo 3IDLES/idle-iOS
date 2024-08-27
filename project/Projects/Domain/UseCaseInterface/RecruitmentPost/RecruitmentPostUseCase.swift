@@ -29,7 +29,7 @@ public protocol RecruitmentPostUseCase: UseCaseBase {
     func getClosedPosts() -> Single<Result<[RecruitmentPostInfoForCenterVO], DomainError>>
     
     /// 지난 공고정보를 가져옵니다.
-    func getApplicantCountForWorker(id: String) -> Single<Result<Int, DomainError>>
+    func getPostApplicantCount(id: String) -> Single<Result<Int, DomainError>>
     
     // MARK: Worker
     
