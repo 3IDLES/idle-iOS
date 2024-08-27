@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class CenterEmployCardInfoView: VStack {
+public class CenterEmployCardInfoView: TappableUIView {
     // Row1
     let durationLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
@@ -33,8 +33,8 @@ public class CenterEmployCardInfoView: VStack {
         return label
     }()
     
-    init() {
-        super.init([], alignment: .leading)
+    override init() {
+        super.init()
         setLayout()
     }
     
@@ -57,14 +57,28 @@ public class CenterEmployCardInfoView: VStack {
             divider.bottomAnchor.constraint(equalTo: infoStack.bottomAnchor, constant: -5),
         ])
         
-        [
+        let viewList = [
             durationLabel,
             Spacer(height: 4),
             postTitleLabel,
             Spacer(height: 2),
             infoStack,
+        ]
+        
+        let contentStack = VStack(viewList, alignment: .leading)
+        
+        [
+            contentStack
         ].forEach {
-            self.addArrangedSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview($0)
         }
+        
+        NSLayoutConstraint.activate([
+            contentStack.topAnchor.constraint(equalTo: self.topAnchor),
+            contentStack.leftAnchor.constraint(equalTo: self.leftAnchor),
+            contentStack.rightAnchor.constraint(equalTo: self.rightAnchor),
+            contentStack.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+        ])
     }
 }

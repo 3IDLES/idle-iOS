@@ -50,6 +50,26 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         ).map { _ in () }
     }
     
+    public func getOngoingPosts() -> RxSwift.Single<[Entity.RecruitmentPostInfoForCenterVO]> {
+        return service.request(api: .getOnGoingPosts, with: .withToken)
+            .map(RecruitmentPostForCenterListDTO.self)
+            .map({ $0.jobPostings.map { $0.toVO() } })
+    }
+    
+    public func getClosedPosts() -> RxSwift.Single<[Entity.RecruitmentPostInfoForCenterVO]> {
+        return service.request(api: .getClosedPosts, with: .withToken)
+            .map(RecruitmentPostForCenterListDTO.self)
+            .map({ $0.jobPostings.map { $0.toVO() } })
+    }
+    
+    public func getApplicantCountForWorker(id: String) -> RxSwift.Single<Int> {
+        service.request(api: .getApplicantCountForWorker(id: id), with: .withToken)
+            .map(PostApplicantCountDTO.self)
+            .map { dto in
+                dto.applicantCount
+            }
+    }
+    
     // MARK: Worker
     public func getPostDetailForWorker(id: String) -> RxSwift.Single<Entity.RecruitmentPostForWorkerBundle> {
         service.request(
@@ -65,12 +85,12 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     public func getNativePostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
         
         service.request(
-            api: .nativePostList(nextPageId: nextPageId, requestCnt: String(requestCnt)),
+            api: .getOnGoingNativePostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
         .map(RecruitmentPostListForWorkerDTO.self)
         .catch({ error in
-            if let moyaError = error as? MoyaError, case .objectMapping(let error, let response) = moyaError {
+            if let moyaError = error as? MoyaError, case .objectMapping(let error, _) = moyaError {
                 print(error.localizedDescription)
             }
             return .error(error)
@@ -81,7 +101,8 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     }
 }
 
-fileprivate extension RegisterRecruitmentPostBundle {
+// MARK: 공고등록 정보를 DTO로 변환하는 영역
+extension RegisterRecruitmentPostBundle {
     
     func toDTO() -> RecruitmentPostRegisterDTO {
         
@@ -161,10 +182,9 @@ fileprivate extension RegisterRecruitmentPostBundle {
         return dto
     }
 }
-
     
 // MARK: 엔티티 타입들을 DTO로 변경하기 위한 확장
-fileprivate extension WorkDay {
+extension WorkDay {
     
     var dtoFormString: String {
         switch self {
@@ -186,7 +206,7 @@ fileprivate extension WorkDay {
     }
 }
 
-fileprivate extension IdleDateComponent {
+extension IdleDateComponent {
     var dtoFormString: String {
         if part == .AM {
             return "\(hour):\(minute)"
@@ -196,7 +216,7 @@ fileprivate extension IdleDateComponent {
     }
 }
 
-fileprivate extension PaymentType {
+extension PaymentType {
     var dtoFormString: String {
         switch self {
         case .hourly:
@@ -209,7 +229,7 @@ fileprivate extension PaymentType {
     }
 }
 
-fileprivate extension Gender {
+extension Gender {
     var dtoFormString: String {
         switch self {
         case .male:
@@ -222,13 +242,13 @@ fileprivate extension Gender {
     }
 }
 
-fileprivate extension CareGrade {
+extension CareGrade {
     var dtoFormInt: Int {
         self.rawValue + 1
     }
 }
 
-fileprivate extension CognitionDegree {
+extension CognitionDegree {
     var dtoFormString: String {
         switch self {
         case .stable:
@@ -241,7 +261,7 @@ fileprivate extension CognitionDegree {
     }
 }
 
-fileprivate extension DailySupportType {
+extension DailySupportType {
     var dtoFormString: String {
         switch self {
         case .cleaning:
@@ -258,7 +278,7 @@ fileprivate extension DailySupportType {
     }
 }
 
-fileprivate extension ApplyType {
+extension ApplyType {
     var dtoFormString: String {
         switch self {
         case .phoneCall:
@@ -271,7 +291,7 @@ fileprivate extension ApplyType {
     }
 }
 
-fileprivate extension ApplyDeadlineType {
+extension ApplyDeadlineType {
     var dtoFormString: String {
         switch self {
         case .untilApplicationFinished:
@@ -282,7 +302,7 @@ fileprivate extension ApplyDeadlineType {
     }
 }
 
-fileprivate extension Date {
+extension Date {
     var dtoFormString: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"

@@ -19,9 +19,17 @@ public protocol RecruitmentPostUseCase: UseCaseBase {
     /// 센터측이 공고를 수정하는 액션입니다.
     func editRecruitmentPost(id: String, inputs: RegisterRecruitmentPostBundle) -> Single<Result<Void, DomainError>>
     
-    /// 센터측이 공고를 조회하는 액션입니다.
+    /// 센터측이 공고상세 정보를 조회하는 액션입니다.
     func getPostDetailForCenter(id: String) -> Single<Result<RegisterRecruitmentPostBundle, DomainError>>
     
+    /// 진행중인 공고정보를 가져옵니다.
+    func getOngoingPosts() -> Single<Result<[RecruitmentPostInfoForCenterVO], DomainError>>
+    
+    /// 지난 공고정보를 가져옵니다.
+    func getClosedPosts() -> Single<Result<[RecruitmentPostInfoForCenterVO], DomainError>>
+    
+    /// 지난 공고정보를 가져옵니다.
+    func getApplicantCountForWorker(id: String) -> Single<Result<Int, DomainError>>
     
     // MARK: Worker
     

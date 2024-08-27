@@ -12,14 +12,25 @@ import Entity
 
 public class CenterRecruitmentPostBoardScreenCoordinator: ChildCoordinator {
     
+    public struct Dependency {
+        let navigationController: UINavigationController
+        let recruitmentPostUseCase: RecruitmentPostUseCase
+        
+        public init(navigationController: UINavigationController, recruitmentPostUseCase: RecruitmentPostUseCase) {
+            self.navigationController = navigationController
+            self.recruitmentPostUseCase = recruitmentPostUseCase
+        }
+    }
+    
     public weak var viewControllerRef: UIViewController?
     public weak var parent: RecruitmentManagementCoordinatable?
-    public let navigationController: UINavigationController
     
-    public init(
-        navigationController: UINavigationController
-    ) {
-        self.navigationController = navigationController
+    public let navigationController: UINavigationController
+    let recruitmentPostUseCase: RecruitmentPostUseCase
+    
+    public init(dependency: Dependency) {
+        self.navigationController = dependency.navigationController
+        self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
     }
     
     deinit {
@@ -28,7 +39,10 @@ public class CenterRecruitmentPostBoardScreenCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = CenterRecruitmentPostBoardVC()
-        let vm = CenterRecruitmentPostBoardVM(coordinator: self)
+        let vm = CenterRecruitmentPostBoardVM(
+            coordinator: self,
+            recruitmentPostUseCase: recruitmentPostUseCase
+        )
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: false)
@@ -43,8 +57,12 @@ public class CenterRecruitmentPostBoardScreenCoordinator: ChildCoordinator {
         parent?.showCheckingApplicantScreen(postId: postId)
     }
     
-    public func showPostDetailScreenForCenter(postId: String, applicantCount: Int?) {
-        parent?.showPostDetailScreenForCenter(postId: postId, applicantCount: applicantCount)
+    public func showPostDetailScreenForCenter(postId: String) {
+        
+        // MARK: 수정
+        fatalError()
+        
+        parent?.showPostDetailScreenForCenter(postId: postId, applicantCount: 1)
     }
     
     public func showEditScreen(postId: String) {

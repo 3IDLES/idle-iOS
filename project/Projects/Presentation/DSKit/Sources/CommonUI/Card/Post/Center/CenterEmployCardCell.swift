@@ -16,7 +16,38 @@ public class CenterEmployCardCell: UITableViewCell {
     
     public static let identifier = String(describing: CenterEmployCardCell.self)
     
-    let cardView = CenterEmployCard()
+    let cardView = CenterEmployCardInfoView()
+    
+    // Row4
+    let checkApplicantsButton: IdlePrimaryCardButton = {
+        let btn = IdlePrimaryCardButton(level: .medium)
+        btn.label.textString = ""
+        return btn
+    }()
+    
+    // Row5
+    let editPostButton: ImageTextButton = {
+        let button = ImageTextButton(
+            iconImage: DSKitAsset.Icons.postEdit.image,
+            position: .prefix
+        )
+        button.icon.tintColor = DSKitAsset.Colors.gray300.color
+        button.label.textString = "공고 수정"
+        button.label.attrTextColor = DSKitAsset.Colors.gray500.color
+        
+        return button
+    }()
+    let terminatePostButton: ImageTextButton = {
+        let button = ImageTextButton(
+            iconImage: DSKitAsset.Icons.postCheck.image,
+            position: .prefix
+        )
+        button.icon.tintColor = DSKitAsset.Colors.gray300.color
+        button.label.textString = "채용 종료"
+        button.label.attrTextColor = DSKitAsset.Colors.gray500.color
+        
+        return button
+    }()
     
     private var disposables: [Disposable?]?
     
@@ -44,46 +75,82 @@ public class CenterEmployCardCell: UITableViewCell {
     
     func setLayout() {
         
+        self.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
+        
+        let buttonStack = HStack([
+            editPostButton,
+            terminatePostButton,
+        ], spacing: 4)
+        
+        let contentStack = VStack([
+            HStack([cardView, Spacer()]),
+            VStack([
+                checkApplicantsButton,
+                HStack([buttonStack, Spacer()])
+            ], alignment: .fill)
+        ], spacing: 12, alignment: .fill)
+        
         [
-            cardView
+            contentStack
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            contentView.addSubview($0)
+            self.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            cardView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            cardView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            contentStack.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            contentStack.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
+            contentStack.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
+            contentStack.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
         ])
     }
+    
+    private func setObservable() { }
     
     public func bind(viewModel: CenterEmployCardViewModelable) {
         
         self.viewModel = viewModel
         
+        // MARK: 카드 랜더링
+        
+        let ro = viewModel.renderObject
+        cardView.durationLabel.textString = "\(ro.startDay) ~ \(ro.endDay)"
+        cardView.postTitleLabel.textString = ro.postTitle
+        cardView.nameLabel.textString = ro.nameText
+        cardView.informationLabel.textString = "\(ro.careGradeText) \(ro.ageText) \(ro.genderText)"
+        
+        
+        // MARK: 공고 상태에 따른 카드 버튼 숨김
+        checkApplicantsButton.isHidden = ro.postState == .closed
+        editPostButton.isHidden = ro.postState == .closed
+        terminatePostButton.isHidden = ro.postState == .closed
+        
+        
+        // MARK: 액션 바인딩
         let disposables: [Disposable?] = [
             // Output
+            
+            // 지원자수 텍스트
             viewModel
-                .renderObject?
-                .drive(onNext: { [cardView] ro in
-                    cardView.bind(ro: ro)
+                .applicantCountText?
+                .drive(onNext: { [weak self] text in
+                    self?.checkApplicantsButton.label.textString = text
                 }),
             
             // Input
+            
             cardView.rx.tap
                 .bind(to: viewModel.cardClicked),
             
-            cardView.checkApplicantsButton
+            checkApplicantsButton
                 .rx.tap
                 .bind(to: viewModel.checkApplicantBtnClicked),
             
-            cardView.editPostButton
+            editPostButton
                 .rx.tap
                 .bind(to: viewModel.editPostBtnClicked),
                 
-            cardView.terminatePostButton
+            terminatePostButton
                 .rx.tap
                 .bind(to: viewModel.terminatePostBtnClicked),
         ]
