@@ -70,12 +70,11 @@ public class AuthSelectionButton: TappableUIView {
     }
     
     private func setObservable() {
-        
         self.rx.tap
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
-                setState(currentState == .accent ? .normal : .accent)
+                setState(.accent)
             })
             .disposed(by: disposeBag)
     }

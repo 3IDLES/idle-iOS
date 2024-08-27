@@ -77,8 +77,8 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         return convert(task: task)
     }
     
-    public func getApplicantCountForWorker(id: String) -> RxSwift.Single<Result<Int, Entity.DomainError>> {
-        convert(task: repository.getApplicantCountForWorker(id: id))
+    public func getPostApplicantCount(id: String) -> RxSwift.Single<Result<Int, Entity.DomainError>> {
+        convert(task: repository.getPostApplicantCount(id: id))
     }
     
     public func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>> {
@@ -92,7 +92,7 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
                 requestCnt: postCount
             )
         case .thirdParty(let nextPageId):
-            /// 미구현
+            /// 워크넷 가져오기 미구현
             fatalError()
         }
         

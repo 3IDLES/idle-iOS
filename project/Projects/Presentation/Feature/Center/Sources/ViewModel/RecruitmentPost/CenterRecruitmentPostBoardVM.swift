@@ -116,8 +116,10 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
         
         // MARK: 지원자 수 조회
         let getApplicantCountResult = recruitmentPostUseCase
-            .getApplicantCountForWorker(id: postInfo.id)
-            
+            .getPostApplicantCount(id: postInfo.id)
+            .asObservable()
+            .share()
+        
         let getApplicantCountSuccess = getApplicantCountResult.compactMap { $0.value }
         let getApplicantCountFailure = getApplicantCountResult.compactMap { $0.error }
         
@@ -129,9 +131,7 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
                     return "지원자 수 조회 실패"
                 }.asObservable()
             )
-            .replay(1)
             .asDriver(onErrorDriveWith: .never())
-        
         
         // MARK: 버튼 처리
         cardClicked

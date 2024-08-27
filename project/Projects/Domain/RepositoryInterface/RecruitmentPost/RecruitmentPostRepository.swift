@@ -29,7 +29,7 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     func getClosedPosts() -> Single<[RecruitmentPostInfoForCenterVO]>
     
     /// 특정 공고의 지원자 수를 확인합니다.
-    func getApplicantCountForWorker(id: String) -> Single<Int>
+    func getPostApplicantCount(id: String) -> Single<Int>
     
     // MARK: Worker
     /// 요양보호사 공고의 상세정보를 조회합니다.
