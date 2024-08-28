@@ -35,7 +35,7 @@ public class PostDetailForCenterVC: BaseViewController {
     
     let sampleCard: WorkerEmployCard = {
         let card = WorkerEmployCard()
-        card.starButton.isUserInteractionEnabled = false
+        card.starButton.isHidden = true
         return card
     }()
     
@@ -197,7 +197,7 @@ public class PostDetailForCenterVC: BaseViewController {
         
         NSLayoutConstraint.activate([
             
-            cardBackgroundView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            cardBackgroundView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
             cardBackgroundView.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
             cardBackgroundView.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
             

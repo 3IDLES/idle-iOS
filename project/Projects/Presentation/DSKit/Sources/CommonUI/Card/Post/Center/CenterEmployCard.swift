@@ -73,8 +73,8 @@ public struct CenterEmployCardRO {
             endDay: endDay,
             postTitle: addressTitle,
             nameText: vo.clientName,
-            careGradeText: vo.careLevel.textForCellBtn,
-            ageText: String(vo.age),
+            careGradeText: "\(vo.careLevel.textForCellBtn)등급",
+            ageText: "\(vo.age)세",
             genderText: vo.gender.twoLetterKoreanWord,
             postState: vo.state
         )

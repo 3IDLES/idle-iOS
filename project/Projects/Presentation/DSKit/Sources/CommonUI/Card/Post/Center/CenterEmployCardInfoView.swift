@@ -35,12 +35,17 @@ public class CenterEmployCardInfoView: TappableUIView {
     
     override init() {
         super.init()
+        setAppearance()
         setLayout()
     }
     
     public required init(coder: NSCoder) { fatalError() }
     
-    func setLayout() {
+    private func setAppearance() {
+        self.backgroundColor = DSColor.gray0.color
+    }
+    
+    private func setLayout() {
         
         // InfoLabel
         let divider = UIView()
@@ -68,7 +73,7 @@ public class CenterEmployCardInfoView: TappableUIView {
         let contentStack = VStack(viewList, alignment: .leading)
         
         [
-            contentStack
+            HStack([contentStack, Spacer()], alignment: .fill)
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview($0)
