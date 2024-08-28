@@ -73,12 +73,15 @@ public class InitialScreenVM {
             printIfDebug("☑️ 센터관리자 정보를 확인합니다.")
             
             // 저장된 센터정보가 없는 경우
-            let requestCenterInfoResult = centerProfileUseCase.getProfile(mode: .myProfile)
+            let requestCenterInfoResult = centerProfileUseCase
+                .getProfile(mode: .myProfile)
+                .asObservable()
+                .share()
             let success = requestCenterInfoResult.compactMap { $0.value }
             let failure = requestCenterInfoResult.compactMap { $0.error }
             
             success
-                .subscribe(onSuccess: { [weak self] fetchedVO in
+                .subscribe(onNext: { [weak self] fetchedVO in
                     
                     guard let self else { return }
                     
@@ -93,7 +96,7 @@ public class InitialScreenVM {
             
             // 실패한 경우
             failure
-                .subscribe(onSuccess: { [weak self] error in
+                .subscribe(onNext: { [weak self] error in
                     
                     guard let self else { return }
                     
@@ -115,12 +118,15 @@ public class InitialScreenVM {
         } else {
             
             // 요양보호사 확인
-            let requestWorkerInfoResult = workerProfileUseCase.getProfile(mode: .myProfile)
+            let requestWorkerInfoResult = workerProfileUseCase
+                .getProfile(mode: .myProfile)
+                .asObservable()
+                .share()
             let success = requestWorkerInfoResult.compactMap { $0.value }
             let failure = requestWorkerInfoResult.compactMap { $0.error }
             
             success
-                .subscribe(onSuccess: { [weak self] fetchedVO in
+                .subscribe(onNext: { [weak self] fetchedVO in
                     
                     guard let self else { return }
                     
@@ -135,7 +141,7 @@ public class InitialScreenVM {
             
             // 실패한 경우
             failure
-                .subscribe(onSuccess: { [weak self] error in
+                .subscribe(onNext: { [weak self] error in
                     
                     guard let self else { return }
                     

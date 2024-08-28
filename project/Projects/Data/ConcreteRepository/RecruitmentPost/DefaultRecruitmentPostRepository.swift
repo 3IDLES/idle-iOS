@@ -28,7 +28,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         let encodedData = try! JSONEncoder().encode(bundle.toDTO())
         
         return service.request(api: .registerPost(postData: encodedData), with: .withToken)
-            .map { _ in () }
+            .mapToVoid()
     }
 
     public func getPostDetailForCenter(id: String) -> RxSwift.Single<Entity.RegisterRecruitmentPostBundle> {
@@ -68,6 +68,16 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             .map { dto in
                 dto.applicantCount
             }
+    }
+    
+    public func closePost(id: String) -> RxSwift.Single<Void> {
+        service.request(api: .closePost(id: id), with: .withToken)
+            .mapToVoid()
+    }
+    
+    public func removePost(id: String) -> RxSwift.Single<Void> {
+        service.request(api: .removePost(id: id), with: .withToken)
+            .mapToVoid()
     }
     
     // MARK: Worker
@@ -310,3 +320,5 @@ extension Date {
         return dateString
     }
 }
+
+

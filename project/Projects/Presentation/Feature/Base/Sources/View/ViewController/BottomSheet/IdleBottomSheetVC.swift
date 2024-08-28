@@ -57,13 +57,11 @@ open class IdleBottomSheetVC: BaseViewController {
         view.backgroundColor = .black.withAlphaComponent(0.0)
     }
     
-    public func setLayout(contentView: UIView) {
-        
-        let conerRadius = 16.0
+    public func setLayout(contentView: UIView, margin: UIEdgeInsets = .init(top: 0, left: 27, bottom: 80, right: 27)) {
         
         sheetView.backgroundColor = .white
-        sheetView.layer.cornerRadius = conerRadius
-        sheetView.layoutMargins = .init(top: 0, left: 27, bottom: 64 + conerRadius, right: 27)
+        sheetView.layer.cornerRadius = 16.0
+        sheetView.layoutMargins = margin
         
         [
             dragSpace,
@@ -95,7 +93,7 @@ open class IdleBottomSheetVC: BaseViewController {
         NSLayoutConstraint.activate([
             sheetView.rightAnchor.constraint(equalTo: view.rightAnchor),
             sheetView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            sheetView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: conerRadius)
+            sheetView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 16)
         ])
     }
     
@@ -127,7 +125,7 @@ extension IdleBottomSheetVC {
         }
     }
     
-    public func dismissView() {
+    public func dismissView(onDismissFinished: (() -> ())? = nil) {
         
         let height = sheetView.bounds.height
         sheetView.isUserInteractionEnabled = false
@@ -136,7 +134,9 @@ extension IdleBottomSheetVC {
             sheetView.transform = .init(translationX: 0, y: height)
             view?.backgroundColor = .black.withAlphaComponent(0.0)
         } completion: { [weak self] _ in
-            self?.dismiss(animated: false)
+            self?.dismiss(animated: false, completion: {
+                onDismissFinished?()
+            })
         }
     }
 }

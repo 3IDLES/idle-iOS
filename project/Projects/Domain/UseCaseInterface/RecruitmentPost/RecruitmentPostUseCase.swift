@@ -31,6 +31,12 @@ public protocol RecruitmentPostUseCase: UseCaseBase {
     /// 지난 공고정보를 가져옵니다.
     func getPostApplicantCount(id: String) -> Single<Result<Int, DomainError>>
     
+    /// 공고를 종료합니다.
+    func closePost(id: String) -> Single<Result<Void, DomainError>>
+    
+    /// 공고를 삭제합니다.
+    func removePost(id: String) -> Single<Result<Void, DomainError>>
+    
     // MARK: Worker
     
     /// 요양보호사가 공고상세를 확인하는 경우에 호출합니다.
