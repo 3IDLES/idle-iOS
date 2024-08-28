@@ -14,13 +14,13 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
     
     public struct Dependency {
         let postId: String
-        var applicantCount: Int?
+        let postState: PostState
         let navigationController: UINavigationController
         let recruitmentPostUseCase: RecruitmentPostUseCase
         
-        public init(postId: String, applicantCount: Int? = nil, navigationController: UINavigationController, recruitmentPostUseCase: RecruitmentPostUseCase) {
+        public init(postId: String, postState: PostState, navigationController: UINavigationController, recruitmentPostUseCase: RecruitmentPostUseCase) {
             self.postId = postId
-            self.applicantCount = applicantCount
+            self.postState = postState
             self.navigationController = navigationController
             self.recruitmentPostUseCase = recruitmentPostUseCase
         }
@@ -31,7 +31,6 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
     
     public let navigationController: UINavigationController
     let postId: String
-    var applicantCount: Int?
     let recruitmentPostUseCase: RecruitmentPostUseCase
     
     public init(
@@ -40,7 +39,6 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
         self.navigationController = dependency.navigationController
         self.postId = dependency.postId
         self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
-        self.applicantCount = dependency.applicantCount
     }
     
     deinit {
@@ -51,7 +49,6 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
         let vc = PostDetailForCenterVC()
         let vm = PostDetailForCenterVM(
             id: postId,
-            applicantCount: applicantCount,
             coordinator: self,
             recruitmentPostUseCase: recruitmentPostUseCase
         )

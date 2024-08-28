@@ -59,10 +59,7 @@ public class CenterRecruitmentPostBoardScreenCoordinator: ChildCoordinator {
     
     public func showPostDetailScreenForCenter(postId: String) {
         
-        // MARK: 수정
-        fatalError()
-        
-        parent?.showPostDetailScreenForCenter(postId: postId, applicantCount: 1)
+        parent?.showPostDetailScreenForCenter(postId: postId)
     }
     
     public func showEditScreen(postId: String) {
