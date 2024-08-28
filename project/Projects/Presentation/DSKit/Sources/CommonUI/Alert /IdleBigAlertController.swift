@@ -37,7 +37,8 @@ public class DefaultIdleAlertVM: IdleAlertViewModelable {
         title: String,
         description: String,
         acceptButtonLabelText: String,
-        cancelButtonLabelText: String
+        cancelButtonLabelText: String,
+        onAccepted: (() -> ())? = nil
     ) {
         self.title = title
         self.description = description
@@ -46,7 +47,9 @@ public class DefaultIdleAlertVM: IdleAlertViewModelable {
         
         dismiss = Observable
             .merge(
-                acceptButtonClicked.asObservable(),
+                acceptButtonClicked
+                    .map({ _ in onAccepted?() })
+                    .asObservable(),
                 cancelButtonClicked.asObservable()
             )
             .asDriver(onErrorDriveWith: .never())

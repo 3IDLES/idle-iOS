@@ -16,6 +16,8 @@ import DSKit
 public protocol OnGoingPostViewModelable {
     
     var ongoingPostInfo: Driver<[RecruitmentPostInfoForCenterVO]>? { get }
+    var showRemovePostAlert: Driver<IdleAlertViewModelable>? { get }
+    
     var requestOngoingPost: PublishRelay<Void> { get }
 
     func createOngoingPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable
@@ -106,6 +108,13 @@ public class OnGoingPostVC: BaseViewController {
                 self.postData = postInfo
                 
                 postTableView.reloadData()
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .showRemovePostAlert?
+            .drive(onNext: { [weak self] vm in
+                self?.showIdleModal(viewModel: vm)
             })
             .disposed(by: disposeBag)
         

@@ -31,8 +31,11 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
     
     public var ongoingPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
     public var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
+    public var showRemovePostAlert: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
     public var alert: Driver<DefaultAlertContentVO>?
+    
+    let disposeBag = DisposeBag()
     
     public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.coordinator = coordinator
@@ -65,12 +68,52 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
         closedPostInfo = requestClosedPostSuccess
             .asDriver(onErrorJustReturn: [])
         
+        // MARK: Show
+        let closePostConfirmed: PublishRelay<String> = .init()
+        showRemovePostAlert = NotificationCenter.default.rx
+            .notification(.removePostRequestFromCell)
+            .map({ notification in
+                let object = notification.object as! [String: Any]
+                let postId = object["postId"] as! String
+                return postId
+            })
+            .map({ (postId: String) in
+                
+                let vm = DefaultIdleAlertVM(
+                    title: "채용을 종료하시겠어요?",
+                    description: "채용 종료 시 지원자 정보는 초기화됩니다.",
+                    acceptButtonLabelText: "종료하기",
+                    cancelButtonLabelText: "취소하기"
+                ) { [closePostConfirmed] in
+                    closePostConfirmed.accept(postId)
+                }
+                return vm
+            })
+            .asDriver(onErrorDriveWith: .never())
+        
+        // 채용종료 버튼
+        let closePostResult = closePostConfirmed
+            .flatMap { [recruitmentPostUseCase] postId in
+                recruitmentPostUseCase.closePost(id: postId)
+            }
+            .share()
+        
+        let closePostSuccess = closePostResult.compactMap { $0.value }
+        
+        // 새로고침
+        closePostSuccess
+            .bind(to: requestOngoingPost)
+            .disposed(by: disposeBag)
+        
+        let closePostFailure = closePostResult.compactMap { $0.error }
+        
         alert = Observable.merge(
             requestOngoingPostFailure,
-            requestClosedPostFailure
+            requestClosedPostFailure,
+            closePostFailure
         ).map { error in
             DefaultAlertContentVO(
-                title: "시스템 오류",
+                title: "메인화면 오류",
                 message: error.message
             )
         }
@@ -173,6 +216,20 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
                 guard let self else { return }
                 
                 self.coordinator?.showEditScreen(postId: postInfo.id)
+            })
+            .disposed(by: disposeBag)
+        
+        
+        terminatePostBtnClicked
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                
+                NotificationCenter.default.post(
+                    name: .removePostRequestFromCell,
+                    object: [
+                        "postId": postInfo.id
+                    ]
+                )
             })
             .disposed(by: disposeBag)
     }
