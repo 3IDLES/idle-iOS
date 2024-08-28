@@ -76,11 +76,12 @@ public extension RecruitmentManagementCoordinator {
         coordinator.start()
     }
     
-    func showPostDetailScreenForCenter(postId: String, applicantCount: Int?) {
+    func showPostDetailScreenForCenter(postId: String, postState: PostState) {
         
         let coordinator = PostDetailForCenterCoordinator(
             dependency: .init(
                 postId: postId,
+                postState: postState,
                 navigationController: navigationController,
                 recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
             )

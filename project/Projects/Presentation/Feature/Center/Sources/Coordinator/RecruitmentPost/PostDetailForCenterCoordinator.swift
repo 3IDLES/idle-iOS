@@ -31,6 +31,7 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
     
     public let navigationController: UINavigationController
     let postId: String
+    let postState: PostState
     let recruitmentPostUseCase: RecruitmentPostUseCase
     
     public init(
@@ -38,6 +39,7 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
     ) {
         self.navigationController = dependency.navigationController
         self.postId = dependency.postId
+        self.postState = dependency.postState
         self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
     }
     
@@ -48,7 +50,8 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
     public func start() {
         let vc = PostDetailForCenterVC()
         let vm = PostDetailForCenterVM(
-            id: postId,
+            postId: postId,
+            postState: postState,
             coordinator: self,
             recruitmentPostUseCase: recruitmentPostUseCase
         )

@@ -12,7 +12,7 @@ import RxSwift
 import Entity
 import DSKit
 
-public class SelectCSTypeVC: IdleButtomSheetVC {
+public class SelectCSTypeVC: IdleBottomSheetVC {
     
     // Init
     

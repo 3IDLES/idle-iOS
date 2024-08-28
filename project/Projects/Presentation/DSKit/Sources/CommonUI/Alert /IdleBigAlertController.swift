@@ -21,6 +21,39 @@ public protocol IdleAlertViewModelable {
     var description: String { get }
 }
 
+public class DefaultIdleAlertVM: IdleAlertViewModelable {
+    
+    public let title: String
+    public let description: String
+    public let acceptButtonLabelText: String
+    public let cancelButtonLabelText: String
+    
+    public let acceptButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public let cancelButtonClicked: RxRelay.PublishRelay<Void> = .init()
+     
+    public let dismiss: RxCocoa.Driver<Void>?
+    
+    public init(
+        title: String,
+        description: String,
+        acceptButtonLabelText: String,
+        cancelButtonLabelText: String
+    ) {
+        self.title = title
+        self.description = description
+        self.acceptButtonLabelText = acceptButtonLabelText
+        self.cancelButtonLabelText = cancelButtonLabelText
+        
+        dismiss = Observable
+            .merge(
+                acceptButtonClicked.asObservable(),
+                cancelButtonClicked.asObservable()
+            )
+            .asDriver(onErrorDriveWith: .never())
+    }
+}
+
+
 public class IdleBigAlertController: UIViewController {
     
     let customTranstionDelegate = CustomTransitionDelegate()
