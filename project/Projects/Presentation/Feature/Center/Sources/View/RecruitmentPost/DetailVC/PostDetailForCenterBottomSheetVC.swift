@@ -57,7 +57,7 @@ class OngoingPostOptionVC: IdleBottomSheetVC {
         
         let mainStack = VStack(viewList, alignment: .fill)
         
-        super.setLayout(contentView: mainStack)
+        super.setLayout(contentView: mainStack, margin: .init(top: 0, left: 20, bottom: 48, right: 20))
     }
     
     private func setObservable() {
@@ -73,7 +73,10 @@ class OngoingPostOptionVC: IdleBottomSheetVC {
                     acceptButtonLabelText: "종료하기",
                     cancelButtonLabelText: "취소하기"
                 ) { [weak self] in
-                    self?.closePostConfirmed.accept(())
+                    self?.dismissView {
+                        // presenter역할을 종료한 이후에 pop합니다.
+                        self?.closePostConfirmed.accept(())
+                    }
                 }
                 
                 showIdleModal(viewModel: vm)
@@ -92,9 +95,6 @@ class OngoingPostOptionVC: IdleBottomSheetVC {
             .disposed(by: disposeBag)
         
         closePostConfirmed
-            .map({ [weak self] _ in
-                self?.dismissView()
-            })
             .bind(to: viewModel.closePostButtonClicked)
             .disposed(by: disposeBag)
     }
@@ -141,7 +141,7 @@ class ClosedPostOptionVC: IdleBottomSheetVC {
         
         let mainStack = VStack(viewList, spacing: 20, alignment: .fill)
         
-        super.setLayout(contentView: mainStack)
+        super.setLayout(contentView: mainStack, margin: .init(top: 0, left: 20, bottom: 48, right: 20))
     }
     
     private func setObservable() {
@@ -157,7 +157,9 @@ class ClosedPostOptionVC: IdleBottomSheetVC {
                     acceptButtonLabelText: "삭제하기",
                     cancelButtonLabelText: "취소하기"
                 ) { [weak self] in
-                    self?.removeConfirmed.accept(())
+                    self?.dismissView {
+                        self?.removeConfirmed.accept(())
+                    }
                 }
                 
                 showIdleModal(viewModel: vm)
@@ -168,9 +170,6 @@ class ClosedPostOptionVC: IdleBottomSheetVC {
     func bind(viewModel: PostDetailViewModelable) {
         
         removeConfirmed
-            .map({ [weak self] _ in
-                self?.dismissView()
-            })
             .bind(to: viewModel.removePostButtonClicked)
             .disposed(by: disposeBag)
     }

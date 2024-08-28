@@ -21,7 +21,6 @@ public protocol Coordinator: AnyObject {
 public extension Coordinator {
     
     func popViewController(animated: Bool = true) {
-        
         navigationController.popViewController(animated: animated)
     }
     

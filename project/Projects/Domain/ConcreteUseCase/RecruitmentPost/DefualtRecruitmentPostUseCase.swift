@@ -77,6 +77,14 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         return convert(task: task)
     }
     
+    public func closePost(id: String) -> Single<Result<Void, DomainError>> {
+        convert(task: repository.closePost(id: id))
+    }
+    
+    public func removePost(id: String) -> Single<Result<Void, DomainError>> {
+        convert(task: repository.removePost(id: id))
+    }
+    
     public func getPostApplicantCount(id: String) -> RxSwift.Single<Result<Int, Entity.DomainError>> {
         convert(task: repository.getPostApplicantCount(id: id))
     }

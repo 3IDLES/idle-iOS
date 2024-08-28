@@ -31,6 +31,12 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     /// 특정 공고의 지원자 수를 확인합니다.
     func getPostApplicantCount(id: String) -> Single<Int>
     
+    /// 공고를 종료합니다.
+    func closePost(id: String) -> Single<Void>
+    
+    /// 공고를 삭제합니다.
+    func removePost(id: String) -> Single<Void>
+    
     // MARK: Worker
     /// 요양보호사 공고의 상세정보를 조회합니다.
     func getPostDetailForWorker(id: String) -> Single<RecruitmentPostForWorkerBundle>

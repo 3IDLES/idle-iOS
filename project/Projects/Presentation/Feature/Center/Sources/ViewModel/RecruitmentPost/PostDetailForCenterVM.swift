@@ -15,7 +15,7 @@ import BaseFeature
 
 public protocol PostDetailViewModelable:
     AnyObject,
-    PostDetailDisplayingViewModelable
+    PostDetailDisplayingViewModelable, DefaultAlertOutputable
 {
     // Output
     var applicantCountText: Driver<String>? { get }
@@ -51,27 +51,29 @@ public protocol PostDetailViewModelable:
 }
 
 public class PostDetailForCenterVM: PostDetailViewModelable {
-
+    
     // Init
     let postId: String
     let postState: PostState
     weak var coordinator: PostDetailForCenterCoordinator?
+    let recruitmentPostUseCase: RecruitmentPostUseCase
     
     // MARK: DetailVC Interaction
     public var applicantCount: Int?
     public var workerEmployCardVO: RxCocoa.Driver<Entity.WorkerEmployCardVO>?
     public var requestDetailFailure: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     public var showOptionSheet: RxCocoa.Driver<Entity.PostState>?
+    public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     
-    public var postEditButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var checkApplicationButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var optionButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var removePostButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var closePostButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var showAsWorkerButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public let postEditButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public let exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public let checkApplicationButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public let optionButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public let removePostButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public let closePostButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public let showAsWorkerButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
-    public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
+    public let viewWillAppear: RxRelay.PublishRelay<Void> = .init()
     
     
     // MARK: fetched
@@ -114,6 +116,7 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
         self.postId = postId
         self.postState = postState
         self.coordinator = coordinator
+        self.recruitmentPostUseCase = recruitmentPostUseCase
         
         casting_workTimeAndPay = fetched_workTimeAndPay.asDriver()
         casting_customerRequirement = fetched_customerRequirement.asDriver()
@@ -197,23 +200,51 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
             })
             .disposed(by: disposeBag)
         
-        // 채용완료 버튼
-        closePostButtonClicked
+        // 채용종료 버튼
+        let closePostResult = closePostButtonClicked
+            .flatMap { [recruitmentPostUseCase] _ in
+                recruitmentPostUseCase.closePost(id: postId)
+            }
+            .share()
+        
+        let closePostSuccess = closePostResult.compactMap { $0.value }
+        let closePostFailure = closePostResult.compactMap { $0.error }
+        
+        
+        // 공고삭제 버튼
+        let removePostResult = removePostButtonClicked
+            .flatMap { [recruitmentPostUseCase] _ in
+                recruitmentPostUseCase.removePost(id: postId)
+            }
+            .share()
+        
+        let removePostSuccess = removePostResult.compactMap { $0.value }
+        let removePostFailure = removePostResult.compactMap { $0.error }
+        
+        Observable
+            .merge(closePostSuccess, removePostSuccess)
             .subscribe(onNext: { [weak self] _ in
-                
+                self?.coordinator?.coordinatorDidFinish()
             })
             .disposed(by: disposeBag)
         
-        // 공고삭제 버튼
-        removePostButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                
-            })
-            .disposed(by: disposeBag)
+        
+        self.alert = Observable
+            .merge(removePostFailure, closePostFailure)
+            .map { error in
+                DefaultAlertContentVO(
+                    title: "공고 상세화면 오류",
+                    message: error.message
+                )
+            }
+            .asDriver(onErrorJustReturn: .default)
+        
         
         // 요양보호사 화면 보기 버튼
         showAsWorkerButtonClicked
             .subscribe(onNext: { [weak self] _ in
+                
+                // 코디네이터 이용
                 
             })
             .disposed(by: disposeBag)
