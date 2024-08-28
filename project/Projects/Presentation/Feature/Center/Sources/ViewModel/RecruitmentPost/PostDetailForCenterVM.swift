@@ -17,31 +17,62 @@ public protocol PostDetailViewModelable:
     AnyObject,
     PostDetailDisplayingViewModelable
 {
-    
+    // Output
+    var applicantCountText: Driver<String>? { get }
     var workerEmployCardVO: Driver<WorkerEmployCardVO>? { get }
     var requestDetailFailure: Driver<DefaultAlertContentVO>? { get }
-    var applicantCount: Int? { get }
+    var showOptionSheet: Driver<PostState>? { get }
+    
     
     // Input
-    var postEditButtonClicked: PublishRelay<Void> { get }
+    /// 옵션버튼
+    var optionButtonClicked: PublishRelay<Void> { get }
+    
+    /// 나가기 버튼
     var exitButtonClicked: PublishRelay<Void> { get }
+    
+    /// 지원자 확인
     var checkApplicationButtonClicked: PublishRelay<Void> { get }
+    
+    /// 공고 삭제
+    var removePostButtonClicked: PublishRelay<Void> { get }
+    
+    /// 공고 종료
+    var closePostButtonClicked: PublishRelay<Void> { get }
+    
+    /// 요양보호사가 보는 화면으로 보기
+    var showAsWorkerButtonClicked: PublishRelay<Void> { get }
+    
+    /// 공고 수정버튼
+    var postEditButtonClicked: PublishRelay<Void> { get }
+    
+    /// viewWillAppear
     var viewWillAppear: PublishRelay<Void> { get }
 }
 
 public class PostDetailForCenterVM: PostDetailViewModelable {
-    
+
+    // Init
+    let postId: String
+    let postState: PostState
     weak var coordinator: PostDetailForCenterCoordinator?
     
     // MARK: DetailVC Interaction
     public var applicantCount: Int?
     public var workerEmployCardVO: RxCocoa.Driver<Entity.WorkerEmployCardVO>?
     public var requestDetailFailure: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    public var showOptionSheet: RxCocoa.Driver<Entity.PostState>?
     
     public var postEditButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var checkApplicationButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var optionButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var removePostButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var closePostButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var showAsWorkerButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    
     public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
+    
     
     // MARK: fetched
     private let fetched_workTimeAndPay: BehaviorRelay<WorkTimeAndPayStateObject> = .init(value: .init())
@@ -68,18 +99,21 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
         return dict
     }()
     
+    // MARK: ETC
+    public let applicantCountText: Driver<String>?
+    
     let disposeBag = DisposeBag()
     
     init(
-            id: String,
-            applicantCount: Int?,
+            postId: String,
+            postState: PostState,
             coordinator: PostDetailForCenterCoordinator?,
             recruitmentPostUseCase: RecruitmentPostUseCase
         )
     {
-        
+        self.postId = postId
+        self.postState = postState
         self.coordinator = coordinator
-        self.applicantCount = applicantCount
         
         casting_workTimeAndPay = fetched_workTimeAndPay.asDriver()
         casting_customerRequirement = fetched_customerRequirement.asDriver()
@@ -87,15 +121,30 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
         casting_applicationDetail = fetched_applicationDetail.asDriver()
         casting_addressInput = fetched_addressInfo.asDriver()
         
-        // MARK: Post card
+        // MARK: 지원자 수 조회
+        let getApplicantCountResult = recruitmentPostUseCase
+            .getPostApplicantCount(id: postId)
+            .asObservable()
+            .share()
         
+        let getApplicantCountSuccess = getApplicantCountResult.compactMap { $0.value }
+        let getApplicantCountFailure = getApplicantCountResult.compactMap { $0.error }
         
+        applicantCountText = Observable
+            .merge(
+                getApplicantCountSuccess.map { cnt in "지원자 \(cnt)명 조회" }.asObservable(),
+                getApplicantCountFailure.map { error in
+                    printIfDebug("지원자수를 가져올 수 없음 \(error.message)")
+                    return "지원자 수 조회 실패"
+                }.asObservable()
+            )
+            .asDriver(onErrorDriveWith: .never())
         
         // MARK: Detail View
         let fetchPostDetailResult = viewWillAppear
             .flatMap { [recruitmentPostUseCase] _ in
                 recruitmentPostUseCase
-                    .getPostDetailForCenter(id: id)
+                    .getPostDetailForCenter(id: postId)
             }
             .share()
         
@@ -111,6 +160,8 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
             })
             .asDriver(onErrorJustReturn: .default)
         
+        
+        // MARK: 요양보호사 버전 카드뷰
         workerEmployCardVO = fetchPostDetailSuccess
             .map { [weak self] bundle in
                 guard let self else { return .default }
@@ -132,21 +183,52 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
             .asDriver(onErrorJustReturn: .default)
             
         
+        // MARK: 버튼 처리
+        
+        // 옵션스크린 표출
+        showOptionSheet = optionButtonClicked
+            .map { _ in postState }
+            .asDriver(onErrorDriveWith: .never())
+        
+        // 공고 수정 버튼
         postEditButtonClicked
             .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.showPostEditScreen(postId: id)
+                self?.coordinator?.showPostEditScreen(postId: postId)
             })
             .disposed(by: disposeBag)
         
+        // 채용완료 버튼
+        closePostButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                
+            })
+            .disposed(by: disposeBag)
+        
+        // 공고삭제 버튼
+        removePostButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                
+            })
+            .disposed(by: disposeBag)
+        
+        // 요양보호사 화면 보기 버튼
+        showAsWorkerButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                
+            })
+            .disposed(by: disposeBag)
+        
+        // 나가기 버튼
         exitButtonClicked
             .subscribe(onNext: { [weak self] _ in
                 self?.coordinator?.coordinatorDidFinish()
             })
             .disposed(by: disposeBag)
         
+        // 지원자확인 버튼
         checkApplicationButtonClicked
             .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.showCheckApplicantScreen(postId: id)
+                self?.coordinator?.showCheckApplicantScreen(postId: postId)
             })
             .disposed(by: disposeBag)
     }

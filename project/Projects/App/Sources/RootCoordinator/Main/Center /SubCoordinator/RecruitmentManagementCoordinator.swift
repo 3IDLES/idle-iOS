@@ -81,7 +81,6 @@ public extension RecruitmentManagementCoordinator {
         let coordinator = PostDetailForCenterCoordinator(
             dependency: .init(
                 postId: postId,
-                applicantCount: applicantCount,
                 navigationController: navigationController,
                 recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
             )

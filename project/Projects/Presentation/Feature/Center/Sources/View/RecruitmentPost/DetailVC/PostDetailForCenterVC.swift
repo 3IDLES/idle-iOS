@@ -21,18 +21,19 @@ public class PostDetailForCenterVC: BaseViewController {
     var viewModel: PostDetailViewModelable?
     
     // View
-    lazy var navigationBar: IdleNavigationBar = {
-        let bar = IdleNavigationBar(titleText: "공고 상세 정보", innerViews: [postEditButton])
-        return bar
-    }()
-    let postEditButton: TextButtonType2 = {
-        let button = TextButtonType2(labelText: "공고 수정하기")
-        button.label.typography = .Body3
-        button.label.attrTextColor = DSKitAsset.Colors.gray300.color
-        button.layoutMargins = .init(top: 5.5, left:12, bottom: 5.5, right: 12)
-        button.layer.cornerRadius = 16
+    let detailViewOptionButton: UIButton = {
+        let button = UIButton()
+        let image = DSIcon.dot3Option.image
+        button.imageView?.image = image
         return button
     }()
+    lazy var navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(titleText: "공고 상세 정보", innerViews: [detailViewOptionButton])
+        return bar
+    }()
+    
+    // MARK: 옵션 바텀스트 버튼들
+    
     
     let sampleCard: WorkerEmployCard = {
         let card = WorkerEmployCard()
@@ -260,11 +261,16 @@ public class PostDetailForCenterVC: BaseViewController {
             .bind(to: viewModel.exitButtonClicked)
             .disposed(by: disposeBag)
         
-        // 수정화면으로 이동
-        postEditButton.eventPublisher
-            .bind(to: viewModel.postEditButtonClicked)
-            .disposed(by: disposeBag)
+        // 1. 공고 수정화면 이동
         
+        // 2. 공고 종료하기(close)
+        
+        // 3. 공고 삭제하기(remove)
+        
+        // 4. 요양보호사가 보는 화면 보기
+        
+        
+
         // 화면이 등장할 때마다 유효한 상태를 불러옵니다.
         self.rx.viewWillAppear
             .map({ _ in })
@@ -272,8 +278,13 @@ public class PostDetailForCenterVC: BaseViewController {
             .disposed(by: disposeBag)
         
         // Ouptut
-        
-        checkApplicantButton.label.textString = "지원자 \(viewModel.applicantCount ?? 0)명 조회"
+        viewModel
+            .applicantCountText?
+            .drive(onNext: { [weak self] text in
+                self?.checkApplicantButton.label.textString = text
+            })
+            .disposed(by: disposeBag)
+         
         
         workConditionOV.bind(viewModel: viewModel)
         customerInfoOV.bind(viewModel: viewModel)
