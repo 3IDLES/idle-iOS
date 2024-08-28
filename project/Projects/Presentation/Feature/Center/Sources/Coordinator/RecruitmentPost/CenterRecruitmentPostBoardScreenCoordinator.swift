@@ -57,9 +57,9 @@ public class CenterRecruitmentPostBoardScreenCoordinator: ChildCoordinator {
         parent?.showCheckingApplicantScreen(postId: postId)
     }
     
-    public func showPostDetailScreenForCenter(postId: String) {
+    public func showPostDetailScreenForCenter(postId: String, postState: PostState) {
         
-        parent?.showPostDetailScreenForCenter(postId: postId)
+        parent?.showPostDetailScreenForCenter(postId: postId, postState: postState)
     }
     
     public func showEditScreen(postId: String) {

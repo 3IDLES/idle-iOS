@@ -72,98 +72,88 @@ public class InitialScreenVM {
             // 센터관리자 확인
             printIfDebug("☑️ 센터관리자 정보를 확인합니다.")
             
-            if userInfoLocalRepository.getCurrentCenterData() == nil {
-                // 저장된 센터정보가 없는 경우
-                let requestCenterInfoResult = centerProfileUseCase.getProfile(mode: .myProfile)
-                let success = requestCenterInfoResult.compactMap { $0.value }
-                let failure = requestCenterInfoResult.compactMap { $0.error }
-                
-                success
-                    .subscribe(onSuccess: { [weak self] fetchedVO in
+            // 저장된 센터정보가 없는 경우
+            let requestCenterInfoResult = centerProfileUseCase.getProfile(mode: .myProfile)
+            let success = requestCenterInfoResult.compactMap { $0.value }
+            let failure = requestCenterInfoResult.compactMap { $0.error }
+            
+            success
+                .subscribe(onSuccess: { [weak self] fetchedVO in
+                    
+                    guard let self else { return }
+                    
+                    userInfoLocalRepository.updateCurrentCenterData(vo: fetchedVO)
+                    
+                    printIfDebug("✅ 센터관리자 프로필 정보가 존재합니다.")
+                    
+                    // 센터 메인화면으로 이동
+                    coordinator?.centerMain()
+                })
+                .disposed(by: disposeBag)
+            
+            // 실패한 경우
+            failure
+                .subscribe(onSuccess: { [weak self] error in
+                    
+                    guard let self else { return }
+                    
+                    if error == .tokenExpiredException {
+                        // 토큰이 만료된 경우로 재로그인 필요
                         
-                        guard let self else { return }
+                        printIfDebug("☑️ 재로그인이 필요합니다.")
                         
-                        userInfoLocalRepository.updateCurrentCenterData(vo: fetchedVO)
-                        
-                        printIfDebug("✅ 센터관리자 프로필 정보가 존재합니다.")
-                        
-                        // 센터 메인화면으로 이동
-                        coordinator?.centerMain()
-                    })
-                    .disposed(by: disposeBag)
-                
-                // 실패한 경우
-                failure
-                    .subscribe(onSuccess: { [weak self] error in
-                        
-                        guard let self else { return }
-                        
-                        if error == .tokenExpiredException {
-                            // 토큰이 만료된 경우로 재로그인 필요
-                            
-                            printIfDebug("☑️ 재로그인이 필요합니다.")
-                            
-                            coordinator?.auth()
-                            return
-                        }
-                        
-                        printIfDebug("☑️ 센터관리자 프로필 정보가 없습니다.")
-                        
-                        // 센터 메인화면으로 이동
-                        coordinator?.centerMain()
-                    })
-                    .disposed(by: disposeBag)
-            } else {
-                coordinator?.centerMain()
-            }
+                        coordinator?.auth()
+                        return
+                    }
+                    
+                    printIfDebug("☑️ 센터관리자 프로필 정보가 없습니다.")
+                    
+                    // 센터 메인화면으로 이동
+                    coordinator?.centerMain()
+                })
+                .disposed(by: disposeBag)
         } else {
             
             // 요양보호사 확인
+            let requestWorkerInfoResult = workerProfileUseCase.getProfile(mode: .myProfile)
+            let success = requestWorkerInfoResult.compactMap { $0.value }
+            let failure = requestWorkerInfoResult.compactMap { $0.error }
             
-            if userInfoLocalRepository.getCurrentWorkerData() == nil {
-                // 저장된 요양보호사
-                let requestWorkerInfoResult = workerProfileUseCase.getProfile(mode: .myProfile)
-                let success = requestWorkerInfoResult.compactMap { $0.value }
-                let failure = requestWorkerInfoResult.compactMap { $0.error }
-                
-                success
-                    .subscribe(onSuccess: { [weak self] fetchedVO in
+            success
+                .subscribe(onSuccess: { [weak self] fetchedVO in
+                    
+                    guard let self else { return }
+                    
+                    userInfoLocalRepository.updateCurrentWorkerData(vo: fetchedVO)
+                    
+                    printIfDebug("✅ 요양보호사 프로필 정보가 존재합니다.")
+                    
+                    // 요양보호사 메인화면으로 이동
+                    coordinator?.workerMain()
+                })
+                .disposed(by: disposeBag)
+            
+            // 실패한 경우
+            failure
+                .subscribe(onSuccess: { [weak self] error in
+                    
+                    guard let self else { return }
+                    
+                    if error == .tokenExpiredException {
+                        // 토큰이 만료된 경우로 재로그인 필요
                         
-                        guard let self else { return }
+                        printIfDebug("☑️ 재로그인이 필요합니다.")
                         
-                        userInfoLocalRepository.updateCurrentWorkerData(vo: fetchedVO)
-                        
-                        printIfDebug("✅ 요양보호사 프로필 정보가 존재합니다.")
-                        
-                        // 요양보호사 메인화면으로 이동
-                        coordinator?.workerMain()
-                    })
-                    .disposed(by: disposeBag)
-                
-                // 실패한 경우
-                failure
-                    .subscribe(onSuccess: { [weak self] error in
-                        
-                        guard let self else { return }
-                        
-                        if error == .tokenExpiredException {
-                            // 토큰이 만료된 경우로 재로그인 필요
-                            
-                            printIfDebug("☑️ 재로그인이 필요합니다.")
-                            
-                            coordinator?.auth()
-                            return
-                        }
-                        
-                        printIfDebug("☑️ 요양보호사 프로필 정보가 없습니다.")
-                        
-                        // 요양보호사 메인화면으로 이동
-                        coordinator?.workerMain()
-                    })
-                    .disposed(by: disposeBag)
-            } else {
-                coordinator?.workerMain()
-            }
+                        coordinator?.auth()
+                        return
+                    }
+                    
+                    printIfDebug("☑️ 요양보호사 프로필 정보가 없습니다.")
+                    
+                    // 요양보호사 메인화면으로 이동
+                    coordinator?.workerMain()
+                })
+                .disposed(by: disposeBag)
         }
     }
 }

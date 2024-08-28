@@ -1,6 +1,6 @@
 //
 //  OneDayPicker.swift
-//  DSKit
+//  BaseFeature
 //
 //  Created by choijunios on 8/2/24.
 //
@@ -11,6 +11,7 @@ import RxCocoa
 import Entity
 import PresentationCore
 import FSCalendar
+import DSKit
 
 public protocol OneDayPickerDelegate: NSObject {
     
@@ -19,7 +20,7 @@ public protocol OneDayPickerDelegate: NSObject {
 
 /// 달력뷰를 바텀시트로 표출하는 뷰 입니다.
 /// setLayout을 반드시 호출해여 합니다.
-public class OneDayPickerViewController: IdleButtomSheetVC {
+public class OneDayPickerViewController: IdleBottomSheetVC {
     
     // View
     public let calendar = FSCalendar()

@@ -18,7 +18,7 @@ public protocol ClosedPostViewModelable {
     var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>? { get }
     var requestClosedPost: PublishRelay<Void> { get }
     
-    func createCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable
+    func createClosedPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable
 }
 
 public class ClosedPostVC: BaseViewController {
@@ -131,7 +131,7 @@ extension ClosedPostVC: UITableViewDataSource, UITableViewDelegate {
         let data = postData[indexPath.item]
         
         if let viewModel = self.viewModel {
-            let vm = viewModel.createCellVM(postInfo: data)
+            let vm = viewModel.createClosedPostCellVM(postInfo: data)
             cell.bind(viewModel: vm)
         }
         

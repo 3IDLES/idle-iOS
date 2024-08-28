@@ -18,7 +18,7 @@ public protocol OnGoingPostViewModelable {
     var ongoingPostInfo: Driver<[RecruitmentPostInfoForCenterVO]>? { get }
     var requestOngoingPost: PublishRelay<Void> { get }
 
-    func createCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable
+    func createOngoingPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable
 }
 
 public class OnGoingPostVC: BaseViewController {
@@ -131,7 +131,7 @@ extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
         let data = postData[indexPath.item]
         
         if let viewModel = self.viewModel {
-            let vm = viewModel.createCellVM(postInfo: data)
+            let vm = viewModel.createOngoingPostCellVM(postInfo: data)
             cell.bind(viewModel: vm)
         }
         

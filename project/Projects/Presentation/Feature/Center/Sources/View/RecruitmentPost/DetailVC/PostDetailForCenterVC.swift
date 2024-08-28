@@ -21,19 +21,17 @@ public class PostDetailForCenterVC: BaseViewController {
     var viewModel: PostDetailViewModelable?
     
     // View
-    let detailViewOptionButton: UIButton = {
+    let optionButton: UIButton = {
         let button = UIButton()
         let image = DSIcon.dot3Option.image
-        button.imageView?.image = image
+        button.setImage(image, for: .normal)
+        button.tintColor = DSColor.gray400.color
         return button
     }()
     lazy var navigationBar: IdleNavigationBar = {
-        let bar = IdleNavigationBar(titleText: "공고 상세 정보", innerViews: [detailViewOptionButton])
+        let bar = IdleNavigationBar(titleText: "공고 상세 정보", innerViews: [optionButton])
         return bar
     }()
-    
-    // MARK: 옵션 바텀스트 버튼들
-    
     
     let sampleCard: WorkerEmployCard = {
         let card = WorkerEmployCard()
@@ -261,14 +259,16 @@ public class PostDetailForCenterVC: BaseViewController {
             .bind(to: viewModel.exitButtonClicked)
             .disposed(by: disposeBag)
         
-        // 1. 공고 수정화면 이동
+        // 옵션 버튼
+        optionButton
+            .rx.tap
+            .bind(to: viewModel.optionButtonClicked)
+            .disposed(by: disposeBag)
         
-        // 2. 공고 종료하기(close)
-        
-        // 3. 공고 삭제하기(remove)
-        
-        // 4. 요양보호사가 보는 화면 보기
-        
+        // 요양보호사가 보는 화면 보기
+        screenFoWorkerButton.rx.tap
+            .bind(to: viewModel.showAsWorkerButtonClicked)
+            .disposed(by: disposeBag)
         
 
         // 화면이 등장할 때마다 유효한 상태를 불러옵니다.
@@ -284,7 +284,29 @@ public class PostDetailForCenterVC: BaseViewController {
                 self?.checkApplicantButton.label.textString = text
             })
             .disposed(by: disposeBag)
-         
+        
+        
+        // 옵션 뷰
+        viewModel
+            .showOptionSheet?
+            .drive(onNext: { [weak self] state in
+                guard let self, let vm = self.viewModel else { return }
+                var vc: IdleBottomSheetVC!
+                switch state {
+                case .onGoing:
+                    let onGoingVC = OngoingPostOptionVC()
+                    onGoingVC.bind(viewModel: vm)
+                    vc = onGoingVC
+                case .closed:
+                    let closedVC = ClosedPostOptionVC()
+                    closedVC.bind(viewModel: vm)
+                    vc = closedVC
+                }
+                
+                vc.modalPresentationStyle = .overFullScreen
+                present(vc, animated: false)
+            })
+            .disposed(by: disposeBag)
         
         workConditionOV.bind(viewModel: viewModel)
         customerInfoOV.bind(viewModel: viewModel)

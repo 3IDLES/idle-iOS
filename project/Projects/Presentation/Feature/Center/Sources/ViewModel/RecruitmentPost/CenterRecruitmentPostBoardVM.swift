@@ -77,9 +77,19 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
         .asDriver(onErrorJustReturn: .default)
     }
     
-    public func createCellVM(postInfo: Entity.RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
+    public func createOngoingPostCellVM(postInfo: Entity.RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
         CenterEmployCardVM(
             postInfo: postInfo,
+            postState: .onGoing,
+            coordinator: coordinator,
+            recruitmentPostUseCase: recruitmentPostUseCase
+        )
+    }
+    
+    public func createClosedPostCellVM(postInfo: Entity.RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
+        CenterEmployCardVM(
+            postInfo: postInfo,
+            postState: .closed,
             coordinator: coordinator,
             recruitmentPostUseCase: recruitmentPostUseCase
         )
@@ -91,6 +101,7 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
     
     // Init
     let postInfo: RecruitmentPostInfoForCenterVO
+    let postState: PostState
     let recruitmentPostUseCase: RecruitmentPostUseCase
     weak var coordinator: CenterRecruitmentPostBoardScreenCoordinator?
     
@@ -106,8 +117,9 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
     
     let disposeBag = DisposeBag()
     
-    init(postInfo: RecruitmentPostInfoForCenterVO, coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
+    init(postInfo: RecruitmentPostInfoForCenterVO, postState: PostState, coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.postInfo = postInfo
+        self.postState = postState
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         
@@ -135,10 +147,11 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
         
         // MARK: 버튼 처리
         cardClicked
-            .subscribe(onNext: { [weak self] _ in
+            .subscribe(onNext: {
+                [weak self] _ in
                 guard let self else { return }
                 
-                self.coordinator?.showPostDetailScreenForCenter(postId: postInfo.id)
+                self.coordinator?.showPostDetailScreenForCenter(postId: postInfo.id, postState: postState)
             })
             .disposed(by: disposeBag)
         

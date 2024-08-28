@@ -1,8 +1,8 @@
 //
-//  File.swift
-//  DSKit
+//  IdleBottomSheetVC.swift
+//  BaseFeature
 //
-//  Created by choijunios on 8/8/24.
+//  Created by choijunios on 8/28/24.
 //
 
 import UIKit
@@ -10,8 +10,9 @@ import RxSwift
 import RxCocoa
 import Entity
 import PresentationCore
+import DSKit
 
-open class IdleButtomSheetVC: UIViewController {
+open class IdleBottomSheetVC: BaseViewController {
     
     // Not init
     private var gestureBeganPosition: CGPoint = .zero
@@ -108,7 +109,7 @@ open class IdleButtomSheetVC: UIViewController {
 }
 
 /// 뷰 디스플레이 관련
-extension IdleButtomSheetVC {
+extension IdleBottomSheetVC {
     
     /// viewDidAppear서브 뷰들의 레이아웃이 결정된 이후 시점(화면상에 나타난 시점)으로, frame, bounds에 근거있는 값들이 할당된 이후이다.
     public override func viewDidAppear(_ animated: Bool) {
@@ -126,7 +127,7 @@ extension IdleButtomSheetVC {
         }
     }
     
-    func dismissView() {
+    public func dismissView() {
         
         let height = sheetView.bounds.height
         sheetView.isUserInteractionEnabled = false
@@ -141,7 +142,7 @@ extension IdleButtomSheetVC {
 }
 
 /// 제스처 동작
-extension IdleButtomSheetVC {
+extension IdleBottomSheetVC {
     
     @objc
     func onPanGesture(_ gesture: UIPanGestureRecognizer) {
