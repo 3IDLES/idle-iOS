@@ -104,7 +104,7 @@ public struct WorkerEmployCardVO {
         return WorkerEmployCardVO(
             dayLeft: leftDay ?? 31,
             isBeginnerPossible: isBeginnerPossible,
-            distanceFromWorkPlace: "500m",
+            distanceFromWorkPlace: "500",
             title: title,
             targetAge: targetAge,
             careGrade: careGrade,

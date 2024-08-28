@@ -41,6 +41,14 @@ public class CenterEmployCardCell: UITableViewCell {
     }()
     
     // Row5
+    lazy var buttonStack: VStack = {
+        let belowButtonStack = HStack([editPostButton, terminatePostButton,], spacing: 4)
+        let stack = VStack([
+            checkApplicantsButton,
+            HStack([belowButtonStack, Spacer()])
+        ], spacing: 8, alignment: .fill)
+        return stack
+    }()
     let editPostButton: ImageTextButton = {
         let button = ImageTextButton(
             iconImage: DSKitAsset.Icons.postEdit.image,
@@ -95,17 +103,9 @@ public class CenterEmployCardCell: UITableViewCell {
         
         contentView.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
         
-        let buttonStack = HStack([
-            editPostButton,
-            terminatePostButton,
-        ], spacing: 4)
-        
         let contentStack = VStack([
-            HStack([cardView, Spacer()]),
-            VStack([
-                checkApplicantsButton,
-                HStack([buttonStack, Spacer()])
-            ], alignment: .fill)
+            cardView,
+            buttonStack
         ], spacing: 12, alignment: .fill)
         
         [
@@ -139,10 +139,8 @@ public class CenterEmployCardCell: UITableViewCell {
         
         
         // MARK: 공고 상태에 따른 카드 버튼 숨김
-        checkApplicantsButton.isHidden = ro.postState == .closed
-        editPostButton.isHidden = ro.postState == .closed
-        terminatePostButton.isHidden = ro.postState == .closed
-        
+        buttonStack.isHidden = ro.postState == .closed
+
         
         // MARK: 액션 바인딩
         let disposables: [Disposable?] = [

@@ -16,7 +16,7 @@ public class WorkerEmployCardRO {
     let showDayLeftTag: Bool
     let dayLeftTagText: String?
     let titleText: String
-    let distanceFromWorkPlace: String
+    let distanceFromWorkPlaceText: String
     let targetInfoText: String
     let workDaysText: String
     let workTimeText: String
@@ -27,7 +27,7 @@ public class WorkerEmployCardRO {
         self.showDayLeftTag = showDayLeftTag
         self.dayLeftTagText = dayLeftTagText
         self.titleText = titleText
-        self.distanceFromWorkPlace = distanceFromWorkPlace
+        self.distanceFromWorkPlaceText = distanceFromWorkPlace
         self.targetInfoText = targetInfoText
         self.workDaysText = workDaysText
         self.workTimeText = workTimeText
@@ -53,12 +53,19 @@ public class WorkerEmployCardRO {
         let workTimeText = "\(vo.startTime) - \(vo.endTime)"
         let payText = "\(vo.paymentType.korLetterText) \(vo.paymentAmount) 원"
         
+        var splittedAddress = vo.title.split(separator: " ")
+        
+        if splittedAddress.count >= 3 {
+            splittedAddress = Array(splittedAddress[0..<3])
+        }
+        let addressTitle = splittedAddress.joined(separator: " ")
+        
         return .init(
             showBiginnerTag: vo.isBeginnerPossible,
             showDayLeftTag: showDayLeftTag,
             dayLeftTagText: dayLeftTagText,
-            titleText: vo.title,
-            distanceFromWorkPlace: vo.distanceFromWorkPlace,
+            titleText: addressTitle,
+            distanceFromWorkPlace: "\(vo.distanceFromWorkPlace)m",
             targetInfoText: targetInfoText,
             workDaysText: workDaysText,
             workTimeText: workTimeText,
@@ -309,7 +316,7 @@ public class WorkerEmployCard: UIView {
         dayLeftTag.isHidden = !ro.showDayLeftTag
         dayLeftTag.textString = ro.dayLeftTagText ?? ""
         titleLabel.textString = ro.titleText
-        distanceFromWorkPlaceLabel.textString = ro.distanceFromWorkPlace
+        distanceFromWorkPlaceLabel.textString = ro.distanceFromWorkPlaceText
         serviceTargetInfoLabel.textString = ro.targetInfoText
         workDaysLabel.textString = ro.workDaysText
         workTimeLabel.textString = ro.workTimeText
