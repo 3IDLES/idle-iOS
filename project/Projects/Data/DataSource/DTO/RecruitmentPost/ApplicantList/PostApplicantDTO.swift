@@ -8,19 +8,6 @@
 import Foundation
 import Entity
 
-public struct PostApplicantScreenDTO: Codable {
-    public let jobPostingSummaryDto: PostSummaryDTO
-    public let jobPostingApplicants: [PostApplicantDTO]
-    
-    public func toEntity() -> (summaryCardVO: CenterEmployCardVO, applicantList: [PostApplicantVO]) {
-         
-        let summaryCardVO = jobPostingSummaryDto.toVO()
-        let applicantList = jobPostingApplicants.map { $0.toVO() }
-        
-        return (summaryCardVO: summaryCardVO, applicantList: applicantList)
-    }
-}
-
 public struct PostApplicantDTO: Codable {
     public let carerId: String
     public let name: String

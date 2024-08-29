@@ -89,6 +89,10 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         convert(task: repository.getPostApplicantCount(id: id))
     }
     
+    public func getPostApplicantScreenData(id: String) -> RxSwift.Single<Result<Entity.PostApplicantScreenVO, Entity.DomainError>> {
+        convert(task: repository.getPostApplicantScreenData(id: id))
+    }
+    
     public func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>> {
         
         let stream: Single<RecruitmentPostListForWorkerVO>!

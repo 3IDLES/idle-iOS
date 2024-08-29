@@ -31,6 +31,9 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     /// 특정 공고의 지원자 수를 확인합니다.
     func getPostApplicantCount(id: String) -> Single<Int>
     
+    /// 특정 공고의 지원자 리스트를 조회합니다. 요약된 공고정보가 포함되어 있습니다.
+    func getPostApplicantScreenData(id: String) -> Single<PostApplicantScreenVO>
+    
     /// 공고를 종료합니다.
     func closePost(id: String) -> Single<Void>
     

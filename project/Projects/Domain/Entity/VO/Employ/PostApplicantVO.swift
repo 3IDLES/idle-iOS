@@ -7,6 +7,8 @@
 
 import Foundation
 
+public typealias PostApplicantScreenVO = (summaryCardVO: CenterEmployCardVO, applicantList: [PostApplicantVO])
+
 public struct PostApplicantVO {
     
     //
