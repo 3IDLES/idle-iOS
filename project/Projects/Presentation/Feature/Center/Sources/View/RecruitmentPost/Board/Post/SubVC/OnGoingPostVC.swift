@@ -33,6 +33,11 @@ public class OnGoingPostVC: BaseViewController {
     let postTableView: UITableView = .init()
     let tableHeader = BoardSortigHeaderView()
     
+    let registerPostButton: IdleFloatingButton = {
+        let button = IdleFloatingButton(labelText: "공고 등록")
+        return button
+    }()
+    
     // DataSource
     private var postData: [RecruitmentPostInfoForCenterVO] = []
     
@@ -77,7 +82,8 @@ public class OnGoingPostVC: BaseViewController {
     private func setLayout() {
         
         [
-            postTableView
+            postTableView,
+            registerPostButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -88,6 +94,9 @@ public class OnGoingPostVC: BaseViewController {
             postTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
             postTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
             postTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            registerPostButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
+            registerPostButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
         ])
     }
     
@@ -145,5 +154,20 @@ extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
         }
         
         return cell
+    }
+    
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if registerPostButton.alpha != 0 {
+            UIView.animate(withDuration: 0.1) {
+                self.registerPostButton.alpha = 0.5
+            }
+        }
+    }
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if registerPostButton.alpha != 1 {
+            UIView.animate(withDuration: 0.1) {
+                self.registerPostButton.alpha = 1
+            }
+        }
     }
 }
