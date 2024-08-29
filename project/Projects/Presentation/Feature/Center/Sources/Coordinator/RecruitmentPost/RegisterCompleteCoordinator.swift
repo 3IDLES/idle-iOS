@@ -29,7 +29,7 @@ public class RegisterCompleteCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        let vc = RegisterCompleteVC()
+        let vc = PostRegisterCompleteVC()
         vc.coordinator = self
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)

@@ -184,10 +184,11 @@ public class WorkerEmployCard: UIView {
         let tagStarStack = HStack(
             [
                 tagStack,
+                Spacer(),
                 starButton
             ],
             alignment: .center,
-            distribution: .equalSpacing
+            distribution: .fill
         )
         tagStack.setContentHuggingPriority(.defaultLow, for: .horizontal)
         starButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
