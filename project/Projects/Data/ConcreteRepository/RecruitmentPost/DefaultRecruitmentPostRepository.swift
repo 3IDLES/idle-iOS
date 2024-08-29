@@ -70,6 +70,14 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             }
     }
     
+    public func getPostApplicantScreenData(id: String) -> RxSwift.Single<Entity.PostApplicantScreenVO> {
+        service.request(api: .getApplicantList(id: id), with: .withToken)
+            .map(PostApplicantScreenDTO.self)
+            .map { dto in
+                dto.toVO()
+            }
+    }
+    
     public func closePost(id: String) -> RxSwift.Single<Void> {
         service.request(api: .closePost(id: id), with: .withToken)
             .mapToVoid()

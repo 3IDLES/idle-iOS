@@ -28,8 +28,11 @@ public protocol RecruitmentPostUseCase: UseCaseBase {
     /// 지난 공고정보를 가져옵니다.
     func getClosedPosts() -> Single<Result<[RecruitmentPostInfoForCenterVO], DomainError>>
     
-    /// 지난 공고정보를 가져옵니다.
+    /// 공고에 지원한 지원자 수를 가져옵니다.
     func getPostApplicantCount(id: String) -> Single<Result<Int, DomainError>>
+    
+    /// 지원자 확인 화면에 사용될 정보를 가져옵니다.
+    func getPostApplicantScreenData(id: String) -> Single<Result<PostApplicantScreenVO,DomainError>>
     
     /// 공고를 종료합니다.
     func closePost(id: String) -> Single<Result<Void, DomainError>>
