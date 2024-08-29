@@ -110,4 +110,18 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         
         return convert(task: stream)
     }
+    
+    public func getFavoritePostListForWorker(pageId: String?, postCount: Int) -> RxSwift.Single<Result<Entity.RecruitmentPostListForWorkerVO, Entity.DomainError>> {
+        convert(task: repository.getFavoritePostListForWorker(
+            nextPageId: pageId,
+            requestCnt: postCount
+        ))
+    }
+    
+    public func getAppliedPostListForWorker(pageId: String?, postCount: Int) -> RxSwift.Single<Result<Entity.RecruitmentPostListForWorkerVO, Entity.DomainError>> {
+        convert(task: repository.getAppliedPostListForWorker(
+            nextPageId: pageId,
+            requestCnt: postCount
+        ))
+    }
 }

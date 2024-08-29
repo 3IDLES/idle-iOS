@@ -32,6 +32,8 @@ public enum RcruitmentPostAPI {
     
     // Worker
     case getOnGoingNativePostListForWorker(nextPageId: String?, requestCnt: String)
+    case getFavoritePostListForWorker(nextPageId: String?, requestCnt: String)
+    case getAppliedPostListForWorker(nextPageId: String?, requestCnt: String)
 }
 
 extension RcruitmentPostAPI: BaseAPI {
@@ -70,6 +72,10 @@ extension RcruitmentPostAPI: BaseAPI {
             
         case .getOnGoingNativePostListForWorker:
             ""
+        case .getFavoritePostListForWorker:
+            "/my/favorites"
+        case .getAppliedPostListForWorker:
+            "/carer/my/applied"
         }
     }
     
@@ -103,6 +109,10 @@ extension RcruitmentPostAPI: BaseAPI {
             
         case .getOnGoingNativePostListForWorker:
             .get
+        case .getFavoritePostListForWorker:
+            .get
+        case .getAppliedPostListForWorker:
+            .get
         }
     }
     
@@ -110,6 +120,16 @@ extension RcruitmentPostAPI: BaseAPI {
         var params: Parameters = [:]
         switch self {
         case .getOnGoingNativePostListForWorker(let nextPageId, let requestCnt):
+            if let nextPageId {
+                params["next"] = nextPageId
+            }
+            params["limit"] = requestCnt
+        case .getFavoritePostListForWorker(let nextPageId, let requestCnt):
+            if let nextPageId {
+                params["next"] = nextPageId
+            }
+            params["limit"] = requestCnt
+        case .getAppliedPostListForWorker(let nextPageId, let requestCnt):
             if let nextPageId {
                 params["next"] = nextPageId
             }
