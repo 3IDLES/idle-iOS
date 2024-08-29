@@ -53,8 +53,8 @@ public protocol RecruitmentPostUseCase: UseCaseBase {
     func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>>
     
     /// 요양보호사가 즐겨찾기한 공고리스트를 호출합니다.
-    func getFavoritePostListForWorker(pageId: String?, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>>
+    func getFavoritePostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>>
     
     /// 요양보호사가 지원한 공고리스트를 호출합니다.
-    func getAppliedPostListForWorker(pageId: String?, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>>
+    func getAppliedPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>>
 }

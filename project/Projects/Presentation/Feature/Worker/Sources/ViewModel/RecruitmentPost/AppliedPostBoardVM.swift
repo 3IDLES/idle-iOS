@@ -15,10 +15,13 @@ import DSKit
 import UseCaseInterface
 
 
-public class AppliedPostBoardVM: WorkerStaticPostBoardVMable {
+public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
     
-    public var postViewWillAppear: RxRelay.PublishRelay<Void> = .init()
+    // Input
+    public var viewDidLoad: RxRelay.PublishRelay<Void> = .init()
+    public var requestNextPage: RxRelay.PublishRelay<Void> = .init()
     
+    // Output
     public var postBoardData: RxCocoa.Driver<[any DSKit.WorkerEmployCardViewModelable]>?
     public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     
@@ -26,27 +29,67 @@ public class AppliedPostBoardVM: WorkerStaticPostBoardVMable {
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?
     let recruitmentPostUseCase: RecruitmentPostUseCase
     
+    // Paging
+    /// 값이 nil이라면 요청을 보내지 않습니다.
+    var nextPagingRequest: PostPagingRequestForWorker?
+    /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
+    private let currentPostVO: BehaviorRelay<[RecruitmentPostForWorkerVO]> = .init(value: [])
+    
     public init(recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.recruitmentPostUseCase = recruitmentPostUseCase
+        self.nextPagingRequest = .initial
         
-        let requestPostResult = postViewWillAppear
-            .flatMap { [unowned self] _ in
-                self.publishAppliedPostMocks()
+        let postPageReqeustResult = Observable
+            .merge(
+                viewDidLoad.asObservable(),
+                requestNextPage.asObservable()
+            )
+            .compactMap { [weak self] _ in
+                // 요청이 없는 경우 요청을 보내지 않는다.
+                // ThirdPatry에서도 불러올 데이터가 없는 경우입니다.
+                self?.nextPagingRequest
+            }
+            .flatMap { [recruitmentPostUseCase] request in
+                recruitmentPostUseCase
+                    .getAppliedPostListForWorker(
+                        request: request,
+                        postCount: 10
+                    )
             }
             .share()
         
-        let requestPostSuccess = requestPostResult.compactMap { $0.value }
-        let requestPostFailure = requestPostResult.compactMap { $0.error }
+        let requestPostListSuccess = postPageReqeustResult.compactMap { $0.value }
+        let requestPostListFailure = postPageReqeustResult.compactMap { $0.error }
         
-        postBoardData = requestPostSuccess
-            .map { postForWorkerVos in
+        postBoardData = Observable
+            .zip(
+                currentPostVO,
+                requestPostListSuccess
+            )
+            .compactMap { [weak self] (prevPostList, fetchedData) -> [WorkerEmployCardViewModelable]? in
+                
+                guard let self else { return nil }
+                
+                // MARK: 지원 공고의 경우 써드파티에서 불러올 데이터가 없다.
+                self.nextPagingRequest = .paging(
+                    source: .native,
+                    nextPageId: fetchedData.nextPageId
+                )
+                
+                // 화면에 표시할 전체리스트 도출
+                let fetchedPosts = fetchedData.posts
+                var mergedPosts = currentPostVO.value
+                mergedPosts.append(contentsOf: fetchedPosts)
+                
+                // 최근값 업데이트
+                self.currentPostVO.accept(mergedPosts)
                 
                 // ViewModel 생성
-                let viewModels = postForWorkerVos.map { vo in
+                let viewModels = mergedPosts.map { vo in
                     
                     let cardVO: WorkerEmployCardVO = .create(vo: vo)
                     
-                    let vm: AppliedWorkerEmployCardVM = .init(
+                    let vm: OngoindWorkerEmployCardVM = .init(
                         postId: vo.postId,
                         vo: cardVO,
                         coordinator: self.coordinator
@@ -59,7 +102,7 @@ public class AppliedPostBoardVM: WorkerStaticPostBoardVMable {
             }
             .asDriver(onErrorJustReturn: [])
         
-        alert = requestPostFailure
+        alert = requestPostListFailure
             .map { error in
                 DefaultAlertContentVO(
                     title: "지원한 공고 불러오기 오류",

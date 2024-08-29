@@ -1,5 +1,5 @@
 //
-//  WorkerStaticPostBoardVC.swift
+//  WorkerPagablePostBoardVC.swift
 //  WorkerFeature
 //
 //  Created by choijunios on 8/16/24.
@@ -13,11 +13,11 @@ import RxSwift
 import Entity
 import DSKit
 
-public class WorkerStaticPostBoardVC: BaseViewController {
+public class WorkerPagablePostBoardVC: BaseViewController {
     
     typealias Cell = WorkerEmployCardCell
     
-    var viewModel: WorkerStaticPostBoardVMable?
+    var viewModel: WorkerPagablePostBoardVMable?
     
     // View
     let postTableView: UITableView = {
@@ -29,9 +29,13 @@ public class WorkerStaticPostBoardVC: BaseViewController {
     
     let tableHeader = BoardSortigHeaderView()
     
-    let postViewModels: BehaviorRelay<[WorkerEmployCardViewModelable]> = .init(value: [])
+    // Paging
+    var isPaging = true
     
     // Observable
+    let postViewModels: BehaviorRelay<[WorkerEmployCardViewModelable]> = .init(value: [])
+    let requestNextPage: PublishRelay<Void> = .init()
+    
     private let disposeBag = DisposeBag()
     
     public init() {
@@ -87,7 +91,7 @@ public class WorkerStaticPostBoardVC: BaseViewController {
         
     }
     
-    func bind(viewModel: WorkerStaticPostBoardVMable) {
+    func bind(viewModel: WorkerPagablePostBoardVMable) {
         
         self.viewModel = viewModel
         
@@ -101,15 +105,25 @@ public class WorkerStaticPostBoardVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        viewModel
+            .alert?
+            .drive(onNext: { [weak self] alertVO in
+                self?.showAlert(vo: alertVO)
+            })
+            .disposed(by: disposeBag)
+        
         // Input
-        rx.viewWillAppear
-            .map { _ in }
-            .bind(to: viewModel.postViewWillAppear)
+        self.rx.viewDidLoad
+            .bind(to: viewModel.viewDidLoad)
+            .disposed(by: disposeBag)
+        
+        self.requestNextPage
+            .bind(to: viewModel.requestNextPage)
             .disposed(by: disposeBag)
     }
 }
 
-extension WorkerStaticPostBoardVC: UITableViewDataSource, UITableViewDelegate {
+extension WorkerPagablePostBoardVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         postViewModels.value.count
@@ -124,5 +138,22 @@ extension WorkerStaticPostBoardVC: UITableViewDataSource, UITableViewDelegate {
         cell.bind(viewModel: vm)
         
         return cell
+    }
+}
+
+// MARK: ScrollView관련
+extension WorkerPagablePostBoardVC {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.height
+        
+        // 스크롤이 테이블 뷰 Offset의 끝에 가게 되면 다음 페이지를 호출
+        if offsetY > (contentHeight - height) {
+            if !isPaging {
+                isPaging = true
+                requestNextPage.accept(())
+            }
+        }
     }
 }
