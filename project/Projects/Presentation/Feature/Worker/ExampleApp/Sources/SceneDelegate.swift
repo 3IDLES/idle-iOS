@@ -9,7 +9,7 @@ import UIKit
 import ConcreteUseCase
 import ConcreteRepository
 import WorkerFeature
-import NetworkDataSource
+import DataSource
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -20,29 +20,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
         
         self.window = UIWindow(windowScene: windowScene)
-        
-        let store = TestStore()
-        
-        try! store.saveAuthToken(
-            accessToken: "",
-            refreshToken: ""
-        )
-        
-        let useCase = DefaultWorkerProfileUseCase(
-            repository: DefaultUserProfileRepository(store)
-        )
-        
-        let vm = WorkerMyProfileViewModel(
-            coordinator: nil,
-            workerProfileUseCase: useCase
-        )
-        
-        let vc = WorkerProfileViewController()
-        
-        vc.bind(vm)
-        
-        let nav = UINavigationController(rootViewController: vc)
-        nav.setNavigationBarHidden(true, animated: false)
         
         window?.rootViewController = WorkerSettingVC()
         window?.makeKeyAndVisible()
