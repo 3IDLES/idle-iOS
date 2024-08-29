@@ -1,5 +1,5 @@
 //
-//  RegisterCompleteVC.swift
+//  PostRegisterCompleteVC.swift
 //  CenterFeature
 //
 //  Created by choijunios on 8/6/24.
@@ -13,7 +13,7 @@ import RxSwift
 import Entity
 import DSKit
 
-public class RegisterCompleteVC: BaseViewController {
+public class PostRegisterCompleteVC: BaseViewController {
     
     // Init
     

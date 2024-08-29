@@ -43,10 +43,14 @@ public class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordina
     
     public func start() {
         let vc = RegisterRecruitmentPostVC()
-        
         vc.bind(viewModel: registerRecruitmentPostVM)
-        viewControllerRef = vc
-        navigationController.pushViewController(vc, animated: true)
+        
+        let coordinator = CoordinatorWrapper(
+            parent: self,
+            nav: navigationController,
+            vc: vc
+        )
+        coordinator.start()
     }
 }
 
