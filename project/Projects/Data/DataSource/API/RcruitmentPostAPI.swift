@@ -29,7 +29,6 @@ public enum RcruitmentPostAPI {
     // - 공고 지원자 관련
     case getPostApplicantCount(id: String)
     
-    
     // Worker
     case getOnGoingNativePostListForWorker(nextPageId: String?, requestCnt: String)
     case getFavoritePostListForWorker(nextPageId: String?, requestCnt: String)
@@ -76,6 +75,7 @@ extension RcruitmentPostAPI: BaseAPI {
             "/my/favorites"
         case .getAppliedPostListForWorker:
             "/carer/my/applied"
+            
         }
     }
     

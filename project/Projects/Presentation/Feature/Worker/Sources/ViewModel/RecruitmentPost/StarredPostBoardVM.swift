@@ -172,7 +172,7 @@ class StarredWorkerEmployCardVM: WorkerEmployCardViewModelable {
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
                 
-                coordinator?.showPostDetail(
+                self.coordinator?.showPostDetail(
                     postId: postId
                 )
             })
