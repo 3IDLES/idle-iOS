@@ -28,6 +28,7 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
 
     public var requestOngoingPost: PublishRelay<Void> = .init()
     public var requestClosedPost: PublishRelay<Void> = .init()
+    public var registerPostButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
     public var ongoingPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
     public var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
@@ -106,6 +107,13 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
             .disposed(by: disposeBag)
         
         let closePostFailure = closePostResult.compactMap { $0.error }
+        
+        // 공고등록버튼
+        registerPostButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                self?.coordinator?.showRegisterPostScreen()
+            })
+            .disposed(by: disposeBag)
         
         alert = Observable.merge(
             requestOngoingPostFailure,
@@ -221,9 +229,8 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
         
         
         terminatePostBtnClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
+            .subscribe(onNext: { _ in
+
                 NotificationCenter.default.post(
                     name: .removePostRequestFromCell,
                     object: [
