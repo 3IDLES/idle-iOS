@@ -51,7 +51,16 @@ public class WorkerEmployCardRO {
         }).map({ $0.korOneLetterText }).joined(separator: ",")
         
         let workTimeText = "\(vo.startTime) - \(vo.endTime)"
-        let payText = "\(vo.paymentType.korLetterText) \(vo.paymentAmount) 원"
+        
+        var formedPayAmountText = ""
+        for (index, char) in vo.paymentAmount.reversed().enumerated() {
+            if (index % 3) == 0, index != 0 {
+                formedPayAmountText = "," + formedPayAmountText
+            }
+            formedPayAmountText = String(char) + formedPayAmountText
+        }
+        
+        let payText = "\(vo.paymentType.korLetterText) \(formedPayAmountText) 원"
         
         var splittedAddress = vo.title.split(separator: " ")
         

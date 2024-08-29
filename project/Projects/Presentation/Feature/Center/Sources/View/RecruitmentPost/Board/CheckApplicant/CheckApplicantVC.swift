@@ -36,9 +36,9 @@ public class CheckApplicantVC: BaseViewController {
     // Init
     
     // View
-    let navigationBar: NavigationBarType1 = {
-        let view = NavigationBarType1(navigationTitle: "지원자 확인")
-        return view
+    let navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(titleText: "지원자 확인")
+        return bar
     }()
     let postSummaryCard: PostInfoCardView = {
         let view = PostInfoCardView()
@@ -121,7 +121,7 @@ public class CheckApplicantVC: BaseViewController {
         let scrollView = UIScrollView()
         scrollView.delaysContentTouches = false
         scrollView.contentInset = .init(
-            top: 36,
+            top: 24,
             left: 0,
             bottom: 20,
             right: 0
@@ -150,8 +150,9 @@ public class CheckApplicantVC: BaseViewController {
         }
         
         NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
-            navigationBar.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            navigationBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             
             scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -177,13 +178,24 @@ public class CheckApplicantVC: BaseViewController {
         
         self.viewModel = viewModel
         
+        // Input
         navigationBar
-            .eventPublisher
+            .backButton.rx.tap
             .bind(to: viewModel.exitButtonClicked)
             .disposed(by: disposeBag)
         
-        postSummaryCard
-            .bind(vo: viewModel.postCardVO)
+        rx.viewWillAppear
+            .map { _ in }
+            .bind(to: viewModel.requestpostApplicantVO)
+            .disposed(by: disposeBag)
+        
+        // Output
+        viewModel
+            .postCardVO?
+            .drive(onNext: { [weak self] cardVO in
+                self?.postSummaryCard.bind(vo: cardVO)
+            })
+            .disposed(by: disposeBag)
         
         viewModel
             .postApplicantVO?
@@ -194,10 +206,7 @@ public class CheckApplicantVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
-        rx.viewWillAppear
-            .map { _ in }
-            .bind(to: viewModel.requestpostApplicantVO)
-            .disposed(by: disposeBag)
+        
     }
 }
 

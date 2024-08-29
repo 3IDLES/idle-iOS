@@ -43,10 +43,23 @@ public struct CenterEmployCardRO {
     )
     
     public static func create(_ vo: CenterEmployCardVO) -> CenterEmployCardRO {
-        .init(
-            startDay: vo.startDay,
-            endDay: vo.endDay ?? "채용 시까지",
-            postTitle: vo.postTitle,
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let startDayText = dateFormatter.string(from: vo.startDay)
+        let endDayText = vo.endDay == nil ? "채용 시까지" : dateFormatter.string(from: vo.endDay!)
+        
+        var splittedAddress = vo.roadNameAddress.split(separator: " ")
+        
+        if splittedAddress.count >= 3 {
+            splittedAddress = Array(splittedAddress[0..<3])
+        }
+        let addressTitle = splittedAddress.joined(separator: " ")
+        
+        return .init(
+            startDay: startDayText,
+            endDay: endDayText,
+            postTitle: addressTitle,
             nameText: vo.name,
             careGradeText: "\(vo.careGrade.textForCellBtn)등급",
             ageText: "\(vo.age)세",
