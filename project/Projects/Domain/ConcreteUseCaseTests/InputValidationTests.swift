@@ -8,7 +8,7 @@
 import XCTest
 @testable import ConcreteUseCase
 @testable import ConcreteRepository
-@testable import NetworkDataSource
+@testable import DataSource
 
 /// 사용자의 입력을 판단하는 UseCase를 테스트 합니다.
 final class InputValidationTests: XCTestCase {
