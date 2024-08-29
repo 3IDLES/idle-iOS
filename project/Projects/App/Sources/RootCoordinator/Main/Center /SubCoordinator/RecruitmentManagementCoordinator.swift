@@ -66,8 +66,9 @@ public extension RecruitmentManagementCoordinator {
     func showCheckingApplicantScreen(postId: String) {
         let coordinator = CheckApplicantCoordinator(
             dependency: .init(
+                postId: postId,
                 navigationController: navigationController,
-                centerEmployCardVO: .mock,
+                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self),
                 workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
             )
         )

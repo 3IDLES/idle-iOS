@@ -123,9 +123,16 @@ public extension WorkConditionDisplayingView {
         workTimeLabel.textString = workTimeText
         
         let paymentTypeText = object.paymentType?.korLetterText ?? "오류"
-        let paymentAmountText = object.paymentAmount
         
-        workPaymentLabel.textString = "\(paymentTypeText) \(paymentAmountText)원"
+        let payAmount = String(object.paymentAmount)
+        var formedPayAmountText = ""
+        for (index, char) in payAmount.reversed().enumerated() {
+            if (index % 3) == 0, index != 0 {
+                formedPayAmountText = "," + formedPayAmountText
+            }
+            formedPayAmountText = String(char) + formedPayAmountText
+        }
+        workPaymentLabel.textString = "\(paymentTypeText) \(formedPayAmountText)원"
     }
     
     private func applyObject(_ object: AddressInputStateObject) {

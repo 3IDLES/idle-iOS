@@ -11,15 +11,17 @@ import RxCocoa
 import Entity
 import DSKit
 import PresentationCore
+import UseCaseInterface
 
 public protocol CheckApplicantViewModelable {
     // Input
     var requestpostApplicantVO: PublishRelay<Void> { get }
     var exitButtonClicked: PublishRelay<Void> { get }
     
+    
     // Output
     var postApplicantVO: Driver<[PostApplicantVO]>? { get }
-    var postCardVO: CenterEmployCardVO { get }
+    var postCardVO: Driver<CenterEmployCardVO>? { get }
     var alert: Driver<DefaultAlertContentVO>? { get }
     
     func createApplicantCardVM(vo: PostApplicantVO) -> ApplicantCardVM
@@ -27,19 +29,24 @@ public protocol CheckApplicantViewModelable {
 
 public class CheckApplicantVM: CheckApplicantViewModelable {
     
+    // Init
+    let postId: String
     weak var coorindator: CheckApplicantCoordinatable?
+    let recruitmentPostUseCase: RecruitmentPostUseCase
     
     public var exitButtonClicked: PublishRelay<Void> = .init()
     public var requestpostApplicantVO: PublishRelay<Void> = .init()
-    public var postCardVO: CenterEmployCardVO
+    
     
     public var postApplicantVO: Driver<[PostApplicantVO]>?
+    public var postCardVO: Driver<CenterEmployCardVO>?
     public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     
     let disposeBag = DisposeBag()
     
-    public init(postCardVO: CenterEmployCardVO, coorindator: CheckApplicantCoordinatable?) {
-        self.postCardVO = postCardVO
+    public init(postId: String, coorindator: CheckApplicantCoordinatable?, recruitmentPostUseCase: RecruitmentPostUseCase) {
+        self.postId = postId
+        self.recruitmentPostUseCase = recruitmentPostUseCase
         self.coorindator = coorindator
         
         exitButtonClicked
@@ -50,23 +57,30 @@ public class CheckApplicantVM: CheckApplicantViewModelable {
             .disposed(by: disposeBag)
         
         // Input
-        let requestPostApplicantVOResult = requestpostApplicantVO
-            .flatMap { [unowned self] _ in
-                publishPostApplicantVOMocks()
+        let requestScreenDataResult = requestpostApplicantVO
+            .flatMap { [recruitmentPostUseCase] _ in
+                recruitmentPostUseCase.getPostApplicantScreenData(id: postId)
             }
             .share()
             
-        let requestPostApplicantSuccess = requestPostApplicantVOResult.compactMap { $0.value }
-        let requestPostApplicantFailure = requestPostApplicantVOResult.compactMap { $0.error }
+        let requestScreenDataSuccess = requestScreenDataResult.compactMap { $0.value }.share()
+        let requestScreenDataFailure = requestScreenDataResult.compactMap { $0.error }
         
         // Output
-        postApplicantVO = requestPostApplicantSuccess.asDriver(onErrorJustReturn: [])
+        postApplicantVO = requestScreenDataSuccess
+            .map({ screenData in screenData.applicantList })
+            .asDriver(onErrorDriveWith: .never())
         
-        alert = requestPostApplicantFailure
+        postCardVO = requestScreenDataSuccess
+            .map({ screenData in screenData.summaryCardVO })
+            .asDriver(onErrorDriveWith: .never())
+        
+        
+        alert = requestScreenDataFailure
             .map { error in
                 
                 DefaultAlertContentVO(
-                    title: "시스템 오류",
+                    title: "지원자 확인 오류",
                     message: error.message
                 )
             }
@@ -75,11 +89,6 @@ public class CheckApplicantVM: CheckApplicantViewModelable {
     
     public func createApplicantCardVM(vo: PostApplicantVO) -> ApplicantCardVM {
         .init(vo: vo, coordinator: coorindator)
-    }
-    
-    func publishPostApplicantVOMocks() -> Single<Result<[PostApplicantVO], DomainError>> {
-        
-        .just(.success((0...10).map { _ in PostApplicantVO.mock }))
     }
 }
 

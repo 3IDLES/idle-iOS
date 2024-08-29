@@ -14,7 +14,7 @@ public class CenterEmployCardVO {
     // For rendering
     public let startDay: Date
     public let endDay: Date?
-    public let postTitle: String
+    public let roadNameAddress: String
     public let name: String
     public let careGrade: CareGrade
     public let age: Int
@@ -24,7 +24,7 @@ public class CenterEmployCardVO {
         postId: String,
         startDay: Date,
         endDay: Date?,
-        postTitle: String,
+        roadNameAddress: String,
         name: String,
         careGrade: CareGrade,
         age: Int,
@@ -33,7 +33,7 @@ public class CenterEmployCardVO {
         self.postId = postId
         self.startDay = startDay
         self.endDay = endDay
-        self.postTitle = postTitle
+        self.roadNameAddress = roadNameAddress
         self.name = name
         self.careGrade = careGrade
         self.age = age
@@ -45,7 +45,7 @@ public class CenterEmployCardVO {
             postId: "00-00000-00000",
             startDay: Date(),
             endDay: nil,
-            postTitle: "서울특별시 강남구 신사동",
+            roadNameAddress: "서울특별시 강남구 신사동 1231-123",
             name: "홍길동",
             careGrade: .one,
             age: 78,

@@ -18,13 +18,15 @@ public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
     public var childCoordinators: [any PresentationCore.Coordinator] = []
     
     public struct Dependency {
+        let postId: String
         let navigationController: UINavigationController
-        let centerEmployCardVO: CenterEmployCardVO
+        let recruitmentPostUseCase: RecruitmentPostUseCase
         let workerProfileUseCase: WorkerProfileUseCase
         
-        public init(navigationController: UINavigationController, centerEmployCardVO: CenterEmployCardVO, workerProfileUseCase: WorkerProfileUseCase) {
+        public init(postId: String, navigationController: UINavigationController, recruitmentPostUseCase: RecruitmentPostUseCase, workerProfileUseCase: WorkerProfileUseCase) {
+            self.postId = postId
             self.navigationController = navigationController
-            self.centerEmployCardVO = centerEmployCardVO
+            self.recruitmentPostUseCase = recruitmentPostUseCase
             self.workerProfileUseCase = workerProfileUseCase
         }
     }
@@ -32,16 +34,18 @@ public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
     public weak var viewControllerRef: UIViewController?
     public weak var parent: ParentCoordinator?
     
+    let postId: String
     public let navigationController: UINavigationController
-    let centerEmployCardVO: CenterEmployCardVO
     let workerProfileUseCase: WorkerProfileUseCase
+    let recruitmentPostUseCase: RecruitmentPostUseCase
     
     public init(
         dependency: Dependency
     ) {
+        self.postId = dependency.postId
         self.navigationController = dependency.navigationController
-        self.centerEmployCardVO = dependency.centerEmployCardVO
         self.workerProfileUseCase = dependency.workerProfileUseCase
+        self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
     }
     
     deinit {
@@ -51,8 +55,9 @@ public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
     public func start() {
         let vc = CheckApplicantVC()
         let vm = CheckApplicantVM(
-            postCardVO: centerEmployCardVO, 
-            coorindator: self
+            postId: postId,
+            coorindator: self,
+            recruitmentPostUseCase: recruitmentPostUseCase
         )
         vc.bind(viewModel: vm)
         viewControllerRef = vc

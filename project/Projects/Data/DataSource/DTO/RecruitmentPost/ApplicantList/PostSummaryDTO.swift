@@ -45,7 +45,7 @@ public struct PostSummaryDTO: Codable {
             postId: id,
             startDay: startDayDate,
             endDay: deadLineDate,
-            postTitle: roadNameAddress,
+            roadNameAddress: roadNameAddress,
             name: clientName,
             careGrade: CareGrade(rawValue: careLevel-1)!,
             age: age,
