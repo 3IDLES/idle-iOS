@@ -40,7 +40,6 @@ public class CenterSettingVM: CenterSettingVMable {
     // Init
     weak var coordinator: CenterSettingScreenCoordinator?
     let settingUseCase: SettingScreenUseCase
-    let centerProfileUseCase: CenterProfileUseCase
     
     public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
     public var myCenterProfileButtonClicked: RxRelay.PublishRelay<Void> = .init()
@@ -58,13 +57,11 @@ public class CenterSettingVM: CenterSettingVMable {
     
     public init(
         coordinator: CenterSettingScreenCoordinator?,
-        settingUseCase: SettingScreenUseCase,
-        centerProfileUseCase: CenterProfileUseCase
+        settingUseCase: SettingScreenUseCase
         )
     {
         self.coordinator = coordinator
         self.settingUseCase = settingUseCase
-        self.centerProfileUseCase = centerProfileUseCase
         
         
         // 기존의 알람수신 동의 여부 확인
@@ -115,22 +112,22 @@ public class CenterSettingVM: CenterSettingVMable {
         
         
         // MARK: 센터카드 정보 알아내기
-        let fetchCenterProfileResult = viewWillAppear
-            .flatMap { [centerProfileUseCase] _ in
-                centerProfileUseCase.getProfile(mode: .myProfile)
-            }
-        
-        let fetchCenterProfileSuccess = fetchCenterProfileResult.compactMap { $0.value }
-        let fetchCenterProfileFailure = fetchCenterProfileResult.compactMap { $0.error }
-    
-        centerInfo = fetchCenterProfileSuccess
+        centerInfo = viewWillAppear
             .map { centerProfileVO in
-                (
-                    centerProfileVO.centerName,
-                    centerProfileVO.roadNameAddress
-                )
+                let vo = settingUseCase.getCenterProfile()
+                return (vo.centerName, vo.roadNameAddress)
             }
             .asDriver(onErrorJustReturn: ("재가요양센터", "대한민국"))
+            
+        
+        // MARK: 센터 정보로 이동하기
+        myCenterProfileButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                self.coordinator?.showMyCenterProfile()
+            })
+            .disposed(by: disposeBag)
+        
         
         // MARK: 로그아웃
         let signOutRequestResult = signOutButtonComfirmed.flatMap({ [settingUseCase] _ in
@@ -163,7 +160,6 @@ public class CenterSettingVM: CenterSettingVMable {
         // MARK: Alert
         alert = Observable.merge(
             approveRequestError.map { _ in "알람수신 동의 실패" },
-            fetchCenterProfileFailure.map { $0.message },
             signOutFailure.map { $0.message }
         )
         .map({ message in
