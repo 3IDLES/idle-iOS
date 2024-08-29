@@ -43,7 +43,7 @@ public class ApplicationDetailViewContentView: UIView {
     
     // 지원 방법
     let applyTypeButtons: [StateButtonTyp1] = {
-        ApplyType.allCases.map { type in
+        [ApplyType.phoneCall, ApplyType.app].map { type in
             StateButtonTyp1(
                 text: type.korTextForBtn,
                 initial: .normal
@@ -234,8 +234,8 @@ public class ApplicationDetailViewContentView: UIView {
                 // 마감기간
                 if let state = stateFromVM.deadlineDate {
                     
-                    calendarOpenButton
-                        .textLabel.textString = state.convertDateToString()
+                    calendarOpenButton.textLabel.textString = state.convertDateToString()
+                    calendarOpenButton.textLabel.attrTextColor = DSColor.gray900.color
                 }
                 
             })
@@ -326,6 +326,7 @@ public class ApplicationDetailViewContentView: UIView {
 
 extension ApplicationDetailViewContentView: OneDayPickerDelegate {
     public func oneDayPicker(selectedDate: Date) {
+        
         // 위임자 패턴으로 데이터를 수신
         deadlineDate.accept(selectedDate)
     }
