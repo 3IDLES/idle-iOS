@@ -109,4 +109,17 @@ public extension RecruitmentManagementCoordinator {
         coordinator.parent = self
         coordinator.start()
     }
+    
+    func showRegisterPostScrean() {
+        
+        let coordinator = RegisterRecruitmentPostCoordinator(
+            dependency: .init(
+                navigationController: navigationController,
+                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
+            )
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
+    }
 }

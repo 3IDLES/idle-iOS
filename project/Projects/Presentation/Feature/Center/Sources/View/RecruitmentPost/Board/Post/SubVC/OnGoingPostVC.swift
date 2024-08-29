@@ -19,6 +19,7 @@ public protocol OnGoingPostViewModelable {
     var showRemovePostAlert: Driver<IdleAlertViewModelable>? { get }
     
     var requestOngoingPost: PublishRelay<Void> { get }
+    var registerPostButtonClicked: PublishRelay<Void> { get }
 
     func createOngoingPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable
 }
@@ -132,6 +133,12 @@ public class OnGoingPostVC: BaseViewController {
             .map { _ in }
             .bind(to: viewModel.requestOngoingPost)
             .disposed(by: disposeBag)
+        
+        registerPostButton
+            .rx.tap
+            .bind(to: viewModel.registerPostButtonClicked)
+            .disposed(by: disposeBag)
+            
     }
 }
 

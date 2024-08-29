@@ -12,4 +12,5 @@ public protocol RecruitmentManagementCoordinatable: ParentCoordinator {
     func showCheckingApplicantScreen(postId: String)
     func showPostDetailScreenForCenter(postId: String, postState: PostState)
     func showEditScreen(postId: String)
+    func showRegisterPostScrean()
 }
