@@ -21,6 +21,7 @@ enum UserInfoStorageKey: String, Hashable, CaseIterable {
     
     // Center
     case currentCenter = "currentCenter"
+    case currentCenterAuthState = "currentCenterAuthState"
 }
 
 public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
@@ -81,6 +82,18 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
     public func updateCurrentCenterData(vo: Entity.CenterProfileVO) {
         let encoded = try! encoder.encode(vo)
         localStorageService.saveData(key: K.currentCenter.rawValue, value: encoded)
+    }
+    
+    public func setCenterAuthState(state: CenterAuthState) {
+        localStorageService.saveData(key: K.currentCenterAuthState.rawValue, value: state.rawValue)
+    }
+    
+    public func getCenterAuthState() -> Entity.CenterAuthState? {
+        if let centerState: String = localStorageService.fetchData(key: K.currentCenterAuthState.rawValue) {
+            
+            return CenterAuthState(rawValue: centerState)
+        }
+        return nil
     }
     
     public func removeAllData() {
