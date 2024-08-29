@@ -73,11 +73,23 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
     }
     
     public func getPersonalDataUsageDescriptionUrl() -> URL {
+        // MARK: TODO
         URL(string: "")!
     }
     
     public func getApplicationPolicyUrl() -> URL {
+        // MARK: TODO
         URL(string: "")!
+    }
+    
+    public func getWorkerProfile() -> Entity.WorkerProfileVO {
+        // 세팅화면이라면 반드시 존재해야한다.
+        userInfoLocalRepository.getCurrentWorkerData()!
+    }
+    
+    public func getCenterProfile() -> Entity.CenterProfileVO {
+        // 세팅화면이라면 반드시 존재해야한다.
+        userInfoLocalRepository.getCurrentCenterData()!
     }
     
     // MARK: 회원탈퇴 & 로그아웃

@@ -15,28 +15,24 @@ public class CenterSettingScreenCoordinator: ChildCoordinator {
     public struct Dependency {
         let navigationController: UINavigationController
         let settingUseCase: SettingScreenUseCase
-        let centerProfileUseCase: CenterProfileUseCase
         
-        public init(navigationController: UINavigationController, settingUseCase: SettingScreenUseCase, centerProfileUseCase: CenterProfileUseCase) {
+        public init(navigationController: UINavigationController, settingUseCase: SettingScreenUseCase) {
             self.navigationController = navigationController
             self.settingUseCase = settingUseCase
-            self.centerProfileUseCase = centerProfileUseCase
         }
     }
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: CenterSettingScreenCoordinatable?
+    public weak var parent: CenterSettingCoordinatable?
     
     public let navigationController: UINavigationController
     let settingUseCase: SettingScreenUseCase
-    let centerProfileUseCase: CenterProfileUseCase
     
     public init(
         dependency: Dependency
     ) {
         self.navigationController = dependency.navigationController
         self.settingUseCase = dependency.settingUseCase
-        self.centerProfileUseCase = dependency.centerProfileUseCase
     }
     
     deinit {
@@ -47,8 +43,7 @@ public class CenterSettingScreenCoordinator: ChildCoordinator {
         let vc = CenterSettingVC()
         let vm = CenterSettingVM(
             coordinator: self,
-            settingUseCase: settingUseCase,
-            centerProfileUseCase: centerProfileUseCase
+            settingUseCase: settingUseCase
         )
         vc.bind(viewModel: vm)
         viewControllerRef = vc
@@ -68,6 +63,10 @@ public class CenterSettingScreenCoordinator: ChildCoordinator {
     
     public func startRemoveCenterAccountFlow() {
         parent?.startRemoveCenterAccountFlow()
+    }
+    
+    public func showMyCenterProfile() {
+        parent?.showMyCenterProfile()
     }
 }
 

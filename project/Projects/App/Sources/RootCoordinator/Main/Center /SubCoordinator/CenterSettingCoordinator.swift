@@ -11,7 +11,7 @@ import RootFeature
 import PresentationCore
 import UseCaseInterface
 
-class CenterSettingCoordinator: CenterSettingScreenCoordinatable {
+class CenterSettingCoordinator: CenterSettingCoordinatable {
     
     struct Dependency {
         let parent: CenterMainCoordinatable
@@ -34,12 +34,11 @@ class CenterSettingCoordinator: CenterSettingScreenCoordinatable {
         self.parent = dependency.parent
     }
     
-    public func start() {
+    func start() {
         let coordinator = CenterSettingScreenCoordinator(
             dependency: .init(
                 navigationController: navigationController,
-                settingUseCase: injector.resolve(SettingScreenUseCase.self),
-                centerProfileUseCase: injector.resolve(CenterProfileUseCase.self)
+                settingUseCase: injector.resolve(SettingScreenUseCase.self)
             )
         )
         addChildCoordinator(coordinator)
@@ -47,12 +46,25 @@ class CenterSettingCoordinator: CenterSettingScreenCoordinatable {
         coordinator.start()
     }
     
-    public func startRemoveCenterAccountFlow() {
+    func startRemoveCenterAccountFlow() {
         let coordinator = DeRegisterCoordinator(
             dependency: .init(
                 userType: .center,
                 settingUseCase: injector.resolve(SettingScreenUseCase.self),
                 inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self),
+                navigationController: navigationController
+            )
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
+    }
+    
+    func showMyCenterProfile() {
+        let coordinator = CenterProfileCoordinator(
+            dependency: .init(
+                mode: .myProfile,
+                profileUseCase: injector.resolve(CenterProfileUseCase.self),
                 navigationController: navigationController
             )
         )

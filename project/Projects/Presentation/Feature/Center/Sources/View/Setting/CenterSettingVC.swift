@@ -79,6 +79,11 @@ public class CenterSettingVC: BaseViewController {
         self.viewModel = viewModel
         
         // Input
+        rx.viewWillAppear
+            .map { _ in () }
+            .bind(to: viewModel.viewWillAppear)
+            .disposed(by: disposeBag)
+        
         Observable.merge(
             myCenterInfoButton.rx.tap.asObservable(),
             centerInfoCard.rx.tap.asObservable()
