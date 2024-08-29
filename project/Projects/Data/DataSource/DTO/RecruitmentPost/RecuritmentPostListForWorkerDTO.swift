@@ -47,25 +47,9 @@ public struct RecruitmentPostForWorkerDTO: Codable {
             WorkDay.toEntity(text: dayText)
         })
         
-        let payAmount = String(payAmount)
-        var formedPayAmount = ""
-        for (index, char) in payAmount.reversed().enumerated() {
-            if (index % 3) == 0, index != 0 {
-                formedPayAmount += ","
-            }
-            formedPayAmount += String(char)
-        }
-        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let deadlineDate = applyDeadline != nil ? dateFormatter.date(from: applyDeadline!) : nil
-        
-        // distance는 미터단위입니다.
-        var distanceText: String = "\(distance)m"
-        if distance >= 1000 {
-            let kilometers = Double(distance)/1000.0
-            distanceText = String(format: "%.1fkm", kilometers)
-        }
         
         return .init(
             postId: id,
@@ -81,8 +65,8 @@ public struct RecruitmentPostForWorkerDTO: Codable {
             applyDeadlineType: ApplyDeadlineType.toEntity(text: applyDeadlineType),
             applyDeadlineDate: deadlineDate,
             payType: PaymentType.toEntity(text: payType),
-            payAmount: formedPayAmount,
-            distanceFromWorkPlace: distanceText
+            payAmount: String(payAmount),
+            distanceFromWorkPlace: distance
         )
     }
 }

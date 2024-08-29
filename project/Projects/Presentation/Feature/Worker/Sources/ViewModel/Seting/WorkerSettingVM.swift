@@ -111,6 +111,14 @@ public class WorkerSettingVM: WorkerSettingVMable {
         )
         .asDriver(onErrorJustReturn: ())
         
+        // MARK: 내프로필 보기
+        myProfileButtonClicked
+            .subscribe(onNext: { [weak self] _ in
+                
+                self?.coordinator?.showMyProfileScreen()
+            })
+            .disposed(by: disposeBag)
+        
         // MARK: 로그아웃
         let signOutRequestResult = signOutButtonComfirmed.flatMap({ [settingUseCase] _ in
             settingUseCase.signoutWorkerAccount()

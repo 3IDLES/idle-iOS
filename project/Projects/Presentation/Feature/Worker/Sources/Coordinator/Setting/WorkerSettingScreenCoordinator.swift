@@ -70,4 +70,8 @@ public class WorkerSettingScreenCoordinator: ChildCoordinator {
     func startRemoveWorkerAccountFlow() {
         parent?.startRemoveWorkerAccountFlow()
     }
+    
+    func showMyProfileScreen() {
+        parent?.showMyProfileScreen()
+    }
 }

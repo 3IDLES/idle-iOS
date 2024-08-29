@@ -69,12 +69,20 @@ public class WorkerEmployCardRO {
         }
         let addressTitle = splittedAddress.joined(separator: " ")
         
+        // distance는 미터단위입니다.
+        var distanceText: String = "\(vo.distanceFromWorkPlace)m"
+
+        if vo.distanceFromWorkPlace >= 1000 {
+            let kilometers = Double(vo.distanceFromWorkPlace)/1000.0
+            distanceText = String(format: "%.1fkm", kilometers)
+        }
+        
         return .init(
             showBiginnerTag: vo.isBeginnerPossible,
             showDayLeftTag: showDayLeftTag,
             dayLeftTagText: dayLeftTagText,
             titleText: addressTitle,
-            distanceFromWorkPlace: "\(vo.distanceFromWorkPlace)m",
+            distanceFromWorkPlace: distanceText,
             targetInfoText: targetInfoText,
             workDaysText: workDaysText,
             workTimeText: workTimeText,

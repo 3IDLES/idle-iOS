@@ -11,7 +11,7 @@ public struct WorkerEmployCardVO {
     
     public let dayLeft: Int
     public let isBeginnerPossible: Bool
-    public let distanceFromWorkPlace: String
+    public let distanceFromWorkPlace: Int
     public let title: String
     public let targetAge: Int
     public let careGrade: CareGrade
@@ -25,7 +25,7 @@ public struct WorkerEmployCardVO {
     public init(
         dayLeft: Int,
         isBeginnerPossible: Bool,
-        distanceFromWorkPlace: String,
+        distanceFromWorkPlace: Int,
         title: String,
         targetAge: Int,
         careGrade: CareGrade,
@@ -104,7 +104,7 @@ public struct WorkerEmployCardVO {
         return WorkerEmployCardVO(
             dayLeft: leftDay ?? 31,
             isBeginnerPossible: isBeginnerPossible,
-            distanceFromWorkPlace: "500",
+            distanceFromWorkPlace: 500,
             title: title,
             targetAge: targetAge,
             careGrade: careGrade,
@@ -160,7 +160,7 @@ public extension WorkerEmployCardVO {
     static let mock = WorkerEmployCardVO(
         dayLeft: 10,
         isBeginnerPossible: true,
-        distanceFromWorkPlace: "500m",
+        distanceFromWorkPlace: 500,
         title: "서울특별시 강남구 신사동",
         targetAge: 78,
         careGrade: .four,
@@ -175,7 +175,7 @@ public extension WorkerEmployCardVO {
     static let `default` = WorkerEmployCardVO(
         dayLeft: 0,
         isBeginnerPossible: true,
-        distanceFromWorkPlace: "8km",
+        distanceFromWorkPlace: 8000,
         title: "기본값",
         targetAge: 10,
         careGrade: .one,
