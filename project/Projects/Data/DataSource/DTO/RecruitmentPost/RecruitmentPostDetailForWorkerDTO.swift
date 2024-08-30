@@ -76,7 +76,7 @@ public struct RecruitmentPostDTO: Codable {
         
         let currentYear = Calendar.current.component(.year, from: Date())
         customerInfo.birthYear = String(currentYear - age)
-        customerInfo.weight = (weight == nil) ? String(weight!) : ""
+        customerInfo.weight = (weight == nil) ? "" : String(weight!)
         customerInfo.careGrade = CareGrade(rawValue: careLevel-1)!
         
         customerInfo.cognitionState = CognitionDegree.toEntity(text: mentalStatus)

@@ -35,7 +35,7 @@ public protocol UserInfoLocalRepository {
     func getCenterAuthState() -> Entity.CenterAuthState?
     
     /// 센터의 인증 정보를 가져옵니다.
-    func getCenterAuthState() -> CenterAuthState
+//    func getCenterAuthState() -> CenterAuthState
     
     /// 유저타입, 정보를 모두 삭제합니다.
     func removeAllData()
