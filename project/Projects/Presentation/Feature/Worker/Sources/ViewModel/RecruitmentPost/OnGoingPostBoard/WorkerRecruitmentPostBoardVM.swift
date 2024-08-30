@@ -143,7 +143,6 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                 let viewModels = mergedPosts.map { vo in
                     
                     let cardVO: WorkerEmployCardVO = .create(vo: vo)
-                    
                     let vm: OngoindWorkerEmployCardVM = .init(
                         postId: vo.postId,
                         vo: cardVO,
@@ -173,6 +172,8 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     }
 }
 
+
+// MARK: ViewModelForCell
 class OngoindWorkerEmployCardVM: WorkerEmployCardViewModelable {
     
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?
