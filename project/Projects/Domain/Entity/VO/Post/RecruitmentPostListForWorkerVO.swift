@@ -40,7 +40,7 @@ public struct RecruitmentPostForWorkerVO {
     public let payType: PaymentType
     public let payAmount: String
     
-    public let distanceFromWorkPlace: String
+    public let distanceFromWorkPlace: Int
     
     public init(
         postId: String,
@@ -57,7 +57,7 @@ public struct RecruitmentPostForWorkerVO {
         applyDeadlineDate: Date?,
         payType: PaymentType,
         payAmount: String,
-        distanceFromWorkPlace: String
+        distanceFromWorkPlace: Int
     ) {
         self.postId = postId
         self.workDays = workDays
@@ -90,7 +90,7 @@ public struct RecruitmentPostForWorkerVO {
         applyDeadlineType: .specificDate,
         applyDeadlineDate: Calendar.current.date(byAdding: .day, value: 7, to: Date()),
         payType: .hourly,
-        payAmount: "15,000",
-        distanceFromWorkPlace: "2.5km"
+        payAmount: "15000",
+        distanceFromWorkPlace: 2500
     )
 }

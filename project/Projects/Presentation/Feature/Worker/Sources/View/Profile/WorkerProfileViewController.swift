@@ -310,8 +310,7 @@ public class WorkerProfileViewController: DisposableViewController {
 //            starButton,
             tagNameStack,
             humanInfoStack,
-            contactButtonContainer,
-            divider,
+            VStack([contactButtonContainer, divider], spacing: 24, alignment: .fill),
             employeeInfoTitleLabel,
             employeeInfoStack
             

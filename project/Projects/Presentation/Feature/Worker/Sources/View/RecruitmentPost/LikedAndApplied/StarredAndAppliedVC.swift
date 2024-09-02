@@ -13,14 +13,6 @@ import RxSwift
 import Entity
 import DSKit
 
-public protocol WorkerStaticPostBoardVMable {
-    
-    var postBoardData: Driver<[WorkerEmployCardViewModelable]>? { get }
-    var postViewWillAppear: PublishRelay<Void> { get }
-    
-    var alert: Driver<DefaultAlertContentVO>? { get }
-}
-
 public class StarredAndAppliedVC: BaseViewController {
     enum TabBarState: Int, CaseIterable {
         case applied = 0
@@ -46,9 +38,9 @@ public class StarredAndAppliedVC: BaseViewController {
     }
     
     private var currentState: TabBarState = .applied
-    private let viewControllerDict: [TabBarState: WorkerStaticPostBoardVC] = [
-        .applied : WorkerStaticPostBoardVC(),
-        .starred : WorkerStaticPostBoardVC()
+    private let viewControllerDict: [TabBarState: WorkerPagablePostBoardVC] = [
+        .applied : WorkerPagablePostBoardVC(),
+        .starred : WorkerPagablePostBoardVC()
     ]
     
     // Init
@@ -166,8 +158,8 @@ public class StarredAndAppliedVC: BaseViewController {
     }
     
     public func bind(
-        appliedPostVM: WorkerStaticPostBoardVMable,
-        starredPostVM: WorkerStaticPostBoardVMable
+        appliedPostVM: WorkerPagablePostBoardVMable,
+        starredPostVM: WorkerPagablePostBoardVMable
     ) {
          
         viewControllerDict[.applied]?.bind(viewModel: appliedPostVM)

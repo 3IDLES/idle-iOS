@@ -14,16 +14,19 @@ import Entity
 import DSKit
 import UseCaseInterface
 
-public protocol WorkerRecruitmentPostBoardVMable: DefaultAlertOutputable {
-    
+public protocol WorkerPagablePostBoardVMable: DefaultAlertOutputable {
     /// 다음 페이지를 요청합니다.
     var requestNextPage: PublishRelay<Void> { get }
-    /// ViewDidLoad
+    /// ViewDidLoad, 최초 요청을 위해 사용합니다.
     var viewDidLoad: PublishRelay<Void> { get }
     
     
     /// 페이지요청에 대한 결과를 전달합니다.
     var postBoardData: Driver<[WorkerEmployCardViewModelable]>? { get }
+}
+
+public protocol WorkerRecruitmentPostBoardVMable: WorkerPagablePostBoardVMable {
+    
     /// 요양보호사 위치 정보를 전달합니다.
     var workerLocationTitleText: Driver<String>? { get }
 }
@@ -63,7 +66,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     {
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
-        self.nextPagingRequest = .native(nextPageId: nil)
+        self.nextPagingRequest = .initial
         
         // 상단 위치정보
         workerLocationTitleText = viewDidLoad
@@ -83,7 +86,6 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                 // ThirdPatry에서도 불러올 데이터가 없는 경우입니다.
                 self?.nextPagingRequest
             }
-            .share()
             .flatMap { [recruitmentPostUseCase] request in
                 recruitmentPostUseCase
                     .getPostListForWorker(
@@ -113,19 +115,26 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                     if let nextPageId = fetchedData.nextPageId {
                         // 다음값이 있는 경우
                         switch prevRequest {
-                        case .native:
-                            nextRequest = .native(nextPageId: nextPageId)
-                        case .thirdParty:
-                            nextRequest = .thirdParty(nextPageId: nextPageId)
+                        case .initial:
+                            nextRequest = .paging(source: .native, nextPageId: nextPageId)
+                        case .paging(let source, let nextPageId):
+                            nextRequest = .paging(source: .thirdParty, nextPageId: nextPageId)
                         }
                     } else {
                         // 다음값이 없는 경우
                         switch prevRequest {
-                        case .native:
-                            nextRequest = .thirdParty(nextPageId: nil)
-                        case .thirdParty:
-                            // 페이징 종료
-                            nextRequest = nil
+                        case .initial:
+                            // 써드파티 데이터 호출
+                            nextRequest = .paging(source: .thirdParty, nextPageId: nil)
+                        case .paging(let source, _):
+                            switch source {
+                            case .native:
+                                // 써드파티 데이터 호출
+                                nextRequest = .paging(source: .thirdParty, nextPageId: nil)
+                            case .thirdParty:
+                                // 페이징 종료
+                                nextRequest = nil
+                            }
                         }
                     }
                 }
