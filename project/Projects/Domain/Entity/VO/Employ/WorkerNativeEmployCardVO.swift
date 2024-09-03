@@ -150,8 +150,8 @@ public struct WorkerNativeEmployCardVO {
             endTime: vo.endTime,
             paymentType: vo.payType,
             paymentAmount: vo.payAmount,
-            applyDate: nil,
-            isFavorite: false
+            applyDate: vo.applyTime,
+            isFavorite: vo.isFavorite
         )
     }
 }
