@@ -170,4 +170,8 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         
         return convert(task: stream)
     }
+    
+    public func applyToPost(postId: String, method: Entity.ApplyType) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
+        convert(task: repository.ApplyToPost(postId: postId, method: method))
+    }
 }

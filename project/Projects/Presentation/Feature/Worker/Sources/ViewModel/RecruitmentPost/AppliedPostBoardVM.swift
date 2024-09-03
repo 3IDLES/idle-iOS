@@ -20,9 +20,10 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
     // Input
     public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
     public var requestNextPage: RxRelay.PublishRelay<Void> = .init()
+    public var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
     
     // Output
-    public var postBoardData: RxCocoa.Driver<[any DSKit.WorkerEmployCardViewModelable]>?
+    public var postBoardData: RxCocoa.Driver<[PostBoardCellData]>?
     public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     
     // Init
@@ -66,7 +67,7 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
                 currentPostVO,
                 requestPostListSuccess
             )
-            .compactMap { [weak self] (prevPostList, fetchedData) -> [WorkerEmployCardViewModelable]? in
+            .compactMap { [weak self] (prevPostList, fetchedData) -> [PostBoardCellData]? in
                 
                 guard let self else { return nil }
                 
@@ -84,21 +85,15 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
                 // 최근값 업데이트
                 self.currentPostVO.accept(mergedPosts)
                 
-                // ViewModel 생성
-                let viewModels = mergedPosts.map { vo in
+                // cellData 생성
+                let cellData: [PostBoardCellData] = mergedPosts.map { vo in
                     
                     let cardVO: WorkerNativeEmployCardVO = .create(vo: vo)
                     
-                    let vm: OngoindWorkerEmployCardVM = .init(
-                        postId: vo.postId,
-                        vo: cardVO,
-                        coordinator: self.coordinator
-                    )
-                    
-                    return vm
+                    return .init(postId: vo.postId, cardVO: cardVO)
                 }
                 
-                return viewModels
+                return cellData
             }
             .asDriver(onErrorJustReturn: [])
         
@@ -111,59 +106,8 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
             }
             .asDriver(onErrorJustReturn: .default)
     }
-}
-
-class AppliedWorkerEmployCardVM: WorkerEmployCardViewModelable {
     
-    weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    
-    // Init
-    let postId: String
-    
-    var cellViewObject: WorkerNativeEmployCardVO
-    
-    public var cardClicked: RxRelay.PublishRelay<Void> = .init()
-    public var applyButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var starButtonClicked: RxRelay.PublishRelay<Bool> = .init()
-    
-    let disposeBag = DisposeBag()
-    
-    public init
-        (
-            postId: String,
-            vo: WorkerNativeEmployCardVO,
-            coordinator: WorkerRecruitmentBoardCoordinatable? = nil
-        )
-    {
-        self.postId = postId
-        self.cellViewObject = vo
-        self.coordinator = coordinator
-        
-        // MARK: 버튼 처리
-        applyButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                // 지원하기 버튼 눌림
-            })
-            .disposed(by: disposeBag)
-        
-        cardClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                coordinator?.showPostDetail(
-                    postId: postId
-                )
-            })
-            .disposed(by: disposeBag)
-        
-        starButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                // 즐겨찾기 버튼눌림
-            })
-            .disposed(by: disposeBag)
+    public func showPostDetail(id: String) {
+        coordinator?.showPostDetail(postId: id)
     }
 }

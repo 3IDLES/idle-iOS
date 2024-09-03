@@ -1,5 +1,5 @@
 //
-//  WorkerEmployCard.swift
+//  WorkerNativeEmployCardCell.swift
 //  DSKit
 //
 //  Created by choijunios on 7/19/24.
@@ -15,25 +15,21 @@ public enum PostAppliedState {
     case notApplied
 }
 
-public protocol WorkerEmployCardViewModelable {
+public protocol WorkerNativeEmployCardViewModelable: AnyObject {
     
-    // Output
-    var cellViewObject: WorkerNativeEmployCardVO { get }
+    /// '지원하기' 버튼이 눌렸을 때, 공고 id를 전달합니다.
+    var applyButtonClicked: PublishRelay<(postId: String, postTitle: String)> { get }
     
-    // Input
-    var cardClicked: PublishRelay<Void> { get }
-    var applyButtonClicked: PublishRelay<Void> { get }
-    
-    /// true일 경우 즐겨 찾기에 등록됩니다.
-    var starButtonClicked: PublishRelay<Bool> { get }
+    /// 공고상세보기
+    func showPostDetail(id: String)
 }
 
-public class WorkerEmployCardCell: UITableViewCell {
+public class WorkerNativeEmployCardCell: UITableViewCell {
     
-    public static let identifier = String(describing: WorkerEmployCardCell.self)
+    public static let identifier = String(describing: WorkerNativeEmployCardCell.self)
     
     
-    var viewModel: WorkerEmployCardViewModelable?
+    var viewModel: WorkerNativeEmployCardViewModelable?
     private var disposables: [Disposable?]?
     
     public override func layoutSubviews() {
@@ -102,15 +98,10 @@ public class WorkerEmployCardCell: UITableViewCell {
         ])
     }
     
-    public func bind(viewModel: WorkerEmployCardViewModelable) {
-        
-        self.viewModel = viewModel
-        
-        // Output
-        let cardVO = viewModel.cellViewObject
+    public func bind(postId: String, vo: WorkerNativeEmployCardVO, viewModel: WorkerNativeEmployCardViewModelable) {
         
         // 지원 여부
-        if let appliedDate = cardVO.applyDate {
+        if let appliedDate = vo.applyDate {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "지원완료 yyyy. MM. dd"
             let applyButtonLabelString = dateFormatter.string(from: appliedDate)
@@ -119,7 +110,7 @@ public class WorkerEmployCardCell: UITableViewCell {
         }
         
         // 카드 컨텐츠 바인딩
-        let cardRO = WorkerNativeEmployCardRO.create(vo: cardVO)
+        let cardRO = WorkerNativeEmployCardRO.create(vo: vo)
         cardView.bind(ro: cardRO)
         
         // input
@@ -128,17 +119,15 @@ public class WorkerEmployCardCell: UITableViewCell {
             // Input
             tappableArea
                 .rx.tap
-                .bind(to: viewModel.cardClicked),
-            
-            applyButton
-                .rx.tap
+                .subscribe(onNext: { [weak viewModel] _ in
+                    viewModel?.showPostDetail(id: postId)
+                }),
+                        
+            applyButton.rx.tap
+                .map({ _ in (postId, vo.title) })
                 .bind(to: viewModel.applyButtonClicked),
             
-            cardView
-                .starButton
-                .eventPublisher
-                .map { $0 == .accent }
-                .bind(to: viewModel.starButtonClicked),
+            //TODO: 즐겨찾기 구현예정
         ]
         
         self.disposables = disposables

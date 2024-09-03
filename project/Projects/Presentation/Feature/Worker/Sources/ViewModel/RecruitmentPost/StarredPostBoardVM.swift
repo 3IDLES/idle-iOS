@@ -14,15 +14,17 @@ import Entity
 import DSKit
 import UseCaseInterface
 
-public class StarredPostBoardVM: WorkerPagablePostBoardVMable {    
-
+public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
+    
     // Input
     public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
     public var requestNextPage: RxRelay.PublishRelay<Void> = .init()
+    public var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
     
     // Output
-    public var postBoardData: RxCocoa.Driver<[any DSKit.WorkerEmployCardViewModelable]>?
-    public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    public var postBoardData: Driver<[PostBoardCellData]>?
+    public var alert: Driver<Entity.DefaultAlertContentVO>?
+    public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
     // Init
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?
@@ -65,7 +67,7 @@ public class StarredPostBoardVM: WorkerPagablePostBoardVMable {
                 currentPostVO,
                 requestPostListSuccess
             )
-            .compactMap { [weak self] (prevPostList, fetchedData) -> [WorkerEmployCardViewModelable]? in
+            .compactMap { [weak self] (prevPostList, fetchedData) -> [PostBoardCellData]? in
                 
                 guard let self else { return nil }
                 
@@ -84,92 +86,64 @@ public class StarredPostBoardVM: WorkerPagablePostBoardVMable {
                 // 최근값 업데이트
                 self.currentPostVO.accept(mergedPosts)
                 
-                // ViewModel 생성
-                let viewModels = mergedPosts.map { vo in
+                // cellData 생성
+                let cellData: [PostBoardCellData] = mergedPosts.map { vo in
                     
                     let cardVO: WorkerNativeEmployCardVO = .create(vo: vo)
                     
-                    let vm: OngoindWorkerEmployCardVM = .init(
-                        postId: vo.postId,
-                        vo: cardVO,
-                        coordinator: self.coordinator
-                    )
-                    
-                    return vm
+                    return .init(postId: vo.postId, cardVO: cardVO)
                 }
                 
-                return viewModels
+                return cellData
             }
             .asDriver(onErrorJustReturn: [])
         
-        alert = requestPostListFailure
+        // MARK: 지원하기
+        let applyRequest: PublishRelay<String> = .init()
+        self.idleAlertVM = applyButtonClicked
+            .map { (postId: String, postTitle: String) in
+                DefaultIdleAlertVM(
+                    title: "'postTitle'\n공고에 지원하시겠어요?",
+                    description: "",
+                    acceptButtonLabelText: "지원하기",
+                    cancelButtonLabelText: "취소하기") { [applyRequest] in
+                        applyRequest.accept(postId)
+                    }
+            }
+            .asDriver(onErrorDriveWith: .never())
+            
+        let applyRequestResult = applyRequest
+            .flatMap { [recruitmentPostUseCase] postId in
+                // 리스트화면에서는 앱내 지원만 지원합니다.
+                recruitmentPostUseCase
+                    .applyToPost(postId: postId, method: .app)
+            }
+            .share()
+        
+        let applyRequestFailure = applyRequestResult.compactMap { $0.error }
+        
+        let applyRequestFailureAlert = applyRequestFailure
+            .map { error in
+                DefaultAlertContentVO(
+                    title: "지원하기 실패",
+                    message: error.message
+                )
+            }
+        
+        let requestPostListFailureAlert = requestPostListFailure
             .map { error in
                 DefaultAlertContentVO(
                     title: "즐겨찾기한 공고 불러오기 오류",
                     message: error.message
                 )
             }
+        
+        alert = Observable
+            .merge(applyRequestFailureAlert, requestPostListFailureAlert)
             .asDriver(onErrorJustReturn: .default)
     }
     
-    
-    func publishStarredPostMocks() -> Single<Result<[NativeRecruitmentPostForWorkerVO], DomainError>> {
-        return .just(.success((0..<10).map { _ in .mock }))
-    }
-}
-
-class StarredWorkerEmployCardVM: WorkerEmployCardViewModelable {
-    
-    
-    
-    weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    
-    // Init
-    let postId: String
-    var cellViewObject: Entity.WorkerNativeEmployCardVO
-    
-    public var cardClicked: RxRelay.PublishRelay<Void> = .init()
-    public var applyButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var starButtonClicked: RxRelay.PublishRelay<Bool> = .init()
-    
-    let disposeBag = DisposeBag()
-    
-    public init
-        (
-            postId: String,
-            vo: WorkerNativeEmployCardVO,
-            coordinator: WorkerRecruitmentBoardCoordinatable? = nil
-        )
-    {
-        self.postId = postId
-        self.cellViewObject = vo
-        self.coordinator = coordinator
-        
-        // MARK: 버튼 처리
-        applyButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                // 지원하기 버튼 눌림
-            })
-            .disposed(by: disposeBag)
-        
-        cardClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                self.coordinator?.showPostDetail(
-                    postId: postId
-                )
-            })
-            .disposed(by: disposeBag)
-        
-        starButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                // 즐겨찾기 버튼눌림
-            })
-            .disposed(by: disposeBag)
+    public func showPostDetail(id: String) {
+        coordinator?.showCenterProfile(centerId: id)
     }
 }

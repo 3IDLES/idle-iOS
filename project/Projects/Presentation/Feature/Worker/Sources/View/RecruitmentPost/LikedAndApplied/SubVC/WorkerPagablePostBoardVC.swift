@@ -15,7 +15,7 @@ import DSKit
 
 public class WorkerPagablePostBoardVC: BaseViewController {
     
-    typealias Cell = WorkerEmployCardCell
+    typealias Cell = WorkerNativeEmployCardCell
     
     var viewModel: WorkerPagablePostBoardVMable?
     
@@ -33,7 +33,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
     var isPaging = true
     
     // Observable
-    let postViewModels: BehaviorRelay<[WorkerEmployCardViewModelable]> = .init(value: [])
+    let cellData: BehaviorRelay<[PostBoardCellData]> = .init(value: [])
     let requestNextPage: PublishRelay<Void> = .init()
     
     private let disposeBag = DisposeBag()
@@ -98,9 +98,41 @@ public class WorkerPagablePostBoardVC: BaseViewController {
         // Output
         viewModel
             .postBoardData?
-            .drive(onNext: { [weak self] viewModels in
+            .drive(onNext: { [weak self] cellData in
                 guard let self else { return }
-                self.postViewModels.accept(viewModels)
+                self.cellData.accept(cellData)
+                self.postTableView.reloadData()
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .alert?
+            .drive(onNext: { [weak self] alertVO in
+                self?.showAlert(vo: alertVO)
+            })
+            .disposed(by: disposeBag)
+        
+        // Input
+        Observable
+            .merge(self.rx.viewWillAppear.map { _ in () })
+            .bind(to: viewModel.requestInitialPageRequest)
+            .disposed(by: disposeBag)
+        
+        self.requestNextPage
+            .bind(to: viewModel.requestNextPage)
+            .disposed(by: disposeBag)
+    }
+    
+    func bind(viewModel: WorkerAppliablePostBoardVMable) {
+        
+        self.viewModel = viewModel
+        
+        // Output
+        viewModel
+            .postBoardData?
+            .drive(onNext: { [weak self] cellData in
+                guard let self else { return }
+                self.cellData.accept(cellData)
                 self.postTableView.reloadData()
             })
             .disposed(by: disposeBag)
@@ -127,7 +159,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
 extension WorkerPagablePostBoardVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        postViewModels.value.count
+        cellData.value.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -135,8 +167,11 @@ extension WorkerPagablePostBoardVC: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
         cell.selectionStyle = .none
         
-        let vm = postViewModels.value[indexPath.row]
-        cell.bind(viewModel: vm)
+        let cellData = cellData.value[indexPath.row]
+        
+        if let vm = viewModel {
+            cell.bind(postId: cellData.postId, vo: cellData.cardVO, viewModel: vm)
+        }
         
         return cell
     }

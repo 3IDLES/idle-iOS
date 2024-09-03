@@ -52,4 +52,7 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     
     /// 요양보호사가 확인하는 케어밋 자체 공고정보를 가져옵니다.
     func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> Single<RecruitmentPostListForWorkerVO>
+    
+    /// 요양보호사가 인앱 공고에 지원합니다.
+    func ApplyToPost(postId: String, method: ApplyType) -> Single<Void>
 }

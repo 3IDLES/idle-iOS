@@ -14,17 +14,31 @@ import Entity
 import DSKit
 import UseCaseInterface
 
-public protocol WorkerPagablePostBoardVMable: DefaultAlertOutputable {
+public struct PostBoardCellData {
+    let postId: String
+    let cardVO: WorkerNativeEmployCardVO
+}
+
+/// 페이징 보드
+public protocol WorkerPagablePostBoardVMable: DefaultAlertOutputable & WorkerNativeEmployCardViewModelable {
     /// 다음 페이지를 요청합니다.
     var requestNextPage: PublishRelay<Void> { get }
+    
     /// 화면이 등장할 때마다 리스트를 초기화합니다.
     var requestInitialPageRequest: PublishRelay<Void> { get }
     
     /// 페이지요청에 대한 결과를 전달합니다.
-    var postBoardData: Driver<[WorkerEmployCardViewModelable]>? { get }
+    var postBoardData: Driver<[PostBoardCellData]>? { get }
 }
 
-public protocol WorkerRecruitmentPostBoardVMable: WorkerPagablePostBoardVMable {
+/// 페이징 + 지원하기
+public protocol WorkerAppliablePostBoardVMable: WorkerPagablePostBoardVMable {
+    /// 지원하기 Alert
+    var idleAlertVM: Driver<IdleAlertViewModelable>? { get }
+}
+
+/// 페이징 + 지원하기 + 요양보호사 위치정보
+public protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable {
     
     /// 요양보호사 위치정보를 요청합니다.
     var requestWorkerLocation: PublishRelay<Void> { get }
@@ -36,15 +50,16 @@ public protocol WorkerRecruitmentPostBoardVMable: WorkerPagablePostBoardVMable {
 public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     
     // Output
-    public var postBoardData: Driver<[WorkerEmployCardViewModelable]>?
-    public var alert: Driver<DefaultAlertContentVO>?
+    public var postBoardData: Driver<[PostBoardCellData]>?
     public var workerLocationTitleText: Driver<String>?
-    
+    public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
+    public var alert: Driver<DefaultAlertContentVO>?
     
     // Input
     public var requestInitialPageRequest: PublishRelay<Void> = .init()
     public var requestWorkerLocation: PublishRelay<Void> = .init()
     public var requestNextPage: PublishRelay<Void> = .init()
+    public var applyButtonClicked: PublishRelay<(postId: String, postTitle: String)> = .init()
     
     
     // Init
@@ -116,7 +131,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                 currentPostVO,
                 requestPostListSuccess
             )
-            .compactMap { [weak self] (prevPostList, fetchedData) -> [WorkerEmployCardViewModelable]? in
+            .compactMap { [weak self] (prevPostList, fetchedData) -> [PostBoardCellData]? in
                 
                 guard let self else { return nil }
                 
@@ -160,31 +175,67 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                 // 최근값 업데이트
                 self.currentPostVO.accept(mergedPosts)
                 
-                // ViewModel 생성
-                let viewModels = mergedPosts.map { postVO in
+                // cellData생성
+                let cellData: [PostBoardCellData] = mergedPosts.map { postVO in
                     
                     let cardVO: WorkerNativeEmployCardVO = .create(vo: postVO)
-                    let cardViewModel: OngoindWorkerEmployCardVM = .init(
-                        postId: postVO.postId,
-                        vo: cardVO,
-                        coordinator: self.coordinator
-                    )
-                    
-                    return cardViewModel
+                    return .init(postId: postVO.postId, cardVO: cardVO)
                 }
                 
-                return viewModels
+                return cellData
             }
             .asDriver(onErrorJustReturn: [])
         
-        alert = requestPostListFailure
+        // MARK: 지원하기
+        let applyRequest: PublishRelay<String> = .init()
+        self.idleAlertVM = applyButtonClicked
+            .map { (postId: String, postTitle: String) in
+                DefaultIdleAlertVM(
+                    title: "'postTitle'\n공고에 지원하시겠어요?",
+                    description: "",
+                    acceptButtonLabelText: "지원하기",
+                    cancelButtonLabelText: "취소하기") { [applyRequest] in
+                        applyRequest.accept(postId)
+                    }
+            }
+            .asDriver(onErrorDriveWith: .never())
+            
+        let applyRequestResult = applyRequest
+            .flatMap { [recruitmentPostUseCase] postId in
+                // 리스트화면에서는 앱내 지원만 지원합니다.
+                recruitmentPostUseCase
+                    .applyToPost(postId: postId, method: .app)
+            }
+            .share()
+        
+        let applyRequestFailure = applyRequestResult.compactMap { $0.error }
+        
+        let applyRequestFailureAlert = applyRequestFailure
             .map { error in
-                return DefaultAlertContentVO(
-                    title: "시스템 오류",
+                DefaultAlertContentVO(
+                    title: "지원하기 실패",
                     message: error.message
                 )
             }
+        
+        let requestPostListFailureAlert = requestPostListFailure
+            .map { error in
+                DefaultAlertContentVO(
+                    title: "공고 불러오기 오류",
+                    message: error.message
+                )
+            }
+            
+        self.alert = Observable
+            .merge(
+                applyRequestFailureAlert,
+                requestPostListFailureAlert
+            )
             .asDriver(onErrorJustReturn: .default)
+    }
+    
+    public func showPostDetail(id: String) {
+        coordinator?.showPostDetail(postId: id)
     }
     
     /// Test
@@ -192,4 +243,3 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
         "서울시 영등포구"
     }
 }
-

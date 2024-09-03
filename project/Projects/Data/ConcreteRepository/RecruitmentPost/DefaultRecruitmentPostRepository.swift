@@ -14,11 +14,13 @@ import Moya
 
 public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     
-    private var service: RecruitmentPostService = .init()
+    private var recruitmentPostService: RecruitmentPostService = .init()
+    private var applyService: ApplyService = .init()
     
     public init(_ store: KeyValueStore? = nil) {
         if let store {
-            self.service = RecruitmentPostService(keyValueStore: store)
+            self.recruitmentPostService = RecruitmentPostService(keyValueStore: store)
+            self.applyService = ApplyService(keyValueStore: store)
         }
     }
     
@@ -27,13 +29,13 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         
         let encodedData = try! JSONEncoder().encode(bundle.toDTO())
         
-        return service.request(api: .registerPost(postData: encodedData), with: .withToken)
+        return recruitmentPostService.request(api: .registerPost(postData: encodedData), with: .withToken)
             .mapToVoid()
     }
 
     public func getPostDetailForCenter(id: String) -> RxSwift.Single<Entity.RegisterRecruitmentPostBundle> {
         
-        service.request(api: .postDetail(id: id, userType: .center), with: .withToken)
+        recruitmentPostService.request(api: .postDetail(id: id, userType: .center), with: .withToken)
             .map(RecruitmentPostFetchDTO.self)
             .map { dto in
                 dto.toEntity()
@@ -44,26 +46,26 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         
         let encodedData = try! JSONEncoder().encode(bundle.toDTO())
         
-        return service.request(
+        return recruitmentPostService.request(
             api: .editPost(id: id, postData: encodedData),
             with: .withToken
         ).map { _ in () }
     }
     
     public func getOngoingPosts() -> RxSwift.Single<[Entity.RecruitmentPostInfoForCenterVO]> {
-        return service.request(api: .getOnGoingPosts, with: .withToken)
+        return recruitmentPostService.request(api: .getOnGoingPosts, with: .withToken)
             .map(RecruitmentPostForCenterListDTO.self)
             .map({ $0.jobPostings.map { $0.toVO() } })
     }
     
     public func getClosedPosts() -> RxSwift.Single<[Entity.RecruitmentPostInfoForCenterVO]> {
-        return service.request(api: .getClosedPosts, with: .withToken)
+        return recruitmentPostService.request(api: .getClosedPosts, with: .withToken)
             .map(RecruitmentPostForCenterListDTO.self)
             .map({ $0.jobPostings.map { $0.toVO() } })
     }
     
     public func getPostApplicantCount(id: String) -> RxSwift.Single<Int> {
-        service.request(api: .getPostApplicantCount(id: id), with: .withToken)
+        recruitmentPostService.request(api: .getPostApplicantCount(id: id), with: .withToken)
             .map(PostApplicantCountDTO.self)
             .map { dto in
                 dto.applicantCount
@@ -71,7 +73,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     }
     
     public func getPostApplicantScreenData(id: String) -> RxSwift.Single<Entity.PostApplicantScreenVO> {
-        service.request(api: .getApplicantList(id: id), with: .withToken)
+        recruitmentPostService.request(api: .getApplicantList(id: id), with: .withToken)
             .map(PostApplicantScreenDTO.self)
             .map { dto in
                 dto.toVO()
@@ -79,18 +81,18 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     }
     
     public func closePost(id: String) -> RxSwift.Single<Void> {
-        service.request(api: .closePost(id: id), with: .withToken)
+        recruitmentPostService.request(api: .closePost(id: id), with: .withToken)
             .mapToVoid()
     }
     
     public func removePost(id: String) -> RxSwift.Single<Void> {
-        service.request(api: .removePost(id: id), with: .withToken)
+        recruitmentPostService.request(api: .removePost(id: id), with: .withToken)
             .mapToVoid()
     }
     
     // MARK: Worker
     public func getPostDetailForWorker(id: String) -> RxSwift.Single<Entity.RecruitmentPostForWorkerBundle> {
-        service.request(
+        recruitmentPostService.request(
             api: .postDetail(id: id, userType: .worker),
             with: .withToken
         )
@@ -102,7 +104,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     
     public func getNativePostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
         
-        service.request(
+        recruitmentPostService.request(
             api: .getOnGoingNativePostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
@@ -121,7 +123,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     }
     
     public func getFavoritePostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
-        service.request(
+        recruitmentPostService.request(
             api: .getFavoritePostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
@@ -140,7 +142,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     }
     
     public func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
-        service.request(
+        recruitmentPostService.request(
             api: .getAppliedPostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
@@ -156,6 +158,18 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         .map { dto in
             dto.toEntity()
         }
+    }
+    
+    public func ApplyToPost(postId: String, method: ApplyType) -> Single<Void> {
+        applyService
+            .request(
+                api: .applys(
+                    jobPostingId: postId,
+                    applyMethodType: method.dtoFormString
+                ),
+                with: .withToken
+            )
+            .mapToVoid()
     }
 }
 

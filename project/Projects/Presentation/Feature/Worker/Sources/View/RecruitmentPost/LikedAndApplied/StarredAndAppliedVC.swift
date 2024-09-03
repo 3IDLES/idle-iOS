@@ -158,8 +158,8 @@ public class StarredAndAppliedVC: BaseViewController {
     }
     
     public func bind(
-        appliedPostVM: WorkerPagablePostBoardVMable,
-        starredPostVM: WorkerPagablePostBoardVMable
+        appliedPostVM: AppliedPostBoardVM,
+        starredPostVM: StarredPostBoardVM
     ) {
          
         viewControllerDict[.applied]?.bind(viewModel: appliedPostVM)
