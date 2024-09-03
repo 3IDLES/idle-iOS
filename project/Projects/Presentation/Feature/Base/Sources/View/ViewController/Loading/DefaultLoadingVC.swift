@@ -12,7 +12,13 @@ import RxSwift
 import Entity
 import DSKit
 
-public class DefaultLoadingVC: BaseViewController {
+public protocol DefaultLoadingVMable {
+    
+    var showLoading: Driver<Void>? { get }
+    var dismissLoading: Driver<Void>? { get }
+}
+
+public class DefaultLoadingVC: UIViewController {
     
     let customTranstionDelegate = CustomTransitionDelegate()
     
@@ -36,6 +42,8 @@ public class DefaultLoadingVC: BaseViewController {
         super.viewDidLoad()
         setAppearance()
         setLayout()
+        
+        loadingView.startAnimating()
     }
     
     private func setAppearance() {
@@ -54,14 +62,6 @@ public class DefaultLoadingVC: BaseViewController {
             loadingView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loadingView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
-    }
-    
-    public func on() {
-        loadingView.startAnimating()
-    }
-    
-    public func off() {
-        loadingView.stopAnimating()
     }
 }
 

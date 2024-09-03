@@ -57,6 +57,8 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         
         self.viewModel = viewModel
         
+        super.bind(viewModel: viewModel, disposeBag: disposeBag)
+        
         // Output
         viewModel
             .workerLocationTitleText?

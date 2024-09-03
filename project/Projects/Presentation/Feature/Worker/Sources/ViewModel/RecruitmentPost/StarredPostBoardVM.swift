@@ -24,7 +24,9 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
     // Output
     public var postBoardData: RxCocoa.Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
     public var alert: Driver<Entity.DefaultAlertContentVO>?
-    public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
+    public var idleAlertVM: RxCocoa.Driver<IdleAlertViewModelable>?
+    public var showLoading: RxCocoa.Driver<Void>?
+    public var dismissLoading: RxCocoa.Driver<Void>?
     
     // Init
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?

@@ -20,7 +20,7 @@ public struct PostBoardCellData {
 }
 
 /// 페이징 보드
-public protocol WorkerPagablePostBoardVMable: DefaultAlertOutputable & WorkerNativeEmployCardViewModelable {
+public protocol WorkerPagablePostBoardVMable: DefaultAlertOutputable & WorkerNativeEmployCardViewModelable & DefaultLoadingVMable {
     /// 다음 페이지를 요청합니다.
     var requestNextPage: PublishRelay<Void> { get }
     
@@ -49,11 +49,17 @@ public protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable
 
 public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     
+    
+    
     // Output
     public var postBoardData: Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
     public var workerLocationTitleText: Driver<String>?
     public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
+    
+    // Default
     public var alert: Driver<DefaultAlertContentVO>?
+    public var showLoading: Driver<Void>?
+    public var dismissLoading: Driver<Void>?
     
     // Input
     public var requestInitialPageRequest: PublishRelay<Void> = .init()
@@ -83,6 +89,9 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         
+        var loadingStartObservables: [Observable<Void>] = []
+        var loadingEndObservables: [Observable<Void>] = []
+        
         // MARK: 상단 위치정보 불러오기
         workerLocationTitleText = requestWorkerLocation
             .compactMap { [weak self] _ in
@@ -103,18 +112,26 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                     }
             }
             .asDriver(onErrorDriveWith: .never())
-            
+
+        // 로딩 시작
+        loadingStartObservables.append(applyRequest.map { _ in })
+        
         let applyRequestResult = applyRequest
             .flatMap { [recruitmentPostUseCase] postId in
+                
                 // 리스트화면에서는 앱내 지원만 지원합니다.
-                recruitmentPostUseCase
+                return recruitmentPostUseCase
                     .applyToPost(postId: postId, method: .app)
             }
             .share()
         
+        // 로딩 종료
+        loadingEndObservables.append(applyRequestResult.map { _ in })
+        
+        let applyRequestSuccess = applyRequestResult.compactMap { $0.value }
+        
         // 지원하기 성공시 새로고침
-        applyRequestResult
-            .compactMap { $0.value }
+        applyRequestSuccess
             .bind(to: requestInitialPageRequest)
             .disposed(by: dispostBag)
         
@@ -142,6 +159,10 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                         postCount: 10
                     )
             }
+            .share()
+        
+        // 로딩 시작
+        loadingStartObservables.append(initialRequest.map { _ in })
         
         // MARK: 공고리스트 페이징 요청
         let pagingRequest = requestNextPage
@@ -161,6 +182,9 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
         let postPageReqeustResult = Observable
             .merge(initialRequest, pagingRequest)
             .share()
+        
+        // 로딩 종료
+        loadingEndObservables.append(postPageReqeustResult.map { _ in })
         
         let requestPostListSuccess = postPageReqeustResult.compactMap { $0.value }
         let requestPostListFailure = postPageReqeustResult.compactMap { $0.error }
@@ -241,6 +265,16 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                 requestPostListFailureAlert
             )
             .asDriver(onErrorJustReturn: .default)
+        
+        // MARK: 로딩
+        showLoading = Observable
+            .merge(loadingStartObservables)
+            .asDriver(onErrorDriveWith: .never())
+        
+        dismissLoading = Observable
+            .merge(loadingEndObservables)
+            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asDriver(onErrorDriveWith: .never())
     }
     
     public func showPostDetail(id: String) {

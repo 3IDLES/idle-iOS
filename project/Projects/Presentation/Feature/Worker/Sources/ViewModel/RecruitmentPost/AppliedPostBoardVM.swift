@@ -25,6 +25,8 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
     // Output
     public var postBoardData: RxCocoa.Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
     public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    public var showLoading: RxCocoa.Driver<Void>?
+    public var dismissLoading: RxCocoa.Driver<Void>?
     
     // Init
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?
