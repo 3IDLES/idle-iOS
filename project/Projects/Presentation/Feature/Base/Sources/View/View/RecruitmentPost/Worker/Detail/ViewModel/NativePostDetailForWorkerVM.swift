@@ -13,12 +13,13 @@ import PresentationCore
 import UseCaseInterface
 import DSKit
 
-public protocol NativePostDetailForWorkerViewModelable {
+public protocol NativePostDetailForWorkerViewModelable: DefaultLoadingVMable {
     
     // Output
     var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
     var locationInfo: Driver<WorkPlaceAndWorkerLocationMapRO>? { get }
     var alert: Driver<AlertWithCompletionVO>? { get }
+    var idleAlertVM: Driver<IdleAlertViewModelable>? { get }
     
     // Input
     var viewWillAppear: PublishRelay<Void> { get }
@@ -37,13 +38,15 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
     private let postId: String
     private let recruitmentPostUseCase: RecruitmentPostUseCase
     
-    
+    // Ouput
     public var postForWorkerBundle: RxCocoa.Driver<Entity.RecruitmentPostForWorkerBundle>?
     public var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
-    
     public var alert: RxCocoa.Driver<Entity.AlertWithCompletionVO>?
+    public var showLoading: Driver<Void>?
+    public var dismissLoading: Driver<Void>?
+    public var idleAlertVM: Driver<any IdleAlertViewModelable>?
     
-    
+    // Input
     public var backButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var applyButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var startButtonClicked: RxRelay.PublishRelay<Bool> = .init()
@@ -62,6 +65,12 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         
+        
+        // MARK: 로딩 옵저버블
+        var loadingStartObservables: [Observable<Void>] = []
+        var loadingEndObservables: [Observable<Void>] = []
+        
+        
         let getPostDetailResult = viewWillAppear
             .flatMap { [recruitmentPostUseCase] _ in
                 recruitmentPostUseCase
@@ -71,6 +80,17 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
         
         let getPostDetailSuccess = getPostDetailResult.compactMap { $0.value }
         let getPostDetailFailure = getPostDetailResult.compactMap { $0.error }
+        
+        let getPostDetailFailureAlert = getPostDetailFailure
+            .map { error in
+                AlertWithCompletionVO(
+                    title: "공고 불러오기 실패",
+                    message: error.message,
+                    buttonInfo: [
+                        ("닫기",  { [weak self] in self?.coordinator?.coordinatorDidFinish() })
+                    ]
+                )
+            }
         
         postForWorkerBundle = getPostDetailSuccess.asDriver(onErrorRecover: { _ in fatalError() })
         
@@ -104,22 +124,6 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
             }
             .asDriver(onErrorRecover: { _ in fatalError() })
         
-        // Alert 처리 필요
-        alert = getPostDetailFailure
-            .map { error in
-                AlertWithCompletionVO(
-                    title: "공고 불러오기 실패",
-                    message: error.message,
-                    buttonInfo: [
-                        ("닫기",  { [weak self] in
-                            self?.coordinator?.coordinatorDidFinish()
-                        })
-                    ]
-                )
-            }
-            .asDriver(onErrorJustReturn: .default)
-        
-        
         // MARK: 버튼 처리
         backButtonClicked
             .subscribe(onNext: { [weak self] _ in
@@ -129,8 +133,48 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
             .disposed(by: disposeBag)
         
         // 지원하기 버튼 클릭
+        // MARK: 지원하기
+        let applyRequest: PublishRelay<Void> = .init()
+        self.idleAlertVM = applyButtonClicked
+            .map { _ in
+                DefaultIdleAlertVM(
+                    title: "공고에 지원하시겠어요?",
+                    description: "",
+                    acceptButtonLabelText: "지원하기",
+                    cancelButtonLabelText: "취소하기") {
+                        applyRequest.accept(())
+                    }
+            }
+            .asDriver(onErrorDriveWith: .never())
 
-        // 즐겨찾기 버튼 클릭
+        // 로딩 시작
+        loadingStartObservables.append(applyRequest.map { _ in })
+        
+        let applyRequestResult = applyRequest
+            .flatMap { [recruitmentPostUseCase] _ in
+                
+                // 리스트화면에서는 앱내 지원만 지원합니다.
+                return recruitmentPostUseCase
+                    .applyToPost(postId: postId, method: .app)
+            }
+            .share()
+        
+        // 로딩 종료
+        loadingEndObservables.append(applyRequestResult.map { _ in })
+        
+        let applyRequestSuccess = applyRequestResult.compactMap { $0.value }
+        let applyRequestFailure = applyRequestResult.compactMap { $0.error }
+        
+        let applyRequestFailureAlert = applyRequestFailure
+            .map { error in
+                AlertWithCompletionVO(
+                    title: "지원하기 실패",
+                    message: error.message
+                )
+            }
+
+        // MARK: 즐겨찾기
+        
         
         // 센터 프로필 조회 버튼클릭
         centerCardClicked
@@ -141,6 +185,26 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
                 self.coordinator?.showCenterProfileScreen(centerId: centerId)
             })
             .disposed(by: disposeBag)
+        
+        
+        // MARK: Alert
+        alert = Observable
+            .merge(
+                getPostDetailFailureAlert,
+                applyRequestFailureAlert
+            )
+            .asDriver(onErrorJustReturn: .default)
+        
+        
+        // MARK: 로딩
+        showLoading = Observable
+            .merge(loadingStartObservables)
+            .asDriver(onErrorDriveWith: .never())
+        
+        dismissLoading = Observable
+            .merge(loadingEndObservables)
+            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asDriver(onErrorDriveWith: .never())
     }
     
     // MARK: Test

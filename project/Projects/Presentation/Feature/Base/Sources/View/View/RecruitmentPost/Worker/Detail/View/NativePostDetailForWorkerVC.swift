@@ -128,6 +128,8 @@ public class NativePostDetailForWorkerVC: BaseViewController {
         
         self.viewModel = viewModel
         
+        super.bind(viewModel: viewModel, disposeBag: disposeBag)
+        
         // Output
         viewModel
             .postForWorkerBundle?
@@ -195,6 +197,14 @@ public class NativePostDetailForWorkerVC: BaseViewController {
                 }
                 .disposed(by: disposeBag)
         }
+        
+        viewModel
+            .idleAlertVM?
+            .drive(onNext: { [weak self] vm in
+                self?.showIdleModal(type: .orange, viewModel: vm)
+            })
+            .disposed(by: disposeBag)
+        
         
         viewModel
             .alert?
