@@ -53,11 +53,6 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         setLayout()
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        postTableView.setContentOffset(.zero, animated: false)
-    }
-    
     public func bind(viewModel: WorkerRecruitmentPostBoardVMable) {
         
         self.viewModel = viewModel
@@ -72,11 +67,17 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         
         viewModel
             .postBoardData?
-            .drive(onNext: { [weak self] cellData in
+            .drive(onNext: { [weak self] (isRefreshed: Bool, cellData) in
                 guard let self else { return }
                 self.cellData.accept(cellData)
-                self.postTableView.reloadData()
-                self.isPaging = false
+                postTableView.reloadData()
+                isPaging = false
+                
+                if isRefreshed {
+                    DispatchQueue.main.async { [weak self] in
+                        self?.postTableView.setContentOffset(.zero, animated: false)
+                    }
+                }
             })
             .disposed(by: disposeBag)
         

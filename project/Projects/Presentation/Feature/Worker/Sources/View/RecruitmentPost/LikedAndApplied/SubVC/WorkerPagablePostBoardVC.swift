@@ -98,10 +98,16 @@ public class WorkerPagablePostBoardVC: BaseViewController {
         // Output
         viewModel
             .postBoardData?
-            .drive(onNext: { [weak self] cellData in
+            .drive(onNext: { [weak self] (isRefreshed, cellData) in
                 guard let self else { return }
                 self.cellData.accept(cellData)
                 self.postTableView.reloadData()
+                
+                if isRefreshed {
+                    DispatchQueue.main.async { [weak self] in
+                        self?.postTableView.setContentOffset(.zero, animated: false)
+                    }
+                }
             })
             .disposed(by: disposeBag)
         
@@ -130,10 +136,14 @@ public class WorkerPagablePostBoardVC: BaseViewController {
         // Output
         viewModel
             .postBoardData?
-            .drive(onNext: { [weak self] cellData in
+            .drive(onNext: { [weak self] (isRefreshed, cellData) in
                 guard let self else { return }
                 self.cellData.accept(cellData)
                 self.postTableView.reloadData()
+                
+                if isRefreshed {
+                    postTableView.setContentOffset(.zero, animated: false)
+                }
             })
             .disposed(by: disposeBag)
         

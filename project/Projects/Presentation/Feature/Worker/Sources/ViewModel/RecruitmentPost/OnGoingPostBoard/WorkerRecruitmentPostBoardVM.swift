@@ -28,7 +28,7 @@ public protocol WorkerPagablePostBoardVMable: DefaultAlertOutputable & WorkerNat
     var requestInitialPageRequest: PublishRelay<Void> { get }
     
     /// 페이지요청에 대한 결과를 전달합니다.
-    var postBoardData: Driver<[PostBoardCellData]>? { get }
+    var postBoardData: Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>? { get }
 }
 
 /// 페이징 + 지원하기
@@ -50,7 +50,7 @@ public protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable
 public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     
     // Output
-    public var postBoardData: Driver<[PostBoardCellData]>?
+    public var postBoardData: Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
     public var workerLocationTitleText: Driver<String>?
     public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     public var alert: Driver<DefaultAlertContentVO>?
@@ -83,14 +83,53 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         
-        // 상단 위치정보
+        // MARK: 상단 위치정보 불러오기
         workerLocationTitleText = requestWorkerLocation
             .compactMap { [weak self] _ in
                 self?.fetchWorkerLocation()
             }
             .asDriver(onErrorJustReturn: "위치정보확인불가")
         
+        // MARK: 지원하기
+        let applyRequest: PublishRelay<String> = .init()
+        self.idleAlertVM = applyButtonClicked
+            .map { (postId: String, postTitle: String) in
+                DefaultIdleAlertVM(
+                    title: "'\(postTitle)'\n공고에 지원하시겠어요?",
+                    description: "",
+                    acceptButtonLabelText: "지원하기",
+                    cancelButtonLabelText: "취소하기") { [applyRequest] in
+                        applyRequest.accept(postId)
+                    }
+            }
+            .asDriver(onErrorDriveWith: .never())
+            
+        let applyRequestResult = applyRequest
+            .flatMap { [recruitmentPostUseCase] postId in
+                // 리스트화면에서는 앱내 지원만 지원합니다.
+                recruitmentPostUseCase
+                    .applyToPost(postId: postId, method: .app)
+            }
+            .share()
         
+        // 지원하기 성공시 새로고침
+        applyRequestResult
+            .compactMap { $0.value }
+            .bind(to: requestInitialPageRequest)
+            .disposed(by: dispostBag)
+        
+        let applyRequestFailure = applyRequestResult.compactMap { $0.error }
+        
+        let applyRequestFailureAlert = applyRequestFailure
+            .map { error in
+                DefaultAlertContentVO(
+                    title: "지원하기 실패",
+                    message: error.message
+                )
+            }
+
+        
+        // MARK: 공고리스트 처음부터 요청하기
         let initialRequest = requestInitialPageRequest
             .flatMap { [weak self, recruitmentPostUseCase] request in
                 
@@ -104,7 +143,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                     )
             }
         
-        
+        // MARK: 공고리스트 페이징 요청
         let pagingRequest = requestNextPage
             .compactMap { [weak self] _ in
                 // 요청이 없는 경우 요청을 보내지 않는다.
@@ -131,9 +170,11 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                 currentPostVO,
                 requestPostListSuccess
             )
-            .compactMap { [weak self] (prevPostList, fetchedData) -> [PostBoardCellData]? in
+            .compactMap { [weak self] (prevPostList, fetchedData) -> (Bool, [PostBoardCellData])? in
                 
                 guard let self else { return nil }
+                
+                let isRefreshed: Bool = self.nextPagingRequest == .initial
                 
                 // 다음 요청설정
                 var nextRequest: PostPagingRequestForWorker?
@@ -145,7 +186,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                         case .initial:
                             nextRequest = .paging(source: .native, nextPageId: nextPageId)
                         case .paging(let source, let nextPageId):
-                            nextRequest = .paging(source: .thirdParty, nextPageId: nextPageId)
+                            nextRequest = .paging(source: source, nextPageId: nextPageId)
                         }
                     } else {
                         // 다음값이 없는 경우
@@ -182,41 +223,9 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                     return .init(postId: postVO.postId, cardVO: cardVO)
                 }
                 
-                return cellData
-            }
-            .asDriver(onErrorJustReturn: [])
-        
-        // MARK: 지원하기
-        let applyRequest: PublishRelay<String> = .init()
-        self.idleAlertVM = applyButtonClicked
-            .map { (postId: String, postTitle: String) in
-                DefaultIdleAlertVM(
-                    title: "'\(postTitle)'\n공고에 지원하시겠어요?",
-                    description: "",
-                    acceptButtonLabelText: "지원하기",
-                    cancelButtonLabelText: "취소하기") { [applyRequest] in
-                        applyRequest.accept(postId)
-                    }
+                return (isRefreshed, cellData)
             }
             .asDriver(onErrorDriveWith: .never())
-            
-        let applyRequestResult = applyRequest
-            .flatMap { [recruitmentPostUseCase] postId in
-                // 리스트화면에서는 앱내 지원만 지원합니다.
-                recruitmentPostUseCase
-                    .applyToPost(postId: postId, method: .app)
-            }
-            .share()
-        
-        let applyRequestFailure = applyRequestResult.compactMap { $0.error }
-        
-        let applyRequestFailureAlert = applyRequestFailure
-            .map { error in
-                DefaultAlertContentVO(
-                    title: "지원하기 실패",
-                    message: error.message
-                )
-            }
         
         let requestPostListFailureAlert = requestPostListFailure
             .map { error in
@@ -225,7 +234,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                     message: error.message
                 )
             }
-            
+        
         self.alert = Observable
             .merge(
                 applyRequestFailureAlert,

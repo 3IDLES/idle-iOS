@@ -23,7 +23,7 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
     public var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
     
     // Output
-    public var postBoardData: RxCocoa.Driver<[PostBoardCellData]>?
+    public var postBoardData: RxCocoa.Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
     public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     
     // Init
@@ -67,9 +67,11 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
                 currentPostVO,
                 requestPostListSuccess
             )
-            .compactMap { [weak self] (prevPostList, fetchedData) -> [PostBoardCellData]? in
+            .compactMap { [weak self] (prevPostList, fetchedData) -> (Bool, [PostBoardCellData])? in
                 
                 guard let self else { return nil }
+                
+                let isRefreshed: Bool = self.nextPagingRequest == .initial
                 
                 // MARK: 지원 공고의 경우 써드파티에서 불러올 데이터가 없다.
                 self.nextPagingRequest = .paging(
@@ -93,9 +95,9 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
                     return .init(postId: vo.postId, cardVO: cardVO)
                 }
                 
-                return cellData
+                return (isRefreshed, cellData)
             }
-            .asDriver(onErrorJustReturn: [])
+            .asDriver(onErrorDriveWith: .never())
         
         alert = requestPostListFailure
             .map { error in

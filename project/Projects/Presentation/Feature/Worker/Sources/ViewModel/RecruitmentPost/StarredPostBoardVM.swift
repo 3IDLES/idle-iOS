@@ -22,7 +22,7 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
     public var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
     
     // Output
-    public var postBoardData: Driver<[PostBoardCellData]>?
+    public var postBoardData: RxCocoa.Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
     public var alert: Driver<Entity.DefaultAlertContentVO>?
     public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
@@ -67,9 +67,11 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
                 currentPostVO,
                 requestPostListSuccess
             )
-            .compactMap { [weak self] (prevPostList, fetchedData) -> [PostBoardCellData]? in
+            .compactMap { [weak self] (prevPostList, fetchedData) -> (Bool, [PostBoardCellData])? in
                 
                 guard let self else { return nil }
+                
+                let isRefreshed: Bool = self.nextPagingRequest == .initial
                 
                 // TODO: ‼️ ‼️ 즐겨찾기 공고의 경우 서버에서 아직 워크넷 공고를 처리하는 방법을 정하지 못했음으로 추후에 수정할 예정입니다.
                 
@@ -94,9 +96,9 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
                     return .init(postId: vo.postId, cardVO: cardVO)
                 }
                 
-                return cellData
+                return (isRefreshed, cellData)
             }
-            .asDriver(onErrorJustReturn: [])
+            .asDriver(onErrorDriveWith: .never())
         
         // MARK: 지원하기
         let applyRequest: PublishRelay<String> = .init()

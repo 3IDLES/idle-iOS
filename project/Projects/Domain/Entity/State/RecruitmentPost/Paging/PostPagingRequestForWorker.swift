@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum PostPagingRequestForWorker {
+public enum PostPagingRequestForWorker: Equatable {
     public enum Source {
         case native
         case thirdParty
