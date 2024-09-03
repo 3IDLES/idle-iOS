@@ -95,6 +95,9 @@ public class WorkerPagablePostBoardVC: BaseViewController {
         
         self.viewModel = viewModel
         
+        // 로딩 바인딩
+        super.bind(viewModel: viewModel, disposeBag: disposeBag)
+        
         // Output
         viewModel
             .postBoardData?
@@ -132,6 +135,9 @@ public class WorkerPagablePostBoardVC: BaseViewController {
     func bind(viewModel: WorkerAppliablePostBoardVMable) {
         
         self.viewModel = viewModel
+        
+        // 로딩 바인딩
+        super.bind(viewModel: viewModel, disposeBag: disposeBag)
         
         // Output
         viewModel

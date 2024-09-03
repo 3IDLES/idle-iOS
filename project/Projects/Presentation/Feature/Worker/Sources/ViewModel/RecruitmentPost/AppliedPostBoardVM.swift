@@ -42,11 +42,29 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
         self.recruitmentPostUseCase = recruitmentPostUseCase
         self.nextPagingRequest = .initial
         
-        let postPageReqeustResult = Observable
-            .merge(
-                requestInitialPageRequest.asObservable(),
-                requestNextPage.asObservable()
-            )
+        var loadingStartObservables: [Observable<Void>] = []
+        var loadingEndObservables: [Observable<Void>] = []
+        
+        // MARK: 공고리스트 처음부터 요청하기
+        let initialRequest = requestInitialPageRequest
+            .flatMap { [weak self, recruitmentPostUseCase] request in
+                
+                self?.currentPostVO.accept([])
+                self?.nextPagingRequest = .initial
+                
+                return recruitmentPostUseCase
+                    .getPostListForWorker(
+                        request: .initial,
+                        postCount: 10
+                    )
+            }
+            .share()
+        
+        // 로딩 시작
+        loadingStartObservables.append(initialRequest.map { _ in })
+        
+        // MARK: 공고리스트 페이징 요청
+        let pagingRequest = requestNextPage
             .compactMap { [weak self] _ in
                 // 요청이 없는 경우 요청을 보내지 않는다.
                 // ThirdPatry에서도 불러올 데이터가 없는 경우입니다.
@@ -54,12 +72,18 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
             }
             .flatMap { [recruitmentPostUseCase] request in
                 recruitmentPostUseCase
-                    .getAppliedPostListForWorker(
+                    .getPostListForWorker(
                         request: request,
                         postCount: 10
                     )
             }
+            
+        let postPageReqeustResult = Observable
+            .merge(initialRequest, pagingRequest)
             .share()
+        
+        // 로딩 종료
+        loadingEndObservables.append(postPageReqeustResult.map { _ in })
         
         let requestPostListSuccess = postPageReqeustResult.compactMap { $0.value }
         let requestPostListFailure = postPageReqeustResult.compactMap { $0.error }
@@ -109,6 +133,16 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
                 )
             }
             .asDriver(onErrorJustReturn: .default)
+        
+        // MARK: 로딩
+        showLoading = Observable
+            .merge(loadingStartObservables)
+            .asDriver(onErrorDriveWith: .never())
+        
+        dismissLoading = Observable
+            .merge(loadingEndObservables)
+            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asDriver(onErrorDriveWith: .never())
     }
     
     public func showPostDetail(id: String) {
