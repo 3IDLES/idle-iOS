@@ -14,10 +14,10 @@ import Entity
 import DSKit
 import UseCaseInterface
 
-public class StarredPostBoardVM: WorkerPagablePostBoardVMable {
-    
+public class StarredPostBoardVM: WorkerPagablePostBoardVMable {    
+
     // Input
-    public var viewDidLoad: RxRelay.PublishRelay<Void> = .init()
+    public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
     public var requestNextPage: RxRelay.PublishRelay<Void> = .init()
     
     // Output
@@ -40,7 +40,7 @@ public class StarredPostBoardVM: WorkerPagablePostBoardVMable {
         
         let postPageReqeustResult = Observable
             .merge(
-                viewDidLoad.asObservable(),
+                requestInitialPageRequest.asObservable(),
                 requestNextPage.asObservable()
             )
             .compactMap { [weak self] _ in

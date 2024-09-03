@@ -17,15 +17,17 @@ import UseCaseInterface
 public protocol WorkerPagablePostBoardVMable: DefaultAlertOutputable {
     /// 다음 페이지를 요청합니다.
     var requestNextPage: PublishRelay<Void> { get }
-    /// ViewDidLoad, 최초 요청을 위해 사용합니다.
-    var viewDidLoad: PublishRelay<Void> { get }
-    
+    /// 화면이 등장할 때마다 리스트를 초기화합니다.
+    var requestInitialPageRequest: PublishRelay<Void> { get }
     
     /// 페이지요청에 대한 결과를 전달합니다.
     var postBoardData: Driver<[WorkerEmployCardViewModelable]>? { get }
 }
 
 public protocol WorkerRecruitmentPostBoardVMable: WorkerPagablePostBoardVMable {
+    
+    /// 요양보호사 위치정보를 요청합니다.
+    var requestWorkerLocation: PublishRelay<Void> { get }
     
     /// 요양보호사 위치 정보를 전달합니다.
     var workerLocationTitleText: Driver<String>? { get }
@@ -39,11 +41,10 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     public var workerLocationTitleText: Driver<String>?
     
     
-    
     // Input
-    public var viewDidLoad: PublishRelay<Void> = .init()
+    public var requestInitialPageRequest: PublishRelay<Void> = .init()
+    public var requestWorkerLocation: PublishRelay<Void> = .init()
     public var requestNextPage: PublishRelay<Void> = .init()
-    
     
     
     // Init
@@ -52,7 +53,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
-    var nextPagingRequest: PostPagingRequestForWorker?
+    var nextPagingRequest: PostPagingRequestForWorker? = .initial
     /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
     private let currentPostVO: BehaviorRelay<[NativeRecruitmentPostForWorkerVO]> = .init(value: [])
     
@@ -66,21 +67,30 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     {
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
-        self.nextPagingRequest = .initial
         
         // 상단 위치정보
-        workerLocationTitleText = viewDidLoad
+        workerLocationTitleText = requestWorkerLocation
             .compactMap { [weak self] _ in
                 self?.fetchWorkerLocation()
             }
-            .asDriver(onErrorJustReturn: "반갑습니다.")
+            .asDriver(onErrorJustReturn: "위치정보확인불가")
         
         
-        let postPageReqeustResult = Observable
-            .merge(
-                viewDidLoad.asObservable(),
-                requestNextPage.asObservable()
-            )
+        let initialRequest = requestInitialPageRequest
+            .flatMap { [weak self, recruitmentPostUseCase] request in
+                
+                self?.currentPostVO.accept([])
+                self?.nextPagingRequest = .initial
+                
+                return recruitmentPostUseCase
+                    .getPostListForWorker(
+                        request: .initial,
+                        postCount: 10
+                    )
+            }
+        
+        
+        let pagingRequest = requestNextPage
             .compactMap { [weak self] _ in
                 // 요청이 없는 경우 요청을 보내지 않는다.
                 // ThirdPatry에서도 불러올 데이터가 없는 경우입니다.
@@ -93,8 +103,10 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                         postCount: 10
                     )
             }
+            
+        let postPageReqeustResult = Observable
+            .merge(initialRequest, pagingRequest)
             .share()
-  
         
         let requestPostListSuccess = postPageReqeustResult.compactMap { $0.value }
         let requestPostListFailure = postPageReqeustResult.compactMap { $0.error }

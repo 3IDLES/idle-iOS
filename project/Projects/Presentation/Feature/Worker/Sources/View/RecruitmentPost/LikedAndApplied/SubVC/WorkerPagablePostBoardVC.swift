@@ -113,8 +113,9 @@ public class WorkerPagablePostBoardVC: BaseViewController {
             .disposed(by: disposeBag)
         
         // Input
-        self.rx.viewDidLoad
-            .bind(to: viewModel.viewDidLoad)
+        Observable
+            .merge(self.rx.viewWillAppear.map { _ in () })
+            .bind(to: viewModel.requestInitialPageRequest)
             .disposed(by: disposeBag)
         
         self.requestNextPage

@@ -18,7 +18,7 @@ import UseCaseInterface
 public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
     
     // Input
-    public var viewDidLoad: RxRelay.PublishRelay<Void> = .init()
+    public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
     public var requestNextPage: RxRelay.PublishRelay<Void> = .init()
     
     // Output
@@ -41,7 +41,7 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
         
         let postPageReqeustResult = Observable
             .merge(
-                viewDidLoad.asObservable(),
+                requestInitialPageRequest.asObservable(),
                 requestNextPage.asObservable()
             )
             .compactMap { [weak self] _ in

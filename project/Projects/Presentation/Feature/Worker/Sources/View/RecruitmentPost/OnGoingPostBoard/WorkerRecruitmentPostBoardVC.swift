@@ -53,6 +53,11 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         setLayout()
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        postTableView.setContentOffset(.zero, animated: false)
+    }
+    
     public func bind(viewModel: WorkerRecruitmentPostBoardVMable) {
         
         self.viewModel = viewModel
@@ -84,7 +89,12 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         
         // Input
         self.rx.viewDidLoad
-            .bind(to: viewModel.viewDidLoad)
+            .bind(to: viewModel.requestWorkerLocation)
+            .disposed(by: disposeBag)
+        
+        self.rx.viewWillAppear
+            .map { _ in () }
+            .bind(to: viewModel.requestInitialPageRequest)
             .disposed(by: disposeBag)
         
         self.requestNextPage
