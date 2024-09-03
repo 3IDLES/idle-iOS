@@ -43,9 +43,11 @@ class AppliedAndLikedBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
     public func start() {
         let vc = StarredAndAppliedVC()
         let appliedVM = AppliedPostBoardVM(
+            coordinator: self,
             recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
         )
         let starredVM = StarredPostBoardVM(
+            coordinator: self,
             recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
         )
         vc.bind(

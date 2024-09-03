@@ -38,7 +38,8 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
     /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
     private let currentPostVO: BehaviorRelay<[NativeRecruitmentPostForWorkerVO]> = .init(value: [])
     
-    public init(recruitmentPostUseCase: RecruitmentPostUseCase) {
+    public init(coordinator: WorkerRecruitmentBoardCoordinatable, recruitmentPostUseCase: RecruitmentPostUseCase) {
+        self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         self.nextPagingRequest = .initial
         
