@@ -53,7 +53,7 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
                 self?.nextPagingRequest = .initial
                 
                 return recruitmentPostUseCase
-                    .getPostListForWorker(
+                    .getFavoritePostListForWorker(
                         request: .initial,
                         postCount: 10
                     )
@@ -72,7 +72,7 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
             }
             .flatMap { [recruitmentPostUseCase] request in
                 recruitmentPostUseCase
-                    .getPostListForWorker(
+                    .getFavoritePostListForWorker(
                         request: request,
                         postCount: 10
                     )
@@ -101,10 +101,15 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
                 
                 // TODO: ‼️ ‼️ 즐겨찾기 공고의 경우 서버에서 아직 워크넷 공고를 처리하는 방법을 정하지 못했음으로 추후에 수정할 예정입니다.
                 
-                self.nextPagingRequest = .paging(
-                    source: .native,
-                    nextPageId: fetchedData.nextPageId
-                )
+                if let next = fetchedData.nextPageId {
+                    // 지원 공고의 경우 써드파티에서 불러올 데이터가 없다.
+                    self.nextPagingRequest = .paging(
+                        source: .native,
+                        nextPageId: next
+                    )
+                } else {
+                    self.nextPagingRequest = nil
+                }
                 
                 // 화면에 표시할 전체리스트 도출
                 let fetchedPosts = fetchedData.posts

@@ -105,6 +105,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
                 guard let self else { return }
                 self.cellData.accept(cellData)
                 self.postTableView.reloadData()
+                isPaging = false
                 
                 if isRefreshed {
                     DispatchQueue.main.async { [weak self] in
@@ -146,6 +147,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
                 guard let self else { return }
                 self.cellData.accept(cellData)
                 self.postTableView.reloadData()
+                isPaging = false
                 
                 if isRefreshed {
                     postTableView.setContentOffset(.zero, animated: false)

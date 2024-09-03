@@ -53,7 +53,7 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
                 self?.nextPagingRequest = .initial
                 
                 return recruitmentPostUseCase
-                    .getPostListForWorker(
+                    .getAppliedPostListForWorker(
                         request: .initial,
                         postCount: 10
                     )
@@ -72,7 +72,7 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
             }
             .flatMap { [recruitmentPostUseCase] request in
                 recruitmentPostUseCase
-                    .getPostListForWorker(
+                    .getAppliedPostListForWorker(
                         request: request,
                         postCount: 10
                     )
@@ -99,11 +99,17 @@ public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
                 
                 let isRefreshed: Bool = self.nextPagingRequest == .initial
                 
-                // MARK: 지원 공고의 경우 써드파티에서 불러올 데이터가 없다.
-                self.nextPagingRequest = .paging(
-                    source: .native,
-                    nextPageId: fetchedData.nextPageId
-                )
+                
+                if let next = fetchedData.nextPageId {
+                    // 지원 공고의 경우 써드파티에서 불러올 데이터가 없다.
+                    self.nextPagingRequest = .paging(
+                        source: .native,
+                        nextPageId: next
+                    )
+                } else {
+                    self.nextPagingRequest = nil
+                }
+                
                 
                 // 화면에 표시할 전체리스트 도출
                 let fetchedPosts = fetchedData.posts

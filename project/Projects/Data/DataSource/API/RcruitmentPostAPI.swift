@@ -142,7 +142,9 @@ extension RcruitmentPostAPI: BaseAPI {
     
     var parameterEncoding: ParameterEncoding {
         switch self {
-        case .getOnGoingNativePostListForWorker:
+        case .getOnGoingNativePostListForWorker,
+                .getFavoritePostListForWorker,
+                .getAppliedPostListForWorker:
             return URLEncoding.queryString
         default:
             return JSONEncoding.default
@@ -151,7 +153,9 @@ extension RcruitmentPostAPI: BaseAPI {
     
     public var task: Moya.Task {
         switch self {
-        case .getOnGoingNativePostListForWorker:
+        case .getOnGoingNativePostListForWorker,
+                .getFavoritePostListForWorker,
+                .getAppliedPostListForWorker:
             .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .registerPost(let bodyData):
             .requestData(bodyData)
