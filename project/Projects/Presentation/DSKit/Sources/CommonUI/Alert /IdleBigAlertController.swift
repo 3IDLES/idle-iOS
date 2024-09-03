@@ -222,13 +222,13 @@ public class IdleBigAlertController: UIViewController {
     }
 }
 
-class FadeInAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+public class FadeInAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.35 // 애니메이션 지속 시간
     }
     
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromView = transitionContext.view(forKey: .from) else { return }
         
         let containerView = transitionContext.containerView
@@ -249,13 +249,13 @@ class FadeInAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     }
 }
 
-class FadeOutAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+public class FadeOutAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.35 // 애니메이션 지속 시간
     }
     
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let toView = transitionContext.view(forKey: .to) else { return }
         
         let containerView = transitionContext.containerView
@@ -275,13 +275,13 @@ class FadeOutAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     }
 }
 
-class CustomTransitionDelegate: NSObject, UIViewControllerTransitioningDelegate {
+public class CustomTransitionDelegate: NSObject, UIViewControllerTransitioningDelegate {
     
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return FadeInAnimator() // 우리가 만든 사용자 정의 애니메이터를 반환
     }
     
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> (any UIViewControllerAnimatedTransitioning)? {
+    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> (any UIViewControllerAnimatedTransitioning)? {
         return FadeOutAnimator()
     }
 }
