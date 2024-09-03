@@ -13,7 +13,7 @@ import PresentationCore
 import UseCaseInterface
 import DSKit
 
-public protocol PostDetailForWorkerViewModelable {
+public protocol NativePostDetailForWorkerViewModelable {
     
     // Output
     var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
@@ -29,7 +29,7 @@ public protocol PostDetailForWorkerViewModelable {
     var centerCardClicked: PublishRelay<Void> { get }
 }
 
-public class PostDetailForWorkerVM: PostDetailForWorkerViewModelable {
+public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable {
 
     public weak var coordinator: PostDetailForWorkerCoodinator?
     

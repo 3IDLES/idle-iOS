@@ -1,5 +1,5 @@
 //
-//  WorkerEmployCardVO.swift
+//  WorkerNativeEmployCardVO.swift
 //  Entity
 //
 //  Created by choijunios on 7/19/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct WorkerEmployCardVO {
+public struct WorkerNativeEmployCardVO {
     
     public let dayLeft: Int
     public let isBeginnerPossible: Bool
@@ -21,6 +21,8 @@ public struct WorkerEmployCardVO {
     public let endTime: String
     public let paymentType: PaymentType
     public let paymentAmount: String
+    public let applyDate: Date?
+    public let isFavorite: Bool
     
     public init(
         dayLeft: Int,
@@ -34,9 +36,10 @@ public struct WorkerEmployCardVO {
         startTime: String,
         endTime: String,
         paymentType: PaymentType,
-        paymentAmount: String
+        paymentAmount: String,
+        applyDate: Date?,
+        isFavorite: Bool
     ) {
-        
         self.dayLeft = dayLeft
         self.isBeginnerPossible = isBeginnerPossible
         self.distanceFromWorkPlace = distanceFromWorkPlace
@@ -49,16 +52,18 @@ public struct WorkerEmployCardVO {
         self.endTime = endTime
         self.paymentType = paymentType
         self.paymentAmount = paymentAmount
+        self.applyDate = applyDate
+        self.isFavorite = isFavorite
     }
       
-    /// 서버가 입력중인 공고의 확인화면에 사용됩니다.
+    /// 공고 상세화면에서 사용됩니다.
     public static func create(
         workTimeAndPay: WorkTimeAndPayStateObject,
         customerRequirement: CustomerRequirementStateObject,
         customerInformation: CustomerInformationStateObject,
         applicationDetail: ApplicationDetailStateObject,
         addressInfo: AddressInputStateObject
-    ) -> WorkerEmployCardVO {
+    ) -> WorkerNativeEmployCardVO {
         
         // 남은 일수
         var leftDay: Int? = nil
@@ -101,7 +106,7 @@ public struct WorkerEmployCardVO {
         let paymentType = workTimeAndPay.paymentType ?? .hourly
         let paymentAmount = workTimeAndPay.paymentAmount
         
-        return WorkerEmployCardVO(
+        return WorkerNativeEmployCardVO(
             dayLeft: leftDay ?? 31,
             isBeginnerPossible: isBeginnerPossible,
             distanceFromWorkPlace: 500,
@@ -113,11 +118,13 @@ public struct WorkerEmployCardVO {
             startTime: startTime,
             endTime: workEndTime,
             paymentType: paymentType,
-            paymentAmount: paymentAmount
+            paymentAmount: paymentAmount,
+            applyDate: nil,
+            isFavorite: false
         )
     }
     
-    public static func create(vo: RecruitmentPostForWorkerVO) -> WorkerEmployCardVO {
+    public static func create(vo: RecruitmentPostForWorkerVO) -> WorkerNativeEmployCardVO {
         
         // 남은 일수
         var leftDay: Int? = nil
@@ -142,7 +149,9 @@ public struct WorkerEmployCardVO {
             startTime: vo.startTime,
             endTime: vo.endTime,
             paymentType: vo.payType,
-            paymentAmount: vo.payAmount
+            paymentAmount: vo.payAmount,
+            applyDate: nil,
+            isFavorite: false
         )
     }
 }
@@ -169,7 +178,9 @@ public extension WorkerEmployCardVO {
         startTime: "09:00",
         endTime: "15:00",
         paymentType: .hourly,
-        paymentAmount: "12,500"
+        paymentAmount: "12,500",
+        applyDate: nil,
+        isFavorite: false
     )
     
     static let `default` = WorkerEmployCardVO(
@@ -184,6 +195,8 @@ public extension WorkerEmployCardVO {
         startTime: "00:00",
         endTime: "00:00",
         paymentType: .hourly,
-        paymentAmount: "12,500"
+        paymentAmount: "12,500",
+        applyDate: nil,
+        isFavorite: false
     )
 }
