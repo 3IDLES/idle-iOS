@@ -1,5 +1,5 @@
 //
-//  ViewModelForCell.swift
+//  OngoindWorkerEmployCardVM.swift
 //  WorkerFeature
 //
 //  Created by choijunios on 9/2/24.
@@ -18,13 +18,10 @@ import UseCaseInterface
 // MARK: ViewModelForCell
 class OngoindWorkerEmployCardVM: WorkerEmployCardViewModelable {
     
-    weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    
     // Init
     let postId: String
-    
-    public var renderObject: RxCocoa.Driver<DSKit.WorkerEmployCardRO>?
-    public var applicationInformation: RxCocoa.Driver<DSKit.ApplicationInfo>?
+    var cellViewObject: Entity.WorkerNativeEmployCardVO
+    weak var coordinator: WorkerRecruitmentBoardCoordinatable?
     
     public var cardClicked: RxRelay.PublishRelay<Void> = .init()
     public var applyButtonClicked: RxRelay.PublishRelay<Void> = .init()
@@ -35,22 +32,13 @@ class OngoindWorkerEmployCardVM: WorkerEmployCardViewModelable {
     public init
         (
             postId: String,
-            vo: WorkerEmployCardVO,
+            vo: WorkerNativeEmployCardVO,
             coordinator: WorkerRecruitmentBoardCoordinatable? = nil
         )
     {
         self.postId = postId
+        self.cellViewObject = vo
         self.coordinator = coordinator
-        
-        // MARK: 지원여부
-        let applicationInformation: BehaviorRelay<ApplicationInfo> = .init(value: .mock)
-        self.applicationInformation = applicationInformation.asDriver()
-        
-        // MARK: Card RenderObject
-        let workerEmployCardRO: BehaviorRelay<WorkerEmployCardRO> = .init(value: .mock)
-        renderObject = workerEmployCardRO.asDriver(onErrorJustReturn: .mock)
-        
-        workerEmployCardRO.accept(WorkerEmployCardRO.create(vo: vo))
         
         // MARK: 버튼 처리
         applyButtonClicked

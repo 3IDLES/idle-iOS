@@ -47,8 +47,8 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
     }
     
     public func start() {
-        let vc = PostDetailForWorkerVC()
-        let vm = PostDetailForWorkerVM(
+        let vc = NativePostDetailForWorkerVC()
+        let vm = NativePostDetailForWorkerVM(
             postId: postId,
             coordinator: self,
             recruitmentPostUseCase: recruitmentPostUseCase

@@ -9,18 +9,18 @@ import Foundation
 
 public struct RecruitmentPostListForWorkerVO {
 
-    public let posts: [RecruitmentPostForWorkerVO]
+    public let posts: [NativeRecruitmentPostForWorkerVO]
     public let nextPageId: String?
     public let fetchedPostCount: Int
     
-    public init(posts: [RecruitmentPostForWorkerVO], nextPageId: String?, fetchedPostCount: Int) {
+    public init(posts: [NativeRecruitmentPostForWorkerVO], nextPageId: String?, fetchedPostCount: Int) {
         self.posts = posts
         self.nextPageId = nextPageId
         self.fetchedPostCount = fetchedPostCount
     }
 }
 
-public struct RecruitmentPostForWorkerVO {
+public struct NativeRecruitmentPostForWorkerVO {
     public let postId: String
     
     public let workDays: [WorkDay]
@@ -41,24 +41,10 @@ public struct RecruitmentPostForWorkerVO {
     public let payAmount: String
     
     public let distanceFromWorkPlace: Int
+    public let applyTime: Date?
+    public let isFavorite: Bool
     
-    public init(
-        postId: String,
-        workDays: [WorkDay],
-        startTime: String,
-        endTime: String,
-        roadNameAddress: String,
-        lotNumberAddress: String,
-        gender: Gender,
-        age: Int,
-        cardGrade: CareGrade,
-        isExperiencePreferred: Bool,
-        applyDeadlineType: ApplyDeadlineType,
-        applyDeadlineDate: Date?,
-        payType: PaymentType,
-        payAmount: String,
-        distanceFromWorkPlace: Int
-    ) {
+    public init(postId: String, workDays: [WorkDay], startTime: String, endTime: String, roadNameAddress: String, lotNumberAddress: String, gender: Gender, age: Int, cardGrade: CareGrade, isExperiencePreferred: Bool, applyDeadlineType: ApplyDeadlineType, applyDeadlineDate: Date?, payType: PaymentType, payAmount: String, distanceFromWorkPlace: Int, applyTime: Date?, isFavorite: Bool) {
         self.postId = postId
         self.workDays = workDays
         self.startTime = startTime
@@ -74,9 +60,11 @@ public struct RecruitmentPostForWorkerVO {
         self.payType = payType
         self.payAmount = payAmount
         self.distanceFromWorkPlace = distanceFromWorkPlace
+        self.applyTime = applyTime
+        self.isFavorite = isFavorite
     }
     
-    public static let mock = RecruitmentPostForWorkerVO(
+    public static let mock = NativeRecruitmentPostForWorkerVO(
         postId: "test-post-id",
         workDays: [.mon, .wed, .fri],
         startTime: "09:00",
@@ -91,6 +79,8 @@ public struct RecruitmentPostForWorkerVO {
         applyDeadlineDate: Calendar.current.date(byAdding: .day, value: 7, to: Date()),
         payType: .hourly,
         payAmount: "15000",
-        distanceFromWorkPlace: 2500
+        distanceFromWorkPlace: 2500,
+        applyTime: Date(),
+        isFavorite: true
     )
 }

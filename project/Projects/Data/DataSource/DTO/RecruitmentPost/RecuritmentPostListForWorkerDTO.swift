@@ -40,8 +40,10 @@ public struct RecruitmentPostForWorkerDTO: Codable {
     public let applyDeadlineType: String
     public let applyDeadline: String?
     public let distance: Int
+    public let applyTime: String?
+    public let isFavorite: Bool
     
-    public func toEntity() -> RecruitmentPostForWorkerVO {
+    public func toEntity() -> NativeRecruitmentPostForWorkerVO {
         
         let workDayList = weekdays.map({ dayText in
             WorkDay.toEntity(text: dayText)
@@ -49,7 +51,9 @@ public struct RecruitmentPostForWorkerDTO: Codable {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        let deadlineDate = applyDeadline != nil ? dateFormatter.date(from: applyDeadline!) : nil
+        
+        let deadlineDate = self.applyDeadline != nil ? dateFormatter.date(from: self.applyDeadline!) : nil
+        let applyDate = self.applyTime != nil ? dateFormatter.date(from: self.applyDeadline!) : nil
         
         return .init(
             postId: id,
@@ -66,7 +70,9 @@ public struct RecruitmentPostForWorkerDTO: Codable {
             applyDeadlineDate: deadlineDate,
             payType: PaymentType.toEntity(text: payType),
             payAmount: String(payAmount),
-            distanceFromWorkPlace: String(distance)
+            distanceFromWorkPlace: distance,
+            applyTime: applyDate,
+            isFavorite: isFavorite
         )
     }
 }

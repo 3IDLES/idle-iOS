@@ -124,7 +124,7 @@ public struct WorkerNativeEmployCardVO {
         )
     }
     
-    public static func create(vo: RecruitmentPostForWorkerVO) -> WorkerNativeEmployCardVO {
+    public static func create(vo: NativeRecruitmentPostForWorkerVO) -> WorkerNativeEmployCardVO {
         
         // 남은 일수
         var leftDay: Int? = nil
@@ -164,9 +164,9 @@ fileprivate extension String {
     }
 }
 
-public extension WorkerEmployCardVO {
+public extension WorkerNativeEmployCardVO {
     
-    static let mock = WorkerEmployCardVO(
+    static let mock: WorkerNativeEmployCardVO = .init(
         dayLeft: 10,
         isBeginnerPossible: true,
         distanceFromWorkPlace: 500,
@@ -183,7 +183,7 @@ public extension WorkerEmployCardVO {
         isFavorite: false
     )
     
-    static let `default` = WorkerEmployCardVO(
+    static let `default`: WorkerNativeEmployCardVO = .init(
         dayLeft: 0,
         isBeginnerPossible: true,
         distanceFromWorkPlace: 8000,

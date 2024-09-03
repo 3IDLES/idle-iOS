@@ -54,7 +54,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     public var registerButtonClicked: PublishRelay<Void> = .init()
     public var overViewWillAppear: RxRelay.PublishRelay<Void> = .init()
     
-    public let workerEmployCardVO: Driver<WorkerEmployCardVO>?
+    public let workerEmployCardVO: Driver<WorkerNativeEmployCardVO>?
     
     // MARK: register request
     public var postRegistrationSuccess: Driver<Void>?
@@ -385,7 +385,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
         
         // MARK: ----- Over view -----
         
-        workerEmployCardVO = Observable<WorkerEmployCardVO>
+        workerEmployCardVO = Observable<WorkerNativeEmployCardVO>
             .create { [
                 editing_workTimeAndPay,
                 editing_customerInformation,
@@ -394,7 +394,7 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 editing_addressInfo
             ] emitter in
                 
-                let vo = WorkerEmployCardVO.create(
+                let vo = WorkerNativeEmployCardVO.create(
                     workTimeAndPay: editing_workTimeAndPay.value,
                     customerRequirement: editing_customerRequirement.value,
                     customerInformation: editing_customerInformation.value,

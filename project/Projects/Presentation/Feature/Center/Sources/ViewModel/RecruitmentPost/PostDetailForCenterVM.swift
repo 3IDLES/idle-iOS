@@ -19,7 +19,7 @@ public protocol PostDetailViewModelable:
 {
     // Output
     var applicantCountText: Driver<String>? { get }
-    var workerEmployCardVO: Driver<WorkerEmployCardVO>? { get }
+    var workerEmployCardVO: Driver<WorkerNativeEmployCardVO>? { get }
     var requestDetailFailure: Driver<DefaultAlertContentVO>? { get }
     var showOptionSheet: Driver<PostState>? { get }
     
@@ -60,20 +60,20 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
     
     // MARK: DetailVC Interaction
     public var applicantCount: Int?
-    public var workerEmployCardVO: RxCocoa.Driver<Entity.WorkerEmployCardVO>?
-    public var requestDetailFailure: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
-    public var showOptionSheet: RxCocoa.Driver<Entity.PostState>?
-    public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    public var workerEmployCardVO: Driver<WorkerNativeEmployCardVO>?
+    public var requestDetailFailure: Driver<DefaultAlertContentVO>?
+    public var showOptionSheet: Driver<PostState>?
+    public var alert: Driver<DefaultAlertContentVO>?
     
-    public let postEditButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public let exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public let checkApplicationButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public let optionButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public let removePostButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public let closePostButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public let showAsWorkerButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public let postEditButtonClicked: PublishRelay<Void> = .init()
+    public let exitButtonClicked: PublishRelay<Void> = .init()
+    public let checkApplicationButtonClicked: PublishRelay<Void> = .init()
+    public let optionButtonClicked: PublishRelay<Void> = .init()
+    public let removePostButtonClicked: PublishRelay<Void> = .init()
+    public let closePostButtonClicked: PublishRelay<Void> = .init()
+    public let showAsWorkerButtonClicked: PublishRelay<Void> = .init()
     
-    public let viewWillAppear: RxRelay.PublishRelay<Void> = .init()
+    public let viewWillAppear: PublishRelay<Void> = .init()
     
     
     // MARK: fetched
@@ -175,7 +175,7 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
                 fetched_applicationDetail.accept(bundle.applicationDetail)
                 fetched_addressInfo.accept(bundle.addressInfo)
                 
-                return WorkerEmployCardVO.create(
+                return WorkerNativeEmployCardVO.create(
                     workTimeAndPay: fetched_workTimeAndPay.value,
                     customerRequirement: fetched_customerRequirement.value,
                     customerInformation: fetched_customerInformation.value,

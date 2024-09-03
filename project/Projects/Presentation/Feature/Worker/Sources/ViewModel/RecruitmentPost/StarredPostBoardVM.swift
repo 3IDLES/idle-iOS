@@ -32,7 +32,7 @@ public class StarredPostBoardVM: WorkerPagablePostBoardVMable {
     /// 값이 nil이라면 요청을 보내지 않습니다.
     var nextPagingRequest: PostPagingRequestForWorker?
     /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
-    private let currentPostVO: BehaviorRelay<[RecruitmentPostForWorkerVO]> = .init(value: [])
+    private let currentPostVO: BehaviorRelay<[NativeRecruitmentPostForWorkerVO]> = .init(value: [])
     
     public init(recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.recruitmentPostUseCase = recruitmentPostUseCase
@@ -87,7 +87,7 @@ public class StarredPostBoardVM: WorkerPagablePostBoardVMable {
                 // ViewModel 생성
                 let viewModels = mergedPosts.map { vo in
                     
-                    let cardVO: WorkerEmployCardVO = .create(vo: vo)
+                    let cardVO: WorkerNativeEmployCardVO = .create(vo: vo)
                     
                     let vm: OngoindWorkerEmployCardVM = .init(
                         postId: vo.postId,
@@ -113,20 +113,20 @@ public class StarredPostBoardVM: WorkerPagablePostBoardVMable {
     }
     
     
-    func publishStarredPostMocks() -> Single<Result<[RecruitmentPostForWorkerVO], DomainError>> {
+    func publishStarredPostMocks() -> Single<Result<[NativeRecruitmentPostForWorkerVO], DomainError>> {
         return .just(.success((0..<10).map { _ in .mock }))
     }
 }
 
 class StarredWorkerEmployCardVM: WorkerEmployCardViewModelable {
     
+    
+    
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?
     
     // Init
     let postId: String
-    
-    public var renderObject: RxCocoa.Driver<DSKit.WorkerEmployCardRO>?
-    public var applicationInformation: RxCocoa.Driver<DSKit.ApplicationInfo>?
+    var cellViewObject: Entity.WorkerNativeEmployCardVO
     
     public var cardClicked: RxRelay.PublishRelay<Void> = .init()
     public var applyButtonClicked: RxRelay.PublishRelay<Void> = .init()
@@ -137,27 +137,13 @@ class StarredWorkerEmployCardVM: WorkerEmployCardViewModelable {
     public init
         (
             postId: String,
-            vo: WorkerEmployCardVO,
+            vo: WorkerNativeEmployCardVO,
             coordinator: WorkerRecruitmentBoardCoordinatable? = nil
         )
     {
         self.postId = postId
+        self.cellViewObject = vo
         self.coordinator = coordinator
-        
-        // MARK: 지원여부
-        let applicationInformation: BehaviorRelay<ApplicationInfo> = .init(
-            value: .init(
-                isApplied: false,
-                applicationDateText: ""
-            )
-        )
-        self.applicationInformation = applicationInformation.asDriver()
-        
-        // MARK: Card RenderObject
-        let workerEmployCardRO: BehaviorRelay<WorkerEmployCardRO> = .init(value: .mock)
-        renderObject = workerEmployCardRO.asDriver(onErrorJustReturn: .mock)
-        
-        workerEmployCardRO.accept(WorkerEmployCardRO.create(vo: vo))
         
         // MARK: 버튼 처리
         applyButtonClicked

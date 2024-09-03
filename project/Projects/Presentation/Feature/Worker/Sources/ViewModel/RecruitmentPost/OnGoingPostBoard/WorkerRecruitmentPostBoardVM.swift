@@ -54,7 +54,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     /// 값이 nil이라면 요청을 보내지 않습니다.
     var nextPagingRequest: PostPagingRequestForWorker?
     /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
-    private let currentPostVO: BehaviorRelay<[RecruitmentPostForWorkerVO]> = .init(value: [])
+    private let currentPostVO: BehaviorRelay<[NativeRecruitmentPostForWorkerVO]> = .init(value: [])
     
     // Observable
     let dispostBag = DisposeBag()
@@ -149,16 +149,16 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
                 self.currentPostVO.accept(mergedPosts)
                 
                 // ViewModel 생성
-                let viewModels = mergedPosts.map { vo in
+                let viewModels = mergedPosts.map { postVO in
                     
-                    let cardVO: WorkerEmployCardVO = .create(vo: vo)
-                    let vm: OngoindWorkerEmployCardVM = .init(
-                        postId: vo.postId,
+                    let cardVO: WorkerNativeEmployCardVO = .create(vo: postVO)
+                    let cardViewModel: OngoindWorkerEmployCardVM = .init(
+                        postId: postVO.postId,
                         vo: cardVO,
                         coordinator: self.coordinator
                     )
                     
-                    return vm
+                    return cardViewModel
                 }
                 
                 return viewModels
@@ -181,69 +181,3 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     }
 }
 
-
-// MARK: ViewModelForCell
-class OngoindWorkerEmployCardVM: WorkerEmployCardViewModelable {
-    
-    weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    
-    // Init
-    let postId: String
-    
-    public var renderObject: RxCocoa.Driver<DSKit.WorkerEmployCardRO>?
-    public var applicationInformation: RxCocoa.Driver<DSKit.ApplicationInfo>?
-    
-    public var cardClicked: RxRelay.PublishRelay<Void> = .init()
-    public var applyButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var starButtonClicked: RxRelay.PublishRelay<Bool> = .init()
-    
-    let disposeBag = DisposeBag()
-    
-    public init
-        (
-            postId: String,
-            vo: WorkerEmployCardVO,
-            coordinator: WorkerRecruitmentBoardCoordinatable? = nil
-        )
-    {
-        self.postId = postId
-        self.coordinator = coordinator
-        
-        // MARK: 지원여부
-        let applicationInformation: BehaviorRelay<ApplicationInfo> = .init(value: .mock)
-        self.applicationInformation = applicationInformation.asDriver()
-        
-        // MARK: Card RenderObject
-        let workerEmployCardRO: BehaviorRelay<WorkerEmployCardRO> = .init(value: .mock)
-        renderObject = workerEmployCardRO.asDriver(onErrorJustReturn: .mock)
-        
-        workerEmployCardRO.accept(WorkerEmployCardRO.create(vo: vo))
-        
-        // MARK: 버튼 처리
-        applyButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                // 지원하기 버튼 눌림
-            })
-            .disposed(by: disposeBag)
-        
-        cardClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                coordinator?.showPostDetail(
-                    postId: postId
-                )
-            })
-            .disposed(by: disposeBag)
-        
-        starButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                // 즐겨찾기 버튼눌림
-            })
-            .disposed(by: disposeBag)
-    }
-}

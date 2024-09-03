@@ -29,7 +29,7 @@ public protocol PostOverviewViewModelable:
     var postOverviewCoordinator: PostOverviewCoordinator? { get set }
     
     /// 공고등록에 성공한 경우 해당 이벤트를 전달 받습니다
-    var workerEmployCardVO: Driver<WorkerEmployCardVO>? { get }
+    var workerEmployCardVO: Driver<WorkerNativeEmployCardVO>? { get }
     
     /// 유효한 값을 가져옵니다.
     func fetchFromState()

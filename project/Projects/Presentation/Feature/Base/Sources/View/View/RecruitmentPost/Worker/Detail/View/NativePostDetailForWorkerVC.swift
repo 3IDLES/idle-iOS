@@ -124,7 +124,7 @@ public class NativePostDetailForWorkerVC: BaseViewController {
             .disposed(by: disposeBag)
     }
     
-    public func bind(viewModel: PostDetailForWorkerViewModelable) {
+    public func bind(viewModel: NativePostDetailForWorkerViewModelable) {
         
         self.viewModel = viewModel
         
@@ -136,17 +136,16 @@ public class NativePostDetailForWorkerVC: BaseViewController {
                 guard let self else { return }
                 
                 // 상단 구인공고 카드
-                contentView.cardView.bind(
-                    ro: WorkerEmployCardRO.create(
-                        vo: .create(
-                            workTimeAndPay: bundle.workTimeAndPay,
-                            customerRequirement: bundle.customerRequirement,
-                            customerInformation: bundle.customerInformation,
-                            applicationDetail: bundle.applicationDetail,
-                            addressInfo: bundle.addressInfo
-                        )
-                    )
+                let cardVO: WorkerNativeEmployCardVO = .create(
+                    workTimeAndPay: bundle.workTimeAndPay,
+                    customerRequirement: bundle.customerRequirement,
+                    customerInformation: bundle.customerInformation,
+                    applicationDetail: bundle.applicationDetail,
+                    addressInfo: bundle.addressInfo
                 )
+                let cardRO: WorkerNativeEmployCardRO = .create(vo: cardVO)
+                
+                contentView.cardView.bind(ro: cardRO)
                 
                 // 근무 조건
                 contentView.workConditionView.bind(
