@@ -36,9 +36,10 @@ public extension BaseViewController {
     }
     
     func showIdleModal(
+        type: IdleBigAlertController.ButtonType = .red,
         viewModel: IdleAlertViewModelable
     ) {
-        let alertVC = IdleBigAlertController()
+        let alertVC = IdleBigAlertController(type: type)
         alertVC.bind(viewModel: viewModel)
         alertVC.modalPresentationStyle = .custom
         present(alertVC, animated: true, completion: nil)

@@ -191,7 +191,7 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
         self.idleAlertVM = applyButtonClicked
             .map { (postId: String, postTitle: String) in
                 DefaultIdleAlertVM(
-                    title: "'postTitle'\n공고에 지원하시겠어요?",
+                    title: "'\(postTitle)'\n공고에 지원하시겠어요?",
                     description: "",
                     acceptButtonLabelText: "지원하기",
                     cancelButtonLabelText: "취소하기") { [applyRequest] in

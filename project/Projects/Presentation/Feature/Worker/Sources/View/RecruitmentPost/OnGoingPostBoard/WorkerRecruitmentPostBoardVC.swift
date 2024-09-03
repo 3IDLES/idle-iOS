@@ -87,6 +87,13 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        viewModel
+            .idleAlertVM?
+            .drive(onNext: { [weak self] vm in
+                self?.showIdleModal(type: .orange, viewModel: vm)
+            })
+            .disposed(by: disposeBag)
+        
         // Input
         self.rx.viewDidLoad
             .bind(to: viewModel.requestWorkerLocation)
