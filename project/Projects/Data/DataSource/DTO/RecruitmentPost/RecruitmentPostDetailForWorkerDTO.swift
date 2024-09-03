@@ -54,16 +54,7 @@ public struct RecruitmentPostDTO: Codable {
         workTimeAndPay.workStartTime = IdleDateComponent.toEntity(text: startTime)
         workTimeAndPay.workEndTime = IdleDateComponent.toEntity(text: endTime)
         workTimeAndPay.paymentType = PaymentType.toEntity(text: payType)
-        
-        let payAmount = String(payAmount)
-        var formedPayAmount = ""
-        for (index, char) in payAmount.reversed().enumerated() {
-            if (index % 3) == 0, index != 0 {
-                formedPayAmount += ","
-            }
-            formedPayAmount += String(char)
-        }
-        workTimeAndPay.paymentAmount = formedPayAmount
+        workTimeAndPay.paymentAmount = String(payAmount)
         
         let addressInfo: AddressInputStateObject = .init()
         addressInfo.addressInfo = .init(
@@ -76,7 +67,7 @@ public struct RecruitmentPostDTO: Codable {
         
         let currentYear = Calendar.current.component(.year, from: Date())
         customerInfo.birthYear = String(currentYear - age)
-        customerInfo.weight = (weight == nil) ? String(weight!) : ""
+        customerInfo.weight = (weight == nil) ? "" : String(weight!)
         customerInfo.careGrade = CareGrade(rawValue: careLevel-1)!
         
         customerInfo.cognitionState = CognitionDegree.toEntity(text: mentalStatus)

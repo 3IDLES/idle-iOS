@@ -51,4 +51,13 @@ public protocol RecruitmentPostUseCase: UseCaseBase {
     
     /// 요양보호사가 메인화면에 사용할 공고리스트를 호출합니다.
     func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>>
+    
+    /// 요양보호사가 즐겨찾기한 공고리스트를 호출합니다.
+    func getFavoritePostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>>
+    
+    /// 요양보호사가 지원한 공고리스트를 호출합니다.
+    func getAppliedPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>>
+    
+    /// 요양보호사가 인앱공고에 지원합니다.
+    func applyToPost(postId: String, method: ApplyType) -> Single<Result<Void, DomainError>>
 }

@@ -1,5 +1,5 @@
 //
-//  WorkerEmployCard.swift
+//  WorkerNativeEmployCardCell.swift
 //  DSKit
 //
 //  Created by choijunios on 7/19/24.
@@ -10,42 +10,26 @@ import RxSwift
 import RxCocoa
 import Entity
 
-/// WorkerEmployCardCell에서 사용됩니다.
-public struct ApplicationInfo {
-    let isApplied: Bool
-    let applicationDateText: String
-    
-    public static let mock: ApplicationInfo = .init(
-        isApplied: true,
-        applicationDateText: "2024. 10. 22"
-    )
-    
-    public init(isApplied: Bool, applicationDateText: String) {
-        self.isApplied = isApplied
-        self.applicationDateText = applicationDateText
-    }
+public enum PostAppliedState {
+    case applied
+    case notApplied
 }
 
-public protocol WorkerEmployCardViewModelable {
-
-    // Output
-    var renderObject: Driver<WorkerEmployCardRO>? { get }
-    var applicationInformation: Driver<ApplicationInfo>? { get }
+public protocol WorkerNativeEmployCardViewModelable: AnyObject {
     
-    // Input
-    var cardClicked: PublishRelay<Void> { get }
-    var applyButtonClicked: PublishRelay<Void> { get }
+    /// '지원하기' 버튼이 눌렸을 때, 공고 id를 전달합니다.
+    var applyButtonClicked: PublishRelay<(postId: String, postTitle: String)> { get }
     
-    /// true일 경우 즐겨 찾기에 등록됩니다.
-    var starButtonClicked: PublishRelay<Bool> { get }
+    /// 공고상세보기
+    func showPostDetail(id: String)
 }
 
-public class WorkerEmployCardCell: UITableViewCell {
+public class WorkerNativeEmployCardCell: UITableViewCell {
     
-    public static let identifier = String(describing: WorkerEmployCardCell.self)
+    public static let identifier = String(describing: WorkerNativeEmployCardCell.self)
     
     
-    var viewModel: WorkerEmployCardViewModelable?
+    var viewModel: WorkerNativeEmployCardViewModelable?
     private var disposables: [Disposable?]?
     
     public override func layoutSubviews() {
@@ -59,7 +43,7 @@ public class WorkerEmployCardCell: UITableViewCell {
     let cardView = WorkerEmployCard()
     let applyButton: IdlePrimaryCardButton = {
         let btn = IdlePrimaryCardButton(level: .large)
-        btn.label.textString = ""
+        btn.label.textString = "지원하기"
         return btn
     }()
     
@@ -114,45 +98,36 @@ public class WorkerEmployCardCell: UITableViewCell {
         ])
     }
     
-    public func bind(viewModel: WorkerEmployCardViewModelable) {
+    public func bind(postId: String, vo: WorkerNativeEmployCardVO, viewModel: WorkerNativeEmployCardViewModelable) {
         
-        self.viewModel = viewModel
+        // 지원 여부
+        if let appliedDate = vo.applyDate {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "지원완료 yyyy. MM. dd"
+            let applyButtonLabelString = dateFormatter.string(from: appliedDate)
+            applyButton.label.textString = applyButtonLabelString
+            applyButton.setEnabled(false)
+        }
+        
+        // 카드 컨텐츠 바인딩
+        let cardRO = WorkerNativeEmployCardRO.create(vo: vo)
+        cardView.bind(ro: cardRO)
         
         // input
         let disposables: [Disposable?] = [
-            // Output
-            viewModel
-                .applicationInformation?
-                .drive(onNext: { [weak self] info in
-                    guard let self else { return }
-                    if info.isApplied {
-                        applyButton.setEnabled(false)
-                        applyButton.label.textString = "지원완료 \(info.applicationDateText)"
-                    } else {
-                        applyButton.setEnabled(true)
-                        applyButton.label.textString = "지원하기"
-                    }
-                }),
-            viewModel
-                .renderObject?
-                .drive(onNext: { [cardView] ro in
-                    cardView.bind(ro: ro)
-                }),
-            
+
             // Input
             tappableArea
                 .rx.tap
-                .bind(to: viewModel.cardClicked),
-            
-            applyButton
-                .rx.tap
+                .subscribe(onNext: { [weak viewModel] _ in
+                    viewModel?.showPostDetail(id: postId)
+                }),
+                        
+            applyButton.rx.tap
+                .map({ _ in (postId, vo.title) })
                 .bind(to: viewModel.applyButtonClicked),
             
-            cardView
-                .starButton
-                .eventPublisher
-                .map { $0 == .accent }
-                .bind(to: viewModel.starButtonClicked),
+            //TODO: 즐겨찾기 구현예정
         ]
         
         self.disposables = disposables

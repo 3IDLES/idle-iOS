@@ -59,7 +59,15 @@ public class DefaultIdleAlertVM: IdleAlertViewModelable {
 
 public class IdleBigAlertController: UIViewController {
     
+    public enum ButtonType {
+        case orange
+        case red
+    }
+    
     let customTranstionDelegate = CustomTransitionDelegate()
+    
+    // Init
+    let type: ButtonType
     
     // Not init
     private let disposeBag = DisposeBag()
@@ -67,6 +75,7 @@ public class IdleBigAlertController: UIViewController {
     // View
     let titleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle1)
+        label.numberOfLines = 0
         label.textAlignment = .center
         return label
     }()
@@ -74,25 +83,24 @@ public class IdleBigAlertController: UIViewController {
     let descriptionLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSKitAsset.Colors.gray500.color
-        label.lineBreakMode = .byWordWrapping
-        label.textAlignment = .center
         label.numberOfLines = 0
+        label.textAlignment = .center
         return label
     }()
     
-    public let cancelButton: IdleThirdinaryButton = {
+    public lazy var cancelButton: IdleThirdinaryButton = {
         let button = IdleThirdinaryButton(level: .medium)
         button.label.textString = ""
         return button
     }()
-    public let acceptButton: IdlePrimaryButton = {
-        let button = IdlePrimaryButton(level: .mediumRed)
+    public lazy var acceptButton: IdlePrimaryButton = {
+        let button = IdlePrimaryButton(level: type == .orange ? .medium : .mediumRed)
         button.label.textString = ""
         return button
     }()
     
-    public init() {
-        
+    public init(type: ButtonType) {
+        self.type = type
         super.init(nibName: nil, bundle: nil)
         
         self.transitioningDelegate = customTranstionDelegate
@@ -105,18 +113,17 @@ public class IdleBigAlertController: UIViewController {
     
     private func setAppearance() {
         view.backgroundColor = DSKitAsset.Colors.gray500.color.withAlphaComponent(0.5)
-        
-        // TODO: 미정으로 변동가능합니다.
-        view.layoutMargins = .init(top: 0, left: 24, bottom: 0, right: 24)
     }
     
     private func setAutoLayout() {
         
+        view.layoutMargins = .init(top: 0, left: 24, bottom: 0, right: 24)
+        
         // 라벨 스택
         let textStack = VStack(
             [
-                Spacer(height: 8),
-                titleLabel
+                titleLabel,
+                descriptionLabel
             ],
             spacing: 8,
             alignment: .center
@@ -136,11 +143,7 @@ public class IdleBigAlertController: UIViewController {
         // 라벨 + 버튼 스택
         let alertContentsStack = VStack(
             [
-                HStack([
-                    Spacer(width: 41.5),
-                    textStack,
-                    Spacer(width: 41.5)
-                ], alignment: .fill),
+                textStack,
                 buttonStack
             ],
             spacing: 24,
@@ -150,7 +153,6 @@ public class IdleBigAlertController: UIViewController {
         NSLayoutConstraint.activate([
             // 버튼 스택 높이 지정
             buttonStack.heightAnchor.constraint(equalToConstant: 52),
-            
         ])
         
         // 전체 스택
@@ -193,7 +195,9 @@ public class IdleBigAlertController: UIViewController {
     public func bind(viewModel vm: IdleAlertViewModelable) {
         
         titleLabel.textString = vm.title
+        titleLabel.textAlignment = .center
         descriptionLabel.textString = vm.description
+        descriptionLabel.textAlignment = .center
         
         acceptButton.label.textString = vm.acceptButtonLabelText
         cancelButton.label.textString = vm.cancelButtonLabelText
@@ -218,13 +222,13 @@ public class IdleBigAlertController: UIViewController {
     }
 }
 
-class FadeInAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+public class FadeInAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.35 // 애니메이션 지속 시간
     }
     
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromView = transitionContext.view(forKey: .from) else { return }
         
         let containerView = transitionContext.containerView
@@ -245,13 +249,13 @@ class FadeInAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     }
 }
 
-class FadeOutAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+public class FadeOutAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.35 // 애니메이션 지속 시간
     }
     
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let toView = transitionContext.view(forKey: .to) else { return }
         
         let containerView = transitionContext.containerView
@@ -271,13 +275,13 @@ class FadeOutAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     }
 }
 
-class CustomTransitionDelegate: NSObject, UIViewControllerTransitioningDelegate {
+public class CustomTransitionDelegate: NSObject, UIViewControllerTransitioningDelegate {
     
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return FadeInAnimator() // 우리가 만든 사용자 정의 애니메이터를 반환
     }
     
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> (any UIViewControllerAnimatedTransitioning)? {
+    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> (any UIViewControllerAnimatedTransitioning)? {
         return FadeOutAnimator()
     }
 }
@@ -286,5 +290,5 @@ class CustomTransitionDelegate: NSObject, UIViewControllerTransitioningDelegate 
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
     
-    IdleBigAlertController()
+    IdleBigAlertController(type: .orange)
 }

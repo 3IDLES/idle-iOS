@@ -15,51 +15,124 @@ import DSKit
 import UseCaseInterface
 
 
-public class AppliedPostBoardVM: WorkerStaticPostBoardVMable {
+public class AppliedPostBoardVM: WorkerPagablePostBoardVMable {
     
-    public var postViewWillAppear: RxRelay.PublishRelay<Void> = .init()
+    // Input
+    public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
+    public var requestNextPage: RxRelay.PublishRelay<Void> = .init()
+    public var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
     
-    public var postBoardData: RxCocoa.Driver<[any DSKit.WorkerEmployCardViewModelable]>?
+    // Output
+    public var postBoardData: RxCocoa.Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
     public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    public var showLoading: RxCocoa.Driver<Void>?
+    public var dismissLoading: RxCocoa.Driver<Void>?
     
     // Init
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?
     let recruitmentPostUseCase: RecruitmentPostUseCase
     
-    public init(recruitmentPostUseCase: RecruitmentPostUseCase) {
+    // Paging
+    /// 값이 nil이라면 요청을 보내지 않습니다.
+    var nextPagingRequest: PostPagingRequestForWorker?
+    /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
+    private let currentPostVO: BehaviorRelay<[NativeRecruitmentPostForWorkerVO]> = .init(value: [])
+    
+    public init(coordinator: WorkerRecruitmentBoardCoordinatable, recruitmentPostUseCase: RecruitmentPostUseCase) {
+        self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
+        self.nextPagingRequest = .initial
         
-        let requestPostResult = postViewWillAppear
-            .flatMap { [unowned self] _ in
-                self.publishAppliedPostMocks()
+        var loadingStartObservables: [Observable<Void>] = []
+        var loadingEndObservables: [Observable<Void>] = []
+        
+        // MARK: 공고리스트 처음부터 요청하기
+        let initialRequest = requestInitialPageRequest
+            .flatMap { [weak self, recruitmentPostUseCase] request in
+                
+                self?.currentPostVO.accept([])
+                self?.nextPagingRequest = .initial
+                
+                return recruitmentPostUseCase
+                    .getAppliedPostListForWorker(
+                        request: .initial,
+                        postCount: 10
+                    )
             }
             .share()
         
-        let requestPostSuccess = requestPostResult.compactMap { $0.value }
-        let requestPostFailure = requestPostResult.compactMap { $0.error }
+        // 로딩 시작
+        loadingStartObservables.append(initialRequest.map { _ in })
         
-        postBoardData = requestPostSuccess
-            .map { postForWorkerVos in
-                
-                // ViewModel 생성
-                let viewModels = postForWorkerVos.map { vo in
-                    
-                    let cardVO: WorkerEmployCardVO = .create(vo: vo)
-                    
-                    let vm: AppliedWorkerEmployCardVM = .init(
-                        postId: vo.postId,
-                        vo: cardVO,
-                        coordinator: self.coordinator
+        // MARK: 공고리스트 페이징 요청
+        let pagingRequest = requestNextPage
+            .compactMap { [weak self] _ in
+                // 요청이 없는 경우 요청을 보내지 않는다.
+                // ThirdPatry에서도 불러올 데이터가 없는 경우입니다.
+                self?.nextPagingRequest
+            }
+            .flatMap { [recruitmentPostUseCase] request in
+                recruitmentPostUseCase
+                    .getAppliedPostListForWorker(
+                        request: request,
+                        postCount: 10
                     )
-                    
-                    return vm
+            }
+            
+        let postPageReqeustResult = Observable
+            .merge(initialRequest, pagingRequest)
+            .share()
+        
+        // 로딩 종료
+        loadingEndObservables.append(postPageReqeustResult.map { _ in })
+        
+        let requestPostListSuccess = postPageReqeustResult.compactMap { $0.value }
+        let requestPostListFailure = postPageReqeustResult.compactMap { $0.error }
+        
+        postBoardData = Observable
+            .zip(
+                currentPostVO,
+                requestPostListSuccess
+            )
+            .compactMap { [weak self] (prevPostList, fetchedData) -> (Bool, [PostBoardCellData])? in
+                
+                guard let self else { return nil }
+                
+                let isRefreshed: Bool = self.nextPagingRequest == .initial
+                
+                
+                if let next = fetchedData.nextPageId {
+                    // 지원 공고의 경우 써드파티에서 불러올 데이터가 없다.
+                    self.nextPagingRequest = .paging(
+                        source: .native,
+                        nextPageId: next
+                    )
+                } else {
+                    self.nextPagingRequest = nil
                 }
                 
-                return viewModels
+                
+                // 화면에 표시할 전체리스트 도출
+                let fetchedPosts = fetchedData.posts
+                var mergedPosts = currentPostVO.value
+                mergedPosts.append(contentsOf: fetchedPosts)
+                
+                // 최근값 업데이트
+                self.currentPostVO.accept(mergedPosts)
+                
+                // cellData 생성
+                let cellData: [PostBoardCellData] = mergedPosts.map { vo in
+                    
+                    let cardVO: WorkerNativeEmployCardVO = .create(vo: vo)
+                    
+                    return .init(postId: vo.postId, cardVO: cardVO)
+                }
+                
+                return (isRefreshed, cellData)
             }
-            .asDriver(onErrorJustReturn: [])
+            .asDriver(onErrorDriveWith: .never())
         
-        alert = requestPostFailure
+        alert = requestPostListFailure
             .map { error in
                 DefaultAlertContentVO(
                     title: "지원한 공고 불러오기 오류",
@@ -67,80 +140,19 @@ public class AppliedPostBoardVM: WorkerStaticPostBoardVMable {
                 )
             }
             .asDriver(onErrorJustReturn: .default)
+        
+        // MARK: 로딩
+        showLoading = Observable
+            .merge(loadingStartObservables)
+            .asDriver(onErrorDriveWith: .never())
+        
+        dismissLoading = Observable
+            .merge(loadingEndObservables)
+            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
+            .asDriver(onErrorDriveWith: .never())
     }
     
-    
-    func publishAppliedPostMocks() -> Single<Result<[RecruitmentPostForWorkerVO], DomainError>> {
-        return .just(.success((0..<10).map { _ in .mock }))
-    }
-}
-
-class AppliedWorkerEmployCardVM: WorkerEmployCardViewModelable {
-    
-    weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    
-    // Init
-    let postId: String
-    
-    public var renderObject: RxCocoa.Driver<DSKit.WorkerEmployCardRO>?
-    public var applicationInformation: RxCocoa.Driver<DSKit.ApplicationInfo>?
-    
-    public var cardClicked: RxRelay.PublishRelay<Void> = .init()
-    public var applyButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var starButtonClicked: RxRelay.PublishRelay<Bool> = .init()
-    
-    let disposeBag = DisposeBag()
-    
-    public init
-        (
-            postId: String,
-            vo: WorkerEmployCardVO,
-            coordinator: WorkerRecruitmentBoardCoordinatable? = nil
-        )
-    {
-        self.postId = postId
-        self.coordinator = coordinator
-        
-        // MARK: 지원여부
-        let applicationInformation: BehaviorRelay<ApplicationInfo> = .init(
-            value: .init(
-                isApplied: true,
-                applicationDateText: "날자정보 (미구현)"
-            )
-        )
-        self.applicationInformation = applicationInformation.asDriver()
-        
-        // MARK: Card RenderObject
-        let workerEmployCardRO: BehaviorRelay<WorkerEmployCardRO> = .init(value: .mock)
-        renderObject = workerEmployCardRO.asDriver(onErrorJustReturn: .mock)
-        
-        workerEmployCardRO.accept(WorkerEmployCardRO.create(vo: vo))
-        
-        // MARK: 버튼 처리
-        applyButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                // 지원하기 버튼 눌림
-            })
-            .disposed(by: disposeBag)
-        
-        cardClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                coordinator?.showPostDetail(
-                    postId: postId
-                )
-            })
-            .disposed(by: disposeBag)
-        
-        starButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                // 즐겨찾기 버튼눌림
-            })
-            .disposed(by: disposeBag)
+    public func showPostDetail(id: String) {
+        coordinator?.showPostDetail(postId: id)
     }
 }

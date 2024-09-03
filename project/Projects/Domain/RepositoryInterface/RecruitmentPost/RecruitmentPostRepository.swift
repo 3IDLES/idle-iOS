@@ -44,6 +44,15 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     /// 요양보호사 공고의 상세정보를 조회합니다.
     func getPostDetailForWorker(id: String) -> Single<RecruitmentPostForWorkerBundle>
     
-    /// 요샹보호사가 확인하는 케어밋 자체 공고정보를 가져옵니다.
+    /// 요양보호사가 확인하는 케어밋 자체 공고정보를 가져옵니다.
     func getNativePostListForWorker(nextPageId: String?, requestCnt: Int) -> Single<RecruitmentPostListForWorkerVO>
+    
+    /// 요양보호사가 확인하는 케어밋 자체 공고정보를 가져옵니다.
+    func getFavoritePostListForWorker(nextPageId: String?, requestCnt: Int) -> Single<RecruitmentPostListForWorkerVO>
+    
+    /// 요양보호사가 확인하는 케어밋 자체 공고정보를 가져옵니다.
+    func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> Single<RecruitmentPostListForWorkerVO>
+    
+    /// 요양보호사가 인앱 공고에 지원합니다.
+    func ApplyToPost(postId: String, method: ApplyType) -> Single<Void>
 }

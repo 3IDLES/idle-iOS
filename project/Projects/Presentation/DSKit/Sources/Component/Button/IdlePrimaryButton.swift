@@ -102,9 +102,7 @@ public class IdlePrimaryButton: TappableUIView {
     private func setApearance() {
         self.layer.cornerRadius = 8
         self.clipsToBounds = true
-        
-        // InitialSetting
-        backgroundColor = level.idleColor
+        self.backgroundColor = level.idleColor
     }
     
     private func setAutoLayout() {

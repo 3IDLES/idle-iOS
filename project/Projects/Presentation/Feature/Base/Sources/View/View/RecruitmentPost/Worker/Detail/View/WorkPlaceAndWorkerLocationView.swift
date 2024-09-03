@@ -43,13 +43,13 @@ public class WorkPlaceAndWorkerLocationView: VStack {
     public let mapViewBackGround: TappableUIView = {
         let view = TappableUIView()
         view.backgroundColor = DSColor.gray050.color
+        view.layer.cornerRadius = 8
+        view.clipsToBounds = true
         return view
     }()
     let mapView: NMFNaverMapView = {
         let view = NMFNaverMapView(frame: .zero)
         view.backgroundColor = DSColor.gray050.color
-        view.layer.cornerRadius = 8
-        view.clipsToBounds = true
         view.isUserInteractionEnabled = false
         return view
     }()

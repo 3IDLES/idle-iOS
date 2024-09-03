@@ -29,9 +29,10 @@ public enum RcruitmentPostAPI {
     // - 공고 지원자 관련
     case getPostApplicantCount(id: String)
     
-    
     // Worker
     case getOnGoingNativePostListForWorker(nextPageId: String?, requestCnt: String)
+    case getFavoritePostListForWorker(nextPageId: String?, requestCnt: String)
+    case getAppliedPostListForWorker(nextPageId: String?, requestCnt: String)
 }
 
 extension RcruitmentPostAPI: BaseAPI {
@@ -70,6 +71,11 @@ extension RcruitmentPostAPI: BaseAPI {
             
         case .getOnGoingNativePostListForWorker:
             ""
+        case .getFavoritePostListForWorker:
+            "/my/favorites"
+        case .getAppliedPostListForWorker:
+            "/carer/my/applied"
+            
         }
     }
     
@@ -103,6 +109,10 @@ extension RcruitmentPostAPI: BaseAPI {
             
         case .getOnGoingNativePostListForWorker:
             .get
+        case .getFavoritePostListForWorker:
+            .get
+        case .getAppliedPostListForWorker:
+            .get
         }
     }
     
@@ -110,6 +120,16 @@ extension RcruitmentPostAPI: BaseAPI {
         var params: Parameters = [:]
         switch self {
         case .getOnGoingNativePostListForWorker(let nextPageId, let requestCnt):
+            if let nextPageId {
+                params["next"] = nextPageId
+            }
+            params["limit"] = requestCnt
+        case .getFavoritePostListForWorker(let nextPageId, let requestCnt):
+            if let nextPageId {
+                params["next"] = nextPageId
+            }
+            params["limit"] = requestCnt
+        case .getAppliedPostListForWorker(let nextPageId, let requestCnt):
             if let nextPageId {
                 params["next"] = nextPageId
             }
@@ -122,7 +142,9 @@ extension RcruitmentPostAPI: BaseAPI {
     
     var parameterEncoding: ParameterEncoding {
         switch self {
-        case .getOnGoingNativePostListForWorker:
+        case .getOnGoingNativePostListForWorker,
+                .getFavoritePostListForWorker,
+                .getAppliedPostListForWorker:
             return URLEncoding.queryString
         default:
             return JSONEncoding.default
@@ -131,7 +153,9 @@ extension RcruitmentPostAPI: BaseAPI {
     
     public var task: Moya.Task {
         switch self {
-        case .getOnGoingNativePostListForWorker:
+        case .getOnGoingNativePostListForWorker,
+                .getFavoritePostListForWorker,
+                .getAppliedPostListForWorker:
             .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .registerPost(let bodyData):
             .requestData(bodyData)

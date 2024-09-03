@@ -15,7 +15,7 @@ import DSKit
 
 
 public class WorkerRecruitmentPostBoardVC: BaseViewController {
-    typealias Cell = WorkerEmployCardCell
+    typealias Cell = WorkerNativeEmployCardCell
     
     var viewModel: WorkerRecruitmentPostBoardVMable?
     
@@ -36,7 +36,7 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     var isPaging = true
     
     // Observable
-    let postViewModels: BehaviorRelay<[WorkerEmployCardViewModelable]> = .init(value: [])
+    let cellData: BehaviorRelay<[PostBoardCellData]> = .init(value: [])
     let requestNextPage: PublishRelay<Void> = .init()
     
     private let disposeBag = DisposeBag()
@@ -57,6 +57,8 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         
         self.viewModel = viewModel
         
+        super.bind(viewModel: viewModel, disposeBag: disposeBag)
+        
         // Output
         viewModel
             .workerLocationTitleText?
@@ -67,11 +69,17 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         
         viewModel
             .postBoardData?
-            .drive(onNext: { [weak self] viewModels in
+            .drive(onNext: { [weak self] (isRefreshed: Bool, cellData) in
                 guard let self else { return }
-                self.postViewModels.accept(viewModels)
-                self.postTableView.reloadData()
-                self.isPaging = false
+                self.cellData.accept(cellData)
+                postTableView.reloadData()
+                isPaging = false
+                
+                if isRefreshed {
+                    DispatchQueue.main.async { [weak self] in
+                        self?.postTableView.setContentOffset(.zero, animated: false)
+                    }
+                }
             })
             .disposed(by: disposeBag)
         
@@ -82,9 +90,21 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        viewModel
+            .idleAlertVM?
+            .drive(onNext: { [weak self] vm in
+                self?.showIdleModal(type: .orange, viewModel: vm)
+            })
+            .disposed(by: disposeBag)
+        
         // Input
         self.rx.viewDidLoad
-            .bind(to: viewModel.viewDidLoad)
+            .bind(to: viewModel.requestWorkerLocation)
+            .disposed(by: disposeBag)
+        
+        self.rx.viewWillAppear
+            .map { _ in () }
+            .bind(to: viewModel.requestInitialPageRequest)
             .disposed(by: disposeBag)
         
         self.requestNextPage
@@ -136,7 +156,7 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
 extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        postViewModels.value.count
+        cellData.value.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -144,8 +164,12 @@ extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelega
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
         cell.selectionStyle = .none
         
-        let vm = postViewModels.value[indexPath.row]
-        cell.bind(viewModel: vm)
+        let cellData = cellData.value[indexPath.row]
+        
+        if let vm = viewModel {
+            
+            cell.bind(postId: cellData.postId, vo: cellData.cardVO, viewModel: vm)
+        }
         
         return cell
     }

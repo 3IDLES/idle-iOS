@@ -1,5 +1,5 @@
 //
-//  PostDetailForWorkerVC.swift
+//  NativePostDetailForWorkerVC.swift
 //  BaseFeature
 //
 //  Created by choijunios on 8/7/24.
@@ -13,9 +13,9 @@ import Entity
 import DSKit
 
 /// 센토도 요양보호사가 보는 공고화면을 볼 수 있기 때문에 해당뷰를 BaseFeature에 구현하였습니다.
-public class PostDetailForWorkerVC: BaseViewController {
+public class NativePostDetailForWorkerVC: BaseViewController {
     
-    var viewModel: PostDetailForWorkerViewModelable?
+    var viewModel: NativePostDetailForWorkerViewModelable?
     
     // Init
     
@@ -124,9 +124,11 @@ public class PostDetailForWorkerVC: BaseViewController {
             .disposed(by: disposeBag)
     }
     
-    public func bind(viewModel: PostDetailForWorkerViewModelable) {
+    public func bind(viewModel: NativePostDetailForWorkerViewModelable) {
         
         self.viewModel = viewModel
+        
+        super.bind(viewModel: viewModel, disposeBag: disposeBag)
         
         // Output
         viewModel
@@ -136,17 +138,16 @@ public class PostDetailForWorkerVC: BaseViewController {
                 guard let self else { return }
                 
                 // 상단 구인공고 카드
-                contentView.cardView.bind(
-                    ro: WorkerEmployCardRO.create(
-                        vo: .create(
-                            workTimeAndPay: bundle.workTimeAndPay,
-                            customerRequirement: bundle.customerRequirement,
-                            customerInformation: bundle.customerInformation,
-                            applicationDetail: bundle.applicationDetail,
-                            addressInfo: bundle.addressInfo
-                        )
-                    )
+                let cardVO: WorkerNativeEmployCardVO = .create(
+                    workTimeAndPay: bundle.workTimeAndPay,
+                    customerRequirement: bundle.customerRequirement,
+                    customerInformation: bundle.customerInformation,
+                    applicationDetail: bundle.applicationDetail,
+                    addressInfo: bundle.addressInfo
                 )
+                let cardRO: WorkerNativeEmployCardRO = .create(vo: cardVO)
+                
+                contentView.cardView.bind(ro: cardRO)
                 
                 // 근무 조건
                 contentView.workConditionView.bind(
@@ -196,6 +197,14 @@ public class PostDetailForWorkerVC: BaseViewController {
                 }
                 .disposed(by: disposeBag)
         }
+        
+        viewModel
+            .idleAlertVM?
+            .drive(onNext: { [weak self] vm in
+                self?.showIdleModal(type: .orange, viewModel: vm)
+            })
+            .disposed(by: disposeBag)
+        
         
         viewModel
             .alert?

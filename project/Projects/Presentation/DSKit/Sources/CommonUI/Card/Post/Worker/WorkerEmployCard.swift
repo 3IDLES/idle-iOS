@@ -1,5 +1,5 @@
 //
-//  WorkerEmployCard.swift
+//  WorkerNativeEmployCardRO.swift
 //  DSKit
 //
 //  Created by choijunios on 7/19/24.
@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 import Entity
 
-public class WorkerEmployCardRO {
+public class WorkerNativeEmployCardRO {
     
     let showBiginnerTag: Bool
     let showDayLeftTag: Bool
@@ -22,19 +22,29 @@ public class WorkerEmployCardRO {
     let workTimeText: String
     let payText: String
     
-    init(showBiginnerTag: Bool, showDayLeftTag: Bool, dayLeftTagText: String?, titleText: String, distanceFromWorkPlace: String, targetInfoText: String, workDaysText: String, workTimeText: String, payText: String) {
+    init(
+        showBiginnerTag: Bool,
+        showDayLeftTag: Bool,
+        dayLeftTagText: String?,
+        titleText: String,
+        distanceFromWorkPlaceText: String,
+        targetInfoText: String,
+        workDaysText: String,
+        workTimeText: String,
+        payText: String
+    ) {
         self.showBiginnerTag = showBiginnerTag
         self.showDayLeftTag = showDayLeftTag
         self.dayLeftTagText = dayLeftTagText
         self.titleText = titleText
-        self.distanceFromWorkPlaceText = distanceFromWorkPlace
+        self.distanceFromWorkPlaceText = distanceFromWorkPlaceText
         self.targetInfoText = targetInfoText
         self.workDaysText = workDaysText
         self.workTimeText = workTimeText
         self.payText = payText
     }
     
-    public static func create(vo: WorkerEmployCardVO) -> WorkerEmployCardRO {
+    public static func create(vo: WorkerNativeEmployCardVO) -> WorkerNativeEmployCardRO {
 
         var dayLeftTagText: String? = nil
         var showDayLeftTag: Bool = false
@@ -69,12 +79,20 @@ public class WorkerEmployCardRO {
         }
         let addressTitle = splittedAddress.joined(separator: " ")
         
+        // distance는 미터단위입니다.
+        var distanceText: String = "\(vo.distanceFromWorkPlace)m"
+
+        if vo.distanceFromWorkPlace >= 1000 {
+            let kilometers = Double(vo.distanceFromWorkPlace)/1000.0
+            distanceText = String(format: "%.1fkm", kilometers)
+        }
+        
         return .init(
             showBiginnerTag: vo.isBeginnerPossible,
             showDayLeftTag: showDayLeftTag,
             dayLeftTagText: dayLeftTagText,
             titleText: addressTitle,
-            distanceFromWorkPlace: "\(vo.distanceFromWorkPlace)m",
+            distanceFromWorkPlaceText: distanceText,
             targetInfoText: targetInfoText,
             workDaysText: workDaysText,
             workTimeText: workTimeText,
@@ -82,12 +100,12 @@ public class WorkerEmployCardRO {
         )
     }
     
-    public static let `mock`: WorkerEmployCardRO = .init(
+    public static let `mock`: WorkerNativeEmployCardRO = .init(
         showBiginnerTag: true,
         showDayLeftTag: true,
         dayLeftTagText: "D-14",
         titleText: "사울시 강남동",
-        distanceFromWorkPlace: "1.1km",
+        distanceFromWorkPlaceText: "1.1km",
         targetInfoText: "1등급 54세 여성",
         workDaysText: "",
         workTimeText: "월, 화, 수",
@@ -320,7 +338,7 @@ public class WorkerEmployCard: UIView {
         payLabel.typography = .Body2
     }
     
-    public func bind(ro: WorkerEmployCardRO) {
+    public func bind(ro: WorkerNativeEmployCardRO) {
         
         beginnerTag.isHidden = !ro.showBiginnerTag
         dayLeftTag.isHidden = !ro.showDayLeftTag

@@ -7,7 +7,11 @@
 
 import Foundation
 
-public enum PostPagingRequestForWorker {
-    case native(nextPageId: String?)
-    case thirdParty(nextPageId: String?)
+public enum PostPagingRequestForWorker: Equatable {
+    public enum Source {
+        case native
+        case thirdParty
+    }
+    case initial
+    case paging(source: Source, nextPageId: String?)
 }
