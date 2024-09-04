@@ -21,6 +21,7 @@ public class WorkerNativeEmployCardRO {
     let workDaysText: String
     let workTimeText: String
     let payText: String
+    let isFavorite: Bool
     
     init(
         showBiginnerTag: Bool,
@@ -31,7 +32,8 @@ public class WorkerNativeEmployCardRO {
         targetInfoText: String,
         workDaysText: String,
         workTimeText: String,
-        payText: String
+        payText: String,
+        isFavorite: Bool
     ) {
         self.showBiginnerTag = showBiginnerTag
         self.showDayLeftTag = showDayLeftTag
@@ -42,6 +44,7 @@ public class WorkerNativeEmployCardRO {
         self.workDaysText = workDaysText
         self.workTimeText = workTimeText
         self.payText = payText
+        self.isFavorite = isFavorite
     }
     
     public static func create(vo: WorkerNativeEmployCardVO) -> WorkerNativeEmployCardRO {
@@ -96,7 +99,8 @@ public class WorkerNativeEmployCardRO {
             targetInfoText: targetInfoText,
             workDaysText: workDaysText,
             workTimeText: workTimeText,
-            payText: payText
+            payText: payText,
+            isFavorite: vo.isFavorite
         )
     }
     
@@ -109,7 +113,8 @@ public class WorkerNativeEmployCardRO {
         targetInfoText: "1등급 54세 여성",
         workDaysText: "",
         workTimeText: "월, 화, 수",
-        payText: "시급 5000원"
+        payText: "시급 5000원",
+        isFavorite: true
     )
 }
 
@@ -339,7 +344,6 @@ public class WorkerEmployCard: UIView {
     }
     
     public func bind(ro: WorkerNativeEmployCardRO) {
-        
         beginnerTag.isHidden = !ro.showBiginnerTag
         dayLeftTag.isHidden = !ro.showDayLeftTag
         dayLeftTag.textString = ro.dayLeftTagText ?? ""
@@ -349,5 +353,6 @@ public class WorkerEmployCard: UIView {
         workDaysLabel.textString = ro.workDaysText
         workTimeLabel.textString = ro.workTimeText
         payLabel.textString = ro.payText
+        starButton.setState(ro.isFavorite ? .accent : .normal, withAnimation: false)
     }
 }
