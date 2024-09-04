@@ -19,6 +19,7 @@ public protocol AuthPhoneNumberInputable {
     var editingAuthNumber: BehaviorRelay<String> { get set }
     var requestAuthForPhoneNumber: PublishRelay<Void> { get set }
     var requestValidationForAuthNumber: PublishRelay<Void> { get set }
+    var alert: PublishSubject<DefaultAlertContentVO> { get }
 }
 
 public protocol AuthPhoneNumberOutputable {
@@ -30,8 +31,6 @@ public protocol AuthPhoneNumberOutputable {
     
     // 요양보호사 로그인에 성공한 경우(요양보호사 한정 로직)
     var loginValidation: Driver<Void>? { get set }
-    
-    var alert: Driver<DefaultAlertContentVO>? { get set }
 }
 public extension AuthPhoneNumberOutputable {
     var loginValidation: Driver<Void>? { get { nil } set { } }
@@ -281,14 +280,6 @@ where
             .drive(onNext: { [weak self] _ in
                 guard let self else { return }
                 (coordinator as! WorkerRegisterCoordinator).authFinished()
-            })
-            .disposed(by: disposeBag)
-        
-        // Alert
-        output
-            .alert?
-            .drive(onNext: { [weak self] vo in
-                self?.showAlert(vo: vo)
             })
             .disposed(by: disposeBag)
         

@@ -15,7 +15,7 @@ import DSKit
 
 public protocol ApplicationDetailDisplayingVMable {
     
-    var casting_applicationDetail: Driver<ApplicationDetailStateObject> { get }
+    var casting_applicationDetail: Driver<ApplicationDetailStateObject>? { get }
 }
 
 public class ApplicationDetailDisplayingView: HStack {
@@ -139,7 +139,7 @@ public extension ApplicationDetailDisplayingView {
     func bind(viewModel: ApplicationDetailDisplayingVMable) {
         
         viewModel
-            .casting_applicationDetail
+            .casting_applicationDetail?
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 applyObject(object)

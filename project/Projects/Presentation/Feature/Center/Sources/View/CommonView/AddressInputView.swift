@@ -101,7 +101,7 @@ class AddressView: UIView {
         
         // Output
         viewModel
-            .addressInputNextable
+            .addressInputNextable?
             .drive(onNext: { [ctaButton] isNextable in
                 ctaButton.setEnabled(isNextable)
             })

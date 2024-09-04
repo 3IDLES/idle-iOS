@@ -51,8 +51,6 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
     public var centerInfo: RxCocoa.Driver<(name: String, location: String)>?
     public var showSettingAlert: Driver<Void>?
     
-    let disposeBag = DisposeBag()
-    
     public init(
         coordinator: CenterSettingScreenCoordinator?,
         settingUseCase: SettingScreenUseCase
@@ -157,7 +155,7 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
         
         
         // MARK: Alert
-        alert = Observable.merge(
+        Observable.merge(
             approveRequestError.map { _ in "알람수신 동의 실패" },
             signOutFailure.map { $0.message }
         )
@@ -167,7 +165,8 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
                 message: message
             )
         })
-        .asDriver(onErrorJustReturn: .default)
+        .subscribe(alert)
+        .disposed(by: disposeBag)
     }
     
     public func createSingOutVM() -> any DSKit.IdleAlertViewModelable {

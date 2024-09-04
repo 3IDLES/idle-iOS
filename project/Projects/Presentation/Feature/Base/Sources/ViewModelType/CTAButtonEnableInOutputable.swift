@@ -12,7 +12,6 @@ import Entity
 
 public protocol RegisterValidationOutputable {
     var registerValidation: Driver<Void>? { get }
-    var alert: Driver<DefaultAlertContentVO>? { get }
 }
 
 public enum CTAButtonAction {

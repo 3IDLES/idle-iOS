@@ -22,6 +22,9 @@ public protocol WorkerNativeEmployCardViewModelable: AnyObject {
     
     /// 공고상세보기
     func showPostDetail(id: String)
+    
+    /// 즐겨찾기 버튼 클릭
+    func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: RecruitmentPostType) -> Single<Bool>
 }
 
 public class WorkerNativeEmployCardCell: UITableViewCell {
@@ -113,6 +116,22 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
         let cardRO = WorkerNativeEmployCardRO.create(vo: vo)
         cardView.bind(ro: cardRO)
         
+        let startButton = cardView.starButton
+        
+        let favoriteRequestResult = startButton
+            .onTapEvent
+            .map { state in
+                // normal인 경우 true / 즐겨찾기 요청
+                state == .normal
+            }
+            .flatMap { [viewModel] isFavoriteRequest in
+                viewModel.setPostFavoriteState(
+                    isFavoriteRequest: isFavoriteRequest,
+                    postId: postId,
+                    postType: .native
+                )
+            }
+        
         // input
         let disposables: [Disposable?] = [
 
@@ -127,7 +146,15 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
                 .map({ _ in (postId, vo.title) })
                 .bind(to: viewModel.applyButtonClicked),
             
-            //TODO: 즐겨찾기 구현예정
+            favoriteRequestResult
+                .subscribe(onNext: { [startButton] isSuccess in
+                    
+                    if isSuccess {
+                        
+                        // 성공시 상태변경
+                        startButton.toggle()
+                    }
+                })
         ]
         
         self.disposables = disposables

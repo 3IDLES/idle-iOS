@@ -18,8 +18,6 @@ class SelectAuthTypeViewModel: BaseViewModel {
     let registerAsCenterButtonClicked: PublishRelay<Void> = .init()
     let registerAsWorkerButtonClicked: PublishRelay<Void> = .init()
     
-    let disposeBag = DisposeBag()
-    
     init(coordinator: SelectAuthTypeCoordinator?) {
         self.coordinator = coordinator
         

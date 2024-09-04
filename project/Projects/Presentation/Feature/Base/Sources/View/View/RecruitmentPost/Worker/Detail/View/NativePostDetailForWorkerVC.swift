@@ -199,7 +199,7 @@ public class NativePostDetailForWorkerVC: BaseViewController {
         
         
         viewModel
-            .alert?
+            .alertDriver?
             .drive(onNext: { [weak self] alertVO in
                 self?.showAlert(vo: alertVO)
             })
@@ -221,7 +221,7 @@ public class NativePostDetailForWorkerVC: BaseViewController {
         
         // 즐겨 찾기 버튼
         contentView.cardView.starButton
-            .eventPublisher
+            .onTapEvent
             .map { state in return state == .accent }
             .bind(to: viewModel.startButtonClicked)
             .disposed(by: disposeBag)

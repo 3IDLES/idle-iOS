@@ -123,7 +123,7 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         
         // Output
         viewModel
-            .workTimeAndPayNextable
+            .workTimeAndPayNextable?
             .drive(onNext: { [ctaButton] nextable in
                 ctaButton.setEnabled(nextable)
             })

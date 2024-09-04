@@ -78,13 +78,6 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
             .disposed(by: disposeBag)
         
         viewModel
-            .alert?
-            .drive(onNext: { [weak self] alertVO in
-                self?.showAlert(vo: alertVO)
-            })
-            .disposed(by: disposeBag)
-        
-        viewModel
             .idleAlertVM?
             .drive(onNext: { [weak self] vm in
                 self?.showIdleModal(type: .orange, viewModel: vm)

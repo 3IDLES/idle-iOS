@@ -19,8 +19,8 @@ public protocol WorkTimeAndPayContentVMable {
     var paymentType: PublishRelay<PaymentType> { get }
     var paymentAmount: PublishRelay<String> { get }
     
-    var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject> { get }
-    var workTimeAndPayNextable: Driver<Bool> { get }
+    var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>? { get }
+    var workTimeAndPayNextable: Driver<Bool>? { get }
 }
 
 
@@ -168,7 +168,7 @@ public class WorkTimeAndPayContentView: UIView {
         // Output
         
         viewModel
-            .casting_workTimeAndPay
+            .casting_workTimeAndPay?
             .drive(onNext: { [weak self] stateFromVM in
                 
                 guard let self else { return }

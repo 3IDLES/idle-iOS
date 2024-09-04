@@ -16,8 +16,8 @@ import DSKit
 
 public protocol CustomerInformationDisplayingVMable {
     
-    var casting_customerInformation: Driver<CustomerInformationStateObject> { get }
-    var casting_customerRequirement: Driver<CustomerRequirementStateObject> { get }
+    var casting_customerInformation: Driver<CustomerInformationStateObject>? { get }
+    var casting_customerRequirement: Driver<CustomerRequirementStateObject>? { get }
 }
 
 public class CustomerInformationDisplayingView: VStack {
@@ -249,7 +249,7 @@ public extension CustomerInformationDisplayingView {
     func bind(viewModel: CustomerInformationDisplayingVMable) {
         
         viewModel
-            .casting_customerInformation
+            .casting_customerInformation?
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 applyObject(object)
@@ -257,7 +257,7 @@ public extension CustomerInformationDisplayingView {
             .disposed(by: disposeBag)
         
         viewModel
-            .casting_customerRequirement
+            .casting_customerRequirement?
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 applyObject(object)

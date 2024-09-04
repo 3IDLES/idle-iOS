@@ -17,8 +17,8 @@ public protocol AddressInputViewContentVMable {
     
     var addressInformation: PublishRelay<AddressInformation> { get }
     
-    var casting_addressInput: Driver<AddressInputStateObject> { get }
-    var addressInputNextable: Driver<Bool> { get }
+    var casting_addressInput: Driver<AddressInputStateObject>? { get }
+    var addressInputNextable: Driver<Bool>? { get }
 }
 
 /// 로그인, 회원가입에 사용되는 구버전 입니다.
@@ -132,7 +132,7 @@ public class AddressContentView: VStack, DaumAddressSearchDelegate {
         
         // 초기값 설정
         viewModel
-            .casting_addressInput
+            .casting_addressInput?
             .drive(onNext: { [weak self] state in
                 
                 if let info = state.addressInfo {

@@ -31,7 +31,7 @@ open class BaseViewController: UIViewController {
         
         // Alert
         viewModel
-            .alert?
+            .alertDriver?
             .drive(onNext: { [weak self] alertVO in
                 self?.showAlert(vo: alertVO)
             })
@@ -39,14 +39,14 @@ open class BaseViewController: UIViewController {
         
         // 로딩
         viewModel
-            .showLoading?
+            .showLoadingDriver?
             .drive(onNext: { [weak self] _ in
                 self?.showDefaultLoadingScreen()
             })
             .disposed(by: disposeBag)
         
         viewModel
-            .dismissLoading?
+            .dismissLoadingDriver?
             .drive(onNext: { [weak self] _ in
                 self?.dismissDefaultLoadingScreen()
             })

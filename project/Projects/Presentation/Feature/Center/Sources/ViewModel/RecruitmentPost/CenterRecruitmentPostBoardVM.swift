@@ -16,7 +16,6 @@ import Entity
 import DSKit
 
 public protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelable & ClosedPostViewModelable {
-    var alert: Driver<DefaultAlertContentVO>? { get }
 }
 
 
@@ -33,8 +32,6 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
     public var ongoingPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
     public var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
     public var showRemovePostAlert: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
-    
-    let disposeBag = DisposeBag()
     
     public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.coordinator = coordinator
@@ -115,7 +112,7 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
             })
             .disposed(by: disposeBag)
         
-        alert = Observable.merge(
+        Observable.merge(
             requestOngoingPostFailure,
             requestClosedPostFailure,
             closePostFailure
@@ -125,7 +122,8 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
                 message: error.message
             )
         }
-        .asDriver(onErrorJustReturn: .default)
+        .subscribe(alert)
+        .disposed(by: disposeBag)
     }
     
     public func createOngoingPostCellVM(postInfo: Entity.RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {

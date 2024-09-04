@@ -21,6 +21,11 @@ public struct PostBoardCellData {
 
 /// 페이징 보드
 public protocol WorkerPagablePostBoardVMable: BaseViewModel, WorkerNativeEmployCardViewModelable {
+    
+    var coordinator: WorkerRecruitmentBoardCoordinatable? { get }
+    
+    var recruitmentPostUseCase: RecruitmentPostUseCase { get }
+    
     /// 다음 페이지를 요청합니다.
     var requestNextPage: PublishRelay<Void> { get }
     
@@ -62,8 +67,8 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
     
     
     // Init
-    weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    let recruitmentPostUseCase: RecruitmentPostUseCase
+    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
+    public let recruitmentPostUseCase: RecruitmentPostUseCase
     
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
@@ -254,30 +259,102 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
                 )
             }
         
-        self.alert = Observable
+        Observable
             .merge(
                 applyRequestFailureAlert,
                 requestPostListFailureAlert
             )
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(self.alert)
+            .disposed(by: dispostBag)
         
         // MARK: 로딩
-        showLoading = Observable
+        Observable
             .merge(loadingStartObservables)
-            .asDriver(onErrorDriveWith: .never())
+            .subscribe(self.showLoading)
+            .disposed(by: dispostBag)
+            
         
-        dismissLoading = Observable
+        Observable
             .merge(loadingEndObservables)
             .delay(.milliseconds(500), scheduler: MainScheduler.instance)
-            .asDriver(onErrorDriveWith: .never())
-    }
-    
-    public func showPostDetail(id: String) {
-        coordinator?.showPostDetail(postId: id)
+            .subscribe(self.dismissLoading)
+            .disposed(by: dispostBag)
     }
     
     /// Test
     func fetchWorkerLocation() -> String {
         "서울시 영등포구"
+    }
+}
+
+// MARK: WorkerPagablePostBoardVMable + Extension
+extension WorkerPagablePostBoardVMable {
+    
+    public func showPostDetail(id: String) {
+        coordinator?.showPostDetail(postId: id)
+    }
+    
+    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: Entity.RecruitmentPostType) -> RxSwift.Single<Bool> {
+        
+        return Single<Bool>.create { [weak self] observer in
+            
+            guard let self else { return Disposables.create { } }
+            
+            let observable: Single<Result<Void, DomainError>>!
+            
+            // 로딩화면 시작
+            self.showLoading.onNext(())
+            
+            if isFavoriteRequest {
+                
+                observable = recruitmentPostUseCase
+                    .addFavoritePost(
+                        postId: postId,
+                        type: postType
+                    )
+                
+            } else {
+                
+                observable = recruitmentPostUseCase
+                    .removeFavoritePost(postId: postId)
+            }
+            
+            let reuslt = observable
+                .asObservable()
+                .share()
+            
+            let success = reuslt.compactMap { $0.value }
+            let failure = reuslt.compactMap { $0.error }
+            
+            let failureAlertDisposable = failure.map { error in
+                    DefaultAlertContentVO(
+                        title: "즐겨찾기 오류",
+                        message: error.message
+                    )
+                }
+                .asObservable()
+                .subscribe(self.alert)
+                
+            
+            let disposable = Observable
+                .merge(
+                    success.map { _ in true }.asObservable(),
+                    failure.map { _ in false }.asObservable()
+                )
+                .map({ [weak self] isSuccess in
+                    
+                    // 로딩화면 종료
+                    self?.dismissLoading.onNext(())
+                    
+                    return isSuccess
+                })
+                .asSingle()
+                .subscribe(observer)
+            
+            return Disposables.create {
+                disposable.dispose()
+                failureAlertDisposable.dispose()
+            }
+        }
     }
 }

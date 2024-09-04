@@ -338,15 +338,6 @@ public class PostOverviewVC: BaseViewController {
                 sampleCard.bind(ro: .create(vo: vo))
             })
             .disposed(by: disposeBag)
-
-        viewModel
-            .alert?
-            .drive(onNext: { [weak self] vo in
-                guard let self else { return }
-                view.isUserInteractionEnabled = true
-                showAlert(vo: vo)
-            })
-            .disposed(by: disposeBag)
     }
 }
 

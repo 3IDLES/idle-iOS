@@ -143,12 +143,13 @@ public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelabl
             }
         
         // Alert
-        self.alert = Observable
+        Observable
             .merge(
                 imageValidationFailure,
                 profileRegisterFailure
             )
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(alert)
+            .disposed(by: disposeBag)
     }
     
     func validateSelectedImage(image: UIImage) -> ImageUploadInfo? {

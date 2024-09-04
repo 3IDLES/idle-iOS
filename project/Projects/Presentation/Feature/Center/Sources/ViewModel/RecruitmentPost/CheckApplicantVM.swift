@@ -23,7 +23,6 @@ public protocol CheckApplicantViewModelable: BaseViewModel {
     // Output
     var postApplicantVO: Driver<[PostApplicantVO]>? { get }
     var postCardVO: Driver<CenterEmployCardVO>? { get }
-    var alert: Driver<DefaultAlertContentVO>? { get }
     
     func createApplicantCardVM(vo: PostApplicantVO) -> ApplicantCardVM
 }
@@ -41,8 +40,6 @@ public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
     
     public var postApplicantVO: Driver<[PostApplicantVO]>?
     public var postCardVO: Driver<CenterEmployCardVO>?
-    
-    let disposeBag = DisposeBag()
     
     public init(postId: String, coorindator: CheckApplicantCoordinatable?, recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.postId = postId
@@ -78,7 +75,7 @@ public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
             .asDriver(onErrorDriveWith: .never())
         
         
-        alert = requestScreenDataFailure
+        requestScreenDataFailure
             .map { error in
                 
                 DefaultAlertContentVO(
@@ -86,7 +83,8 @@ public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
                     message: error.message
                 )
             }
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(alert)
+            .disposed(by: disposeBag)
     }
     
     public func createApplicantCardVM(vo: PostApplicantVO) -> ApplicantCardVM {
