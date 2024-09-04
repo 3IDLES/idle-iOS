@@ -17,8 +17,6 @@ import DSKit
 public class WorkerRecruitmentPostBoardVC: BaseViewController {
     typealias Cell = WorkerNativeEmployCardCell
     
-    var viewModel: WorkerRecruitmentPostBoardVMable?
-    
     // View
     fileprivate let topContainer: WorkerMainTopContainer = {
         let container = WorkerMainTopContainer(innerViews: [])
@@ -39,8 +37,6 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     let cellData: BehaviorRelay<[PostBoardCellData]> = .init(value: [])
     let requestNextPage: PublishRelay<Void> = .init()
     
-    private let disposeBag = DisposeBag()
-    
     public init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -55,9 +51,7 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     
     public func bind(viewModel: WorkerRecruitmentPostBoardVMable) {
         
-        self.viewModel = viewModel
-        
-        super.bind(viewModel: viewModel, disposeBag: disposeBag)
+        super.bind(viewModel: viewModel)
         
         // Output
         viewModel
@@ -166,8 +160,7 @@ extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelega
         
         let cellData = cellData.value[indexPath.row]
         
-        if let vm = viewModel {
-            
+        if let vm = viewModel as? WorkerNativeEmployCardViewModelable {
             cell.bind(postId: cellData.postId, vo: cellData.cardVO, viewModel: vm)
         }
         

@@ -20,7 +20,7 @@ public struct PostBoardCellData {
 }
 
 /// 페이징 보드
-public protocol WorkerPagablePostBoardVMable: DefaultAlertOutputable & WorkerNativeEmployCardViewModelable & DefaultLoadingVMable {
+public protocol WorkerPagablePostBoardVMable: BaseViewModel, WorkerNativeEmployCardViewModelable {
     /// 다음 페이지를 요청합니다.
     var requestNextPage: PublishRelay<Void> { get }
     
@@ -47,19 +47,12 @@ public protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable
     var workerLocationTitleText: Driver<String>? { get }
 }
 
-public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
-    
-    
+public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostBoardVMable {
     
     // Output
     public var postBoardData: Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
     public var workerLocationTitleText: Driver<String>?
     public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
-    
-    // Default
-    public var alert: Driver<DefaultAlertContentVO>?
-    public var showLoading: Driver<Void>?
-    public var dismissLoading: Driver<Void>?
     
     // Input
     public var requestInitialPageRequest: PublishRelay<Void> = .init()
@@ -88,6 +81,8 @@ public class WorkerRecruitmentPostBoardVM: WorkerRecruitmentPostBoardVMable {
     {
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
+        
+        super.init()
         
         var loadingStartObservables: [Observable<Void>] = []
         var loadingEndObservables: [Observable<Void>] = []

@@ -14,7 +14,7 @@ import Entity
 import DSKit
 import UseCaseInterface
 
-public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
+public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
     
     // Input
     public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
@@ -23,10 +23,7 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
     
     // Output
     public var postBoardData: RxCocoa.Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
-    public var alert: Driver<Entity.DefaultAlertContentVO>?
     public var idleAlertVM: RxCocoa.Driver<IdleAlertViewModelable>?
-    public var showLoading: RxCocoa.Driver<Void>?
-    public var dismissLoading: RxCocoa.Driver<Void>?
     
     // Init
     weak var coordinator: WorkerRecruitmentBoardCoordinatable?
@@ -42,6 +39,8 @@ public class StarredPostBoardVM: WorkerAppliablePostBoardVMable {
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         self.nextPagingRequest = .initial
+        
+        super.init()
         
         var loadingStartObservables: [Observable<Void>] = []
         var loadingEndObservables: [Observable<Void>] = []
