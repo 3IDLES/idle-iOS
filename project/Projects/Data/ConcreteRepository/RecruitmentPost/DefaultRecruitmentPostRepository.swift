@@ -160,7 +160,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         }
     }
     
-    public func ApplyToPost(postId: String, method: ApplyType) -> Single<Void> {
+    public func applyToPost(postId: String, method: ApplyType) -> Single<Void> {
         applyService
             .request(
                 api: .applys(
@@ -169,6 +169,18 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
                 ),
                 with: .withToken
             )
+            .mapToVoid()
+    }
+    
+    public func addFavoritePost(postId: String, type: RecruitmentPostType) -> Single<Void> {
+        recruitmentPostService
+            .request(api: .addFavoritePost(id: postId, jobPostingType: type), with: .withToken)
+            .mapToVoid()
+    }
+    
+    public func removeFavoritePost(postId: String) -> Single<Void> {
+        recruitmentPostService
+            .request(api: .removeFavoritePost(id: postId), with: .withToken)
             .mapToVoid()
     }
 }
