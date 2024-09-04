@@ -33,6 +33,8 @@ public enum RcruitmentPostAPI {
     case getOnGoingNativePostListForWorker(nextPageId: String?, requestCnt: String)
     case getFavoritePostListForWorker(nextPageId: String?, requestCnt: String)
     case getAppliedPostListForWorker(nextPageId: String?, requestCnt: String)
+    case addFavoritePost(id: String, jobPostingType: RecruitmentPostType)
+    case removeFavoritePost(id: String)
 }
 
 extension RcruitmentPostAPI: BaseAPI {
@@ -76,6 +78,10 @@ extension RcruitmentPostAPI: BaseAPI {
         case .getAppliedPostListForWorker:
             "/carer/my/applied"
             
+        case .addFavoritePost(id: let id):
+            "\(id)/favorites"
+        case .removeFavoritePost(id: let id):
+            "\(id)/favorites"
         }
     }
     
@@ -113,6 +119,11 @@ extension RcruitmentPostAPI: BaseAPI {
             .get
         case .getAppliedPostListForWorker:
             .get
+            
+        case .addFavoritePost:
+            .post
+        case .removeFavoritePost:
+            .delete
         }
     }
     
@@ -134,6 +145,8 @@ extension RcruitmentPostAPI: BaseAPI {
                 params["next"] = nextPageId
             }
             params["limit"] = requestCnt
+        case .addFavoritePost(_, let jobPostingType):
+            params["jobPostingType"] = jobPostingType.upscaleEngWord
         default:
             break
         }
@@ -161,6 +174,8 @@ extension RcruitmentPostAPI: BaseAPI {
             .requestData(bodyData)
         case .editPost(_, let editData):
             .requestData(editData)
+        case .addFavoritePost:
+            .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         default:
             .requestPlain
         }
