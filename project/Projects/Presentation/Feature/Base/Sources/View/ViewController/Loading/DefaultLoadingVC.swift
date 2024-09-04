@@ -12,12 +12,6 @@ import RxSwift
 import Entity
 import DSKit
 
-public protocol DefaultLoadingVMable {
-    
-    var showLoading: Driver<Void>? { get }
-    var dismissLoading: Driver<Void>? { get }
-}
-
 public class DefaultLoadingVC: UIViewController {
     
     let customTranstionDelegate = CustomTransitionDelegate()

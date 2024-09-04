@@ -17,8 +17,6 @@ public class WorkerPagablePostBoardVC: BaseViewController {
     
     typealias Cell = WorkerNativeEmployCardCell
     
-    var viewModel: WorkerPagablePostBoardVMable?
-    
     // View
     let postTableView: UITableView = {
         let tableView = UITableView()
@@ -35,8 +33,6 @@ public class WorkerPagablePostBoardVC: BaseViewController {
     // Observable
     let cellData: BehaviorRelay<[PostBoardCellData]> = .init(value: [])
     let requestNextPage: PublishRelay<Void> = .init()
-    
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -93,10 +89,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
     
     func bind(viewModel: WorkerPagablePostBoardVMable) {
         
-        self.viewModel = viewModel
-        
-        // 로딩 바인딩
-        super.bind(viewModel: viewModel, disposeBag: disposeBag)
+        super.bind(viewModel: viewModel)
         
         // Output
         viewModel
@@ -135,10 +128,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
     
     func bind(viewModel: WorkerAppliablePostBoardVMable) {
         
-        self.viewModel = viewModel
-        
-        // 로딩 바인딩
-        super.bind(viewModel: viewModel, disposeBag: disposeBag)
+        super.bind(viewModel: viewModel)
         
         // Output
         viewModel
@@ -187,7 +177,7 @@ extension WorkerPagablePostBoardVC: UITableViewDataSource, UITableViewDelegate {
         
         let cellData = cellData.value[indexPath.row]
         
-        if let vm = viewModel {
+        if let vm = viewModel as? WorkerNativeEmployCardViewModelable {
             cell.bind(postId: cellData.postId, vo: cellData.cardVO, viewModel: vm)
         }
         
