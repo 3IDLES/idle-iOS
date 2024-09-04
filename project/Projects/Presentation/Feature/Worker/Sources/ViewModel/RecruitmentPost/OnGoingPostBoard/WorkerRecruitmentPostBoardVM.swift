@@ -321,19 +321,26 @@ extension WorkerPagablePostBoardVMable {
             
             let reuslt = observable
                 .asObservable()
+                .map({ [weak self] result in
+                    
+                    // 로딩화면 종료
+                    self?.dismissLoading.onNext(())
+                    return result
+                })
                 .share()
             
             let success = reuslt.compactMap { $0.value }
             let failure = reuslt.compactMap { $0.error }
             
-            let failureAlertDisposable = failure.map { error in
-                    DefaultAlertContentVO(
+            let failureAlertDisposable = failure
+                .subscribe(onNext: { [weak self] error in
+                    let vo = DefaultAlertContentVO(
                         title: "즐겨찾기 오류",
                         message: error.message
                     )
-                }
-                .asObservable()
-                .subscribe(self.alert)
+                    
+                    self?.alert.onNext(vo)
+                })
                 
             
             let disposable = Observable
@@ -341,13 +348,6 @@ extension WorkerPagablePostBoardVMable {
                     success.map { _ in true }.asObservable(),
                     failure.map { _ in false }.asObservable()
                 )
-                .map({ [weak self] isSuccess in
-                    
-                    // 로딩화면 종료
-                    self?.dismissLoading.onNext(())
-                    
-                    return isSuccess
-                })
                 .asSingle()
                 .subscribe(observer)
             

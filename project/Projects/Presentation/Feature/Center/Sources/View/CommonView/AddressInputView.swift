@@ -106,8 +106,6 @@ class AddressView: UIView {
                 ctaButton.setEnabled(isNextable)
             })
             .disposed(by: disposeBag)
-        
-        
     }
     
     func setKeyboardAvoidance() {

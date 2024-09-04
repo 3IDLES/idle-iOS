@@ -19,13 +19,14 @@ public protocol NativePostDetailForWorkerViewModelable: BaseViewModel {
     var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
     var locationInfo: Driver<WorkPlaceAndWorkerLocationMapRO>? { get }
     var idleAlertVM: Driver<IdleAlertViewModelable>? { get }
-    
+    var starButtonRequestResult: Driver<Bool>? { get }
+     
     // Input
     var viewWillAppear: PublishRelay<Void> { get }
     
     var backButtonClicked: PublishRelay<Void> { get }
     var applyButtonClicked: PublishRelay<Void> { get }
-    var startButtonClicked: PublishRelay<Bool> { get }
+    var starButtonClicked: PublishRelay<Bool> { get }
     var centerCardClicked: PublishRelay<Void> { get }
 }
 
@@ -41,11 +42,12 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     public var postForWorkerBundle: RxCocoa.Driver<Entity.RecruitmentPostForWorkerBundle>?
     public var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
     public var idleAlertVM: Driver<any IdleAlertViewModelable>?
+    public var starButtonRequestResult: Driver<Bool>?
     
     // Input
     public var backButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var applyButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var startButtonClicked: RxRelay.PublishRelay<Bool> = .init()
+    public var starButtonClicked: RxRelay.PublishRelay<Bool> = .init()
     public var centerCardClicked: RxRelay.PublishRelay<Void> = .init()
     public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
 
@@ -167,7 +169,16 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             }
 
         // MARK: 즐겨찾기
-        
+        starButtonRequestResult = starButtonClicked
+            .flatMap { [weak self] isFavoriteRequest in
+                self?.setPostFavoriteState(
+                    isFavoriteRequest: isFavoriteRequest,
+                    postId: postId,
+                    postType: .native
+                ) ?? .never()
+            }
+            .asDriver(onErrorJustReturn: false)
+            
         
         // 센터 프로필 조회 버튼클릭
         centerCardClicked
@@ -209,5 +220,71 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             longitude: 127.046425,
             latitude: 37.504588
         )
+    }
+        
+    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: Entity.RecruitmentPostType) -> RxSwift.Single<Bool> {
+        
+        return Single<Bool>.create { [weak self] observer in
+            
+            guard let self else { return Disposables.create { } }
+            
+            let observable: Single<Result<Void, DomainError>>!
+            
+            // 로딩화면 시작
+            self.showLoading.onNext(())
+            
+            if isFavoriteRequest {
+                
+                observable = recruitmentPostUseCase
+                    .addFavoritePost(
+                        postId: postId,
+                        type: postType
+                    )
+                
+            } else {
+                
+                observable = recruitmentPostUseCase
+                    .removeFavoritePost(postId: postId)
+            }
+            
+            let reuslt = observable
+                .asObservable()
+                .map({ [weak self] result in
+                    
+                    // 로딩화면 종료
+                    self?.dismissLoading.onNext(())
+                    
+                    return result
+                })
+                .share()
+            
+            let success = reuslt.compactMap { $0.value }
+            let failure = reuslt.compactMap { $0.error }
+            
+            let failureAlertDisposable = failure.map { error in
+                    DefaultAlertContentVO(
+                        title: "즐겨찾기 오류",
+                        message: error.message
+                    )
+                }
+                .asObservable()
+                .subscribe(onNext: { [weak self] alertVO in
+                    self?.alert.onNext(alertVO)
+                })
+                
+            	
+            let disposable = Observable
+                .merge(
+                    success.map { _ in true }.asObservable(),
+                    failure.map { _ in false }.asObservable()
+                )
+                .asSingle()
+                .subscribe(observer)
+            
+            return Disposables.create {
+                disposable.dispose()
+                failureAlertDisposable.dispose()
+            }
+        }
     }
 }

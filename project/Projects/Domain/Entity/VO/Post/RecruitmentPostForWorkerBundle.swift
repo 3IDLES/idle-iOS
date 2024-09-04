@@ -32,6 +32,8 @@ public class RecruitmentPostForWorkerBundle {
         }
     }
     
+    public let isFavorite: Bool?
+    public let applyDate: Date?
     public let workTimeAndPay: WorkTimeAndPayStateObject
     public let customerRequirement: CustomerRequirementStateObject
     public let customerInformation: CustomerInformationStateObject
@@ -47,6 +49,8 @@ public class RecruitmentPostForWorkerBundle {
     
     
     public init(
+        isFavorite: Bool? = false,
+        applyDate: Date? = nil,
         workTimeAndPay: WorkTimeAndPayStateObject,
         customerRequirement: CustomerRequirementStateObject,
         customerInformation: CustomerInformationStateObject,
@@ -56,6 +60,8 @@ public class RecruitmentPostForWorkerBundle {
         jobLocation: LocationInformation,
         distanceToWorkPlace: Int
     ) {
+        self.isFavorite = isFavorite
+        self.applyDate = applyDate
         self.workTimeAndPay = workTimeAndPay
         self.customerRequirement = customerRequirement
         self.customerInformation = customerInformation

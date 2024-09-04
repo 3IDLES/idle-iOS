@@ -116,9 +116,9 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
         let cardRO = WorkerNativeEmployCardRO.create(vo: vo)
         cardView.bind(ro: cardRO)
         
-        let startButton = cardView.starButton
+        let starButton = cardView.starButton
         
-        let favoriteRequestResult = startButton
+        let favoriteRequestResult = starButton
             .onTapEvent
             .map { state in
                 // normal인 경우 true / 즐겨찾기 요청
@@ -147,12 +147,12 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
                 .bind(to: viewModel.applyButtonClicked),
             
             favoriteRequestResult
-                .subscribe(onNext: { [startButton] isSuccess in
+                .subscribe(onNext: { [starButton] isSuccess in
                     
                     if isSuccess {
                         
                         // 성공시 상태변경
-                        startButton.toggle()
+                        starButton.toggle()
                     }
                 })
         ]

@@ -180,6 +180,6 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
     }
     
     public func removeFavoritePost(postId: String) -> Single<Result<Void, DomainError>> {
-        convert(task: repository.removePost(id: postId))
+        convert(task: repository.removeFavoritePost(postId: postId))
     }
 }
