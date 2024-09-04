@@ -89,14 +89,13 @@ public extension BaseViewController {
         
         let vc = DefaultLoadingVC()
         loadingVC = vc
-        vc.modalPresentationStyle = .custom
-        
+        vc.modalPresentationStyle = .overFullScreen
         isLoadingPresenting = true
-        present(vc, animated: true) {
+        present(vc, animated: false) {
             
             if self.loadingDimissionRequested {
                 DispatchQueue.main.async { [weak self] in
-                    vc.dismiss(animated: true) {
+                    vc.dismiss(animated: false) {
                         self?.loadingVC = nil
                     }
                     self?.isLoadingPresenting = false
@@ -111,7 +110,7 @@ public extension BaseViewController {
         if let loadingVC {
             
             if !isLoadingPresenting {
-                loadingVC.dismiss(animated: true) {
+                loadingVC.dismiss(animated: false) {
                     self.loadingVC = nil
                 }
             } else {

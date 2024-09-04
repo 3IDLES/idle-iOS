@@ -44,6 +44,9 @@ public struct RecruitmentPostDTO: Codable {
     public let applyDeadlineType: String
     public let applyDeadline: String?
     
+    public let applyTime: String?
+    public let isFavorite: Bool
+    
     public func toEntity() -> RecruitmentPostForWorkerBundle {
         
         let workTimeAndPay: WorkTimeAndPayStateObject = .init()
@@ -107,7 +110,12 @@ public struct RecruitmentPostDTO: Codable {
             latitude: Double(latitude)!
         )
         
+        // MARK: Apply date
+        let applyDate = applyTime != nil ? dateFormatter.date(from: applyTime!) : nil
+        
         return .init(
+            isFavorite: isFavorite,
+            applyDate: applyDate,
             workTimeAndPay: workTimeAndPay,
             customerRequirement: customerRequirement,
             customerInformation: customerInfo,

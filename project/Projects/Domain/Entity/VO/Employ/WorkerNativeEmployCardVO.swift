@@ -21,8 +21,8 @@ public struct WorkerNativeEmployCardVO {
     public let endTime: String
     public let paymentType: PaymentType
     public let paymentAmount: String
-    public let applyDate: Date?
-    public let isFavorite: Bool
+    public var applyDate: Date?
+    public var isFavorite: Bool
     
     public init(
         dayLeft: Int,
@@ -54,6 +54,22 @@ public struct WorkerNativeEmployCardVO {
         self.paymentAmount = paymentAmount
         self.applyDate = applyDate
         self.isFavorite = isFavorite
+    }
+    
+    public static func create(bundle: RecruitmentPostForWorkerBundle) -> WorkerNativeEmployCardVO {
+        
+        var vo = self.create(
+            workTimeAndPay: bundle.workTimeAndPay,
+            customerRequirement: bundle.customerRequirement,
+            customerInformation: bundle.customerInformation,
+            applicationDetail: bundle.applicationDetail,
+            addressInfo: bundle.addressInfo
+        )
+        
+        vo.isFavorite = bundle.isFavorite!
+        vo.applyDate = bundle.applyDate
+        
+        return vo
     }
       
     /// 공고 상세화면에서 사용됩니다.

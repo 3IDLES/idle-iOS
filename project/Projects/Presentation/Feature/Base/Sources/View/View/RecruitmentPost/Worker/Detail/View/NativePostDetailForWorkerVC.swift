@@ -130,13 +130,7 @@ public class NativePostDetailForWorkerVC: BaseViewController {
                 guard let self else { return }
                 
                 // 상단 구인공고 카드
-                let cardVO: WorkerNativeEmployCardVO = .create(
-                    workTimeAndPay: bundle.workTimeAndPay,
-                    customerRequirement: bundle.customerRequirement,
-                    customerInformation: bundle.customerInformation,
-                    applicationDetail: bundle.applicationDetail,
-                    addressInfo: bundle.addressInfo
-                )
+                let cardVO: WorkerNativeEmployCardVO = .create(bundle: bundle)
                 let cardRO: WorkerNativeEmployCardRO = .create(vo: cardVO)
                 
                 contentView.cardView.bind(ro: cardRO)
@@ -197,6 +191,17 @@ public class NativePostDetailForWorkerVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        viewModel
+            .starButtonRequestResult?
+            .drive(onNext: { [weak self] isSuccess in
+                
+                guard let self else { return }
+                
+                if isSuccess {
+                    contentView.cardView.starButton.toggle()
+                }
+            })
+            .disposed(by: disposeBag)
         
         viewModel
             .alertDriver?
@@ -222,9 +227,13 @@ public class NativePostDetailForWorkerVC: BaseViewController {
         // 즐겨 찾기 버튼
         contentView.cardView.starButton
             .onTapEvent
-            .map { state in return state == .accent }
-            .bind(to: viewModel.startButtonClicked)
+            .map { state in
+                // normal인 경우 true / 즐겨찾기 요청
+                state == .normal
+            }
+            .bind(to: viewModel.starButtonClicked)
             .disposed(by: disposeBag)
+            
         
         // 센터 프로필 보기 버튼
         contentView.centerInfoCard
