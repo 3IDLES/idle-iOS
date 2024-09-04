@@ -13,7 +13,7 @@ import RepositoryInterface
 import Entity
 import PresentationCore
 
-public class CenterLoginViewModel: ViewModelType {
+public class CenterLoginViewModel: BaseViewModel, ViewModelType {
     
     // Init
     weak var coordinator: CenterLoginCoordinator?
@@ -27,6 +27,8 @@ public class CenterLoginViewModel: ViewModelType {
     public init(coordinator: CenterLoginCoordinator?, authUseCase: AuthUseCase) {
         self.coordinator = coordinator
         self.authUseCase = authUseCase
+        
+        super.init()
         
         // MARK: input
         input.backButtonClicked
@@ -75,9 +77,11 @@ public class CenterLoginViewModel: ViewModelType {
             }
             .asDriver(onErrorJustReturn: false)
         
-        output.alert = loginFailure
+        
+        // MARK: BaseViewModel
+        alert = loginFailure
             .map { error in
-                AlertWithCompletionVO(
+                DefaultAlertContentVO(
                     title: "로그인 실패",
                     message: error.message
                 )
@@ -102,6 +106,5 @@ public extension CenterLoginViewModel {
     
     class Output {
         public var canRequestLoginAction: Driver<Bool>?
-        public var alert: Driver<AlertWithCompletionVO>?
     }
 }

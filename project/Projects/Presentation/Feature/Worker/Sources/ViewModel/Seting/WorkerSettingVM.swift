@@ -15,7 +15,7 @@ import DSKit
 import UseCaseInterface
 import UserNotifications
 
-public protocol WorkerSettingVMable {
+public protocol WorkerSettingVMable: BaseViewModel {
     
     // Input
     var viewWillAppear: PublishRelay<Void> { get }
@@ -28,13 +28,12 @@ public protocol WorkerSettingVMable {
     // Output
     var pushNotificationApproveState: Driver<Bool>? { get }
     var showSettingAlert: Driver<Void>? { get }
-    var alert: Driver<AlertWithCompletionVO>? { get }
     
     // SignOut
     func createSingOutVM() -> IdleAlertViewModelable
 }
 
-public class WorkerSettingVM: WorkerSettingVMable {
+public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
     
     // Init
     weak var coordinator: WorkerSettingScreenCoordinator?
@@ -50,7 +49,6 @@ public class WorkerSettingVM: WorkerSettingVMable {
     
     public var pushNotificationApproveState: RxCocoa.Driver<Bool>?
     public var showSettingAlert: Driver<Void>?
-    public var alert: RxCocoa.Driver<Entity.AlertWithCompletionVO>?
     
     let disposeBag = DisposeBag()
     
@@ -64,6 +62,7 @@ public class WorkerSettingVM: WorkerSettingVMable {
         self.settingUseCase = settingUseCase
         self.centerProfileUseCase = centerProfileUseCase
         
+        super.init()
         
         // 기존의 알람수신 동의 여부 확인
         // 설정화면에서 다시돌아온 경우 이벤트 수신
@@ -153,7 +152,7 @@ public class WorkerSettingVM: WorkerSettingVMable {
             signOutFailure.map { $0.message }
         )
         .map({ message in
-            AlertWithCompletionVO(
+            DefaultAlertContentVO(
                 title: "환경설정 오류",
                 message: message
             )

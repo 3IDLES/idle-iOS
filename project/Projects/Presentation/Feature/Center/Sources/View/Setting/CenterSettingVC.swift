@@ -15,8 +15,6 @@ import DSKit
 
 public class CenterSettingVC: BaseViewController {
     
-    var viewModel: CenterSettingVMable?
-    
     // Init
     
     // View
@@ -65,9 +63,6 @@ public class CenterSettingVC: BaseViewController {
         return button
     }()
     
-    
-    private let disposeBag = DisposeBag()
-    
     public init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -76,7 +71,7 @@ public class CenterSettingVC: BaseViewController {
     
     public func bind(viewModel: CenterSettingVMable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // Input
         rx.viewWillAppear
@@ -264,7 +259,7 @@ public class CenterSettingVC: BaseViewController {
         signOutButton
             .rx.tap
             .subscribe(onNext: { [weak self] _ in
-                guard let self, let vm = viewModel else { return }
+                guard let self, let vm = viewModel as? CenterSettingVMable else { return }
                 let signOutVM = vm.createSingOutVM()
                 showIdleModal(viewModel: signOutVM)
             })

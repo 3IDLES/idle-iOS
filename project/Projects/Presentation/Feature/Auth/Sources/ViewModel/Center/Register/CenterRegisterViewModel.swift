@@ -13,7 +13,7 @@ import UseCaseInterface
 import Entity
 import BaseFeature
 
-public class CenterRegisterViewModel: ViewModelType {
+public class CenterRegisterViewModel: BaseViewModel, ViewModelType {
     
     // UseCase
     public let inputValidationUseCase: AuthInputValidationUseCase
@@ -30,6 +30,8 @@ public class CenterRegisterViewModel: ViewModelType {
         authUseCase: AuthUseCase) {
             self.inputValidationUseCase = inputValidationUseCase
             self.authUseCase = authUseCase
+            
+            super.init()
             
             AuthInOutStreamManager.enterNameInOut(
                 input: input,

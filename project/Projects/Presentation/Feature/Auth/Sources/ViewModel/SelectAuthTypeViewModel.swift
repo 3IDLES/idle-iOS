@@ -8,8 +8,9 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import BaseFeature
 
-class SelectAuthTypeViewModel {
+class SelectAuthTypeViewModel: BaseViewModel {
     
     weak var coordinator: SelectAuthTypeCoordinator?
     
@@ -21,6 +22,8 @@ class SelectAuthTypeViewModel {
     
     init(coordinator: SelectAuthTypeCoordinator?) {
         self.coordinator = coordinator
+        
+        super.init()
         
         loginAsCenterButtonClicked
             .subscribe(onNext: { [weak self] _ in

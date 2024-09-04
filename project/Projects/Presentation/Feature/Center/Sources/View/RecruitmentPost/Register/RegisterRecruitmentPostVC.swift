@@ -55,10 +55,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     private var pagesAreSetted = false
     
     var currentIndex: Int = 0
-    
-    // For RC=1
-    private var viewModel: RegisterRecruitmentPostViewModelable?
-    
+
     // View
     let navigationBar: NavigationBarType1 = {
         let bar = NavigationBarType1(navigationTitle: "공고 등록")
@@ -71,9 +68,6 @@ public class RegisterRecruitmentPostVC: BaseViewController {
         )
         return view
     }()
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         
@@ -215,8 +209,10 @@ public class RegisterRecruitmentPostVC: BaseViewController {
             }
         } else {
             
+            guard let vm = viewModel as? RegisterRecruitmentPostViewModelable else { return }
+            
             // 오버뷰화면으로 이동
-            viewModel?.registerRecruitmentPostCoordinator?.showOverViewScreen()
+            vm.registerRecruitmentPostCoordinator?.showOverViewScreen()
         }
     }
     
@@ -238,8 +234,10 @@ public class RegisterRecruitmentPostVC: BaseViewController {
             }
         } else {
             
+            guard let vm = viewModel as? RegisterRecruitmentPostViewModelable else { return }
+            
             // 돌아가기, Coordinator호출
-            viewModel?.registerRecruitmentPostCoordinator?.registerFinished()
+            vm.registerRecruitmentPostCoordinator?.registerFinished()
         }
     }
     

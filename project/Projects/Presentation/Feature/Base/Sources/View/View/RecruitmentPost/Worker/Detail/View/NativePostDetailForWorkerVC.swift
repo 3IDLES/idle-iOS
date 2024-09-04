@@ -14,9 +14,7 @@ import DSKit
 
 /// 센토도 요양보호사가 보는 공고화면을 볼 수 있기 때문에 해당뷰를 BaseFeature에 구현하였습니다.
 public class NativePostDetailForWorkerVC: BaseViewController {
-    
-    var viewModel: NativePostDetailForWorkerViewModelable?
-    
+
     // Init
     
     // View
@@ -39,10 +37,6 @@ public class NativePostDetailForWorkerVC: BaseViewController {
         btn.label.textString = "지원하기"
         return btn
     }()
-    
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -126,9 +120,7 @@ public class NativePostDetailForWorkerVC: BaseViewController {
     
     public func bind(viewModel: NativePostDetailForWorkerViewModelable) {
         
-        self.viewModel = viewModel
-        
-        super.bind(viewModel: viewModel, disposeBag: disposeBag)
+        super.bind(viewModel: viewModel)
         
         // Output
         viewModel

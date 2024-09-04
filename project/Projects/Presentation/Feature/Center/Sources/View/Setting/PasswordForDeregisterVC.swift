@@ -18,9 +18,6 @@ public class PasswordForDeregisterVC: BaseViewController {
     
     // Init
     
-    // Not init
-    var viewModel: PasswordForDeregisterVM?
-    
     // View
     let navigationBar: IdleNavigationBar = {
         let bar = IdleNavigationBar(innerViews: [])
@@ -59,9 +56,6 @@ public class PasswordForDeregisterVC: BaseViewController {
         button.setEnabled(false)
         return button
     }()
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -154,7 +148,7 @@ public class PasswordForDeregisterVC: BaseViewController {
     
     public func bind(viewModel: PasswordForDeregisterVM) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // Input
         acceptDeregisterButton

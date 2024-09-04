@@ -15,8 +15,6 @@ import Entity
 
 class SelectAuthTypeViewController: BaseViewController {
     
-    var viewModel: SelectAuthTypeViewModel?
-    
     // View
     let titleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Heading1)
@@ -65,8 +63,6 @@ class SelectAuthTypeViewController: BaseViewController {
         button.alpha = 0
         return button
     }()
-    
-    let disposeBag = DisposeBag()
     
     init() { 
         
@@ -166,7 +162,7 @@ class SelectAuthTypeViewController: BaseViewController {
     
     public func bind(viewModel: SelectAuthTypeViewModel) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         loginAsCenterButton.eventPublisher
             .bind(to: viewModel.loginAsCenterButtonClicked)

@@ -13,12 +13,11 @@ import PresentationCore
 import UseCaseInterface
 import DSKit
 
-public protocol NativePostDetailForWorkerViewModelable: DefaultLoadingVMable {
+public protocol NativePostDetailForWorkerViewModelable: BaseViewModel {
     
     // Output
     var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
     var locationInfo: Driver<WorkPlaceAndWorkerLocationMapRO>? { get }
-    var alert: Driver<AlertWithCompletionVO>? { get }
     var idleAlertVM: Driver<IdleAlertViewModelable>? { get }
     
     // Input
@@ -30,7 +29,7 @@ public protocol NativePostDetailForWorkerViewModelable: DefaultLoadingVMable {
     var centerCardClicked: PublishRelay<Void> { get }
 }
 
-public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable {
+public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWorkerViewModelable {
 
     public weak var coordinator: PostDetailForWorkerCoodinator?
     
@@ -41,9 +40,6 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
     // Ouput
     public var postForWorkerBundle: RxCocoa.Driver<Entity.RecruitmentPostForWorkerBundle>?
     public var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
-    public var alert: RxCocoa.Driver<Entity.AlertWithCompletionVO>?
-    public var showLoading: Driver<Void>?
-    public var dismissLoading: Driver<Void>?
     public var idleAlertVM: Driver<any IdleAlertViewModelable>?
     
     // Input
@@ -65,6 +61,7 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         
+        super.init()
         
         // MARK: 로딩 옵저버블
         var loadingStartObservables: [Observable<Void>] = []
@@ -83,12 +80,9 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
         
         let getPostDetailFailureAlert = getPostDetailFailure
             .map { error in
-                AlertWithCompletionVO(
+                DefaultAlertContentVO(
                     title: "공고 불러오기 실패",
-                    message: error.message,
-                    buttonInfo: [
-                        ("닫기",  { [weak self] in self?.coordinator?.coordinatorDidFinish() })
-                    ]
+                    message: error.message
                 )
             }
         
@@ -167,7 +161,7 @@ public class NativePostDetailForWorkerVM: NativePostDetailForWorkerViewModelable
         
         let applyRequestFailureAlert = applyRequestFailure
             .map { error in
-                AlertWithCompletionVO(
+                DefaultAlertContentVO(
                     title: "지원하기 실패",
                     message: error.message
                 )

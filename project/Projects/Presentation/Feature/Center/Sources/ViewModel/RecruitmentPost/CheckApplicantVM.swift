@@ -12,8 +12,9 @@ import Entity
 import DSKit
 import PresentationCore
 import UseCaseInterface
+import BaseFeature
 
-public protocol CheckApplicantViewModelable {
+public protocol CheckApplicantViewModelable: BaseViewModel {
     // Input
     var requestpostApplicantVO: PublishRelay<Void> { get }
     var exitButtonClicked: PublishRelay<Void> { get }
@@ -27,7 +28,7 @@ public protocol CheckApplicantViewModelable {
     func createApplicantCardVM(vo: PostApplicantVO) -> ApplicantCardVM
 }
 
-public class CheckApplicantVM: CheckApplicantViewModelable {
+public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
     
     // Init
     let postId: String
@@ -40,7 +41,6 @@ public class CheckApplicantVM: CheckApplicantViewModelable {
     
     public var postApplicantVO: Driver<[PostApplicantVO]>?
     public var postCardVO: Driver<CenterEmployCardVO>?
-    public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     
     let disposeBag = DisposeBag()
     
@@ -48,6 +48,8 @@ public class CheckApplicantVM: CheckApplicantViewModelable {
         self.postId = postId
         self.recruitmentPostUseCase = recruitmentPostUseCase
         self.coorindator = coorindator
+        
+        super.init()
         
         exitButtonClicked
             .subscribe(onNext: { [weak self] _ in

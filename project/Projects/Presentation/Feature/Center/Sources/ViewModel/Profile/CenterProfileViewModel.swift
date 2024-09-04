@@ -11,6 +11,7 @@ import RxSwift
 import RxCocoa
 import PresentationCore
 import UseCaseInterface
+import BaseFeature
 
 struct ChangeCenterInformation {
     let phoneNumber: String?
@@ -18,7 +19,7 @@ struct ChangeCenterInformation {
     let image: UIImage?
 }
 
-public protocol CenterProfileViewModelable where Input: CenterProfileInputable, Output: CenterProfileOutputable {
+public protocol CenterProfileViewModelable: BaseViewModel where Input: CenterProfileInputable, Output: CenterProfileOutputable {
     associatedtype Input
     associatedtype Output
     var input: Input { get }
@@ -46,12 +47,10 @@ public protocol CenterProfileOutputable {
     var displayingImage: Driver<UIImage?> { get }
     var isEditingMode: Driver<Bool> { get }
     var editingValidation: Driver<Void> { get }
-    
-    var alert: Driver<AlertWithCompletionVO>? { get }
 }
 
 
-public class CenterProfileViewModel: CenterProfileViewModelable {
+public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
     let profileUseCase: CenterProfileUseCase
     weak var coordinator: CenterProfileCoordinator?
@@ -93,6 +92,8 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         
         self.input = Input()
         
+        super.init()
+        
         // MARK: fetch from server
         let profileRequestResult = input
             .readyToFetch
@@ -107,14 +108,9 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         let profileRequestFailure = profileRequestResult
             .compactMap { $0.error }
             .map { error in
-                AlertWithCompletionVO(
+                DefaultAlertContentVO(
                     title: "프로필 정보 불러오기 실패",
-                    message: error.message,
-                    buttonInfo: [
-                        ("닫기", { [weak self] in
-                            self?.coordinator?.coordinatorDidFinish()
-                        })
-                    ]
+                    message: error.message
                 )
             }
             
@@ -171,7 +167,7 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
         let imageValidationFailure = imageValidationResult
             .filter { $0 == nil }
             .map { _ in
-                AlertWithCompletionVO(
+                DefaultAlertContentVO(
                     title: "이미지 선택 오류",
                     message: "지원하지 않는 이미지 형식입니다."
                 )
@@ -226,7 +222,7 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
             .compactMap({ $0.error })
             .map({ error in
                 // 변경 실패 Alert
-                return AlertWithCompletionVO(
+                return DefaultAlertContentVO(
                     title: "변경 실패",
                     message: "변경 싪패 이유"
                 )
@@ -282,8 +278,7 @@ public class CenterProfileViewModel: CenterProfileViewModelable {
             centerIntroduction: centerIntroductionDriver,
             displayingImage: displayingImageDriver,
             isEditingMode: isEditingMode,
-            editingValidation: editingValidation,
-            alert: alertDriver
+            editingValidation: editingValidation
         )
     }
     
@@ -325,9 +320,7 @@ public extension CenterProfileViewModel {
         // 요구사항 X
         public var editingValidation: Driver<Void>
         
-        public var alert: Driver<AlertWithCompletionVO>?
-        
-        init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, displayingImage: Driver<UIImage?>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>, alert: Driver<AlertWithCompletionVO>) {
+        init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, displayingImage: Driver<UIImage?>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>) {
             self.centerName = centerName
             self.centerLocation = centerLocation
             self.centerPhoneNumber = centerPhoneNumber
@@ -335,7 +328,6 @@ public extension CenterProfileViewModel {
             self.displayingImage = displayingImage
             self.isEditingMode = isEditingMode
             self.editingValidation = editingValidation
-            self.alert = alert
         }
     }
 }

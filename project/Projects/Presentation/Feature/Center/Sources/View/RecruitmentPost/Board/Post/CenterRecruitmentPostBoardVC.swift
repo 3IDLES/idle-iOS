@@ -37,8 +37,6 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
         }
     }
     
-    var viewModel: CenterRecruitmentPostBoardViewModelable?
-    
     private var currentState: TabBarState = .onGoingPost
     private let viewControllerDict: [TabBarState: UIViewController] = [
         .onGoingPost : OnGoingPostVC(),
@@ -58,9 +56,6 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
         items: TabBarState.allCases.map { TabBarItem(id: $0) },
         initialItem: .init(id: currentState)
     )!
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(nibName: nil, bundle: nil)

@@ -65,10 +65,7 @@ public class RegisterCenterInfoVC: BaseViewController {
     private var pagesAreSetted = false
     
     var currentIndex: Int = 0
-    
-    // For RC=1
-    private var viewModel: RegisterCenterInfoViewModelable?
-    
+
     // View
     let navigationBar: NavigationBarType1 = {
         let bar = NavigationBarType1(navigationTitle: "센터 회원가입")
@@ -81,9 +78,6 @@ public class RegisterCenterInfoVC: BaseViewController {
         )
         return view
     }()
-    
-    // Observable
-    let disposeBag = DisposeBag()
 
     public init(coordinator: RegisterCenterInfoCoordinator?) {
         
@@ -251,13 +245,13 @@ public class RegisterCenterInfoVC: BaseViewController {
         }
     }
     
-    public func bind(viewModel vm: RegisterCenterInfoViewModelable) {
+    public func bind(viewModel: RegisterCenterInfoViewModelable) {
         
         // RC=1
-        self.viewModel = vm
+        super.bind(viewModel: viewModel)
         
         // Output
-        vm
+        viewModel
             .alert?
             .drive { [weak self] vo in
                 self?.showAlert(vo: vo)
@@ -267,7 +261,7 @@ public class RegisterCenterInfoVC: BaseViewController {
         // pageView에 ViewModel을 바인딩
         pageViews
             .forEach { pv in
-                pv.bind(viewModel: vm)
+                pv.bind(viewModel: viewModel)
             }
     }
 }

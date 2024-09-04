@@ -20,7 +20,7 @@ public protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelabl
 }
 
 
-public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelable {
+public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostBoardViewModelable {
     
     // Init
     weak var coordinator: CenterRecruitmentPostBoardScreenCoordinator?
@@ -34,13 +34,13 @@ public class CenterRecruitmentPostBoardVM: CenterRecruitmentPostBoardViewModelab
     public var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
     public var showRemovePostAlert: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
-    public var alert: Driver<DefaultAlertContentVO>?
-    
     let disposeBag = DisposeBag()
     
     public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
+        
+        super.init()
         
         let requestOngoingPostResult = requestOngoingPost
             .flatMap { [recruitmentPostUseCase] _ in

@@ -14,7 +14,7 @@ import Entity
 import DSKit
 import Entity
 
-public protocol DeregisterReasonVMable {
+public protocol DeregisterReasonVMable: BaseViewModel {
     var coordinator: SelectReasonCoordinator? { get }
     var exitButonClicked: PublishRelay<Void> { get }
     var acceptDeregisterButonClicked: PublishRelay<[DeregisterReasonVO]> { get }
@@ -23,9 +23,6 @@ public protocol DeregisterReasonVMable {
 public class DeregisterReasonVC: BaseViewController {
     
     // Init
-    
-    // Not init
-    var viewModel: DeregisterReasonVMable?
     
     // View
     let navigationBar: IdleNavigationBar = {
@@ -83,8 +80,6 @@ public class DeregisterReasonVC: BaseViewController {
         }
         return dict
     }()
-    
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -197,7 +192,7 @@ public class DeregisterReasonVC: BaseViewController {
     
     public func bind(viewModel: DeregisterReasonVMable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         acceptDeregisterButton
             .rx.tap

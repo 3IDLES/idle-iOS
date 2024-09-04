@@ -22,9 +22,7 @@ public protocol ChangePasswordSuccessOutputable {
 
 class ValidateNewPasswordViewController<T: ViewModelType>: BaseViewController
 where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
-      T.Output: SetPasswordOutputable & ChangePasswordSuccessOutputable {
-    
-    private let viewModel: T
+      T.Output: SetPasswordOutputable & ChangePasswordSuccessOutputable, T: BaseViewModel {
     
     var coordinator: Coordinator?
     
@@ -91,14 +89,13 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
         return button
     }()
     
-    private let disposeBag = DisposeBag()
-    
     public init(coordinator: Coordinator, viewModel: T) {
         
         self.coordinator = coordinator
-        self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
+        
+        super.bind(viewModel: viewModel)
         
         setAppearance()
         setAutoLayout()
@@ -176,6 +173,8 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
     }
     
     func setObservable() {
+        
+        guard let viewModel = self.viewModel as? T else { return }
         
         // MARK: Input
         let input = viewModel.input

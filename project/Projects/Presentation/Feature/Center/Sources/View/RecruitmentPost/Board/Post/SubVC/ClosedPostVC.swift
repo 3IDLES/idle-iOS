@@ -13,7 +13,7 @@ import RxSwift
 import Entity
 import DSKit
 
-public protocol ClosedPostViewModelable {
+public protocol ClosedPostViewModelable: BaseViewModel {
     
     var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>? { get }
     var requestClosedPost: PublishRelay<Void> { get }
@@ -25,18 +25,12 @@ public class ClosedPostVC: BaseViewController {
     
     typealias Cell = CenterEmployCardCell
     
-    var viewModel: ClosedPostViewModelable?
-    
     // View
     let postTableView: UITableView = .init()
     let tableHeader = BoardSortigHeaderView()
     
     // DataSource
     private var postData: [RecruitmentPostInfoForCenterVO] = []
-    
-    // Observable
-    private let disposeBag = DisposeBag()
-    
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -95,7 +89,7 @@ public class ClosedPostVC: BaseViewController {
     
     public func bind(viewModel: ClosedPostViewModelable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // Output
         viewModel
@@ -130,7 +124,7 @@ extension ClosedPostVC: UITableViewDataSource, UITableViewDelegate {
         
         let data = postData[indexPath.item]
         
-        if let viewModel = self.viewModel {
+        if let viewModel = self.viewModel as? ClosedPostViewModelable {
             let vm = viewModel.createClosedPostCellVM(postInfo: data)
             cell.bind(viewModel: vm)
         }

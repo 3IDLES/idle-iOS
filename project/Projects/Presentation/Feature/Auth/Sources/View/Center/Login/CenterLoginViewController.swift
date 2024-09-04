@@ -13,8 +13,6 @@ import BaseFeature
 
 public class CenterLoginViewController: BaseViewController {
     
-    let viewModel: CenterLoginViewModel
-    
     // View
     private let navigationBar: IdleNavigationBar = {
         let bar = IdleNavigationBar(titleText: "로그인")
@@ -84,12 +82,11 @@ public class CenterLoginViewController: BaseViewController {
         return button
     }()
     
-    private let disposeBag = DisposeBag()
-    
     public init(viewModel: CenterLoginViewModel) {
-        self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
+        
+        super.bind(viewModel: viewModel)
         
         setAppearance()
         setAutoLayout()
@@ -154,6 +151,8 @@ public class CenterLoginViewController: BaseViewController {
     
     private func setObservable() {
         
+        guard let viewModel = self.viewModel as? CenterLoginViewModel else { return }
+        
         // MARK: Input
         let input = viewModel.input
         
@@ -183,17 +182,17 @@ public class CenterLoginViewController: BaseViewController {
         let output = viewModel.output
         
         // 로그인 시도 결과 수신
-        output
+        viewModel
             .alert?
             .drive(onNext: { [weak self] alertVO in
                 guard let self else { return }
+                
+                // 비밀번호 입력창 반응
+                
                 loginFailedText.isHidden = false
                 passwordField.idleTextField.onCustomState { textField in
                     textField.layer.borderColor = DSKitColors.Color.red.cgColor
                 }
-                
-                //alert
-                showAlert(vo: alertVO)
             })
             .disposed(by: disposeBag)
     }

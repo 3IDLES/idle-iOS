@@ -15,8 +15,6 @@ import DSKit
 
 public class WorkerSettingVC: BaseViewController {
     
-    var viewModel: WorkerSettingVMable?
-    
     // Init
     
     // View
@@ -61,9 +59,6 @@ public class WorkerSettingVC: BaseViewController {
         return button
     }()
     
-    
-    private let disposeBag = DisposeBag()
-    
     public init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -72,7 +67,7 @@ public class WorkerSettingVC: BaseViewController {
     
     public func bind(viewModel: WorkerSettingVMable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // Input
         myProfileButton.rx.tap
@@ -233,7 +228,7 @@ public class WorkerSettingVC: BaseViewController {
         signOutButton
             .rx.tap
             .subscribe(onNext: { [weak self] _ in
-                guard let self, let vm = viewModel else { return }
+                guard let self, let vm = viewModel as? WorkerSettingVMable else { return }
                 let signOutVM = vm.createSingOutVM()
                 showIdleModal(viewModel: signOutVM)
             })

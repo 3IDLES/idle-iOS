@@ -22,7 +22,7 @@ public protocol AddressInputViewContentVMable {
 }
 
 /// 로그인, 회원가입에 사용되는 구버전 입니다.
-public protocol AddressInputViewModelable {
+public protocol AddressInputViewModelable: BaseViewModel {
     
     // Input
     var editingAddress: PublishRelay<AddressInformation> { get }

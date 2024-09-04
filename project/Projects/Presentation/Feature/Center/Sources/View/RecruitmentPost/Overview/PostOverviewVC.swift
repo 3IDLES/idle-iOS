@@ -17,12 +17,12 @@ public typealias PostDetailDisplayingViewModelable = ApplicationDetailDisplaying
 
 public protocol PostOverviewViewModelable:
     AnyObject,
+    BaseViewModel,
     ApplicationDetailContentVMable,
     CustomerInformationContentVMable,
     CustomerRequirementContentVMable,
     WorkTimeAndPayContentVMable,
     AddressInputViewContentVMable,
-    DefaultAlertOutputable,
     PostDetailDisplayingViewModelable
 {
     
@@ -45,9 +45,6 @@ public protocol PostOverviewViewModelable:
 public class PostOverviewVC: BaseViewController {
     
     // Init
-    
-    // Not init
-    var viewModel: PostOverviewViewModelable?
     
     // View
     let backButton: UIButton = {
@@ -106,10 +103,6 @@ public class PostOverviewVC: BaseViewController {
     let workConditionOV = WorkConditionDisplayingView()
     let customerInfoOV = CustomerInformationDisplayingView()
     let applyInfoOverView = ApplicationDetailDisplayingView()
-    
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -307,7 +300,7 @@ public class PostOverviewVC: BaseViewController {
     
     func bind(viewModel: PostOverviewViewModelable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // 앞전까지 입력한 정보를 저장합니다.
         viewModel.updateToState()

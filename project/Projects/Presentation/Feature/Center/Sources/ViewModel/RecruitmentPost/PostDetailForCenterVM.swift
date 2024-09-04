@@ -15,7 +15,8 @@ import BaseFeature
 
 public protocol PostDetailViewModelable:
     AnyObject,
-    PostDetailDisplayingViewModelable, DefaultAlertOutputable
+    PostDetailDisplayingViewModelable,
+    BaseViewModel
 {
     // Output
     var applicantCountText: Driver<String>? { get }
@@ -50,7 +51,7 @@ public protocol PostDetailViewModelable:
     var viewWillAppear: PublishRelay<Void> { get }
 }
 
-public class PostDetailForCenterVM: PostDetailViewModelable {
+public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
     
     // Init
     let postId: String
@@ -63,7 +64,6 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
     public var workerEmployCardVO: Driver<WorkerNativeEmployCardVO>?
     public var requestDetailFailure: Driver<DefaultAlertContentVO>?
     public var showOptionSheet: Driver<PostState>?
-    public var alert: Driver<DefaultAlertContentVO>?
     
     public let postEditButtonClicked: PublishRelay<Void> = .init()
     public let exitButtonClicked: PublishRelay<Void> = .init()
@@ -142,6 +142,8 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
                 }.asObservable()
             )
             .asDriver(onErrorDriveWith: .never())
+        
+        super.init()
         
         // MARK: Detail View
         let fetchPostDetailResult = viewWillAppear
@@ -240,7 +242,7 @@ public class PostDetailForCenterVM: PostDetailViewModelable {
             .asDriver(onErrorJustReturn: .default)
         
         
-        // 요양보호사 화면 보기 버튼
+        // 요양보호사 화면으로 보기 버튼
         showAsWorkerButtonClicked
             .subscribe(onNext: { [weak self] _ in
                 

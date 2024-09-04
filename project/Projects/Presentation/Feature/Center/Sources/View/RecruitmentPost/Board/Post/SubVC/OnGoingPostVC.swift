@@ -13,7 +13,7 @@ import RxSwift
 import Entity
 import DSKit
 
-public protocol OnGoingPostViewModelable {
+public protocol OnGoingPostViewModelable: BaseViewModel {
     
     var ongoingPostInfo: Driver<[RecruitmentPostInfoForCenterVO]>? { get }
     var showRemovePostAlert: Driver<IdleAlertViewModelable>? { get }
@@ -28,8 +28,6 @@ public class OnGoingPostVC: BaseViewController {
     
     typealias Cell = CenterEmployCardCell
     
-    var viewModel: OnGoingPostViewModelable?
-    
     // View
     let postTableView: UITableView = .init()
     let tableHeader = BoardSortigHeaderView()
@@ -41,9 +39,6 @@ public class OnGoingPostVC: BaseViewController {
     
     // DataSource
     private var postData: [RecruitmentPostInfoForCenterVO] = []
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -107,7 +102,7 @@ public class OnGoingPostVC: BaseViewController {
     
     public func bind(viewModel: OnGoingPostViewModelable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // Output
         viewModel
@@ -155,7 +150,7 @@ extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
         
         let data = postData[indexPath.item]
         
-        if let viewModel = self.viewModel {
+        if let viewModel = self.viewModel as? OnGoingPostViewModelable {
             let vm = viewModel.createOngoingPostCellVM(postInfo: data)
             cell.bind(viewModel: vm)
         }
