@@ -21,15 +21,13 @@ public protocol AuthBusinessOwnerInputable {
 public protocol AuthBusinessOwnerOutputable {
     var canSubmitBusinessNumber: Driver<Bool>? { get set }
     var businessNumberVO: Driver<BusinessInfoVO>? { get set }
-    var businessNumberValidationFailrue: Driver<Void>? { get set }
+    var businessNumberValidationFailure: Driver<Void>? { get set }
 }
 
-public class AuthBusinessOwnerViewController<T: ViewModelType>: DisposableViewController
-where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable {
+public class AuthBusinessOwnerViewController<T: ViewModelType>: BaseViewController
+where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable, T: BaseViewModel {
     
     public var coordinator: CenterRegisterCoordinator?
-    
-    private let viewModel: T
     
     // View
     private let processTitle: ResizableUILabel = {
@@ -86,13 +84,12 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
         return button
     }()
     
-    private let disposeBag = DisposeBag()
-    
     public init(coordinator: CenterRegisterCoordinator?, viewModel: T) {
         self.coordinator = coordinator
-        self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
+        
+        super.bind(viewModel: viewModel)
         
         setAppearance()
         setAutoLayout()
@@ -162,6 +159,8 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
     
     private func setObservable() {
         
+        guard let viewModel = self.viewModel as? T else { return }
+        
         // MARK: Input
         let input = viewModel.input
         
@@ -202,7 +201,7 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
             .disposed(by: disposeBag)
         
         output
-            .businessNumberValidationFailrue?
+            .businessNumberValidationFailure?
             .drive(onNext: { [weak self] in
                 // 정보가 없는 경우
                 self?.dismissCenterInfo()

@@ -123,7 +123,7 @@ extension CenterRegisterViewModel {
         // 사업자 번호 입력
         public var canSubmitBusinessNumber: Driver<Bool>?
         public var businessNumberVO: Driver<BusinessInfoVO>?
-        public var businessNumberValidationFailrue: Driver<Void>?
+        public var businessNumberValidationFailure: Driver<Void>?
         
         // Id
         public var canCheckIdDuplication: Driver<Bool>?
@@ -197,14 +197,26 @@ extension CenterRegisterViewModel {
         let businessNumberValidationResult = input
             .requestBusinessNumberValidation
             .compactMap { $0 }
-            .flatMap { [unowned input] _ in
+            .flatMap { [weak self, input, inputValidationUseCase] _ in
+                
+                // 로딩 시작
+                self?.showLoading.onNext(())
+                
                 let businessNumber = input.editingBusinessNumber.value
                 let formatted = AuthInOutStreamManager.formatBusinessNumber(businessNumber: businessNumber)
                 printIfDebug("[CenterRegisterViewModel] 사업자 번호 인증 요청: \(formatted)")
-                return self.inputValidationUseCase
+                return inputValidationUseCase
                     .requestBusinessNumberAuthentication(businessNumber: formatted)
             }
             .share()
+        
+        businessNumberValidationResult
+            .subscribe(onNext: { [weak self] _ in
+                // 로딩 종료
+                self?.dismissLoading.onNext(())
+            })
+            .disposed(by: disposeBag)
+        
         
         output.businessNumberVO = businessNumberValidationResult
             .compactMap { $0.value }
@@ -216,13 +228,28 @@ extension CenterRegisterViewModel {
             }
             .asDriver(onErrorJustReturn: .onError)
         
-        output.businessNumberValidationFailrue = businessNumberValidationResult
+        let searchFailure = businessNumberValidationResult
             .compactMap { $0.error }
+        
+        output.businessNumberValidationFailure = searchFailure
             .map { error in
                 printIfDebug("❌ 사업자번호 검색실패 \n 에러내용: \(error.message)")
                 return ()
             }
             .asDriver(onErrorJustReturn: ())
+        
+        searchFailure
+            .map { error in
+                DefaultAlertContentVO(
+                    title: "사업자 번호 조회 오류",
+                    message: error.message
+                )
+            }
+            .subscribe(onNext: { [weak self] alertVO in
+                
+                self?.alert.onNext(alertVO)
+            })
+            .disposed(by: disposeBag)
     }
 
 }
