@@ -15,8 +15,6 @@ import BaseFeature
 
 public class CenterProfileViewController: BaseViewController {
     
-    var viewModel: (any CenterProfileViewModelable)?
-    
     let navigationBar: NavigationBarType1 = {
         let bar = NavigationBarType1(navigationTitle: "내 센터 정보")
         return bar
@@ -118,8 +116,6 @@ public class CenterProfileViewController: BaseViewController {
         let view = ImageSelectView(state: .editing, viewController: self)
         return view
     }()
-    
-    private let disposeBag = DisposeBag()
     
     public init() {
         
@@ -296,7 +292,7 @@ public class CenterProfileViewController: BaseViewController {
     
     public func bind(viewModel: any CenterProfileViewModelable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // input
         let input = viewModel.input
@@ -419,14 +415,6 @@ public class CenterProfileViewController: BaseViewController {
             profileEditButton.isHidden = true
             centerImageView.state.accept(.normal)
         }
-        
-        output
-            .alert?
-            .drive { [weak self] vo in
-                print("!!")
-                self?.showAlert(vo: vo)
-            }
-            .disposed(by: disposeBag)
         
         // 바인딩 종료
         bindFinished.accept(())

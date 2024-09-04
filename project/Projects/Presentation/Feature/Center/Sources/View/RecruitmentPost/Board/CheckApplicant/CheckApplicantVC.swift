@@ -31,8 +31,6 @@ public class CheckApplicantVC: BaseViewController {
     
     typealias Cell = ApplicantCardCell
     
-    var viewModel: CheckApplicantViewModelable?
-    
     // Init
     
     // View
@@ -55,9 +53,6 @@ public class CheckApplicantVC: BaseViewController {
         let tableView = MyTableView()
         return tableView
     }()
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     let postApplicantVO: BehaviorRelay<[PostApplicantVO]> = .init(value: [])
     
@@ -176,7 +171,7 @@ public class CheckApplicantVC: BaseViewController {
     
     public func bind(viewModel: CheckApplicantViewModelable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // Input
         navigationBar
@@ -219,7 +214,7 @@ extension CheckApplicantVC: UITableViewDataSource, UITableViewDelegate {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
         
-        if let viewModel = self.viewModel {
+        if let viewModel = self.viewModel as? CheckApplicantViewModelable {
             let vm = viewModel.createApplicantCardVM(vo: postApplicantVO.value[indexPath.row])
             cell.bind(viewModel: vm)
             cell.selectionStyle = .none

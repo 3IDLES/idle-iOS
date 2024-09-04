@@ -12,7 +12,7 @@ import Entity
 import PresentationCore
 import BaseFeature
 
-public class CenterSetNewPasswordViewModel: ViewModelType {
+public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
     
     // Init
     let authUseCase: AuthUseCase
@@ -29,6 +29,8 @@ public class CenterSetNewPasswordViewModel: ViewModelType {
         inputValidationUseCase: AuthInputValidationUseCase) {
         self.authUseCase = authUseCase
         self.inputValidationUseCase = inputValidationUseCase
+            
+            super.init()
             
         setObservable()
     }

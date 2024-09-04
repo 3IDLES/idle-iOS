@@ -11,8 +11,9 @@ import RxSwift
 import Entity
 import PresentationCore
 import UseCaseInterface
+import BaseFeature
 
-public class RegisterCenterInfoVM: RegisterCenterInfoViewModelable {
+public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelable {
     
     // Input
     public var editingName: PublishRelay<String> = .init()
@@ -29,12 +30,13 @@ public class RegisterCenterInfoVM: RegisterCenterInfoViewModelable {
     public var introductionValidation: Driver<Bool>? = nil
     public var imageValidation: Driver<UIImage>? = nil
     public var profileRegisterSuccess: Driver<CenterProfileCardVO>? = nil
-    public var alert: Driver<DefaultAlertContentVO>? = nil
     
     // StatObject
     private let stateObject = CenterProfileRegisterState()
 
     public init(profileUseCase useCase: CenterProfileUseCase) {
+        
+        super.init()
         
         // Set stream
         self.nameAndNumberValidation = Observable

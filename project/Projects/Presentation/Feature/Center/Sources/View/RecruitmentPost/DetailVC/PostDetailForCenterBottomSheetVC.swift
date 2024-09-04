@@ -29,9 +29,6 @@ class OngoingPostOptionVC: IdleBottomSheetVC {
     private let closePostButton: BottomSheetButton = .init(image: DSIcon.postCheck.image, titleText: "채용 종료하기", color: DSColor.red200.color)
     let closePostConfirmed: PublishRelay<Void> = .init()
     
-    // Observable
-    private let disposeBag = DisposeBag()
-    
     public override init() {
         super.init()
     }
@@ -115,9 +112,6 @@ class ClosedPostOptionVC: IdleBottomSheetVC {
     let removePostButton: BottomSheetButton = .init(image: DSIcon.trashBox.image, titleText: "공고 삭제하기", color: DSColor.red200.color)
     
     let removeConfirmed: PublishRelay<Void> = .init()
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public override init() {
         super.init()

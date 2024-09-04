@@ -11,16 +11,16 @@ import RxSwift
 import Entity
 import AuthFeature
 import UseCaseInterface
+import BaseFeature
 
-
-public protocol PhoneNumberValidationForDeregisterVMable: AuthPhoneNumberInputable & AuthPhoneNumberOutputable { 
+public protocol PhoneNumberValidationForDeregisterVMable: BaseViewModel, AuthPhoneNumberInputable & AuthPhoneNumberOutputable {
     
     var backButtonClicked: PublishRelay<Void> { get }
     var cancelButtonClicked: PublishRelay<Void> { get }
     var deregisterButtonClicked: PublishRelay<Void> { get }
 }
 
-class PhoneNumberValidationForDeregisterVM: PhoneNumberValidationForDeregisterVMable {
+class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidationForDeregisterVMable {
     
     // Init
     weak var coordinator: PhoneNumberValidationForDeregisterCoordinator?
@@ -41,7 +41,6 @@ class PhoneNumberValidationForDeregisterVM: PhoneNumberValidationForDeregisterVM
     var canSubmitAuthNumber: RxCocoa.Driver<Bool>?
     var phoneNumberValidation: RxCocoa.Driver<Bool>?
     var authNumberValidation: RxCocoa.Driver<Bool>?
-    var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
 
     let disposeBag = DisposeBag()
     
@@ -55,6 +54,8 @@ class PhoneNumberValidationForDeregisterVM: PhoneNumberValidationForDeregisterVM
         self.coordinator = coordinator
         self.inputValidationUseCase = inputValidationUseCase
         self.settingUseCase = settingUseCase
+        
+        super.init()
         
         // MARK: 번호인증 로직
         AuthInOutStreamManager.validatePhoneNumberInOut(

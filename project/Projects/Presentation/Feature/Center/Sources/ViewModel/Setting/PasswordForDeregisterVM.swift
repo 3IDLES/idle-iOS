@@ -11,14 +11,13 @@ import RxCocoa
 import RxSwift
 import Entity
 
-public class PasswordForDeregisterVM: DefaultAlertOutputable {
+public class PasswordForDeregisterVM: BaseViewModel {
 
     public weak var coordinator: PasswordForDeregisterCoordinator?
     
     public let deregisterButtonClicked: PublishRelay<String> = .init()
     public let backButtonClicked: PublishRelay<Void> = .init()
     public let cancelButtonClicked: PublishRelay<Void> = .init()
-    public var alert: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
     
     let settingUseCase: SettingScreenUseCase
     
@@ -31,6 +30,8 @@ public class PasswordForDeregisterVM: DefaultAlertOutputable {
     ) {
         self.coordinator = coordinator
         self.settingUseCase = settingUseCase
+        
+        super.init()
         
         let deregisterResult = deregisterButtonClicked
             .flatMap { [settingUseCase] password in

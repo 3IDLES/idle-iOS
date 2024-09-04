@@ -15,14 +15,9 @@ import DSKit
 
 public class InitialScreenVC: BaseViewController {
     
-    var viewModel: InitialScreenVM?
-    
     // Init
     
     // View
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -46,7 +41,8 @@ public class InitialScreenVC: BaseViewController {
     private func setObservable() { }
     
     public func bind(viewModel: InitialScreenVM) {
-        self.viewModel = viewModel
+        
+        super.bind(viewModel: viewModel)
         
         self.rx.viewWillAppear
             .map { _ in () }

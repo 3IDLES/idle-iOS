@@ -17,9 +17,6 @@ public class PostDetailForCenterVC: BaseViewController {
     
     // Init
     
-    // Not init
-    var viewModel: PostDetailViewModelable?
-    
     // View
     let optionButton: UIButton = {
         let button = UIButton()
@@ -60,10 +57,6 @@ public class PostDetailForCenterVC: BaseViewController {
     let workConditionOV = WorkConditionDisplayingView()
     let customerInfoOV = CustomerInformationDisplayingView()
     let applyInfoOverView = ApplicationDetailDisplayingView()
-    
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -245,7 +238,7 @@ public class PostDetailForCenterVC: BaseViewController {
     
     public func bind(viewModel: PostDetailViewModelable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // Input
         // 지원공고자 확인 버튼 클릭
@@ -317,7 +310,9 @@ public class PostDetailForCenterVC: BaseViewController {
             .drive(onNext: { [weak self] alertVO in
                 
                 self?.showAlert(vo: alertVO, onClose: {
-                    self?.viewModel?.exitButtonClicked.accept(())
+                    
+                    guard let vm = self?.viewModel as? PostDetailViewModelable else { return }
+                    vm.exitButtonClicked.accept(())
                 })
             })
             .disposed(by: disposeBag)

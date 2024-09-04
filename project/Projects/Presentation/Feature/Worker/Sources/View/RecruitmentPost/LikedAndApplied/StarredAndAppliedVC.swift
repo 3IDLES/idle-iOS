@@ -57,9 +57,6 @@ public class StarredAndAppliedVC: BaseViewController {
         initialItem: .init(id: currentState)
     )!
     
-    // Observable
-    private let disposeBag = DisposeBag()
-    
     public init() {
         super.init(nibName: nil, bundle: nil)
     }

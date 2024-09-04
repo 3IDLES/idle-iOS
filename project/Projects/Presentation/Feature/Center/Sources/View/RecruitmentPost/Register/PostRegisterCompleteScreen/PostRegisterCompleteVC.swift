@@ -28,9 +28,6 @@ public class PostRegisterCompleteVC: BaseViewController {
         return button
     }()
     
-    // Observable
-    private let disposeBag = DisposeBag()
-    
     public init() {
         super.init(nibName: nil, bundle: nil)
     }

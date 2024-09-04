@@ -25,7 +25,7 @@ open class BaseViewController: UIViewController {
     public let disposeBag = DisposeBag()
     
     /// 기본 바인딩
-    public func bind(viewModel: BaseViewModel) {
+    open func bind(viewModel: BaseViewModel) {
         
         self.viewModel = viewModel
         
@@ -52,6 +52,8 @@ open class BaseViewController: UIViewController {
             })
             .disposed(by: disposeBag)
     }
+    
+    open func alert(vo: DefaultAlertContentVO) { }
 }
 
 // MARK: Alert
@@ -79,8 +81,6 @@ public extension BaseViewController {
         alertVC.modalPresentationStyle = .custom
         present(alertVC, animated: true, completion: nil)
     }
-    
-    func alert(vo: DefaultAlertContentVO) { }
 }
 
 public extension BaseViewController {

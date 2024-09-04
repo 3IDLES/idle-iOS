@@ -19,10 +19,6 @@ public class SelectCSTypeVC: IdleBottomSheetVC {
     // View
     let phoneCSButton: PhoneCSButton = .init()
     
-    
-    // Observable
-    private let disposeBag = DisposeBag()
-    
     public override init() {
         super.init()
         setObservable()

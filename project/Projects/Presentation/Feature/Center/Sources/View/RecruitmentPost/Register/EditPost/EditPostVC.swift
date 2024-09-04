@@ -13,7 +13,8 @@ import RxSwift
 import Entity
 import DSKit
 
-public protocol EditPostViewModelable: AnyObject,
+public protocol EditPostViewModelable:
+    BaseViewModel,
     ApplicationDetailContentVMable,
     CustomerInformationContentVMable,
     CustomerRequirementContentVMable,
@@ -48,9 +49,6 @@ public class EditPostVC: BaseViewController {
     let customerInfoEditView: CustomerInformationContentView
     let customerRequirementEditView: CustomerRequirementContentView
     private(set) var applyInfoEditView: ApplicationDetailViewContentView!
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         self.workTimeAndPaymentEditView = WorkTimeAndPayContentView()
@@ -274,6 +272,8 @@ public class EditPostVC: BaseViewController {
     }
     
     public func bind(viewModel: EditPostViewModelable) {
+        
+        super.bind(viewModel: viewModel)
         
         editingCompleteButton
             .eventPublisher

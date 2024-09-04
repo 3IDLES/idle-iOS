@@ -123,7 +123,6 @@ public class EditWorkerProfileViewController: BaseViewController {
     
     let addressPublisher: PublishRelay<AddressInformation> = .init()
     let imagePublisher: PublishRelay<UIImage> = .init()
-    let disposeBag = DisposeBag()
     
     // Optinal values
     public var onError: (()->())?

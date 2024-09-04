@@ -18,11 +18,9 @@ public protocol EnterAddressInputable {
 }
 
 public class EnterAddressViewController<T: ViewModelType>: BaseViewController
-where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: RegisterValidationOutputable {
+where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: RegisterValidationOutputable, T: BaseViewModel {
     
     public var coordinator: WorkerRegisterCoordinator?
-    
-    private let viewModel: T
     
     // View
     private let processTitle1: IdleLabel = {
@@ -58,16 +56,16 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
     private let ctaButton: CTAButtonType1 = {
         
         let button = CTAButtonType1(labelText: "완료")
-        
+        button.setEnabled(false)
         return button
     }()
     
-    let disposeBag = DisposeBag()
-    
     public init(coordinator: WorkerRegisterCoordinator? = nil, viewModel: T) {
         self.coordinator = coordinator
-        self.viewModel = viewModel
+       
         super.init(nibName: nil, bundle: nil)
+        
+        super.bind(viewModel: viewModel)
         
         setAppearance()
         setAutoLayout()
@@ -126,7 +124,7 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
     
     private func setObservable() {
         
-        ctaButton.setEnabled(false)
+        guard let viewModel = self.viewModel as? T else { return }
         
         let input = viewModel.input
         

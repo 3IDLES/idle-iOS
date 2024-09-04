@@ -33,11 +33,9 @@ public protocol SetPasswordOutputable {
 
 class SetIdPasswordViewController<T: ViewModelType>: BaseViewController
 where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
-      T.Output: SetIdOutputable & SetPasswordOutputable & RegisterValidationOutputable {
+      T.Output: SetIdOutputable & SetPasswordOutputable & RegisterValidationOutputable, T: BaseViewModel {
     
     var coordinator: CenterRegisterCoordinator?
-    
-    private let viewModel: T
     
     // View
     private let processTitle: ResizableUILabel = {
@@ -138,14 +136,13 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
         return button
     }()
     
-    private let disposeBag = DisposeBag()
-    
     public init(coordinator: CenterRegisterCoordinator?, viewModel: T) {
         
         self.coordinator = coordinator
-        self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
+        
+        super.bind(viewModel: viewModel)
         
         setAppearance()
         setAutoLayout()
@@ -239,6 +236,8 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
     }
     
     private func setObservable() {
+        
+        guard let viewModel = self.viewModel as? T else { return }
         
         // MARK: Input
         let input = viewModel.input

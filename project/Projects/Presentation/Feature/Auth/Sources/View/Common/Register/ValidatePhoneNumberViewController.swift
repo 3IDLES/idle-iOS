@@ -40,11 +40,9 @@ public extension AuthPhoneNumberOutputable {
 class ValidatePhoneNumberViewController<T: ViewModelType>: BaseViewController
 where
     T.Input: AuthPhoneNumberInputable,
-    T.Output: AuthPhoneNumberOutputable {
+    T.Output: AuthPhoneNumberOutputable, T: BaseViewModel {
     
     var coordinator: Coordinator?
-    
-    let viewModel: T
     
     // View
     private let processTitle: ResizableUILabel = {
@@ -117,16 +115,15 @@ where
         return button
     }()
     
-    private let disposeBag = DisposeBag()
-    
     public init(
         coordinator: Coordinator? = nil,
         viewModel: T
     ) {
         self.coordinator = coordinator
-        self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
+        
+        super.bind(viewModel: viewModel)
         
         setAppearance()
         setAutoLayout()
@@ -208,6 +205,8 @@ where
     }
     
     private func setObservable() {
+        
+        guard let viewModel = self.viewModel as? T else { return }
         
         // MARK: Input
         let input = viewModel.input

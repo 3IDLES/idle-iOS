@@ -34,9 +34,6 @@ public class WorkPlaceAndWorkerLocationFullVC: BaseViewController {
         return view
     }()
     
-    // Observable
-    private let disposeBag = DisposeBag()
-    
     public init() {
         super.init(nibName: nil, bundle: nil)
     }

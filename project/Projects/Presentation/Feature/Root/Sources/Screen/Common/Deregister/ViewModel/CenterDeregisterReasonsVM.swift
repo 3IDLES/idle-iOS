@@ -8,8 +8,9 @@
 import Entity
 import RxSwift
 import RxCocoa
+import BaseFeature
 
-public class CenterDeregisterReasonsVM: DeregisterReasonVMable {
+public class CenterDeregisterReasonsVM: BaseViewModel, DeregisterReasonVMable {
     
     public weak var coordinator: SelectReasonCoordinator?
     public var exitButonClicked: RxRelay.PublishRelay<Void> = .init()
@@ -19,6 +20,8 @@ public class CenterDeregisterReasonsVM: DeregisterReasonVMable {
     
     public init(coordinator: SelectReasonCoordinator) {
         self.coordinator = coordinator
+        
+        super.init()
         
         acceptDeregisterButonClicked
             .subscribe(onNext: { [weak self] reasons in

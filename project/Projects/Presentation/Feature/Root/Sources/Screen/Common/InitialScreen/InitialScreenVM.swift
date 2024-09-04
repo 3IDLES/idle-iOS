@@ -11,8 +11,9 @@ import Foundation
 import PresentationCore
 import UseCaseInterface
 import RepositoryInterface
+import BaseFeature
 
-public class InitialScreenVM {
+public class InitialScreenVM: BaseViewModel {
     
     weak var coordinator: RootCoorinatable?
     
@@ -36,6 +37,8 @@ public class InitialScreenVM {
         self.workerProfileUseCase = workerProfileUseCase
         self.centerProfileUseCase = centerProfileUseCase
         self.userInfoLocalRepository = userInfoLocalRepository
+        
+        super.init()
         
         // MARK: 로그아웃, 회원탈퇴시
         NotificationCenter.default.rx.notification(.popToInitialVC)

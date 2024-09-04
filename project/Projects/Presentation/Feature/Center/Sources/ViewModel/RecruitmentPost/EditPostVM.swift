@@ -11,9 +11,9 @@ import RxCocoa
 import Entity
 import PresentationCore
 import UseCaseInterface
+import BaseFeature
 
-
-public class EditPostVM: EditPostViewModelable {
+public class EditPostVM: BaseViewModel, EditPostViewModelable {
     
     // Init
     let id: String
@@ -104,9 +104,6 @@ public class EditPostVM: EditPostViewModelable {
         }
         return dict
     }()
-    
-    // MARK: Alert
-    public var alert: Driver<Entity.DefaultAlertContentVO>?
     
     // 옵셔널한 입력을 유지합니다.
     let disposeBag = DisposeBag()
@@ -323,6 +320,7 @@ public class EditPostVM: EditPostViewModelable {
             .compactMap { $0 }
             .map { $0.convertDateToString() }
             .asDriver(onErrorJustReturn: "")
+        
          
         let applicationDetailInputValidation = saveButtonClicked
             .map { [editing_applicationDetail] _ in
@@ -348,6 +346,7 @@ public class EditPostVM: EditPostViewModelable {
         
         applicationDetailViewNextable = applicationDetailInputValidation.asDriver(onErrorJustReturn: false)
         
+        super.init()
         
         editViewExitButtonClicked
             .subscribe(onNext: { [weak self] in

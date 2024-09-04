@@ -13,7 +13,7 @@ import UseCaseInterface
 import Entity
 import BaseFeature
 
-public class WorkerRegisterViewModel: ViewModelType {
+public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
     
     // UseCase
     public let inputValidationUseCase: AuthInputValidationUseCase
@@ -32,6 +32,8 @@ public class WorkerRegisterViewModel: ViewModelType {
     ) {
         self.inputValidationUseCase = inputValidationUseCase
         self.authUseCase = authUseCase
+        
+        super.init()
         
         setInput()
     }

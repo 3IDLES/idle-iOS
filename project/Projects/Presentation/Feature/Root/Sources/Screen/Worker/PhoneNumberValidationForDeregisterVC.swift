@@ -16,8 +16,6 @@ import AuthFeature
 
 public class PhoneNumberValidationForDeregisterVC: BaseViewController {
     
-    var viewModel: PhoneNumberValidationForDeregisterVMable?
-    
     // Init
     
     // View
@@ -103,9 +101,6 @@ public class PhoneNumberValidationForDeregisterVC: BaseViewController {
         button.setEnabled(false)
         return button
     }()
-    
-    // Observable
-    private let disposeBag = DisposeBag()
     
     public init() {
         super.init(
@@ -197,7 +192,8 @@ public class PhoneNumberValidationForDeregisterVC: BaseViewController {
     }
     
     public func bind(viewModel: PhoneNumberValidationForDeregisterVMable) {
-        self.viewModel = viewModel
+        
+        super.bind(viewModel: viewModel)
         
         // Input
         cancelButton.rx.tap

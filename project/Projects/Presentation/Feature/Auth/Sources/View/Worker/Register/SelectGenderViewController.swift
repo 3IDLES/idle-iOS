@@ -23,12 +23,10 @@ protocol SelectGenderOutputable {
 
 class SelectGenderViewController<T: ViewModelType>: BaseViewController
 where T.Input: SelectGenderInputable & CTAButtonEnableInputable,
-      T.Output: SelectGenderOutputable
+      T.Output: SelectGenderOutputable, T: BaseViewModel
 {
     
     var coordinator: WorkerRegisterCoordinator?
-    
-    private let viewModel: T
     
     // View
     private let processTitle: IdleLabel = {
@@ -67,20 +65,19 @@ where T.Input: SelectGenderInputable & CTAButtonEnableInputable,
     private let ctaButton: CTAButtonType1 = {
         
         let button = CTAButtonType1(labelText: "다음")
-        
+        button.setEnabled(false)
         return button
     }()
-    
-    let disposeBag = DisposeBag()
     
     public init(
         coordinator: WorkerRegisterCoordinator? = nil,
         viewModel: T
     ) {
         self.coordinator = coordinator
-        self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
+        
+        super.bind(viewModel: viewModel)
         
         setAppearance()
         setAutoLayout()
@@ -133,8 +130,7 @@ where T.Input: SelectGenderInputable & CTAButtonEnableInputable,
     
     private func setObservable() {
         
-        // - CTA버튼 비활성화
-        ctaButton.setEnabled(false)
+        guard let viewModel = self.viewModel as? T else { return }
         
         let femaleClicked = femaleButton.eventPublisher
             .filter({ $0 == .accent })

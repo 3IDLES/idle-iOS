@@ -11,6 +11,7 @@ import RxCocoa
 import Entity
 import PresentationCore
 import UseCaseInterface
+import BaseFeature
 
 public enum RegisterRecruitmentPostInputSection: CaseIterable {
     case workTimeAndPay
@@ -35,7 +36,7 @@ public enum RegisterRecruitmentPostInputSection: CaseIterable {
     }
 }
 
-public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
+public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostViewModelable {
 
     //Init
     let recruitmentPostUseCase: RecruitmentPostUseCase
@@ -124,10 +125,6 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
     
     public var deadlineString: Driver<String>
     public var applicationDetailViewNextable: Driver<Bool>
-    
-    
-    // MARK: Alert
-    public var alert: Driver<Entity.DefaultAlertContentVO>?
     
     
     // MARK: 모든 섹션의 유효성 확인
@@ -407,6 +404,8 @@ public class RegisterRecruitmentPostVM: RegisterRecruitmentPostViewModelable {
                 return Disposables.create { }
             }
             .asDriver(onErrorJustReturn: .mock)
+        
+        super.init()
         
         overViewWillAppear
             .subscribe(onNext: { [weak self] _ in
