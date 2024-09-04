@@ -33,7 +33,6 @@ public protocol RegisterCenterInfoViewModelable: AddressInputViewModelable {
     var nameAndNumberValidation: Driver<Bool>? { get }
     var imageValidation: Driver<UIImage>? { get }
     var profileRegisterSuccess: Driver<CenterProfileCardVO>? { get }
-    var alert: Driver<DefaultAlertContentVO>? { get }
 }
 
 fileprivate protocol RegisterCenterInfoVCViews: UIView {
@@ -251,12 +250,6 @@ public class RegisterCenterInfoVC: BaseViewController {
         super.bind(viewModel: viewModel)
         
         // Output
-        viewModel
-            .alert?
-            .drive { [weak self] vo in
-                self?.showAlert(vo: vo)
-            }
-            .disposed(by: disposeBag)
         
         // pageView에 ViewModel을 바인딩
         pageViews

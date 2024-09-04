@@ -15,8 +15,8 @@ import DSKit
 
 public protocol WorkConditionDisplayingVMable {
     
-    var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject> { get }
-    var casting_addressInput: Driver<AddressInputStateObject> { get }
+    var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>? { get }
+    var casting_addressInput: Driver<AddressInputStateObject>? { get }
 }
 
 public class WorkConditionDisplayingView: HStack {
@@ -150,7 +150,7 @@ public extension WorkConditionDisplayingView {
     func bind(viewModel: WorkConditionDisplayingVMable) {
         
         viewModel
-            .casting_workTimeAndPay
+            .casting_workTimeAndPay?
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 applyObject(object)
@@ -158,7 +158,7 @@ public extension WorkConditionDisplayingView {
             .disposed(by: disposeBag)
         
         viewModel
-            .casting_addressInput
+            .casting_addressInput?
             .drive(onNext: { [weak self] object in
                 guard let self else { return }
                 applyObject(object)

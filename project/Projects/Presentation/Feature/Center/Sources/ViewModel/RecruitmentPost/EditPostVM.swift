@@ -41,11 +41,11 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
     private let editing_addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .init())
     
     // MARK: Casting
-    public var casting_addressInput: Driver<AddressInputStateObject>
-    public var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>
-    public var casting_customerRequirement: Driver<CustomerRequirementStateObject>
-    public var casting_customerInformation: Driver<CustomerInformationStateObject>
-    public var casting_applicationDetail: Driver<ApplicationDetailStateObject>
+    public var casting_addressInput: Driver<AddressInputStateObject>?
+    public var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>?
+    public var casting_customerRequirement: Driver<CustomerRequirementStateObject>?
+    public var casting_customerInformation: Driver<CustomerInformationStateObject>?
+    public var casting_applicationDetail: Driver<ApplicationDetailStateObject>?
     
     // MARK: Address input
     public var addressInformation: PublishRelay<AddressInformation> = .init()
@@ -85,14 +85,14 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
     public var applyDeadlineType: PublishRelay<ApplyDeadlineType> = .init()
     public var deadlineDate: BehaviorRelay<Date?> = .init(value: nil)
     
-    public var deadlineString: Driver<String>
+    public var deadlineString: Driver<String>?
 
 
-    public var addressInputNextable: Driver<Bool>
-    public var workTimeAndPayNextable: Driver<Bool>
-    public var customerRequirementNextable: Driver<Bool>
-    public var customerInformationNextable: Driver<Bool>
-    public var applicationDetailViewNextable: Driver<Bool>
+    public var addressInputNextable: Driver<Bool>?
+    public var workTimeAndPayNextable: Driver<Bool>?
+    public var customerRequirementNextable: Driver<Bool>?
+    public var customerInformationNextable: Driver<Bool>?
+    public var applicationDetailViewNextable: Driver<Bool>?
     
     
     // MARK: 모든 섹션의 유효성 확인
@@ -105,15 +105,14 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
         return dict
     }()
     
-    // 옵셔널한 입력을 유지합니다.
-    let disposeBag = DisposeBag()
-    
     public init(
         id: String,
         recruitmentPostUseCase: RecruitmentPostUseCase
     ) {
         self.id = id
         self.recruitmentPostUseCase = recruitmentPostUseCase
+        
+        super.init()
         
         // MARK: Work time and pay
         casting_workTimeAndPay = editing_workTimeAndPay.asDriver(onErrorJustReturn: .mock)
@@ -345,8 +344,6 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
             }
         
         applicationDetailViewNextable = applicationDetailInputValidation.asDriver(onErrorJustReturn: false)
-        
-        super.init()
         
         editViewExitButtonClicked
             .subscribe(onNext: { [weak self] in

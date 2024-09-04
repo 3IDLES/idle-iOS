@@ -48,8 +48,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     public var startButtonClicked: RxRelay.PublishRelay<Bool> = .init()
     public var centerCardClicked: RxRelay.PublishRelay<Void> = .init()
     public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
-    
-    private let disposeBag = DisposeBag()
+
     
     public init(
             postId: String,
@@ -182,23 +181,26 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
         
         
         // MARK: Alert
-        alert = Observable
+        Observable
             .merge(
                 getPostDetailFailureAlert,
                 applyRequestFailureAlert
             )
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(alert)
+            .disposed(by: disposeBag)
         
         
         // MARK: 로딩
-        showLoading = Observable
+        Observable
             .merge(loadingStartObservables)
-            .asDriver(onErrorDriveWith: .never())
+            .subscribe(showLoading)
+            .disposed(by: disposeBag)
         
-        dismissLoading = Observable
+        Observable
             .merge(loadingEndObservables)
             .delay(.milliseconds(500), scheduler: MainScheduler.instance)
-            .asDriver(onErrorDriveWith: .never())
+            .subscribe(dismissLoading)
+            .disposed(by: disposeBag)
     }
     
     // MARK: Test

@@ -115,7 +115,7 @@ public class CustomerRequirementView: UIView, RegisterRecruitmentPostViews {
         
         // Output
         viewModel
-            .customerRequirementNextable
+            .customerRequirementNextable?
             .drive(onNext: { [ctaButton] nextable in
                 ctaButton.setEnabled(nextable)
             })

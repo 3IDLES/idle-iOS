@@ -13,11 +13,26 @@ import Entity
 open class BaseViewModel {
     
     // Alert
-    public var alert: Driver<DefaultAlertContentVO>?
+    public let alert: PublishSubject<DefaultAlertContentVO> = .init()
+    var alertDriver: Driver<DefaultAlertContentVO>?
     
     // 로딩
-    public var showLoading: Driver<Void>?
-    public var dismissLoading: Driver<Void>?
+    public let showLoading: PublishSubject<Void> = .init()
+    public let dismissLoading: PublishSubject<Void> = .init()
+    var showLoadingDriver: Driver<Void>?
+    var dismissLoadingDriver: Driver<Void>?
     
-    public init() { }
+    public let disposeBag = DisposeBag()
+    
+    public init() { 
+        
+        self.alertDriver = alert
+            .asDriver(onErrorDriveWith: .never())
+            
+        self.showLoadingDriver = showLoading
+            .asDriver(onErrorDriveWith: .never())
+        
+        self.dismissLoadingDriver = dismissLoading
+            .asDriver(onErrorDriveWith: .never())
+    }
 }

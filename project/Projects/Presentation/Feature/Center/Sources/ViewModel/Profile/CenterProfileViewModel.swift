@@ -78,8 +78,6 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         )
     }
     
-    let disposeBag = DisposeBag()
-    
     public init(
         mode: ProfileMode,
         coordinator: CenterProfileCoordinator,

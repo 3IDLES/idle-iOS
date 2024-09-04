@@ -44,7 +44,9 @@ public class CenterRegisterViewModel: BaseViewModel, ViewModelType {
             AuthInOutStreamManager.validatePhoneNumberInOut(
                 input: input,
                 output: output,
-                useCase: inputValidationUseCase) { [weak self] authedPhoneNumber in
+                useCase: inputValidationUseCase,
+                disposeBag: disposeBag
+            ) { [weak self] authedPhoneNumber in
                     // 🚀 상태추적 🚀
                     self?.stateObject.phoneNumber = authedPhoneNumber
                 }
@@ -102,6 +104,9 @@ extension CenterRegisterViewModel {
         
         // Password
         public var editingPasswords: PublishRelay<(pwd: String, cpwd: String)> = .init()
+        
+        // Alert
+        public var alert: PublishSubject<DefaultAlertContentVO> = .init()
     }
     
     public class Output {
@@ -129,9 +134,6 @@ extension CenterRegisterViewModel {
         
         // Register success
         public var registerValidation: Driver<Void>?
-        
-        // Alert
-        public var alert: Driver<DefaultAlertContentVO>?
     }
 }
 
@@ -165,7 +167,7 @@ extension CenterRegisterViewModel {
             }
         output.registerValidation = loginResult.asDriver(onErrorJustReturn: ())
         
-        let registrationFailure = registerValidation
+        let registrationFailureAlert = registerValidation
             .compactMap { $0.error }
             .map { error in
                 printIfDebug("❌ 회원가입 실패: \(error.message)")
@@ -175,19 +177,9 @@ extension CenterRegisterViewModel {
                 )
             }
         
-        // 이미 alert드라이버가 존재할 경우 merge
-        var newAlertDrvier: Observable<DefaultAlertContentVO>!
-        if let alertDrvier = output.alert {
-            newAlertDrvier = Observable
-                .merge(
-                    alertDrvier.asObservable(),
-                    registrationFailure
-                )
-        } else {
-            newAlertDrvier = registrationFailure
-        }
-        output
-            .alert = newAlertDrvier.asDriver(onErrorJustReturn: .default)
+        registrationFailureAlert
+            .subscribe(self.alert)
+            .disposed(by: disposeBag)
     }
 }
 

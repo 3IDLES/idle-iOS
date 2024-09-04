@@ -41,8 +41,6 @@ class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidation
     var canSubmitAuthNumber: RxCocoa.Driver<Bool>?
     var phoneNumberValidation: RxCocoa.Driver<Bool>?
     var authNumberValidation: RxCocoa.Driver<Bool>?
-
-    let disposeBag = DisposeBag()
     
     init(
             coordinator: PhoneNumberValidationForDeregisterCoordinator?,
@@ -61,7 +59,9 @@ class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidation
         AuthInOutStreamManager.validatePhoneNumberInOut(
             input: self,
             output: self,
-            useCase: inputValidationUseCase) { _ in }
+            useCase: inputValidationUseCase,
+            disposeBag: disposeBag
+        ) { _ in }
         
         let deregisterResult = deregisterButtonClicked
             .flatMap { [settingUseCase] _ in
@@ -84,21 +84,18 @@ class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidation
             })
             .disposed(by: disposeBag)
         
-        if let alert {
-            
-            self.alert = Observable
-                .merge(
-                    alert.asObservable(),
-                    deregisterFailure
-                        .map {
-                            DefaultAlertContentVO(
-                                title: "회원탈퇴 실패",
-                                message: $0.message
-                            )
-                        }
+        let deregisterFailureAlert = deregisterFailure
+            .map {
+                DefaultAlertContentVO(
+                    title: "회원탈퇴 실패",
+                    message: $0.message
                 )
-                .asDriver(onErrorJustReturn: .default)
-        }
+            }
+        
+        Observable
+            .merge(deregisterFailureAlert)
+            .subscribe(alert)
+            .disposed(by: disposeBag)
         
         backButtonClicked
             .observe(on: MainScheduler.instance)

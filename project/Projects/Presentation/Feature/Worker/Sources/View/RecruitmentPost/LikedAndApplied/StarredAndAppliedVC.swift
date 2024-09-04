@@ -161,16 +161,6 @@ public class StarredAndAppliedVC: BaseViewController {
          
         viewControllerDict[.applied]?.bind(viewModel: appliedPostVM)
         viewControllerDict[.starred]?.bind(viewModel: starredPostVM)
-        
-        Observable
-            .merge(
-                appliedPostVM.alert?.asObservable() ?? .empty(),
-                starredPostVM.alert?.asObservable() ?? .empty()
-            )
-            .subscribe(onNext: { [weak self] alertVO in
-                self?.showAlert(vo: alertVO)
-            })
-            .disposed(by: disposeBag)
     }
 }
 

@@ -37,6 +37,7 @@ public enum RegisterRecruitmentPostInputSection: CaseIterable {
 }
 
 public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostViewModelable {
+    
 
     //Init
     let recruitmentPostUseCase: RecruitmentPostUseCase
@@ -55,7 +56,7 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
     public var registerButtonClicked: PublishRelay<Void> = .init()
     public var overViewWillAppear: RxRelay.PublishRelay<Void> = .init()
     
-    public let workerEmployCardVO: Driver<WorkerNativeEmployCardVO>?
+    public var workerEmployCardVO: Driver<WorkerNativeEmployCardVO>?
     
     // MARK: register request
     public var postRegistrationSuccess: Driver<Void>?
@@ -75,16 +76,16 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
     private let editing_addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .init())
     
     // MARK: Casting
-    public var casting_addressInput: Driver<AddressInputStateObject>
-    public var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>
-    public var casting_customerRequirement: Driver<CustomerRequirementStateObject>
-    public var casting_customerInformation: Driver<CustomerInformationStateObject>
-    public var casting_applicationDetail: Driver<ApplicationDetailStateObject>
+    public var casting_addressInput: Driver<AddressInputStateObject>?
+    public var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>?
+    public var casting_customerRequirement: Driver<CustomerRequirementStateObject>?
+    public var casting_customerInformation: Driver<CustomerInformationStateObject>?
+    public var casting_applicationDetail: Driver<ApplicationDetailStateObject>?
     
     // MARK: Address input
     public var addressInformation: PublishRelay<AddressInformation> = .init()
     
-    public var addressInputNextable: Driver<Bool>
+    public var addressInputNextable: Driver<Bool>?
     
     // MARK: Work time and pay
     public var selectedDay: PublishRelay<(WorkDay, Bool)> = .init()
@@ -94,7 +95,7 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
     public var paymentAmount: PublishRelay<String> = .init()
     
     
-    public var workTimeAndPayNextable: Driver<Bool>
+    public var workTimeAndPayNextable: Driver<Bool>?
     
     // MARK: Customer requirement
     public var mealSupportNeeded: PublishRelay<Bool> = .init()
@@ -103,7 +104,7 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
     public var dailySupportTypes: PublishRelay<(DailySupportType, Bool)> = .init()
     public var additionalRequirement: PublishRelay<String> = .init()
     
-    public var customerRequirementNextable: Driver<Bool>
+    public var customerRequirementNextable: Driver<Bool>?
     
     // MARK: Customer information
     public var name: PublishRelay<String> = .init()
@@ -114,7 +115,7 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
     public var cognitionState: PublishRelay<CognitionDegree> = .init()
     public var deceaseDescription: PublishRelay<String> = .init()
     
-    public var customerInformationNextable: Driver<Bool>
+    public var customerInformationNextable: Driver<Bool>?
     
     
     // MARK: Application detail
@@ -123,8 +124,8 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
     public var applyDeadlineType: PublishRelay<ApplyDeadlineType> = .init()
     public var deadlineDate: BehaviorRelay<Date?> = .init(value: nil)
     
-    public var deadlineString: Driver<String>
-    public var applicationDetailViewNextable: Driver<Bool>
+    public var deadlineString: Driver<String>?
+    public var applicationDetailViewNextable: Driver<Bool>?
     
     
     // MARK: 모든 섹션의 유효성 확인
@@ -137,15 +138,14 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         return dict
     }()
     
-    // 옵셔널한 입력을 유지합니다.
-    let disposeBag = DisposeBag()
-    
     public init(
         registerRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable,
         recruitmentPostUseCase: RecruitmentPostUseCase
     ) {
         self.registerRecruitmentPostCoordinator = registerRecruitmentPostCoordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
+        
+        super.init()
         
         // MARK: Work time and pay
         casting_workTimeAndPay = editing_workTimeAndPay.asDriver { _ in fatalError() }
@@ -405,8 +405,6 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
             }
             .asDriver(onErrorJustReturn: .mock)
         
-        super.init()
-        
         overViewWillAppear
             .subscribe(onNext: { [weak self] _ in
                 // OverView가 나타날때 마다 상태를 업데이트 합니다.
@@ -488,14 +486,15 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         let requestRegistrationFailure = registerPostResult
             .compactMap { $0.error }
         
-        alert = requestRegistrationFailure
+        requestRegistrationFailure
             .map { error in
                 DefaultAlertContentVO(
                     title: "공고등록 오류",
                     message: error.message
                 )
             }
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(alert)
+            .disposed(by: disposeBag)
         
         Observable
             .merge(

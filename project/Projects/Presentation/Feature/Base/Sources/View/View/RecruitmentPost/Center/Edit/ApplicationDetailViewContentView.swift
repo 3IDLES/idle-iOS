@@ -21,9 +21,9 @@ public protocol ApplicationDetailContentVMable {
     var deadlineDate: BehaviorRelay<Date?> { get }
     
     // Output
-    var deadlineString: Driver<String> { get }
-    var applicationDetailViewNextable: Driver<Bool> { get }
-    var casting_applicationDetail: Driver<ApplicationDetailStateObject> { get }
+    var deadlineString: Driver<String>? { get }
+    var applicationDetailViewNextable: Driver<Bool>? { get }
+    var casting_applicationDetail: Driver<ApplicationDetailStateObject>? { get }
 }
 
 public class ApplicationDetailViewContentView: UIView {
@@ -190,7 +190,7 @@ public class ApplicationDetailViewContentView: UIView {
         // Output
         
         viewModel
-            .casting_applicationDetail
+            .casting_applicationDetail?
             .drive(onNext: { [weak self] stateFromVM in
                 
                 guard let self else { return }
@@ -242,7 +242,7 @@ public class ApplicationDetailViewContentView: UIView {
             .disposed(by: disposeBag)
         
         viewModel
-            .deadlineString
+            .deadlineString?
             .drive(onNext: { [calendarOpenButton] str in
                 calendarOpenButton.textLabel.textString = str
             })

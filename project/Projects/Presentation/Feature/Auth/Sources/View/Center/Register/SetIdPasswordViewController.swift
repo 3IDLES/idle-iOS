@@ -322,14 +322,6 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
             }
             .disposed(by: disposeBag)
         
-        // 경고창 표시 로직
-        output
-            .alert?
-            .drive(onNext: { [weak self] vo in
-                self?.showAlert(vo: vo)
-            })
-            .disposed(by: disposeBag)
-        
         // MARK: ViewController한정 로직
         // CTA버튼 클릭시 버튼 비활성화
         ctaButton

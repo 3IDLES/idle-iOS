@@ -108,13 +108,6 @@ public class WorkerSettingVC: BaseViewController {
                 }
             })
             .disposed(by: disposeBag)
-        
-        viewModel.alert?
-            .drive(onNext: { [weak self] alertVO in
-                self?.showAlert(vo: alertVO)
-            })
-            .disposed(by: disposeBag)
-        
     }
     
     public override func viewDidLoad() {

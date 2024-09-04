@@ -26,8 +26,8 @@ public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
     public var postBoardData: RxCocoa.Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
     
     // Init
-    weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    let recruitmentPostUseCase: RecruitmentPostUseCase
+    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
+    public let recruitmentPostUseCase: RecruitmentPostUseCase
     
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
@@ -131,27 +131,26 @@ public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
             }
             .asDriver(onErrorDriveWith: .never())
         
-        alert = requestPostListFailure
+        requestPostListFailure
             .map { error in
                 DefaultAlertContentVO(
                     title: "지원한 공고 불러오기 오류",
                     message: error.message
                 )
             }
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(self.alert)
+            .disposed(by: disposeBag)
         
         // MARK: 로딩
-        showLoading = Observable
+        Observable
             .merge(loadingStartObservables)
-            .asDriver(onErrorDriveWith: .never())
+            .subscribe(self.showLoading)
+            .disposed(by: disposeBag)
         
-        dismissLoading = Observable
+        Observable
             .merge(loadingEndObservables)
             .delay(.milliseconds(500), scheduler: MainScheduler.instance)
-            .asDriver(onErrorDriveWith: .never())
-    }
-    
-    public func showPostDetail(id: String) {
-        coordinator?.showPostDetail(postId: id)
+            .subscribe(self.dismissLoading)
+            .disposed(by: disposeBag)
     }
 }

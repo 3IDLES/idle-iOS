@@ -19,6 +19,7 @@ public extension AuthInOutStreamManager {
         output: AuthPhoneNumberOutputable & AnyObject,
         useCase: AuthInputValidationUseCase,
         authUseCase: AuthUseCase? = nil,
+        disposeBag: DisposeBag,
         stateTracker: @escaping (String) -> ()
     ) {
         
@@ -166,7 +167,7 @@ public extension AuthInOutStreamManager {
         }
         
         // 번호 인증 관련 Alert
-        let phoneAuthValidation = Observable
+        let failureAlert = Observable
             .merge(
                 phoneNumeberAuthRequestFailure,
                 phoneNumeberAuthFailure
@@ -178,19 +179,9 @@ public extension AuthInOutStreamManager {
                 )
             }
         
-        // 이미 alert드라이버가 존재할 경우 merge
-        var newAlertDrvier: Observable<DefaultAlertContentVO>!
-        if let alertDrvier = output.alert {
-            newAlertDrvier = Observable
-                .merge(
-                    alertDrvier.asObservable(),
-                    phoneAuthValidation
-                )
-        } else {
-            newAlertDrvier = phoneAuthValidation
-        }
-        output
-            .alert = newAlertDrvier.asDriver(onErrorJustReturn: .default)
+        failureAlert
+            .subscribe(input.alert)
+            .disposed(by: disposeBag)
     }
 }
 

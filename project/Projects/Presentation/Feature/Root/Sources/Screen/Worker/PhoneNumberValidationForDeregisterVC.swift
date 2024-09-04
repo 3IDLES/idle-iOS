@@ -283,15 +283,6 @@ public class PhoneNumberValidationForDeregisterVC: BaseViewController {
                 authSuccessText.alpha = 1
             })
             .disposed(by: disposeBag)
-    
-        
-        // Alert
-        viewModel
-            .alert?
-            .drive(onNext: { [weak self] vo in
-                self?.showAlert(vo: vo)
-            })
-            .disposed(by: disposeBag)
     }
     
     func activateAuthNumberField() {

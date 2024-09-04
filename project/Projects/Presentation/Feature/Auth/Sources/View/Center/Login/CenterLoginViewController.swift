@@ -179,22 +179,7 @@ public class CenterLoginViewController: BaseViewController {
             .bind(to: input.loginButtonPressed)
             .disposed(by: disposeBag)
         
-        let output = viewModel.output
-        
-        // 로그인 시도 결과 수신
-        viewModel
-            .alert?
-            .drive(onNext: { [weak self] alertVO in
-                guard let self else { return }
-                
-                // 비밀번호 입력창 반응
-                
-                loginFailedText.isHidden = false
-                passwordField.idleTextField.onCustomState { textField in
-                    textField.layer.borderColor = DSKitColors.Color.red.cgColor
-                }
-            })
-            .disposed(by: disposeBag)
+        let _ = viewModel.output
     }
     
     private func setKeyboardAvoidance() {

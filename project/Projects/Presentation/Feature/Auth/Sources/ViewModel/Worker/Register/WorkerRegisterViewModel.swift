@@ -24,8 +24,6 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
     
     private let stateObject = WorkerRegisterState()
     
-    private let disposeBag = DisposeBag()
-    
     public init(
         inputValidationUseCase: AuthInputValidationUseCase,
         authUseCase: AuthUseCase
@@ -78,7 +76,8 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
             input: input,
             output: output,
             useCase: inputValidationUseCase,
-            authUseCase: authUseCase
+            authUseCase: authUseCase,
+            disposeBag: disposeBag
         ) { [weak self] authedPhoneNumber in
                 // 🚀 상태추적 🚀
                 self?.stateObject.phoneNumber = authedPhoneNumber
@@ -119,7 +118,7 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
             }
             .asDriver(onErrorJustReturn: ())
         
-        let registerFailure = registerValidation
+        let failureAlert = registerValidation
             .compactMap { $0.error }
             .map { error in
                 print("❌ 회원가입 실패 \n 에러내용: \(error.message)")
@@ -129,19 +128,9 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
                 )
             }
         
-        // 이미 alert드라이버가 존재할 경우 merge
-        var newAlertDrvier: Observable<DefaultAlertContentVO>!
-        if let alertDrvier = output.alert {
-            newAlertDrvier = Observable
-                .merge(
-                    alertDrvier.asObservable(),
-                    registerFailure
-                )
-        } else {
-            newAlertDrvier = registerFailure
-        }
-        output
-            .alert = newAlertDrvier.asDriver(onErrorJustReturn: .default)
+        failureAlert
+            .subscribe(self.alert)
+            .disposed(by: disposeBag)
     }
 }
 
@@ -185,7 +174,9 @@ extension WorkerRegisterViewModel {
         
         // 주소 입력
         public var addressInformation: PublishRelay<AddressInformation> = .init()
-//        public var editingDetailAddress: PublishRelay<String?> = .init()
+        
+        // Alert
+        public var alert: PublishSubject<DefaultAlertContentVO> = .init()
     }
     
     public class Output {
@@ -207,9 +198,6 @@ extension WorkerRegisterViewModel {
         
         // 요양보호사 로그인 성공 여부
         public var loginValidation: Driver<Void>?
-        
-        // Alert
-        public var alert: Driver<DefaultAlertContentVO>?
     }
 }
 

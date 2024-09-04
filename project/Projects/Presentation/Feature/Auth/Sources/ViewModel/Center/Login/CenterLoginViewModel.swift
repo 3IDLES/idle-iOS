@@ -22,8 +22,6 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
     public var input: Input = .init()
     public var output: Output = .init()
     
-    let disposeBag = DisposeBag()
-    
     public init(coordinator: CenterLoginCoordinator?, authUseCase: AuthUseCase) {
         self.coordinator = coordinator
         self.authUseCase = authUseCase
@@ -79,14 +77,15 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
         
         
         // MARK: BaseViewModel
-        alert = loginFailure
+        loginFailure
             .map { error in
                 DefaultAlertContentVO(
                     title: "로그인 실패",
                     message: error.message
                 )
             }
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(alert)
+            .disposed(by: disposeBag)
     }
     
     deinit {

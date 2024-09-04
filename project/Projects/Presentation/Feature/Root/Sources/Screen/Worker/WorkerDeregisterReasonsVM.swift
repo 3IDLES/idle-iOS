@@ -16,8 +16,6 @@ public class WorkerDeregisterReasonsVM: BaseViewModel, DeregisterReasonVMable {
     public var exitButonClicked: RxRelay.PublishRelay<Void> = .init()
     public var acceptDeregisterButonClicked: PublishRelay<[DeregisterReasonVO]> = .init()
     
-    let disposeBag = DisposeBag()
-    
     public init(coordinator: SelectReasonCoordinator) {
         self.coordinator = coordinator
         

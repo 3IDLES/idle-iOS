@@ -19,8 +19,8 @@ public protocol CustomerRequirementContentVMable {
     var dailySupportTypes: PublishRelay<(DailySupportType, Bool)> { get }
     var additionalRequirement: PublishRelay<String> { get }
     
-    var casting_customerRequirement: Driver<CustomerRequirementStateObject> { get }
-    var customerRequirementNextable: Driver<Bool> { get }
+    var casting_customerRequirement: Driver<CustomerRequirementStateObject>? { get }
+    var customerRequirementNextable: Driver<Bool>? { get }
 }
 
 public class CustomerRequirementContentView: UIView {
@@ -227,7 +227,7 @@ public class CustomerRequirementContentView: UIView {
         
         // Output, viewModel로 부터 전달받는 상태
         viewModel
-            .casting_customerRequirement
+            .casting_customerRequirement?
             .drive(onNext: { [weak self] stateFromVM in
                 
                 guard let self else { return }

@@ -50,8 +50,6 @@ public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
     public var pushNotificationApproveState: RxCocoa.Driver<Bool>?
     public var showSettingAlert: Driver<Void>?
     
-    let disposeBag = DisposeBag()
-    
     public init(
         coordinator: WorkerSettingScreenCoordinator?,
         settingUseCase: SettingScreenUseCase,
@@ -147,7 +145,7 @@ public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
         
         
         // MARK: Alert
-        alert = Observable.merge(
+        Observable.merge(
             approveRequestError.map { _ in "알람수신 동의 실패" },
             signOutFailure.map { $0.message }
         )
@@ -157,7 +155,8 @@ public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
                 message: message
             )
         })
-        .asDriver(onErrorJustReturn: .default)
+        .subscribe(alert)
+        .disposed(by: disposeBag)
     }
     
     public func createSingOutVM() -> any DSKit.IdleAlertViewModelable {

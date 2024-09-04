@@ -116,7 +116,7 @@ public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
         contentView.bind(viewModel: viewModel)
         
         viewModel
-            .applicationDetailViewNextable
+            .applicationDetailViewNextable?
             .drive(onNext: { [ctaButton] nextable in
                 ctaButton.setEnabled(nextable)
             })

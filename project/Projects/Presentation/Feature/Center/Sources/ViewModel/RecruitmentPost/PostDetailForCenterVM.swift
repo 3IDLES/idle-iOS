@@ -84,11 +84,11 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
     private let fetched_addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .init())
     
     // MARK: Casting
-    public var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>
-    public var casting_customerRequirement: Driver<CustomerRequirementStateObject>
-    public var casting_customerInformation: Driver<CustomerInformationStateObject>
-    public var casting_applicationDetail: Driver<ApplicationDetailStateObject>
-    public var casting_addressInput: Driver<AddressInputStateObject>
+    public var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>?
+    public var casting_customerRequirement: Driver<CustomerRequirementStateObject>?
+    public var casting_customerInformation: Driver<CustomerInformationStateObject>?
+    public var casting_applicationDetail: Driver<ApplicationDetailStateObject>?
+    public var casting_addressInput: Driver<AddressInputStateObject>?
     
     
     // MARK: 모든 섹션의 유효성 확인
@@ -103,8 +103,6 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
     
     // MARK: ETC
     public let applicantCountText: Driver<String>?
-    
-    let disposeBag = DisposeBag()
     
     init(
             postId: String,
@@ -231,7 +229,7 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
             .disposed(by: disposeBag)
         
         
-        self.alert = Observable
+        Observable
             .merge(removePostFailure, closePostFailure)
             .map { error in
                 DefaultAlertContentVO(
@@ -239,7 +237,8 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
                     message: error.message
                 )
             }
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(alert)
+            .disposed(by: disposeBag)
         
         
         // 요양보호사 화면으로 보기 버튼

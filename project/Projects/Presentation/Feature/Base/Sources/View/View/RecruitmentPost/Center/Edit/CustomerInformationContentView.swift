@@ -21,8 +21,8 @@ public protocol CustomerInformationContentVMable {
     var cognitionState: PublishRelay<CognitionDegree> { get }
     var deceaseDescription: PublishRelay<String> { get }
     
-    var casting_customerInformation: Driver<CustomerInformationStateObject> { get }
-    var customerInformationNextable: Driver<Bool> { get }
+    var casting_customerInformation: Driver<CustomerInformationStateObject>? { get }
+    var customerInformationNextable: Driver<Bool>? { get }
 }
 
 public class CustomerInformationContentView: UIView {
@@ -226,7 +226,7 @@ public class CustomerInformationContentView: UIView {
         
         // output
         viewModel
-            .casting_customerInformation
+            .casting_customerInformation?
             .drive(onNext: { [weak self] stateFromVM in
               
                 guard let self else { return }

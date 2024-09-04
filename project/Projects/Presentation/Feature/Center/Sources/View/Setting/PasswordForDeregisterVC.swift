@@ -164,14 +164,6 @@ public class PasswordForDeregisterVC: BaseViewController {
         navigationBar.backButton.rx.tap
             .bind(to: viewModel.backButtonClicked)
             .disposed(by: disposeBag)
-        
-        // Output
-        viewModel
-            .alert?
-            .drive(onNext: { [weak self] alertVO in
-                self?.showAlert(vo: alertVO)
-            })
-            .disposed(by: disposeBag)
     }
 }
 

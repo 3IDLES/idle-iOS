@@ -108,13 +108,6 @@ public class WorkerPagablePostBoardVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
-        viewModel
-            .alert?
-            .drive(onNext: { [weak self] alertVO in
-                self?.showAlert(vo: alertVO)
-            })
-            .disposed(by: disposeBag)
-        
         // Input
         Observable
             .merge(self.rx.viewWillAppear.map { _ in () })
@@ -142,13 +135,6 @@ public class WorkerPagablePostBoardVC: BaseViewController {
                 if isRefreshed {
                     postTableView.setContentOffset(.zero, animated: false)
                 }
-            })
-            .disposed(by: disposeBag)
-        
-        viewModel
-            .alert?
-            .drive(onNext: { [weak self] alertVO in
-                self?.showAlert(vo: alertVO)
             })
             .disposed(by: disposeBag)
         

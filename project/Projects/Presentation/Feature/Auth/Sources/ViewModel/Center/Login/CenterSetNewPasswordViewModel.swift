@@ -54,7 +54,9 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
         AuthInOutStreamManager.validatePhoneNumberInOut(
                 input: input,
                 output: output,
-                useCase: inputValidationUseCase) { _ in }
+                useCase: inputValidationUseCase,
+                disposeBag: disposeBag
+        ) { _ in }
         
         changePasswordInOut()
     }
@@ -102,6 +104,9 @@ public extension CenterSetNewPasswordViewModel {
         
         // Change password
         public var changePasswordButtonClicked: PublishRelay<Void> = .init()
+        
+        // Alert
+        public var alert: PublishSubject<Entity.DefaultAlertContentVO> = .init()
     }
     
     class Output {
@@ -117,8 +122,6 @@ public extension CenterSetNewPasswordViewModel {
         
         // Change password
         public var changePasswordValidation: Driver<Bool>?
-        
-        public var alert: Driver<Entity.DefaultAlertContentVO>?
     }
 }
 

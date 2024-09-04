@@ -21,8 +21,6 @@ public class PasswordForDeregisterVM: BaseViewModel {
     
     let settingUseCase: SettingScreenUseCase
     
-    let disposeBag = DisposeBag()
-    
     public init(
         deregisterReasons: [DeregisterReasonVO],
         coordinator: PasswordForDeregisterCoordinator,
@@ -65,13 +63,14 @@ public class PasswordForDeregisterVM: BaseViewModel {
             })
             .disposed(by: disposeBag)
         
-        alert = deregisterFailure
+        deregisterFailure
             .map { error in
                 DefaultAlertContentVO(
                     title: "회원탈퇴 실패",
                     message: error.message
                 )
             }
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(alert)
+            .disposed(by: disposeBag)
     }
 }

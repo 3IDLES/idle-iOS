@@ -24,8 +24,6 @@ public class InitialScreenVM: BaseViewModel {
     let centerProfileUseCase: CenterProfileUseCase
     let userInfoLocalRepository: UserInfoLocalRepository
     
-    let disposeBag = DisposeBag()
-    
     public init(
             coordinator: RootCoorinatable?,
             workerProfileUseCase: WorkerProfileUseCase,

@@ -160,13 +160,6 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
          
         (viewControllerDict[.onGoingPost] as? OnGoingPostVC)?.bind(viewModel: viewModel)
         (viewControllerDict[.closedPost] as? ClosedPostVC)?.bind(viewModel: viewModel)
-        
-        viewModel
-            .alert?
-            .drive(onNext: { [weak self] alertVO in
-                self?.showAlert(vo: alertVO)
-            })
-            .disposed(by: disposeBag)
     }
 }
 
