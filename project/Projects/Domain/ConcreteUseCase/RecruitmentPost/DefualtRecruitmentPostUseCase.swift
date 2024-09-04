@@ -172,6 +172,14 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
     }
     
     public func applyToPost(postId: String, method: Entity.ApplyType) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
-        convert(task: repository.ApplyToPost(postId: postId, method: method))
+        convert(task: repository.applyToPost(postId: postId, method: method))
+    }
+    
+    public func addFavoritePost(postId: String, type: RecruitmentPostType) -> Single<Result<Void, DomainError>> {
+        convert(task: repository.addFavoritePost(postId: postId, type: type))
+    }
+    
+    public func removeFavoritePost(postId: String) -> Single<Result<Void, DomainError>> {
+        convert(task: repository.removePost(id: postId))
     }
 }

@@ -54,5 +54,11 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> Single<RecruitmentPostListForWorkerVO>
     
     /// 요양보호사가 인앱 공고에 지원합니다.
-    func ApplyToPost(postId: String, method: ApplyType) -> Single<Void>
+    func applyToPost(postId: String, method: ApplyType) -> Single<Void>
+    
+    /// 요양보호사 즐겨찾기 공고 추가
+    func addFavoritePost(postId: String, type: RecruitmentPostType) -> Single<Void>
+    
+    /// 요양보호사 즐겨찾기 공고 삭제
+    func removeFavoritePost(postId: String) -> Single<Void>
 }
