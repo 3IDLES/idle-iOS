@@ -42,10 +42,17 @@ public class IconWithColorStateButton: TappableUIView {
         
         super.init()
         
+        self.addSubview(imageView)
+        
         setAppearance()
     }
     
     required init?(coder: NSCoder) { fatalError() }
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        imageView.frame = .init(origin: .zero, size: self.bounds.size)
+    }
     
     private func setAppearance() {
         
