@@ -22,7 +22,13 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
     }
     
     public func getProfile(mode: ProfileMode) -> Single<Result<CenterProfileVO, DomainError>> {
-        convert(task: userProfileRepository.getCenterProfile(mode: mode))
+        
+        if let cachedProfile = userInfoLocalRepository.getCurrentCenterData() {
+            // 캐쉬된 데이터 전송
+            return .just(.success(cachedProfile))
+        }
+        
+        return convert(task: userProfileRepository.getCenterProfile(mode: mode))
     }
     
     public func updateProfile(phoneNumber: String?, introduction: String?, imageInfo: ImageUploadInfo?) -> Single<Result<Void, DomainError>> {

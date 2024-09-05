@@ -69,6 +69,7 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
     // Init
     public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
     public let recruitmentPostUseCase: RecruitmentPostUseCase
+    public let workerProfileUseCase: WorkerProfileUseCase
     
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
@@ -81,11 +82,13 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
     
     public init(
         coordinator: WorkerRecruitmentBoardCoordinatable,
-        recruitmentPostUseCase: RecruitmentPostUseCase
+        recruitmentPostUseCase: RecruitmentPostUseCase,
+        workerProfileUseCase: WorkerProfileUseCase
         )
     {
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
+        self.workerProfileUseCase = workerProfileUseCase
         
         super.init()
         
@@ -94,9 +97,10 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
         
         // MARK: 상단 위치정보 불러오기
         workerLocationTitleText = requestWorkerLocation
-            .compactMap { [weak self] _ in
-                self?.fetchWorkerLocation()
+            .flatMap { [workerProfileUseCase] _ in
+                workerProfileUseCase.getProfile(mode: .myProfile)
             }
+            .map(<#T##transform: (Result<WorkerProfileVO, DomainError>) throws -> Result##(Result<WorkerProfileVO, DomainError>) throws -> Result#>)
             .asDriver(onErrorJustReturn: "위치정보확인불가")
         
         // MARK: 지원하기
@@ -283,7 +287,7 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
     
     /// Test
     func fetchWorkerLocation() -> String {
-        "서울시 영등포구"
+        workerProfileUseCase.getProfile(mode: .myProfile)
     }
 }
 
