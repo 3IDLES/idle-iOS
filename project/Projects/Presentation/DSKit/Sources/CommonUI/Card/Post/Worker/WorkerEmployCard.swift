@@ -13,10 +13,8 @@ import Entity
 public class WorkerNativeEmployCardRO {
     
     let showBiginnerTag: Bool
-    let showDayLeftTag: Bool
-    let dayLeftTagText: String?
     let titleText: String
-    let distanceFromWorkPlaceText: String
+    let timeDurationForWalkingText: String
     let targetInfoText: String
     let workDaysText: String
     let workTimeText: String
@@ -25,10 +23,8 @@ public class WorkerNativeEmployCardRO {
     
     init(
         showBiginnerTag: Bool,
-        showDayLeftTag: Bool,
-        dayLeftTagText: String?,
         titleText: String,
-        distanceFromWorkPlaceText: String,
+        timeDurationForWalkingText: String,
         targetInfoText: String,
         workDaysText: String,
         workTimeText: String,
@@ -36,10 +32,8 @@ public class WorkerNativeEmployCardRO {
         isFavorite: Bool
     ) {
         self.showBiginnerTag = showBiginnerTag
-        self.showDayLeftTag = showDayLeftTag
-        self.dayLeftTagText = dayLeftTagText
         self.titleText = titleText
-        self.distanceFromWorkPlaceText = distanceFromWorkPlaceText
+        self.timeDurationForWalkingText = timeDurationForWalkingText
         self.targetInfoText = targetInfoText
         self.workDaysText = workDaysText
         self.workTimeText = workTimeText
@@ -49,13 +43,13 @@ public class WorkerNativeEmployCardRO {
     
     public static func create(vo: WorkerNativeEmployCardVO) -> WorkerNativeEmployCardRO {
 
-        var dayLeftTagText: String? = nil
-        var showDayLeftTag: Bool = false
-        
-        if (0...14).contains(vo.dayLeft) {
-            showDayLeftTag = true
-            dayLeftTagText = vo.dayLeft == 0 ? "D-Day" : "D-\(vo.dayLeft)"
-        }
+//        var dayLeftTagText: String? = nil
+//        var showDayLeftTag: Bool = false
+//        
+//        if (0...14).contains(vo.dayLeft) {
+//            showDayLeftTag = true
+//            dayLeftTagText = vo.dayLeft == 0 ? "D-Day" : "D-\(vo.dayLeft)"
+//        }
        
         let targetInfoText = "\(vo.careGrade.textForCellBtn)등급 \(vo.targetAge)세 \(vo.targetGender.twoLetterKoreanWord)"
         
@@ -83,19 +77,12 @@ public class WorkerNativeEmployCardRO {
         let addressTitle = splittedAddress.joined(separator: " ")
         
         // distance는 미터단위입니다.
-        var distanceText: String = "\(vo.distanceFromWorkPlace)m"
-
-        if vo.distanceFromWorkPlace >= 1000 {
-            let kilometers = Double(vo.distanceFromWorkPlace)/1000.0
-            distanceText = String(format: "%.1fkm", kilometers)
-        }
+        let durationText = Self.timeForDistance(meter: vo.distanceFromWorkPlace)
         
         return .init(
             showBiginnerTag: vo.isBeginnerPossible,
-            showDayLeftTag: showDayLeftTag,
-            dayLeftTagText: dayLeftTagText,
             titleText: addressTitle,
-            distanceFromWorkPlaceText: distanceText,
+            timeDurationForWalkingText: durationText,
             targetInfoText: targetInfoText,
             workDaysText: workDaysText,
             workTimeText: workTimeText,
@@ -106,16 +93,38 @@ public class WorkerNativeEmployCardRO {
     
     public static let `mock`: WorkerNativeEmployCardRO = .init(
         showBiginnerTag: true,
-        showDayLeftTag: true,
-        dayLeftTagText: "D-14",
         titleText: "사울시 강남동",
-        distanceFromWorkPlaceText: "1.1km",
+        timeDurationForWalkingText: "도보 15분 ~ 20분",
         targetInfoText: "1등급 54세 여성",
         workDaysText: "",
         workTimeText: "월, 화, 수",
         payText: "시급 5000원",
         isFavorite: true
     )
+    
+    static func timeForDistance(meter: Int) -> String {
+        switch meter {
+        case 0..<200:
+            return "도보 5분 이내"
+        case 200..<400:
+            return "도보 5 ~ 10분"
+        case 400..<700:
+            return "도보 10 ~ 15분"
+        case 700..<1000:
+            return "도보 15 ~ 20분"
+        case 1000..<1250:
+            return "도보 20 ~ 25분"
+        case 1250..<1500:
+            return "도보 25 ~ 30분"
+        case 1500..<1750:
+            return "도보 30 ~ 35분"
+        case 1750..<2000:
+            return "도보 35 ~ 40분"
+        default:
+            return "도보 40분 ~"
+        }
+    }
+
 }
 
 
@@ -140,12 +149,12 @@ public class WorkerEmployCard: UIView {
         )
         return tag
     }()
-    let dayLeftTag: TagLabel = {
+    let timeDurationForWorkingTag: TagLabel = {
         let tag = TagLabel(
             text: "",
             typography: .caption,
             textColor: DSKitAsset.Colors.gray300.color,
-            backgroundColor: DSKitAsset.Colors.gray100.color
+            backgroundColor: DSKitAsset.Colors.gray050.color
         )
         return tag
     }()
@@ -199,7 +208,7 @@ public class WorkerEmployCard: UIView {
         let tagStack = HStack(
             [
                 beginnerTag,
-                dayLeftTag
+                timeDurationForWorkingTag
             ],
             spacing: 4
         )
@@ -345,10 +354,8 @@ public class WorkerEmployCard: UIView {
     
     public func bind(ro: WorkerNativeEmployCardRO) {
         beginnerTag.isHidden = !ro.showBiginnerTag
-        dayLeftTag.isHidden = !ro.showDayLeftTag
-        dayLeftTag.textString = ro.dayLeftTagText ?? ""
+        timeDurationForWorkingTag.textString = ro.timeDurationForWalkingText
         titleLabel.textString = ro.titleText
-        distanceFromWorkPlaceLabel.textString = ro.distanceFromWorkPlaceText
         serviceTargetInfoLabel.textString = ro.targetInfoText
         workDaysLabel.textString = ro.workDaysText
         workTimeLabel.textString = ro.workTimeText
