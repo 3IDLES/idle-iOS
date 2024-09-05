@@ -197,7 +197,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                 getPostDetailFailureAlert,
                 applyRequestFailureAlert
             )
-            .subscribe(alert)
+            .subscribe(self.alert)
             .disposed(by: disposeBag)
         
         

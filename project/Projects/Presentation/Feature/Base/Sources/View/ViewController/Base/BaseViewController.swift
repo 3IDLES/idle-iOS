@@ -60,6 +60,9 @@ open class BaseViewController: UIViewController {
 public extension BaseViewController {
     
     func showAlert(vo: DefaultAlertContentVO, onClose: (() -> ())? = nil) {
+        
+        guard let _ = self.parent else { return }
+        
         let alert = UIAlertController(
             title: vo.title,
             message: vo.message,
@@ -86,6 +89,8 @@ public extension BaseViewController {
 public extension BaseViewController {
     
     func showDefaultLoadingScreen() {
+        
+        guard let _ = self.parent else { return }
         
         let vc = DefaultLoadingVC()
         loadingVC = vc

@@ -14,7 +14,6 @@ public enum IdleInfoPlist {
             "NSAllowsArbitraryLoads" : true
         ],
         "UILaunchStoryboardName": "LaunchScreen.storyboard",
-        "CFBundleDisplayName" : "$(BUNDLE_DISPLAY_NAME)",
         "UIApplicationSceneManifest": [
             "UIApplicationSupportsMultipleScenes": false,
             "UISceneConfigurations": [

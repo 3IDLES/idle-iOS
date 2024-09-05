@@ -21,6 +21,7 @@ let project = Project(
             name: "Idle-iOS",
             destinations: DeploymentSettings.platform,
             product: .app,
+            productName: DeploymentSettings.productDisplayName,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             infoPlist: IdleInfoPlist.appDefault,
