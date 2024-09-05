@@ -156,8 +156,8 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
     
     public func bind(viewModel: CenterRecruitmentPostBoardViewModelable) {
         
-        self.viewModel = viewModel
-         
+        super.bind(viewModel: viewModel)
+    
         (viewControllerDict[.onGoingPost] as? OnGoingPostVC)?.bind(viewModel: viewModel)
         (viewControllerDict[.closedPost] as? ClosedPostVC)?.bind(viewModel: viewModel)
     }

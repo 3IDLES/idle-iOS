@@ -40,19 +40,21 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
         super.init()
         
         let requestOngoingPostResult = requestOngoingPost
-            .map({ [weak self]_ in
+            .flatMap { [weak self, recruitmentPostUseCase] _ in
+                
                 // 로딩 시작
                 self?.showLoading.onNext(())
-            })
-            .flatMap { [recruitmentPostUseCase] _ in
-                recruitmentPostUseCase
+                
+                return recruitmentPostUseCase
                     .getOngoingPosts()
             }
             .share()
         
         requestOngoingPostResult
+            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .subscribe (onNext: { [weak self] _ in
-                self?.dismissLoading.onNext(())
+                self?.dismissLoading
+                    .onNext(())
             })
             .disposed(by: disposeBag)
         
@@ -64,11 +66,23 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
             
         
         let requestClosedPostResult = requestClosedPost
-            .flatMap { [recruitmentPostUseCase] _ in
-                recruitmentPostUseCase
+            .flatMap { [weak self, recruitmentPostUseCase] _ in
+                
+                // 로딩 시작
+                self?.showLoading.onNext(())
+                
+                return recruitmentPostUseCase
                     .getClosedPosts()
             }
             .share()
+        
+        requestClosedPostResult
+            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
+            .subscribe (onNext: { [weak self] _ in
+                self?.dismissLoading
+                    .onNext(())
+            })
+            .disposed(by: disposeBag)
         
         let requestClosedPostSuccess = requestClosedPostResult.compactMap { $0.value }
         let requestClosedPostFailure = requestClosedPostResult.compactMap { $0.error }

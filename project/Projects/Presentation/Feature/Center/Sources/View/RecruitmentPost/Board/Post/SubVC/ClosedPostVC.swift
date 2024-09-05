@@ -89,7 +89,8 @@ public class ClosedPostVC: BaseViewController {
     
     public func bind(viewModel: ClosedPostViewModelable) {
         
-        super.bind(viewModel: viewModel)
+        // 다수의 화면이 하나의 ViewModel을 공유하는 특수한 경우
+        self.viewModel = viewModel
         
         // Output
         viewModel
