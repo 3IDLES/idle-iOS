@@ -50,7 +50,7 @@ let project = Project(
             name: "IdleAppTests",
             destinations: DeploymentSettings.platform,
             product: .unitTests,
-            bundleId: "com.idle-application.test",
+            bundleId: "com.idleApplication.test",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Tests/**"],
             dependencies: [.target(name: "Idle-iOS")]

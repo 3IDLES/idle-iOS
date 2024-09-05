@@ -7,8 +7,6 @@
 
 import UIKit
 import AuthFeature
-import ConcreteUseCase
-import ConcreteRepository
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
