@@ -100,8 +100,18 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
             .flatMap { [workerProfileUseCase] _ in
                 workerProfileUseCase.getProfile(mode: .myProfile)
             }
-            .map(<#T##transform: (Result<WorkerProfileVO, DomainError>) throws -> Result##(Result<WorkerProfileVO, DomainError>) throws -> Result#>)
-            .asDriver(onErrorJustReturn: "위치정보확인불가")
+            .map { [weak self] result in
+                switch result {
+                case .success(let profileVO):
+                    let address = profileVO.address.roadAddress
+                    let locationText = self?.convertStringToLessThan3Words(target: address)
+                    return locationText ?? "케어밋"
+                case .failure(let error):
+                    printIfDebug("프로필 불러오기 실패", error.message)
+                    return "케어밋"
+                }
+            }
+            .asDriver(onErrorJustReturn: "케어밋")
         
         // MARK: 지원하기
         let applyRequest: PublishRelay<String> = .init()
@@ -285,9 +295,17 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
             .disposed(by: dispostBag)
     }
     
-    /// Test
-    func fetchWorkerLocation() -> String {
-        workerProfileUseCase.getProfile(mode: .myProfile)
+    func convertStringToLessThan3Words(target: String) -> String {
+        let splited = target.split(separator: " ")
+        var resultParts: [String] = []
+        for (index, part) in splited.enumerated() {
+            
+            if index >= 3 { break }
+            
+            let current = String(part)
+            resultParts.append(current)
+        }
+        return resultParts.joined(separator: " ")
     }
 }
 
