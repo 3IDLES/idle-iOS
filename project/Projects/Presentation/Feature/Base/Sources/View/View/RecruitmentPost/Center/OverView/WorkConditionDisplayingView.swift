@@ -37,8 +37,9 @@ public class WorkConditionDisplayingView: HStack {
     
     public init() {
         super.init(
-            [keyStack, valueStack, Spacer()],
-            spacing: 32
+            [keyStack, valueStack],
+            spacing: 32,
+            distribution: .fill
         )
         setAppearance()
         setLayout()
