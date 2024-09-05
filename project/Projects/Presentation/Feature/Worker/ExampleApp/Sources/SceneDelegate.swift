@@ -6,10 +6,7 @@
 //
 
 import UIKit
-import ConcreteUseCase
-import ConcreteRepository
 import WorkerFeature
-import DataSource
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -24,24 +21,4 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = WorkerSettingVC()
         window?.makeKeyAndVisible()
     }
-}
-
-
-class TestStore: KeyValueStore {
-    func save(key: String, value: String) throws {
-        UserDefaults.standard.setValue(value, forKey: key)
-    }
-    
-    func get(key: String) -> String? {
-        UserDefaults.standard.string(forKey: key)
-    }
-    
-    func delete(key: String) throws {
-        
-    }
-    
-    func removeAll() throws {
-        
-    }
-    
 }

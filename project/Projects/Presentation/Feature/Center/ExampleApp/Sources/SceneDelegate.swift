@@ -7,8 +7,6 @@
 
 import UIKit
 import CenterFeature
-import ConcreteUseCase
-import ConcreteRepository
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -19,13 +17,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
         
         window = UIWindow(windowScene: windowScene)
-        
-        let store = TestStore()
-        
-        try! store.saveAuthToken(
-            accessToken: "",
-            refreshToken: ""
-        )
         
 //        let useCase = DefaultCenterProfileUseCase(
 //            repository: DefaultUserProfileRepository(store)
