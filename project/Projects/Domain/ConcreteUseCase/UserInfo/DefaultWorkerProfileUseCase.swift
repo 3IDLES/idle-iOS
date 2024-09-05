@@ -22,7 +22,13 @@ public class DefaultWorkerProfileUseCase: WorkerProfileUseCase {
     }
     
     public func getProfile(mode: ProfileMode) -> Single<Result<WorkerProfileVO, DomainError>> {
-        convert(task: userProfileRepository.getWorkerProfile(mode: mode))
+        
+        if let cachedProfile = userInfoLocalRepository.getCurrentWorkerData() {
+            // Cache된 정보가 있는 경우 해당 값을 전달
+            return .just(.success(cachedProfile))
+        }
+        
+        return convert(task: userProfileRepository.getWorkerProfile(mode: mode))
     }
     
     public func updateProfile(stateObject: WorkerProfileStateObject, imageInfo: ImageUploadInfo?) -> Single<Result<Void, DomainError>> {
