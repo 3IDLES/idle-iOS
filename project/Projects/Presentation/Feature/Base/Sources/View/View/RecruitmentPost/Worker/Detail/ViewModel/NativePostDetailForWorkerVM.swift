@@ -269,7 +269,8 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                 }
                 .asObservable()
                 .subscribe(onNext: { [weak self] alertVO in
-                    self?.alert.onNext(alertVO)
+                    guard let self else { return }
+                    alert.onNext(alertVO)
                 })
                 
             	

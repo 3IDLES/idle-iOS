@@ -40,6 +40,7 @@ public protocol CenterProfileInputable {
 }
 
 public protocol CenterProfileOutputable {
+    var navigationBarTitle: String { get }
     var centerName: Driver<String> { get }
     var centerLocation: Driver<String> { get }
     var centerPhoneNumber: Driver<String> { get }
@@ -269,7 +270,10 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             })
             .disposed(by: disposeBag)
         
+        let navigationBarTitle = (mode == .myProfile ? "내 센터 정보" : "센터 정보")
+        
         self.output = .init(
+            navigationBarTitle: navigationBarTitle,
             centerName: centerNameDriver,
             centerLocation: centerAddressDriver,
             centerPhoneNumber: centerPhoneNumberDriver,
@@ -306,6 +310,7 @@ public extension CenterProfileViewModel {
     
     class Output: CenterProfileOutputable {
         // 기본 데이터
+        public let navigationBarTitle: String
         public var centerName: Driver<String>
         public var centerLocation: Driver<String>
         public var centerPhoneNumber: Driver<String>
@@ -318,7 +323,17 @@ public extension CenterProfileViewModel {
         // 요구사항 X
         public var editingValidation: Driver<Void>
         
-        init(centerName: Driver<String>, centerLocation: Driver<String>, centerPhoneNumber: Driver<String>, centerIntroduction: Driver<String>, displayingImage: Driver<UIImage?>, isEditingMode: Driver<Bool>, editingValidation: Driver<Void>) {
+        init(
+            navigationBarTitle: String,
+            centerName: Driver<String>,
+            centerLocation: Driver<String>,
+            centerPhoneNumber: Driver<String>,
+            centerIntroduction: Driver<String>,
+            displayingImage: Driver<UIImage?>,
+            isEditingMode: Driver<Bool>,
+            editingValidation: Driver<Void>
+        ) {
+            self.navigationBarTitle = navigationBarTitle
             self.centerName = centerName
             self.centerLocation = centerLocation
             self.centerPhoneNumber = centerPhoneNumber

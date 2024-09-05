@@ -15,8 +15,9 @@ import BaseFeature
 
 public class CenterProfileViewController: BaseViewController {
     
-    let navigationBar: NavigationBarType1 = {
-        let bar = NavigationBarType1(navigationTitle: "내 센터 정보")
+    // View
+    lazy var navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(innerViews: [profileEditButton, editingCompleteButton])
         return bar
     }()
     
@@ -27,7 +28,15 @@ public class CenterProfileViewController: BaseViewController {
         return btn
     }()
     
-    // View
+    let profileEditButton: TextButtonType2 = {
+        let button = TextButtonType2(labelText: "수정하기")
+        
+        button.label.typography = .Body3
+        button.label.attrTextColor = DSKitAsset.Colors.gray300.color
+        button.layoutMargins = .init(top: 5.5, left:12, bottom: 5.5, right: 12)
+        button.layer.cornerRadius = 16
+        return button
+    }()
     
     /// Center name label
     let centerNameLabel: IdleLabel = {
@@ -48,16 +57,7 @@ public class CenterProfileViewController: BaseViewController {
         label.textString = "센터 상세 정보"
         return label
     }()
-    let profileEditButton: TextButtonType2 = {
-        let button = TextButtonType2(labelText: "수정하기")
-        
-        button.label.typography = .Body3
-        button.label.attrTextColor = DSKitAsset.Colors.gray300.color
-        button.layoutMargins = .init(top: 5.5, left:12, bottom: 5.5, right: 12)
-        button.layer.cornerRadius = 16
-        return button
-    }()
-    
+
     /// ☑️ "전화번호" 라벨 ☑️
     let centerPhoneNumeberTitleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
@@ -134,26 +134,6 @@ public class CenterProfileViewController: BaseViewController {
     
     func setAutoLayout() {
         
-        // 상단 네비게이션바 세팅
-        let navigationStack = HStack([
-            navigationBar,
-            editingCompleteButton,
-        ])
-        navigationStack.distribution = .equalSpacing
-        navigationStack.backgroundColor = .white
-        
-        let navigationStackBackground = UIView()
-        navigationStackBackground.addSubview(navigationStack)
-        navigationStack.translatesAutoresizingMaskIntoConstraints = false
-        navigationStackBackground.backgroundColor = .white
-        navigationStackBackground.layoutMargins = .init(top: 0, left: 12, bottom: 0, right: 28)
-        NSLayoutConstraint.activate([
-            navigationStack.topAnchor.constraint(equalTo: navigationStackBackground.layoutMarginsGuide.topAnchor),
-            navigationStack.leadingAnchor.constraint(equalTo: navigationStackBackground.layoutMarginsGuide.leadingAnchor),
-            navigationStack.trailingAnchor.constraint(equalTo: navigationStackBackground.layoutMarginsGuide.trailingAnchor),
-            navigationStack.bottomAnchor.constraint(equalTo: navigationStackBackground.layoutMarginsGuide.bottomAnchor),
-        ])
-        
         let locationIcon = UIImageView.locationMark
         locationIcon.tintColor = DSColor.gray700.color
         
@@ -198,7 +178,6 @@ public class CenterProfileViewController: BaseViewController {
             divider,
             
             centerDetailLabel,
-            profileEditButton,
             
             centerPhoneNumberStack,
             
@@ -212,23 +191,20 @@ public class CenterProfileViewController: BaseViewController {
         }
         
         [
-            navigationStackBackground,
+            navigationBar,
             scrollView
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
-        // view 서브뷰 zindex설정
-        navigationStackBackground.layer.zPosition = 1
-        scrollView.layer.zPosition = 0
         
         // 전체 뷰
         NSLayoutConstraint.activate([
-            navigationStackBackground.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navigationStackBackground.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            navigationStackBackground.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            navigationBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             
-            scrollView.topAnchor.constraint(equalTo: navigationStackBackground.bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -262,9 +238,6 @@ public class CenterProfileViewController: BaseViewController {
             
             centerDetailLabel.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 24),
             centerDetailLabel.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor),
-            
-            profileEditButton.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 24),
-            profileEditButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor),
             
             centerPhoneNumberStack.topAnchor.constraint(equalTo: centerDetailLabel.bottomAnchor, constant: 20),
             centerPhoneNumberStack.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor),
@@ -334,12 +307,15 @@ public class CenterProfileViewController: BaseViewController {
         }
         
         navigationBar
-            .eventPublisher
+            .backButton
+            .rx.tap
             .bind(to: input.exitButtonClicked)
             .disposed(by: disposeBag)
         
         // output
         guard let output = viewModel.output else { fatalError() }
+        
+        navigationBar.titleLabel.textString = output.navigationBarTitle
         
         output
             .centerName
