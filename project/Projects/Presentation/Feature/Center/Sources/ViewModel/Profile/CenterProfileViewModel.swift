@@ -19,12 +19,7 @@ struct ChangeCenterInformation {
     let image: UIImage?
 }
 
-public protocol CenterProfileViewModelable: BaseViewModel where Input: CenterProfileInputable, Output: CenterProfileOutputable {
-    associatedtype Input
-    associatedtype Output
-    var input: Input { get }
-    var output: Output? { get }
-    
+public protocol CenterProfileViewModelable: BaseViewModel, CenterProfileInputable & CenterProfileOutputable {
     var profileMode: ProfileMode { get }
 }
 
@@ -41,13 +36,13 @@ public protocol CenterProfileInputable {
 
 public protocol CenterProfileOutputable {
     var navigationBarTitle: String { get }
-    var centerName: Driver<String> { get }
-    var centerLocation: Driver<String> { get }
-    var centerPhoneNumber: Driver<String> { get }
-    var centerIntroduction: Driver<String> { get }
-    var displayingImage: Driver<UIImage?> { get }
-    var isEditingMode: Driver<Bool> { get }
-    var editingValidation: Driver<Void> { get }
+    var centerName: Driver<String>? { get }
+    var centerLocation: Driver<String>? { get }
+    var centerPhoneNumber: Driver<String>? { get }
+    var centerIntroduction: Driver<String>? { get }
+    var displayingImage: Driver<UIImage?>? { get }
+    var isEditingMode: Driver<Bool>? { get }
+    var editingValidation: Driver<Void>? { get }
 }
 
 
@@ -55,9 +50,6 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
     let profileUseCase: CenterProfileUseCase
     weak var coordinator: CenterProfileCoordinator?
-    
-    public var input: Input
-    public var output: Output? = nil
     
     public let profileMode: ProfileMode
     
@@ -67,10 +59,33 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
     private var editingImageInfo: ImageUploadInfo?
     
+    
+    public var readyToFetch: PublishRelay<Void> = .init()
+    public var editingButtonPressed: PublishRelay<Void> = .init()
+    public var editingFinishButtonPressed: PublishRelay<Void> = .init()
+    public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
+    public var editingInstruction: BehaviorRelay<String> = .init(value: "")
+    public var selectedImage: PublishRelay<UIImage> = .init()
+    public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    
+    // 기본 데이터
+    public let navigationBarTitle: String
+    public var centerName: Driver<String>?
+    public var centerLocation: Driver<String>?
+    public var centerPhoneNumber: Driver<String>?
+    public var centerIntroduction: Driver<String>?
+    public var displayingImage: Driver<UIImage?>?
+    
+    // 수정 상태 여부
+    public var isEditingMode: Driver<Bool>?
+    
+    // 요구사항 X
+    public var editingValidation: Driver<Void>?
+    
     func checkModification() -> (String?, String?, ImageUploadInfo?) {
         
-        let phoneNumber = input.editingPhoneNumber.value
-        let instruction = input.editingInstruction.value
+        let phoneNumber = editingPhoneNumber.value
+        let instruction = editingInstruction.value
         
         return (
             phoneNumber == fetchedPhoneNumber ? nil : phoneNumber,
@@ -89,13 +104,13 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         self.coordinator = coordinator
         self.profileUseCase = useCase
         
-        self.input = Input()
+        let navigationBarTitle = (mode == .myProfile ? "내 센터 정보" : "센터 정보")
+        self.navigationBarTitle = navigationBarTitle
         
         super.init()
         
         // MARK: fetch from server
-        let profileRequestResult = input
-            .readyToFetch
+        let profileRequestResult = readyToFetch
             .flatMap { [profileMode, profileUseCase] _ in
                 profileUseCase.getProfile(mode: profileMode)
             }
@@ -153,8 +168,7 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             })
         
         // MARK: image validation
-        let imageValidationResult = input
-            .selectedImage
+        let imageValidationResult = selectedImage
             .map { [unowned self] image -> UIImage? in
                 guard let imageInfo = self.validateSelectedImage(image: image) else { return nil }
                 printIfDebug("✅ 업로드 가능한 이미지 타입 \(imageInfo.ext)")
@@ -181,12 +195,11 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         
         
         // 최신 값들 + 버튼이 눌릴 경우 변경 로직이 실행된다.
-        let editingRequestResult = input
-            .editingFinishButtonPressed
+        let editingRequestResult = editingFinishButtonPressed
             .map({ [unowned self] _ in
                 checkModification()
             })
-            .flatMap { [useCase, input] (inputs) in
+            .flatMap { [useCase, editingPhoneNumber] (inputs) in
                 
                 let (phoneNumber, introduction, imageInfo) = inputs
                 
@@ -197,7 +210,7 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
                 
                 // 전화번호는 무조건 포함시켜야 함으로 아래와 같이 포함합니다.
                 return useCase.updateProfile(
-                    phoneNumber: phoneNumber ?? input.editingPhoneNumber.value,
+                    phoneNumber: phoneNumber ?? editingPhoneNumber.value,
                     introduction: introduction,
                     imageInfo: imageInfo
                 )
@@ -206,12 +219,12 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         
         let editingValidation = editingRequestResult
             .compactMap { $0.value }
-            .map { [input] info in
+            .map { [readyToFetch] info in
                 
                 printIfDebug("✅ 정보가 성공적으로 업데이트됨")
                 
                 // 업데이트된 정보 요청
-                input.readyToFetch.accept(())
+                readyToFetch.accept(())
                 
                 return ()
             }
@@ -235,8 +248,8 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         
         let buttonPress = Observable
             .merge(
-                input.editingButtonPressed.map { Mode.editing },
-                input.editingFinishButtonPressed.map { Mode.display }
+                editingButtonPressed.map { Mode.editing },
+                editingFinishButtonPressed.map { Mode.display }
             )
             .map { mode in
                 switch mode {
@@ -254,34 +267,29 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             )
             .asDriver(onErrorJustReturn: false)
         
-        
-        let alertDriver = Observable
+        Observable
             .merge(
                 profileRequestFailure,
                 editingRequestFailure,
                 imageValidationFailure
             )
-            .asDriver(onErrorJustReturn: .default)
+            .subscribe(self.alert)
+            .disposed(by: disposeBag)
             
         // MARK: Exit Button
-            input.exitButtonClicked
+        exitButtonClicked
             .subscribe(onNext: { [weak self] _ in
                 self?.coordinator?.coordinatorDidFinish()
             })
             .disposed(by: disposeBag)
         
-        let navigationBarTitle = (mode == .myProfile ? "내 센터 정보" : "센터 정보")
-        
-        self.output = .init(
-            navigationBarTitle: navigationBarTitle,
-            centerName: centerNameDriver,
-            centerLocation: centerAddressDriver,
-            centerPhoneNumber: centerPhoneNumberDriver,
-            centerIntroduction: centerIntroductionDriver,
-            displayingImage: displayingImageDriver,
-            isEditingMode: isEditingMode,
-            editingValidation: editingValidation
-        )
+        self.centerName = centerNameDriver
+        self.centerLocation = centerAddressDriver
+        self.centerPhoneNumber = centerPhoneNumberDriver
+        self.centerIntroduction = centerIntroductionDriver
+        self.displayingImage = displayingImageDriver
+        self.isEditingMode = isEditingMode
+        self.editingValidation = editingValidation
     }
     
     func validateSelectedImage(image: UIImage) -> ImageUploadInfo? {
@@ -291,56 +299,5 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             return .init(data: jpegData, ext: "JPEG")
         }
         return nil
-    }
-}
-
-
-public extension CenterProfileViewModel {
-    
-    class Input: CenterProfileInputable {
-        // ViewController에서 받아오는 데이터
-        public var readyToFetch: PublishRelay<Void> = .init()
-        public var editingButtonPressed: PublishRelay<Void> = .init()
-        public var editingFinishButtonPressed: PublishRelay<Void> = .init()
-        public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
-        public var editingInstruction: BehaviorRelay<String> = .init(value: "")
-        public var selectedImage: PublishRelay<UIImage> = .init()
-        public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    }
-    
-    class Output: CenterProfileOutputable {
-        // 기본 데이터
-        public let navigationBarTitle: String
-        public var centerName: Driver<String>
-        public var centerLocation: Driver<String>
-        public var centerPhoneNumber: Driver<String>
-        public var centerIntroduction: Driver<String>
-        public var displayingImage: Driver<UIImage?>
-        
-        // 수정 상태 여부
-        public var isEditingMode: Driver<Bool>
-        
-        // 요구사항 X
-        public var editingValidation: Driver<Void>
-        
-        init(
-            navigationBarTitle: String,
-            centerName: Driver<String>,
-            centerLocation: Driver<String>,
-            centerPhoneNumber: Driver<String>,
-            centerIntroduction: Driver<String>,
-            displayingImage: Driver<UIImage?>,
-            isEditingMode: Driver<Bool>,
-            editingValidation: Driver<Void>
-        ) {
-            self.navigationBarTitle = navigationBarTitle
-            self.centerName = centerName
-            self.centerLocation = centerLocation
-            self.centerPhoneNumber = centerPhoneNumber
-            self.centerIntroduction = centerIntroduction
-            self.displayingImage = displayingImage
-            self.isEditingMode = isEditingMode
-            self.editingValidation = editingValidation
-        }
     }
 }
