@@ -263,17 +263,16 @@ public class CenterProfileViewController: BaseViewController {
     
     }
     
-    public func bind(viewModel: any CenterProfileViewModelable) {
+    public func bind(viewModel: CenterProfileViewModelable) {
         
         super.bind(viewModel: viewModel)
         
         // input
-        let input = viewModel.input
         
         let bindFinished = PublishRelay<Void>()
         
         bindFinished
-            .bind(to: input.readyToFetch)
+            .bind(to: viewModel.readyToFetch)
             .disposed(by: disposeBag)
         
         // 내 센터보기 상태인 경우(수정가능한 프로필 상태)
@@ -281,88 +280,87 @@ public class CenterProfileViewController: BaseViewController {
             
             profileEditButton
                 .eventPublisher
-                .bind(to: input.editingButtonPressed)
+                .bind(to: viewModel.editingButtonPressed)
                 .disposed(by: disposeBag)
             
             editingCompleteButton
                 .eventPublisher
-                .bind(to: input.editingFinishButtonPressed)
+                .bind(to: viewModel.editingFinishButtonPressed)
                 .disposed(by: disposeBag)
             
             centerPhoneNumeberField.rx.text
                 .compactMap { $0 }
-                .bind(to: input.editingPhoneNumber)
+                .bind(to: viewModel.editingPhoneNumber)
                 .disposed(by: disposeBag)
             
             centerIntroductionField.rx.text
                 .compactMap { $0 }
-                .bind(to: input.editingInstruction)
+                .bind(to: viewModel.editingInstruction)
                 .disposed(by: disposeBag)
             
             centerImageView
                 .selectedImage
                 .compactMap { $0 }
-                .bind(to: input.selectedImage)
+                .bind(to: viewModel.selectedImage)
                 .disposed(by: disposeBag)
         }
         
         navigationBar
             .backButton
             .rx.tap
-            .bind(to: input.exitButtonClicked)
+            .bind(to: viewModel.exitButtonClicked)
             .disposed(by: disposeBag)
         
         // output
-        guard let output = viewModel.output else { fatalError() }
         
-        navigationBar.titleLabel.textString = output.navigationBarTitle
+        navigationBar.titleLabel.textString = viewModel.navigationBarTitle
         
-        output
-            .centerName
+        viewModel
+            .centerName?
             .drive(centerNameLabel.rx.textString)
             .disposed(by: disposeBag)
         
-        output
-            .centerLocation
+        viewModel
+            .centerLocation?
             .drive(centerLocationLabel.rx.textString)
             .disposed(by: disposeBag)
         
-        output
-            .centerPhoneNumber
+        viewModel
+            .centerPhoneNumber?
             .drive(centerPhoneNumeberLabel.rx.textString)
             .disposed(by: disposeBag)
-        output
-            .centerPhoneNumber
+        viewModel
+            .centerPhoneNumber?
             .drive(centerPhoneNumeberField.rx.textString)
             .disposed(by: disposeBag)
         
-        output
-            .centerIntroduction
+        viewModel
+            .centerIntroduction?
             .drive(centerIntroductionLabel.rx.textString)
             .disposed(by: disposeBag)
-        output
-            .centerIntroduction
+        viewModel
+            .centerIntroduction?
             .drive(centerIntroductionField.rx.textString)
             .disposed(by: disposeBag)
         
-        output
-            .displayingImage
+        viewModel
+            .displayingImage?
             .drive(centerImageView.displayingImage)
             .disposed(by: disposeBag)
         
         // MARK: Edit Mode
         if case .myProfile = viewModel.profileMode {
             
-            output
-                .isEditingMode
+            viewModel
+                .isEditingMode?
                 .map { isEditing -> ImageSelectView.State in
                     isEditing ? .editing : .normal
                 }
                 .drive(centerImageView.state)
                 .disposed(by: disposeBag)
             
-            output
-                .isEditingMode
+            viewModel
+                .isEditingMode?
                 .drive { [weak self] in
                     guard let self else { return }
                     
@@ -377,8 +375,8 @@ public class CenterProfileViewController: BaseViewController {
                 }
                 .disposed(by: disposeBag)
             
-            output
-                .editingValidation
+            viewModel
+                .editingValidation?
                 .drive { _ in
                     // do something when editing success
                 }
