@@ -265,12 +265,6 @@ public class WorkerProfileViewController: DisposableViewController {
             }
         }
         
-        // MARK: Divider
-        // 요양보호사 인적정보 / 요양보호사 구직정보 디바이더
-        let divider = UIView()
-        divider.backgroundColor = DSKitAsset.Colors.gray050.color
-        
-        
         // 요양보호사 구직정보
         let employeeInfoTitleLabel = IdleLabel(typography: .Subtitle1)
         employeeInfoTitleLabel.textString = "상세 정보"
@@ -304,13 +298,31 @@ public class WorkerProfileViewController: DisposableViewController {
             right: 20
         )
         
+        // MARK: Divider
+        // 요양보호사 인적정보 / 요양보호사 구직정보 디바이더
+        let divider = Spacer(height: 8)
+        divider.backgroundColor = DSKitAsset.Colors.gray050.color
+        
+        let contactButtonsAndDivider = VStack(
+            [
+                HStack([
+                    Spacer(width: 36),
+                    contactButtonContainer,
+                    Spacer(width: 36)
+                ]),
+                divider
+            ],
+            spacing: 24,
+            alignment: .fill
+        )
+        
         [
             grayBackgrounnd,
             profileImageContainer,
 //            starButton,
             tagNameStack,
             humanInfoStack,
-            VStack([contactButtonContainer, divider], spacing: 24, alignment: .fill),
+            contactButtonsAndDivider,
             employeeInfoTitleLabel,
             employeeInfoStack
             
@@ -342,16 +354,11 @@ public class WorkerProfileViewController: DisposableViewController {
             humanInfoStack.topAnchor.constraint(equalTo: tagNameStack.bottomAnchor, constant: 16),
             humanInfoStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
-            contactButtonContainer.topAnchor.constraint(equalTo: humanInfoStack.bottomAnchor, constant: 24),
-            contactButtonContainer.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-            contactButtonContainer.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
+            contactButtonsAndDivider.topAnchor.constraint(equalTo: humanInfoStack.bottomAnchor, constant: 24),
+            contactButtonsAndDivider.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+            contactButtonsAndDivider.rightAnchor.constraint(equalTo: contentView.rightAnchor),
             
-            divider.topAnchor.constraint(equalTo: contactButtonContainer.bottomAnchor, constant: 24),
-            divider.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            divider.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            divider.heightAnchor.constraint(equalToConstant: 8),
-            
-            employeeInfoTitleLabel.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 24),
+            employeeInfoTitleLabel.topAnchor.constraint(equalTo: contactButtonsAndDivider.bottomAnchor, constant: 24),
             employeeInfoTitleLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             
             employeeInfoStack.topAnchor.constraint(equalTo: employeeInfoTitleLabel.bottomAnchor, constant: 20),
