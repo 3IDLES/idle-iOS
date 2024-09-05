@@ -44,7 +44,8 @@ class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
         let vc = WorkerRecruitmentPostBoardVC()
         let vm = WorkerRecruitmentPostBoardVM(
             coordinator: self,
-            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
+            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self),
+            workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
         )
         vc.bind(viewModel: vm)
         viewControllerRef = vc
