@@ -290,7 +290,7 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
         
         Observable
             .merge(loadingEndObservables)
-            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
+            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .subscribe(self.dismissLoading)
             .disposed(by: dispostBag)
     }

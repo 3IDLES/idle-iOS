@@ -164,11 +164,6 @@ public class WorkerEmployCard: UIView {
         let label = IdleLabel(typography: .Subtitle2)
         return label
     }()
-    let distanceFromWorkPlaceLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Body3)
-        label.attrTextColor = DSKitAsset.Colors.gray500.color
-        return label
-    }()
     
     let serviceTargetInfoLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body2)
@@ -228,16 +223,6 @@ public class WorkerEmployCard: UIView {
             starButton.widthAnchor.constraint(equalToConstant: 24),
             starButton.heightAnchor.constraint(equalTo: starButton.widthAnchor),
         ])
-        
-        // MARK: Title & takenTimesForWalk
-        let titleStack = HStack(
-            [
-                titleLabel,
-                distanceFromWorkPlaceLabel
-            ],
-            spacing: 8,
-            alignment: .bottom
-        )
         
         let divider = UIView()
         divider.backgroundColor = DSKitAsset.Colors.gray300.color
@@ -310,7 +295,9 @@ public class WorkerEmployCard: UIView {
             tagStarStack,
             Spacer(height: 8),
             VStack(
-                [titleStack,serviceTargetInfoLabel],
+                [
+                    titleLabel, serviceTargetInfoLabel
+                ],
                 spacing: 2,
                 alignment: .leading
             ),
@@ -345,7 +332,6 @@ public class WorkerEmployCard: UIView {
     
     public func setToPostAppearance() {
         titleLabel.typography = .Subtitle1
-        distanceFromWorkPlaceLabel.isHidden = true
         serviceTargetInfoLabel.typography = .Body3
         workDaysLabel.typography = .Body2
         workTimeLabel.typography = .Body2

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum ProfileMode {
+public enum ProfileMode: Equatable {
     case myProfile
     case otherProfile(id: String)
 }
