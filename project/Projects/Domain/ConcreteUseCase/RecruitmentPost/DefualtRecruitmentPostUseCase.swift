@@ -163,8 +163,9 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
                     requestCnt: postCount
                 )
             case .thirdParty:
+                
                 // TODO: ‼️ ‼️워크넷 가져오기 미구현
-                fatalError()
+                return .just(.failure(.notImplemented))
             }
         }
         

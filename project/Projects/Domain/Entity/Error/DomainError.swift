@@ -60,6 +60,9 @@ public enum DomainError: Error {
     case undefinedCode
     case undefinedError
     
+    // Not Implemented
+    case notImplemented
+    
     public init(code: String) {
         switch code {
         case "API-001":
@@ -198,6 +201,9 @@ public enum DomainError: Error {
             
         case .undefinedCode, .undefinedError:
             return "예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+            
+        case .notImplemented:
+            return "아직 개발되지 않은 기능입니다."
         }
     }
 }
