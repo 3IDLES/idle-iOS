@@ -33,7 +33,7 @@ public class InitialScreenVC: BaseViewController {
     }
     
     private func setAppearance() {
-        view.backgroundColor = DSColor.gray0.color
+        view.backgroundColor = DSColor.orange500.color
     }
     
     private func setLayout() { }
