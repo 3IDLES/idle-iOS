@@ -20,7 +20,7 @@ let project = Project(
         /// FeatureConcrete
         .target(
             name: "AuthFeature",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
@@ -37,7 +37,7 @@ let project = Project(
         /// FeatureConcrete ExampleApp
         .target(
             name: "Auth_ExampleApp",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
