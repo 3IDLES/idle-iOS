@@ -86,7 +86,7 @@ class SelectAuthTypeViewController: BaseViewController {
     
     func setAutoLayout() {
         
-        let selectAuthButtonStack = HStack([startAsCenterButton, startAsWorkerButton], spacing: 8)
+        let selectAuthButtonStack = HStack([startAsCenterButton, startAsWorkerButton], spacing: 8, distribution: .fillEqually)
         
         let centerLoginContainer = HStack([loginAsCenterLabel, loginAsCenterButton], spacing: 12)
         [
