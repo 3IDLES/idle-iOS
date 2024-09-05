@@ -113,6 +113,9 @@ public class OnGoingPostVC: BaseViewController {
                 self.postData = postInfo
                 
                 postTableView.reloadData()
+                DispatchQueue.main.async { [weak self] in
+                    self?.postTableView.setContentOffset(.zero, animated: false)
+                }
             })
             .disposed(by: disposeBag)
         

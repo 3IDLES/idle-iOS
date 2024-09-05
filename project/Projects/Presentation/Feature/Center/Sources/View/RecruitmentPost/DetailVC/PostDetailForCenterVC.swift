@@ -283,7 +283,7 @@ public class PostDetailForCenterVC: BaseViewController {
         viewModel
             .showOptionSheet?
             .drive(onNext: { [weak self] state in
-                guard let self, let vm = self.viewModel else { return }
+                guard let self, let vm = self.viewModel as? PostDetailViewModelable else { return }
                 var vc: IdleBottomSheetVC!
                 switch state {
                 case .onGoing:
