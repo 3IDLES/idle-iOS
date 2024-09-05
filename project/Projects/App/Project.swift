@@ -19,9 +19,9 @@ let project = Project(
         /// Application
         .target(
             name: "Idle-iOS",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .app,
-            productName: DeploymentSettings.productDisplayName,
+            productName: DeploymentSettings.productName,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             infoPlist: IdleInfoPlist.appDefault,
@@ -49,7 +49,7 @@ let project = Project(
         /// UnitTests
         .target(
             name: "IdleAppTests",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .unitTests,
             bundleId: "com.idleApplication.test",
             deploymentTargets: DeploymentSettings.deployment_version,

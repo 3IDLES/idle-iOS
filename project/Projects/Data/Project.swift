@@ -20,7 +20,7 @@ let project = Project(
         /// RepositoryConcrete
         .target(
             name: "ConcreteRepository",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
@@ -40,7 +40,7 @@ let project = Project(
         /// ConcreteTests
         .target(
             name: "ConcretesTests",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .unitTests,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
@@ -57,7 +57,7 @@ let project = Project(
         /// DataSource
         .target(
             name: "DataSource",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,

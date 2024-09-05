@@ -18,7 +18,7 @@ let proejct = Project(
     targets: [
         .target(
             name: "PresentationCore",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,

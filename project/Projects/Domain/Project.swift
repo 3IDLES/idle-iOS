@@ -20,7 +20,7 @@ let project = Project(
         /// UseCaseConcrete type
         .target(
             name: "ConcreteUseCase",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
@@ -40,7 +40,7 @@ let project = Project(
         /// Concrete type Test
         .target(
             name: "ConcreteUseCaseTests",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .unitTests,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
@@ -61,7 +61,7 @@ let project = Project(
         /// Domain interface
         .target(
             name: "UseCaseInterface",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
@@ -80,7 +80,7 @@ let project = Project(
         /// Repository interface
         .target(
             name: "RepositoryInterface",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
@@ -100,7 +100,7 @@ let project = Project(
         /// Entity
         .target(
             name: "Entity",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,

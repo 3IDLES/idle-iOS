@@ -18,7 +18,7 @@ let proejct = Project(
     targets: [
         .target(
             name: "DSKit",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
@@ -42,7 +42,7 @@ let proejct = Project(
         // Component를 테스트하는 Example타겟
         .target(
             name: "DSKitExampleApp",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
