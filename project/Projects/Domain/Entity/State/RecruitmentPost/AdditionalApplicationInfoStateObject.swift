@@ -27,7 +27,6 @@ public class ApplicationDetailStateObject: NSCopying {
         mockObject.experiencePreferenceType = .beginnerPossible
         mockObject.applyType = [
             .app : true,
-            .message : false,
             .phoneCall : false
         ]
         mockObject.applyDeadlineType = .untilApplicationFinished

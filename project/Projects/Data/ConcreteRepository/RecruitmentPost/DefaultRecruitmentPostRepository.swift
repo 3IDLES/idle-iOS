@@ -367,8 +367,6 @@ extension ApplyType {
         switch self {
         case .phoneCall:
             "CALLING"
-        case .message:
-            "MESSAGE"
         case .app:
             "APP"
         }

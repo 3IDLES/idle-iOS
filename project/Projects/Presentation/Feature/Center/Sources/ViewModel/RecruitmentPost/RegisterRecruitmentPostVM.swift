@@ -460,6 +460,8 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
             .flatMap { [weak self] _ -> Single<Result<Void, DomainError>> in
                 guard let self else { return .never() }
                 
+                self.showLoading.onNext(())
+                
                 // 공고를 등록합니다.
                 let inputs = RegisterRecruitmentPostBundle(
                     workTimeAndPay: state_workTimeAndPay,
@@ -474,6 +476,13 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
             }
             .share()
         
+        registerPostResult
+            .subscribe(onNext: { [weak self] _ in
+                
+                self?.dismissLoading.onNext(())
+            })
+            .disposed(by: disposeBag)
+        
         // 공고 등록 성공
         registerPostResult
             .compactMap { $0.value }
@@ -483,18 +492,18 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
             .disposed(by: disposeBag)
             
         
-        let requestRegistrationFailure = registerPostResult
+        registerPostResult
             .compactMap { $0.error }
-        
-        requestRegistrationFailure
-            .map { error in
-                DefaultAlertContentVO(
+            .subscribe(onNext: { [weak self] error in
+                let alertVO = DefaultAlertContentVO(
                     title: "공고등록 오류",
                     message: error.message
                 )
-            }
-            .subscribe(alert)
+                
+                self?.alert.onNext(alertVO)
+            })
             .disposed(by: disposeBag)
+            
         
         Observable
             .merge(
