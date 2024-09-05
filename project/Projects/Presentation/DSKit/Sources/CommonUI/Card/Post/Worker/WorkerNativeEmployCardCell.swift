@@ -35,14 +35,14 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
     var viewModel: WorkerNativeEmployCardViewModelable?
     private var disposables: [Disposable?]?
     
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-
-        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 20, bottom: 8, right: 20))
-    }
-    
     // View
-    let tappableArea: TappableUIView = .init()
+    let tappableArea: TappableUIView = {
+        let view = TappableUIView()
+        view.layer.borderWidth = 1
+        view.layer.cornerRadius = 12
+        view.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
+        return view
+    }()
     let cardView = WorkerEmployCard()
     let applyButton: IdlePrimaryCardButton = {
         let btn = IdlePrimaryCardButton(level: .large)
@@ -65,9 +65,7 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
     }
     
     func setAppearance() {
-        contentView.layer.borderWidth = 1
-        contentView.layer.cornerRadius = 12
-        contentView.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
+        
     }
     
     func setLayout() {
@@ -95,9 +93,9 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
             mainStack.bottomAnchor.constraint(equalTo: tappableArea.layoutMarginsGuide.bottomAnchor),
 
             tappableArea.topAnchor.constraint(equalTo: contentView.topAnchor),
-            tappableArea.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            tappableArea.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            tappableArea.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            tappableArea.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+            tappableArea.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+            tappableArea.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
         ])
     }
     
