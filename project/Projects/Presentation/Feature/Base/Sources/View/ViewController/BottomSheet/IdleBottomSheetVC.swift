@@ -109,6 +109,13 @@ open class IdleBottomSheetVC: BaseViewController {
 /// 뷰 디스플레이 관련
 extension IdleBottomSheetVC {
     
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // 애니메이션 시작전에 해당뷰를 화면 밖으로 이동한다.
+        sheetView.transform = .init(translationX: 0, y: 1000)
+    }
+    
     /// viewDidAppear서브 뷰들의 레이아웃이 결정된 이후 시점(화면상에 나타난 시점)으로, frame, bounds에 근거있는 값들이 할당된 이후이다.
     public override func viewDidAppear(_ animated: Bool) {
         
