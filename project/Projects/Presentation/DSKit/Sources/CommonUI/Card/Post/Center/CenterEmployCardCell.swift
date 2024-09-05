@@ -42,10 +42,9 @@ public class CenterEmployCardCell: UITableViewCell {
     
     // Row5
     lazy var buttonStack: VStack = {
-        let belowButtonStack = HStack([editPostButton, terminatePostButton,], spacing: 4)
         let stack = VStack([
             checkApplicantsButton,
-            HStack([belowButtonStack, Spacer()])
+            HStack([editPostButton, terminatePostButton, Spacer()], spacing: 4, distribution: .fill)
         ], spacing: 8, alignment: .fill)
         return stack
     }()
@@ -88,38 +87,48 @@ public class CenterEmployCardCell: UITableViewCell {
         disposables = nil
     }
     
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-
-        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 20, bottom: 8, right: 20))
-    }
-    
     func setAppearance() { 
-        contentView.backgroundColor = DSColor.gray0.color
-        contentView.layer.setGrayBorder()
+        contentView.backgroundColor = .clear
     }
     
     func setLayout() {
         
-        contentView.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
+        let cellView = UIView()
+        cellView.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
+        cellView.backgroundColor = DSColor.gray0.color
+        cellView.layer.setGrayBorder()
         
         let contentStack = VStack([
             cardView,
             buttonStack
         ], spacing: 12, alignment: .fill)
-        
+
         [
             contentStack
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            cellView.addSubview($0)
+        }
+        
+        NSLayoutConstraint.activate([
+            contentStack.topAnchor.constraint(equalTo: cellView.layoutMarginsGuide.topAnchor),
+            contentStack.leftAnchor.constraint(equalTo: cellView.layoutMarginsGuide.leftAnchor),
+            contentStack.rightAnchor.constraint(equalTo: cellView.layoutMarginsGuide.rightAnchor),
+            contentStack.bottomAnchor.constraint(equalTo: cellView.layoutMarginsGuide.bottomAnchor),
+        ])
+        
+        [
+            cellView
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            contentStack.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            contentStack.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
-            contentStack.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
-            contentStack.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            cellView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            cellView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+            cellView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+            cellView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
         ])
     }
     
