@@ -290,12 +290,7 @@ public class PostOverviewVC: BaseViewController {
     }
     
     private func setObservable() {
-        executeRegisterButton
-            .rx.tap
-            .subscribe { [weak self] _ in
-                self?.view.isUserInteractionEnabled = false
-            }
-            .disposed(by: disposeBag)
+        
     }
     
     func bind(viewModel: PostOverviewViewModelable) {

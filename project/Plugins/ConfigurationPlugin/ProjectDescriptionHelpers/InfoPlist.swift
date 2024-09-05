@@ -29,6 +29,9 @@ public enum IdleInfoPlist {
             ]
         ],
         
+        // 멀티 스크린 미지원
+        "UIRequiresFullScreen": true,
+        
         "NMFClientId": "$(NAVER_API_CLIENT_ID)",
         
         // 앱추적 허용 메세지

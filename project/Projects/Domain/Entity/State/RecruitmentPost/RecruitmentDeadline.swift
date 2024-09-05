@@ -23,15 +23,12 @@ public enum ExperiencePreferenceType: Int, CaseIterable {
 
 public enum ApplyType: Int, CaseIterable {
     case phoneCall
-    case message
     case app
     
     public var korTextForBtn: String {
         switch self {
         case .phoneCall:
             "전화 지원"
-        case .message:
-            "문자 지원"
         case .app:
             "어플 지원"
         }
@@ -41,8 +38,6 @@ public enum ApplyType: Int, CaseIterable {
         switch self {
         case .phoneCall:
             "전화"
-        case .message:
-            "문자"
         case .app:
             "어플"
         }

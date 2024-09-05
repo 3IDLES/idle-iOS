@@ -189,8 +189,6 @@ extension ApplyType {
         switch text {
         case "CALLING":
             return .phoneCall
-        case "MESSAGE":
-            return .message
         case "APP":
             return .app
         default:

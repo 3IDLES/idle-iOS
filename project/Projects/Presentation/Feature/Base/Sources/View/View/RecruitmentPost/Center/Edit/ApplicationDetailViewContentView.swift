@@ -245,6 +245,7 @@ public class ApplicationDetailViewContentView: UIView {
             .deadlineString?
             .drive(onNext: { [calendarOpenButton] str in
                 calendarOpenButton.textLabel.textString = str
+                calendarOpenButton.textLabel.attrTextColor = DSColor.gray900.color
             })
             .disposed(by: disposeBag)
         
