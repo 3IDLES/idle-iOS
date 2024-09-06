@@ -93,16 +93,20 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     }
     
     // MARK: Worker
-    public func getPostDetailForWorker(id: String) -> RxSwift.Single<Entity.RecruitmentPostForWorkerBundle> {
+    public func getNativePostDetailForWorker(id: String) -> RxSwift.Single<Entity.RecruitmentPostForWorkerBundle> {
         recruitmentPostService.request(
             api: .postDetail(id: id, userType: .worker),
             with: .withToken
         )
-        .map(RecruitmentPostDTO.self)
-        .map { dto in
-            dto.toEntity()
-        }
+        .mapToEntity(NativeRecruitmentPostDetailDTO.self)
     }
+    
+    public func getWorknetPostDetailForWorker(id: String) -> RxSwift.Single<Entity.WorknetRecruitmentPostDetailVO> {
+        crawlingPostService
+            .request(api: .getDetail(postId: id), with: .withToken)
+            .mapToEntity(WorknetRecruitmentPostDetailDTO.self)
+    }
+    
     
     public func getNativePostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
         

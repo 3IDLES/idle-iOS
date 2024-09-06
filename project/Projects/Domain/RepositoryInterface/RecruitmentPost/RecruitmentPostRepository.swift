@@ -41,8 +41,11 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     func removePost(id: String) -> Single<Void>
     
     // MARK: Worker
-    /// 요양보호사 공고의 상세정보를 조회합니다.
-    func getPostDetailForWorker(id: String) -> Single<RecruitmentPostForWorkerBundle>
+    /// 요양보호사 앱내 공고의 상세정보를 조회합니다.
+    func getNativePostDetailForWorker(id: String) -> Single<RecruitmentPostForWorkerBundle>
+    
+    /// 요양보호사 워크넷 공고의 상세정보를 조회합니다.
+    func getWorknetPostDetailForWorker(id: String) -> Single<WorknetRecruitmentPostDetailVO>
     
     // MARK: Native post
     

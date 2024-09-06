@@ -12,4 +12,12 @@ public extension PrimitiveSequence where Trait == SingleTrait, Element == Respon
     func mapToVoid() -> Single<Void> {
         flatMap { _ in .just(()) }
     }
+    
+    func mapToEntity<T: EntityRepresentable>(_ type: T.Type) -> Single<T.Entity> {
+        map(T.self)
+        .map { dto in
+            dto.toEntity()
+        }
+        
+    }
 }

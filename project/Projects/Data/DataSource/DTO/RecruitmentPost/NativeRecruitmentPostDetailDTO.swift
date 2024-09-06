@@ -1,5 +1,5 @@
 //
-//  RecruitmentPostDetailForWorkerDTO.swift
+//  NativeRecruitmentPostDetailDTO.swift
 //  NetworkDataSource
 //
 //  Created by choijunios on 8/15/24.
@@ -8,7 +8,7 @@
 import Foundation
 import Entity
 
-public struct RecruitmentPostDTO: Codable {
+public struct NativeRecruitmentPostDetailDTO: EntityRepresentable {
     public let id: String
     
     public let longitude: String
