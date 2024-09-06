@@ -1,5 +1,5 @@
 //
-//  RecruitmentPostListForWorkerVO.swift
+//  NativeRecruitmentPostForWorkerVO.swift
 //  Entity
 //
 //  Created by choijunios on 8/16/24.
@@ -7,20 +7,10 @@
 
 import Foundation
 
-public struct RecruitmentPostListForWorkerVO {
-
-    public let posts: [NativeRecruitmentPostForWorkerVO]
-    public let nextPageId: String?
-    public let fetchedPostCount: Int
+public struct NativeRecruitmentPostForWorkerVO: RecruitmentPostForWorkerRepresentable {
     
-    public init(posts: [NativeRecruitmentPostForWorkerVO], nextPageId: String?, fetchedPostCount: Int) {
-        self.posts = posts
-        self.nextPageId = nextPageId
-        self.fetchedPostCount = fetchedPostCount
-    }
-}
-
-public struct NativeRecruitmentPostForWorkerVO {
+    public var postType: RecruitmentPostType
+    
     public let postId: String
     
     public let workDays: [WorkDay]
@@ -44,7 +34,26 @@ public struct NativeRecruitmentPostForWorkerVO {
     public let applyTime: Date?
     public let isFavorite: Bool
     
-    public init(postId: String, workDays: [WorkDay], startTime: String, endTime: String, roadNameAddress: String, lotNumberAddress: String, gender: Gender, age: Int, cardGrade: CareGrade, isExperiencePreferred: Bool, applyDeadlineType: ApplyDeadlineType, applyDeadlineDate: Date?, payType: PaymentType, payAmount: String, distanceFromWorkPlace: Int, applyTime: Date?, isFavorite: Bool) {
+    public init(
+        postId: String,
+        workDays: [WorkDay],
+        startTime: String,
+        endTime: String,
+        roadNameAddress: String,
+        lotNumberAddress: String,
+        gender: Gender,
+        age: Int,
+        cardGrade: CareGrade,
+        isExperiencePreferred: Bool,
+        applyDeadlineType: ApplyDeadlineType,
+        applyDeadlineDate: Date?,
+        payType: PaymentType,
+        payAmount: String,
+        distanceFromWorkPlace: Int,
+        applyTime: Date?,
+        isFavorite: Bool,
+        postType: RecruitmentPostType
+    ) {
         self.postId = postId
         self.workDays = workDays
         self.startTime = startTime
@@ -62,6 +71,7 @@ public struct NativeRecruitmentPostForWorkerVO {
         self.distanceFromWorkPlace = distanceFromWorkPlace
         self.applyTime = applyTime
         self.isFavorite = isFavorite
+        self.postType = postType
     }
     
     public static let mock = NativeRecruitmentPostForWorkerVO(
@@ -81,6 +91,7 @@ public struct NativeRecruitmentPostForWorkerVO {
         payAmount: "15000",
         distanceFromWorkPlace: 2500,
         applyTime: Date(),
-        isFavorite: true
+        isFavorite: true,
+        postType: .native
     )
 }

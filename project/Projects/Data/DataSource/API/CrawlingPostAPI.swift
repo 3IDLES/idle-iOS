@@ -11,7 +11,7 @@ import Moya
 
 public enum CrawlingPostAPI {
     
-    case getPostList(nextPageId: String?, requestCnt: String)
+    case getPostList(nextPageId: String?, requestCnt: Int)
     case getDetail(postId: String)
 }
 
