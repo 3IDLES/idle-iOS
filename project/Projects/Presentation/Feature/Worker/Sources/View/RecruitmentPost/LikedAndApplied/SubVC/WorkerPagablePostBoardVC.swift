@@ -19,13 +19,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
     typealias WorknetCell = WorkerWorknetEmployCardCell
     
     // View
-    let postTableView: UITableView = {
-        let tableView = UITableView()
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(NativeCell.self, forCellReuseIdentifier: NativeCell.identifier)
-        tableView.register(WorknetCell.self, forCellReuseIdentifier: WorknetCell.identifier)
-        return tableView
-    }()
+    let postTableView = UITableView()
     
     let tableHeader = BoardSortigHeaderView()
     
@@ -51,6 +45,12 @@ public class WorkerPagablePostBoardVC: BaseViewController {
     }
     
     private func setTableView() {
+        
+        postTableView.rowHeight = UITableView.automaticDimension
+        postTableView.estimatedRowHeight = 218
+        postTableView.register(NativeCell.self, forCellReuseIdentifier: NativeCell.identifier)
+        postTableView.register(WorknetCell.self, forCellReuseIdentifier: WorknetCell.identifier)
+        
         postTableView.dataSource = self
         postTableView.delegate = self
         postTableView.separatorStyle = .none
