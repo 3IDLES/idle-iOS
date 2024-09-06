@@ -37,6 +37,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     // Init
     private let postId: String
     private let recruitmentPostUseCase: RecruitmentPostUseCase
+    private let workerProfileUseCase: WorkerProfileUseCase
     
     // Ouput
     public var postForWorkerBundle: RxCocoa.Driver<Entity.RecruitmentPostForWorkerBundle>?
@@ -55,12 +56,14 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     public init(
             postId: String,
             coordinator: PostDetailForWorkerCoodinator?,
-            recruitmentPostUseCase: RecruitmentPostUseCase
+            recruitmentPostUseCase: RecruitmentPostUseCase,
+            workerProfileUseCase: WorkerProfileUseCase
         )
     {
         self.postId = postId
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
+        self.workerProfileUseCase = workerProfileUseCase
         
         super.init()
         
@@ -90,10 +93,25 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
         postForWorkerBundle = getPostDetailSuccess.asDriver(onErrorRecover: { _ in fatalError() })
         
         // MARK: 센터, 워커 위치정보
-        locationInfo = getPostDetailSuccess
-            .map { [weak self] bundle in
+        let requestWorkerLocationResult = viewWillAppear
+            .flatMap({ [workerProfileUseCase] _ in
+                workerProfileUseCase
+                    .getProfile(mode: .myProfile)
+            })
+        
+        let requestWorkerLocationSuccess = requestWorkerLocationResult.compactMap { $0.value }
+        let requestWorkerLocationFailure = requestWorkerLocationResult.compactMap { $0.error }
+        
+        locationInfo = Observable
+            .zip(getPostDetailSuccess, requestWorkerLocationSuccess)
+            .map {
+                [weak self] bundle, profile in
+                
                 // 요양보호사 위치 가져오기
-                let workerLocation = self?.getWorkerLocation()
+                let workerLocation: LocationInformation = .init(
+                    longitude: profile.longitude,
+                    latitude: profile.latitude
+                )
                 
                 let workPlaceLocation = bundle.jobLocation
                 
@@ -222,14 +240,6 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                 dismissLoading.onNext(())
             })
             .disposed(by: disposeBag)
-    }
-    
-    // MARK: Test
-    func getWorkerLocation() -> LocationInformation {
-        return .init(
-            longitude: 127.046425,
-            latitude: 37.504588
-        )
     }
         
     public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: Entity.RecruitmentPostType) -> RxSwift.Single<Bool> {

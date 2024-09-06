@@ -18,13 +18,22 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
         weak var parent: WorkerRecruitmentBoardCoordinatable?
         let navigationController: UINavigationController
         let recruitmentPostUseCase: RecruitmentPostUseCase
+        let workerProfileUseCase: WorkerProfileUseCase
         
-        public init(postType: RecruitmentPostType, postId: String, parent: WorkerRecruitmentBoardCoordinatable? = nil, navigationController: UINavigationController, recruitmentPostUseCase: RecruitmentPostUseCase) {
+        public init(
+            postType: RecruitmentPostType,
+            postId: String,
+            parent: WorkerRecruitmentBoardCoordinatable? = nil,
+            navigationController: UINavigationController,
+            recruitmentPostUseCase: RecruitmentPostUseCase,
+            workerProfileUseCase: WorkerProfileUseCase
+        ) {
             self.postType = postType
             self.postId = postId
             self.parent = parent
             self.navigationController = navigationController
             self.recruitmentPostUseCase = recruitmentPostUseCase
+            self.workerProfileUseCase = workerProfileUseCase
         }
     }
     
@@ -35,6 +44,7 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
     let postId: String
     public let navigationController: UINavigationController
     let recruitmentPostUseCase: RecruitmentPostUseCase
+    let workerProfileUseCase: WorkerProfileUseCase
     
     public init(
         dependency: Dependency
@@ -44,6 +54,7 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
         self.parent = dependency.parent
         self.navigationController = dependency.navigationController
         self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
+        self.workerProfileUseCase = dependency.workerProfileUseCase
     }
     
     deinit {
@@ -60,7 +71,8 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
             let vm = NativePostDetailForWorkerVM(
                 postId: postId,
                 coordinator: self,
-                recruitmentPostUseCase: recruitmentPostUseCase
+                recruitmentPostUseCase: recruitmentPostUseCase, 
+                workerProfileUseCase: workerProfileUseCase
             )
             nativeDetailVC.bind(viewModel: vm)
             vc = nativeDetailVC

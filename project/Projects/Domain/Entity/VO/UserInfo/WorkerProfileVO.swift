@@ -10,8 +10,8 @@ import Foundation
 public struct WorkerProfileVO: Codable {
     
     public let profileImageURL: String?
-    
-    
+    public let longitude: Double
+    public let latitude: Double
     public let nameText: String
     public let phoneNumber: String
     public let isLookingForJob: Bool
@@ -32,7 +32,9 @@ public struct WorkerProfileVO: Codable {
         expYear: Int?,
         address: AddressInformation,
         introductionText: String,
-        specialty: String
+        specialty: String,
+        longitude: Double,
+        latitude: Double
     ) {
         self.profileImageURL = profileImageURL
         self.nameText = nameText
@@ -44,6 +46,8 @@ public struct WorkerProfileVO: Codable {
         self.address = address
         self.introductionText = introductionText
         self.specialty = specialty
+        self.latitude = latitude
+        self.longitude = longitude
     }
 }
 
@@ -61,6 +65,8 @@ public extension WorkerProfileVO {
             jibunAddress: ""
         ),
         introductionText: "",
-        specialty: ""
+        specialty: "",
+        longitude: 0.0,
+        latitude: 0.0
     )
 }

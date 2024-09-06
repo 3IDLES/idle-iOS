@@ -62,7 +62,8 @@ extension WorkerRecruitmentBoardCoordinator {
                 postId: postId,
                 parent: self,
                 navigationController: navigationController,
-                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
+                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self),
+                workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
             )
         )
         addChildCoordinator(coodinator)
