@@ -18,7 +18,7 @@ public enum PostAppliedState {
 public protocol WorkerEmployCardViewModelable: AnyObject {
     
     /// 공고상세보기
-    func showPostDetail(id: String)
+    func showPostDetail(postType: RecruitmentPostType, id: String)
     
     /// 즐겨찾기 버튼 클릭
     func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: RecruitmentPostType) -> Single<Bool>
@@ -137,7 +137,7 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
             tappableArea
                 .rx.tap
                 .subscribe(onNext: { [weak viewModel] _ in
-                    viewModel?.showPostDetail(id: postId)
+                    viewModel?.showPostDetail(postType: .native, id: postId)
                 }),
                         
             applyButton.rx.tap

@@ -11,10 +11,12 @@ public struct DefaultAlertContentVO {
     
     public let title: String
     public let message: String
+    public let onDismiss: (() -> ())?
     
-    public init(title: String, message: String) {
+    public init(title: String, message: String, onDismiss: (() -> ())? = nil) {
         self.title = title
         self.message = message
+        self.onDismiss = onDismiss
     }
     
     public static let `default` = DefaultAlertContentVO(

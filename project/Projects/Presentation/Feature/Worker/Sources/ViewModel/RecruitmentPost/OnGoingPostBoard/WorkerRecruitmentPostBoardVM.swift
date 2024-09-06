@@ -302,8 +302,8 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
 // MARK: WorkerPagablePostBoardVMable + Extension
 extension WorkerPagablePostBoardVMable {
     
-    public func showPostDetail(id: String) {
-        coordinator?.showPostDetail(postId: id)
+    public func showPostDetail(postType: RecruitmentPostType, id: String) {
+        coordinator?.showPostDetail(postType: postType, postId: id)
     }
     
     public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: Entity.RecruitmentPostType) -> RxSwift.Single<Bool> {

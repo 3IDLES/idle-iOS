@@ -166,7 +166,7 @@ public class WorkerWorknetEmployCard: VStack {
         }
     }
     
-    func applyRO(ro: WorkerWorknetEmployCardRO) {
+    public func applyRO(ro: WorkerWorknetEmployCardRO) {
         
         beginnerTag.isHidden = !ro.showBeginnerTag
         daysUntilDeadlineTag.textString = ro.leftDayUnitlDeadlineText

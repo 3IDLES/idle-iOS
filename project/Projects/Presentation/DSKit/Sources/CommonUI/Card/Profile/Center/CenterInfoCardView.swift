@@ -18,6 +18,7 @@ public class CenterInfoCardView: TappableUIView {
     // View
     let nameLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle3)
+        label.numberOfLines = 0
         return label
     }()
     let locationLabel: IdleLabel = {

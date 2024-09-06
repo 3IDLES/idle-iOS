@@ -17,7 +17,7 @@ public struct WorkPlaceAndWorkerLocationMapRO {
     
     let workPlaceRoadAddress: String
     let homeToworkPlaceText: NSMutableAttributedString
-    let distanceToWorkPlaceText: String
+    let estimatedArrivalTimeText: String
     
     let workPlaceLocation: LocationInformation
     let workerLocation: LocationInformation?
@@ -33,7 +33,7 @@ public class WorkPlaceAndWorkerLocationView: VStack {
         return label
     }()
     
-    let distanceLabel: IdleLabel = {
+    let estimatedArrivalTimeTextLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle2)
         label.textString = ""
         label.textAlignment = .left
@@ -73,7 +73,7 @@ public class WorkPlaceAndWorkerLocationView: VStack {
     private func setLayout() {
         
         let walkingImage = DSKitAsset.Icons.walkingHuman.image.toView()
-        let timeCostStack = HStack([walkingImage, distanceLabel], spacing: 6, alignment: .center)
+        let timeCostStack = HStack([walkingImage, estimatedArrivalTimeTextLabel], spacing: 6, alignment: .center)
         
         let labelStack = VStack([walkToLocationLabel, timeCostStack], spacing: 4, alignment: .leading)
         
@@ -107,7 +107,7 @@ public class WorkPlaceAndWorkerLocationView: VStack {
     public func bind(locationRO: WorkPlaceAndWorkerLocationMapRO) {
         
         walkToLocationLabel.attributedText = locationRO.homeToworkPlaceText
-        distanceLabel.textString = locationRO.distanceToWorkPlaceText
+        estimatedArrivalTimeTextLabel.textString = locationRO.estimatedArrivalTimeText
         
         mapView.bind(
             locationRO: locationRO,

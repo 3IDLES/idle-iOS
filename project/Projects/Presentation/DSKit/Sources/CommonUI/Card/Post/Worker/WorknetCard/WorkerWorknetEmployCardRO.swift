@@ -36,6 +36,29 @@ public struct WorkerWorknetEmployCardRO {
         self.isStarred = isStarred
     }
     
+    public static func create(vo: WorknetRecruitmentPostDetailVO) -> WorkerWorknetEmployCardRO {
+        
+        var leftDayUnitlDeadlineText: String = "타임존 다름"
+        if let dateDiff = Calendar.current.dateComponents([.day], from: .now, to: vo.applyDeadline).day {
+            leftDayUnitlDeadlineText = "D-\(dateDiff)"
+            if dateDiff == 0 {
+                leftDayUnitlDeadlineText = "D-Day"
+            }
+        }
+        
+        let durationText = Self.timeForDistance(meter: vo.distance)
+        
+        return .init(
+            showBeginnerTag: false,
+            leftDayUnitlDeadlineText: leftDayUnitlDeadlineText,
+            titleText: vo.title,
+            timeDurationForWalkingText: durationText,
+            workTimeInfoText: "\(vo.workingSchedule) | \(vo.workingTime)",
+            paymentInfoText: vo.payInfo,
+            isStarred: vo.isFavorite
+        )
+    }
+    
     public static func create(vo: WorknetRecruitmentPostVO) -> WorkerWorknetEmployCardRO {
         
         var leftDayUnitlDeadlineText: String = "타임존 다름"
