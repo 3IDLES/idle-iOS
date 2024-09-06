@@ -8,9 +8,14 @@
 import Foundation
 import Entity
 
-public struct RecruitmentPostListForWorkerDTO: Codable {
+public protocol EntityRepresentable: Codable {
+    associatedtype Entity
+    func toEntity() -> Entity
+}
 
-    public let items: [RecruitmentPostForWorkerDTO]
+public struct RecruitmentPostListForWorkerDTO<T: EntityRepresentable>: Codable where T.Entity: RecruitmentPostForWorkerRepresentable {
+
+    public let items: [T]
     public let next: String?
     public let total: Int
     
@@ -24,7 +29,43 @@ public struct RecruitmentPostListForWorkerDTO: Codable {
     }
 }
 
-public struct RecruitmentPostForWorkerDTO: Codable {
+// MARK: Worknet post의 카드 정보
+public struct WorkNetRecruitmentPostForWorkerDTO: EntityRepresentable {
+     
+    public let id: String
+    public let title: String
+    public let distance: Int
+    public let workingTime: String
+    public let workingSchedule: String
+    public let payInfo: String
+    public let applyDeadline: String
+    public let isFavorite: Bool
+    public let jobPostingType: RecruitmentPostType
+    
+    public func toEntity() -> WorknetRecruitmentPostVO {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let deadlineDate = dateFormatter.date(from: self.applyDeadline)!
+        
+        return .init(
+            id: id,
+            title: title,
+            distance: distance,
+            workingTime: workingTime,
+            workingSchedule: workingSchedule,
+            payInfo: payInfo,
+            applyDeadline: deadlineDate,
+            isFavorite: isFavorite,
+            postType: jobPostingType
+        )
+    }
+}
+
+// MARK: Native Post의 카드 정보입니다.
+public struct NativeRecruitmentPostForWorkerDTO: EntityRepresentable {
+    
     public let isExperiencePreferred: Bool
     public let id: String
     public let weekdays: [String]
@@ -42,6 +83,7 @@ public struct RecruitmentPostForWorkerDTO: Codable {
     public let distance: Int
     public let applyTime: String?
     public let isFavorite: Bool
+    public let jobPostingType: RecruitmentPostType
     
     public func toEntity() -> NativeRecruitmentPostForWorkerVO {
         
@@ -72,7 +114,9 @@ public struct RecruitmentPostForWorkerDTO: Codable {
             payAmount: String(payAmount),
             distanceFromWorkPlace: distance,
             applyTime: applyDate,
-            isFavorite: isFavorite
+            isFavorite: isFavorite,
+            postType: jobPostingType
         )
     }
 }
+

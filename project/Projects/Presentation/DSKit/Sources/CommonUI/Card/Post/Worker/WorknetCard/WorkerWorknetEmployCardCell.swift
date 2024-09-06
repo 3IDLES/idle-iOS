@@ -66,10 +66,10 @@ public class WorkerWorknetEmployCardCell: UITableViewCell {
         ])
     }
     
-    public func bind(postId: String, viewModel: WorkerEmployCardViewModelable) {
+    public func bind(postId: String, ro: WorkerWorknetEmployCardRO, viewModel: WorkerEmployCardViewModelable) {
         
         // 카드 컨텐츠 바인딩
-        
+        cardView.applyRO(ro: ro)
         
         let starButton = cardView.starButton
         

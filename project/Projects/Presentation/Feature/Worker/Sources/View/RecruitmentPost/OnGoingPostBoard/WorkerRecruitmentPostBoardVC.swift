@@ -15,7 +15,8 @@ import DSKit
 
 
 public class WorkerRecruitmentPostBoardVC: BaseViewController {
-    typealias Cell = WorkerNativeEmployCardCell
+    typealias NativeCell = WorkerNativeEmployCardCell
+    typealias WorknetCell = WorkerWorknetEmployCardCell
     
     // View
     fileprivate let topContainer: WorkerMainTopContainer = {
@@ -25,7 +26,8 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     let postTableView: UITableView = {
         let tableView = UITableView()
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
+        tableView.register(NativeCell.self, forCellReuseIdentifier: NativeCell.identifier)
+        tableView.register(WorknetCell.self, forCellReuseIdentifier: NativeCell.identifier)
         return tableView
     }()
     let tableHeader = BoardSortigHeaderView()
@@ -34,7 +36,7 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     var isPaging = true
     
     // Observable
-    let cellData: BehaviorRelay<[PostBoardCellData]> = .init(value: [])
+    var postData: [RecruitmentPostForWorkerRepresentable] = []
     let requestNextPage: PublishRelay<Void> = .init()
     
     public init() {
@@ -63,9 +65,9 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         
         viewModel
             .postBoardData?
-            .drive(onNext: { [weak self] (isRefreshed: Bool, cellData) in
+            .drive(onNext: { [weak self] (isRefreshed: Bool, postData) in
                 guard let self else { return }
-                self.cellData.accept(cellData)
+                self.postData = postData
                 postTableView.reloadData()
                 isPaging = false
                 
@@ -143,19 +145,47 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
 extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        cellData.value.count
+        postData.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
-        cell.selectionStyle = .none
+        var cell: UITableViewCell!
         
-        let cellData = cellData.value[indexPath.row]
+        let postData = postData[indexPath.row]
         
-        if let vm = viewModel as? WorkerNativeEmployCardViewModelable {
-            cell.bind(postId: cellData.postId, vo: cellData.cardVO, viewModel: vm)
+        switch postData.postType {
+        case .native:
+            
+            // Cell
+            let nativeCell = tableView.dequeueReusableCell(withIdentifier: NativeCell.identifier) as! NativeCell
+            
+            let postVO = postData as! NativeRecruitmentPostForWorkerVO
+            let vm = viewModel as! WorkerEmployCardViewModelable
+            let cellVO: WorkerNativeEmployCardVO = .create(vo: postVO)
+            nativeCell.bind(
+                postId: postVO.postId,
+                vo: cellVO,
+                viewModel: vm
+            )
+            cell = nativeCell
+        case .workNet:
+            
+            // Cell
+            let workNetCell = tableView.dequeueReusableCell(withIdentifier: WorknetCell.identifier) as! WorknetCell
+            
+            let postVO = postData as! WorknetRecruitmentPostVO
+            let vm = viewModel as! WorkerEmployCardViewModelable
+            let cellRO = WorkerWorknetEmployCardRO.create(vo: postVO)
+            workNetCell.bind(
+                postId: postVO.id,
+                ro: cellRO,
+                viewModel: vm
+            )
+            cell = workNetCell
         }
+        
+        cell.selectionStyle = .none
         
         return cell
     }

@@ -7,9 +7,9 @@
 
 import Foundation
 
-public enum RecruitmentPostType {
-    case native
-    case workNet
+public enum RecruitmentPostType: String, Codable {
+    case native="CAREMEET"
+    case workNet="WORKNET"
     
     public var upscaleEngWord: String {
         switch self {

@@ -15,11 +15,13 @@ import Moya
 public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     
     private var recruitmentPostService: RecruitmentPostService = .init()
+    private var crawlingPostService: CrawlingPostService = .init()
     private var applyService: ApplyService = .init()
     
     public init(_ store: KeyValueStore? = nil) {
         if let store {
             self.recruitmentPostService = RecruitmentPostService(keyValueStore: store)
+            self.crawlingPostService = CrawlingPostService(keyValueStore: store)
             self.applyService = ApplyService(keyValueStore: store)
         }
     }
@@ -102,13 +104,13 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         }
     }
     
-    public func getNativePostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
+    public func getNativePostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
         
         recruitmentPostService.request(
             api: .getOnGoingNativePostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
-        .map(RecruitmentPostListForWorkerDTO.self)
+        .map(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
         .catch({ error in
             if let moyaError = error as? MoyaError, case .objectMapping(let error, _) = moyaError {
                 #if DEBUG
@@ -122,12 +124,12 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         }
     }
     
-    public func getFavoritePostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
+    public func getFavoritePostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
         recruitmentPostService.request(
             api: .getFavoritePostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
-        .map(RecruitmentPostListForWorkerDTO.self)
+        .map(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
         .catch({ error in
             if let moyaError = error as? MoyaError, case .objectMapping(let error, _) = moyaError {
                 #if DEBUG
@@ -141,12 +143,12 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         }
     }
     
-    public func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<Entity.RecruitmentPostListForWorkerVO> {
+    public func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
         recruitmentPostService.request(
             api: .getAppliedPostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
-        .map(RecruitmentPostListForWorkerDTO.self)
+        .map(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
         .catch({ error in
             if let moyaError = error as? MoyaError, case .objectMapping(let error, _) = moyaError {
                 #if DEBUG
@@ -158,6 +160,27 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         .map { dto in
             dto.toEntity()
         }
+    }
+    
+    public func getWorknetPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
+        crawlingPostService
+            .request(
+                api: .getPostList(nextPageId: nextPageId, requestCnt: requestCnt),
+                with: .withToken
+            )
+            .map(RecruitmentPostListForWorkerDTO<WorkNetRecruitmentPostForWorkerDTO>.self)
+            .catch({ error in
+                if let moyaError = error as? MoyaError, case .objectMapping(let error, _) = moyaError {
+                    #if DEBUG
+                    print("지원한 공고 전체조회 에러:", error.localizedDescription)
+                    #endif
+                }
+                return .error(error)
+            })
+            .map { dto in
+                dto.toEntity()
+            }
+        
     }
     
     public func applyToPost(postId: String, method: ApplyType) -> Single<Void> {

@@ -14,13 +14,10 @@ import Entity
 import DSKit
 import UseCaseInterface
 
-public struct PostBoardCellData {
-    let postId: String
-    let cardVO: WorkerNativeEmployCardVO
-}
+public typealias BoardRefreshResult = (isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])
 
 /// 페이징 보드
-public protocol WorkerPagablePostBoardVMable: BaseViewModel, WorkerNativeEmployCardViewModelable {
+public protocol WorkerPagablePostBoardVMable: BaseViewModel, AppliableWorkerEmployCardVMable {
     
     var coordinator: WorkerRecruitmentBoardCoordinatable? { get }
     
@@ -33,7 +30,7 @@ public protocol WorkerPagablePostBoardVMable: BaseViewModel, WorkerNativeEmployC
     var requestInitialPageRequest: PublishRelay<Void> { get }
     
     /// 페이지요청에 대한 결과를 전달합니다.
-    var postBoardData: Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>? { get }
+    var postBoardData: Driver<BoardRefreshResult>? { get }
 }
 
 /// 페이징 + 지원하기
@@ -55,7 +52,7 @@ public protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable
 public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostBoardVMable {
     
     // Output
-    public var postBoardData: Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
+    public var postBoardData: Driver<(isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])>?
     public var workerLocationTitleText: Driver<String>?
     public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
@@ -75,7 +72,7 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
     /// 값이 nil이라면 요청을 보내지 않습니다.
     var nextPagingRequest: PostPagingRequestForWorker? = .initial
     /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
-    private let currentPostVO: BehaviorRelay<[NativeRecruitmentPostForWorkerVO]> = .init(value: [])
+    private let currentPostVO: BehaviorRelay<[RecruitmentPostForWorkerRepresentable]> = .init(value: [])
     
     // Observable
     let dispostBag = DisposeBag()
@@ -208,7 +205,7 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
                 currentPostVO,
                 requestPostListSuccess
             )
-            .compactMap { [weak self] (prevPostList, fetchedData) -> (Bool, [PostBoardCellData])? in
+            .compactMap { [weak self] (prevPostList, fetchedData) -> BoardRefreshResult? in
                 
                 guard let self else { return nil }
                 
@@ -254,14 +251,7 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
                 // 최근값 업데이트
                 self.currentPostVO.accept(mergedPosts)
                 
-                // cellData생성
-                let cellData: [PostBoardCellData] = mergedPosts.map { postVO in
-                    
-                    let cardVO: WorkerNativeEmployCardVO = .create(vo: postVO)
-                    return .init(postId: postVO.postId, cardVO: cardVO)
-                }
-                
-                return (isRefreshed, cellData)
+                return (isRefreshed, mergedPosts)
             }
             .asDriver(onErrorDriveWith: .never())
         
