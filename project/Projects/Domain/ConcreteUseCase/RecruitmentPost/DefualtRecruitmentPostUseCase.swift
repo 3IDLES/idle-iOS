@@ -111,8 +111,10 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
                     requestCnt: postCount
                 )
             case .thirdParty:
-                // TODO: ‼️ ‼️워크넷 가져오기 미구현
-                fatalError()
+                stream = repository.getWorknetPostListForWorker(
+                    nextPageId: nextPageId,
+                    requestCnt: postCount
+                )
             }
         }
         
@@ -163,9 +165,7 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
                     requestCnt: postCount
                 )
             case .thirdParty:
-                
-                // TODO: ‼️ ‼️워크넷 가져오기 미구현
-                return .just(.failure(.notImplemented))
+                return .just(.failure(.undefinedError))
             }
         }
         

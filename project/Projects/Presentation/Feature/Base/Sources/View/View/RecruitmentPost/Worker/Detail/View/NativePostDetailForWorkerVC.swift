@@ -253,8 +253,8 @@ public class NativePostDetailForWorkerVC: BaseViewController {
 public class PostDetailForWorkerContentView: UIView {
     
     /// 구인공고 카드
-    let cardView: WorkerEmployCard = {
-        let view = WorkerEmployCard()
+    let cardView: WorkerNativeEmployCard = {
+        let view = WorkerNativeEmployCard()
         view.setToPostAppearance()
         return view
     }()

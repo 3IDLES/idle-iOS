@@ -23,7 +23,7 @@ public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
     public var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
     
     // Output
-    public var postBoardData: RxCocoa.Driver<(isRefreshed: Bool, cellData: [PostBoardCellData])>?
+    public var postBoardData: RxCocoa.Driver<BoardRefreshResult>?
     
     // Init
     public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
@@ -33,7 +33,7 @@ public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
     /// 값이 nil이라면 요청을 보내지 않습니다.
     var nextPagingRequest: PostPagingRequestForWorker?
     /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
-    private let currentPostVO: BehaviorRelay<[NativeRecruitmentPostForWorkerVO]> = .init(value: [])
+    private let currentPostVO: BehaviorRelay<[RecruitmentPostForWorkerRepresentable]> = .init(value: [])
     
     public init(coordinator: WorkerRecruitmentBoardCoordinatable, recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.coordinator = coordinator
@@ -93,7 +93,7 @@ public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
                 currentPostVO,
                 requestPostListSuccess
             )
-            .compactMap { [weak self] (prevPostList, fetchedData) -> (Bool, [PostBoardCellData])? in
+            .compactMap { [weak self] (prevPostList, fetchedData) -> BoardRefreshResult? in
                 
                 guard let self else { return nil }
                 
@@ -119,15 +119,7 @@ public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
                 // 최근값 업데이트
                 self.currentPostVO.accept(mergedPosts)
                 
-                // cellData 생성
-                let cellData: [PostBoardCellData] = mergedPosts.map { vo in
-                    
-                    let cardVO: WorkerNativeEmployCardVO = .create(vo: vo)
-                    
-                    return .init(postId: vo.postId, cardVO: cardVO)
-                }
-                
-                return (isRefreshed, cellData)
+                return (isRefreshed, mergedPosts)
             }
             .asDriver(onErrorDriveWith: .never())
         
