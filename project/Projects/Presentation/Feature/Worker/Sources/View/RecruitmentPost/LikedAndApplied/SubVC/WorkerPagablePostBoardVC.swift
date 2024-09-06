@@ -15,13 +15,15 @@ import DSKit
 
 public class WorkerPagablePostBoardVC: BaseViewController {
     
-    typealias Cell = WorkerNativeEmployCardCell
+    typealias NativeCell = WorkerNativeEmployCardCell
+    typealias WorknetCell = WorkerWorknetEmployCardCell
     
     // View
     let postTableView: UITableView = {
         let tableView = UITableView()
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
+        tableView.register(NativeCell.self, forCellReuseIdentifier: NativeCell.identifier)
+        tableView.register(WorknetCell.self, forCellReuseIdentifier: WorknetCell.identifier)
         return tableView
     }()
     
@@ -31,7 +33,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
     var isPaging = true
     
     // Observable
-    let cellData: BehaviorRelay<[PostBoardCellData]> = .init(value: [])
+    var postData: [RecruitmentPostForWorkerRepresentable] = []
     let requestNextPage: PublishRelay<Void> = .init()
     
     public init() {
@@ -94,9 +96,9 @@ public class WorkerPagablePostBoardVC: BaseViewController {
         // Output
         viewModel
             .postBoardData?
-            .drive(onNext: { [weak self] (isRefreshed, cellData) in
+            .drive(onNext: { [weak self] (isRefreshed, postData) in
                 guard let self else { return }
-                self.cellData.accept(cellData)
+                self.postData = postData
                 self.postTableView.reloadData()
                 isPaging = false
                 
@@ -128,7 +130,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
             .postBoardData?
             .drive(onNext: { [weak self] (isRefreshed, cellData) in
                 guard let self else { return }
-                self.cellData.accept(cellData)
+                self.postData = postData
                 self.postTableView.reloadData()
                 isPaging = false
                 
@@ -153,19 +155,47 @@ public class WorkerPagablePostBoardVC: BaseViewController {
 extension WorkerPagablePostBoardVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        cellData.value.count
+        postData.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
-        cell.selectionStyle = .none
+        var cell: UITableViewCell!
         
-        let cellData = cellData.value[indexPath.row]
+        let postData = postData[indexPath.row]
         
-        if let vm = viewModel as? WorkerNativeEmployCardViewModelable {
-            cell.bind(postId: cellData.postId, vo: cellData.cardVO, viewModel: vm)
+        switch postData.postType {
+        case .native:
+            
+            // Cell
+            let nativeCell = tableView.dequeueReusableCell(withIdentifier: NativeCell.identifier) as! NativeCell
+            
+            let postVO = postData as! NativeRecruitmentPostForWorkerVO
+            let vm = viewModel as! WorkerEmployCardViewModelable
+            let cellVO: WorkerNativeEmployCardVO = .create(vo: postVO)
+            nativeCell.bind(
+                postId: postVO.postId,
+                vo: cellVO,
+                viewModel: vm
+            )
+            cell = nativeCell
+        case .workNet:
+            
+            // Cell
+            let workNetCell = tableView.dequeueReusableCell(withIdentifier: WorknetCell.identifier) as! WorknetCell
+            
+            let postVO = postData as! WorknetRecruitmentPostVO
+            let vm = viewModel as! WorkerEmployCardViewModelable
+            let cellRO = WorkerWorknetEmployCardRO.create(vo: postVO)
+            workNetCell.bind(
+                postId: postVO.id,
+                ro: cellRO,
+                viewModel: vm
+            )
+            cell = workNetCell
         }
+        
+        cell.selectionStyle = .none
         
         return cell
     }

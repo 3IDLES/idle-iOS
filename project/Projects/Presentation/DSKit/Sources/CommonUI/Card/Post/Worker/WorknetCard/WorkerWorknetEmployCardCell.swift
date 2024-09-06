@@ -12,7 +12,7 @@ import Entity
 
 public class WorkerWorknetEmployCardCell: UITableViewCell {
     
-    public static let identifier = String(describing: WorkerNativeEmployCardCell.self)
+    public static let identifier = String(describing: WorkerWorknetEmployCardCell.self)
     
     private var disposables: [Disposable?]?
     

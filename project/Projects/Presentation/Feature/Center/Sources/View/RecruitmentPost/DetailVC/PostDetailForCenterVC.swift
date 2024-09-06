@@ -30,8 +30,8 @@ public class PostDetailForCenterVC: BaseViewController {
         return bar
     }()
     
-    let sampleCard: WorkerEmployCard = {
-        let card = WorkerEmployCard()
+    let sampleCard: WorkerNativeEmployCard = {
+        let card = WorkerNativeEmployCard()
         card.starButton.isHidden = true
         return card
     }()

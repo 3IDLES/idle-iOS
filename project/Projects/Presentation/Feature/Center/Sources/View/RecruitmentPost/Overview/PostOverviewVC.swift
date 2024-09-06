@@ -76,8 +76,8 @@ public class PostOverviewVC: BaseViewController {
         return label
     }()
     
-    let sampleCard: WorkerEmployCard = {
-        let card = WorkerEmployCard()
+    let sampleCard: WorkerNativeEmployCard = {
+        let card = WorkerNativeEmployCard()
         card.starButton.isUserInteractionEnabled = false
         return card
     }()

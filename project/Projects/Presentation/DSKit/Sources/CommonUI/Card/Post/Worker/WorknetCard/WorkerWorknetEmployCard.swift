@@ -55,6 +55,7 @@ public class WorkerWorknetEmployCard: VStack {
     
     let titleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle2)
+        label.numberOfLines = 0
         return label
     }()
     
@@ -62,6 +63,7 @@ public class WorkerWorknetEmployCard: VStack {
     let estimatedArrivalTimeLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSKitAsset.Colors.gray500.color
+        label.numberOfLines = 0
         return label
     }()
     
@@ -69,6 +71,7 @@ public class WorkerWorknetEmployCard: VStack {
     let workTimeLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSKitAsset.Colors.gray500.color
+        label.numberOfLines = 0
         return label
     }()
     
@@ -76,6 +79,7 @@ public class WorkerWorknetEmployCard: VStack {
     let payLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSKitAsset.Colors.gray500.color
+        label.numberOfLines = 0
         return label
     }()
     
@@ -136,7 +140,9 @@ public class WorkerWorknetEmployCard: VStack {
         
         NSLayoutConstraint.activate([
             timeImage.widthAnchor.constraint(equalToConstant: 24),
+            timeImage.heightAnchor.constraint(equalTo: timeImage.widthAnchor),
             payImage.widthAnchor.constraint(equalToConstant: 24),
+            payImage.heightAnchor.constraint(equalTo: payImage.widthAnchor),
             starButton.widthAnchor.constraint(equalToConstant: 24),
             starButton.heightAnchor.constraint(equalTo: starButton.widthAnchor),
         ])
