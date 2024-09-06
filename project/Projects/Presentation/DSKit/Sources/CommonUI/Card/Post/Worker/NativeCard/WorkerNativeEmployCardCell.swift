@@ -43,7 +43,7 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
         view.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
         return view
     }()
-    let cardView = WorkerEmployCard()
+    let cardView = WorkerNativeEmployCard()
     let applyButton: IdlePrimaryCardButton = {
         let btn = IdlePrimaryCardButton(level: .large)
         btn.label.textString = "지원하기"
