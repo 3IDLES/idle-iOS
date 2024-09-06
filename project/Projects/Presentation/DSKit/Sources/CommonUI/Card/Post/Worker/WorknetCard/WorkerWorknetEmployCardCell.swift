@@ -94,7 +94,7 @@ public class WorkerWorknetEmployCardCell: UITableViewCell {
             tappableArea
                 .rx.tap
                 .subscribe(onNext: { [weak viewModel] _ in
-                    viewModel?.showPostDetail(id: postId)
+                    viewModel?.showPostDetail(postType: .workNet, id: postId)
                 }),
             
             favoriteRequestResult

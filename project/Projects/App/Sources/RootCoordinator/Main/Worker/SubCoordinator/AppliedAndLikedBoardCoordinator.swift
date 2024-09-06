@@ -7,6 +7,7 @@
 
 import UIKit
 import WorkerFeature
+import Entity
 import BaseFeature
 import CenterFeature
 import PresentationCore
@@ -65,9 +66,10 @@ class AppliedAndLikedBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
 }
 
 extension AppliedAndLikedBoardCoordinator {
-    public func showPostDetail(postId: String) {
+    public func showPostDetail(postType: RecruitmentPostType, postId: String) {
         let coodinator = PostDetailForWorkerCoodinator(
             dependency: .init(
+                postType: postType,
                 postId: postId,
                 parent: self,
                 navigationController: navigationController,

@@ -1,8 +1,8 @@
 //
-//  NativePostDetailForWorkerVM.swift
+//  WorknetPostDetailForWorkerVM.swift
 //  BaseFeature
 //
-//  Created by choijunios on 8/15/24.
+//  Created by choijunios on 9/6/24.
 //
 
 import UIKit
@@ -13,25 +13,21 @@ import PresentationCore
 import UseCaseInterface
 import DSKit
 
-public protocol NativePostDetailForWorkerViewModelable: BaseViewModel {
+public protocol WorknetPostDetailForWorkerViewModelable: BaseViewModel {
     
     // Output
-    var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
+    var postDetail: Driver<WorknetRecruitmentPostDetailVO>? { get }
     var locationInfo: Driver<WorkPlaceAndWorkerLocationMapRO>? { get }
-    var idleAlertVM: Driver<IdleAlertViewModelable>? { get }
     var starButtonRequestResult: Driver<Bool>? { get }
-     
-    // Input
-    var viewWillAppear: PublishRelay<Void> { get }
     
+    // Input
+    var requestRefresh: PublishRelay<Void> { get }
     var backButtonClicked: PublishRelay<Void> { get }
-    var applyButtonClicked: PublishRelay<Void> { get }
     var starButtonClicked: PublishRelay<Bool> { get }
-    var centerCardClicked: PublishRelay<Void> { get }
 }
 
-public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWorkerViewModelable {
-
+public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWorkerViewModelable {
+    
     public weak var coordinator: PostDetailForWorkerCoodinator?
     
     // Init
@@ -39,17 +35,14 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     private let recruitmentPostUseCase: RecruitmentPostUseCase
     
     // Ouput
-    public var postForWorkerBundle: RxCocoa.Driver<Entity.RecruitmentPostForWorkerBundle>?
+    public var postDetail: RxCocoa.Driver<Entity.WorknetRecruitmentPostDetailVO>?
     public var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
-    public var idleAlertVM: Driver<any IdleAlertViewModelable>?
     public var starButtonRequestResult: Driver<Bool>?
     
     // Input
+    public var requestRefresh: RxRelay.PublishRelay<Void> = .init()
     public var backButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var applyButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var starButtonClicked: RxRelay.PublishRelay<Bool> = .init()
-    public var centerCardClicked: RxRelay.PublishRelay<Void> = .init()
-    public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
 
     
     public init(
@@ -64,15 +57,10 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
         
         super.init()
         
-        // MARK: 로딩 옵저버블
-        var loadingStartObservables: [Observable<Void>] = []
-        var loadingEndObservables: [Observable<Void>] = []
-        
-        
-        let getPostDetailResult = viewWillAppear
+        let getPostDetailResult = requestRefresh
             .flatMap { [recruitmentPostUseCase] _ in
                 recruitmentPostUseCase
-                    .getNativePostDetailForWorker(id: postId)
+                    .getWorknetPostDetailForWorker(id: postId)
             }
             .share()
         
@@ -80,24 +68,30 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
         let getPostDetailFailure = getPostDetailResult.compactMap { $0.error }
         
         let getPostDetailFailureAlert = getPostDetailFailure
-            .map { error in
+            .map { [weak self] error in
                 DefaultAlertContentVO(
                     title: "공고 불러오기 실패",
                     message: error.message
-                )
+                ) { [weak self] in
+                    self?.coordinator?.coordinatorDidFinish()
+                }
             }
         
-        postForWorkerBundle = getPostDetailSuccess.asDriver(onErrorRecover: { _ in fatalError() })
+        postDetail = getPostDetailSuccess
+            .asDriver(onErrorDriveWith: .never())
         
         // MARK: 센터, 워커 위치정보
         locationInfo = getPostDetailSuccess
-            .map { [weak self] bundle in
+            .map { [weak self] postVO in
                 // 요양보호사 위치 가져오기
                 let workerLocation = self?.getWorkerLocation()
                 
-                let workPlaceLocation = bundle.jobLocation
+                let workPlaceLocation: LocationInformation = .init(
+                    longitude: Double(postVO.longitude) ?? 0.0,
+                    latitude: Double(postVO.latitude) ?? 0.0
+                )
                 
-                let roadAddress = bundle.addressInfo.addressInfo?.roadAddress ?? "근무지 위치"
+                let roadAddress = postVO.clientAddress
                 let text = "거주지에서 \(roadAddress) 까지"
                 var normalAttr = Typography.Body2.attributes
                 normalAttr[.foregroundColor] = DSKitAsset.Colors.gray500.color
@@ -109,7 +103,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                 let range = NSRange(text.range(of: roadAddress)!, in: text)
                 attrText.addAttribute(.font, value: roadTextFont, range: range)
                 
-                let estimatedArrivalTimeText = self?.timeForDistance(meter: bundle.distanceToWorkPlace)
+                let estimatedArrivalTimeText = self?.timeForDistance(meter: postVO.distance)
                 
                 return WorkPlaceAndWorkerLocationMapRO(
                     workPlaceRoadAddress: roadAddress,
@@ -128,47 +122,6 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                 self.coordinator?.coordinatorDidFinish()
             })
             .disposed(by: disposeBag)
-        
-        // 지원하기 버튼 클릭
-        // MARK: 지원하기
-        let applyRequest: PublishRelay<Void> = .init()
-        self.idleAlertVM = applyButtonClicked
-            .map { _ in
-                DefaultIdleAlertVM(
-                    title: "공고에 지원하시겠어요?",
-                    description: "",
-                    acceptButtonLabelText: "지원하기",
-                    cancelButtonLabelText: "취소하기") {
-                        applyRequest.accept(())
-                    }
-            }
-            .asDriver(onErrorDriveWith: .never())
-
-        // 로딩 시작
-        loadingStartObservables.append(applyRequest.map { _ in })
-        
-        let applyRequestResult = applyRequest
-            .flatMap { [recruitmentPostUseCase] _ in
-                
-                // 리스트화면에서는 앱내 지원만 지원합니다.
-                return recruitmentPostUseCase
-                    .applyToPost(postId: postId, method: .app)
-            }
-            .share()
-        
-        // 로딩 종료
-        loadingEndObservables.append(applyRequestResult.map { _ in })
-        
-        let applyRequestSuccess = applyRequestResult.compactMap { $0.value }
-        let applyRequestFailure = applyRequestResult.compactMap { $0.error }
-        
-        let applyRequestFailureAlert = applyRequestFailure
-            .map { error in
-                DefaultAlertContentVO(
-                    title: "지원하기 실패",
-                    message: error.message
-                )
-            }
 
         // MARK: 즐겨찾기
         starButtonRequestResult = starButtonClicked
@@ -182,44 +135,12 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             .asDriver(onErrorJustReturn: false)
             
         
-        // 센터 프로필 조회 버튼클릭
-        centerCardClicked
-            .withLatestFrom(getPostDetailSuccess)
-            .subscribe(onNext: { [weak self] bundle in
-                guard let self else { return }
-                let centerId = bundle.centerInfo.centerId
-                self.coordinator?.showCenterProfileScreen(centerId: centerId)
-            })
-            .disposed(by: disposeBag)
-        
-        
         // MARK: Alert
         Observable
-            .merge(
-                getPostDetailFailureAlert,
-                applyRequestFailureAlert
-            )
+            .merge(getPostDetailFailureAlert)
             .subscribe(onNext: { [weak self] alertVO in
                 guard let self else { return }
                 alert.onNext(alertVO)
-            })
-            .disposed(by: disposeBag)
-        
-        // MARK: 로딩
-        Observable
-            .merge(loadingStartObservables)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                showLoading.onNext(())
-            })
-            .disposed(by: disposeBag)
-        
-        Observable
-            .merge(loadingEndObservables)
-            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                dismissLoading.onNext(())
             })
             .disposed(by: disposeBag)
     }
@@ -283,7 +204,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                     alert.onNext(alertVO)
                 })
                 
-            	
+                
             let disposable = Observable
                 .merge(
                     success.map { _ in true }.asObservable(),

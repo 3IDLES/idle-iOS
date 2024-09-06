@@ -70,6 +70,9 @@ public extension BaseViewController {
         )
         let close = UIAlertAction(title: "닫기", style: .default) { [weak self] _ in
             self?.alert(vo: vo)
+            
+            // dismiss
+            vo.onDismiss?()
         }
         alert.addAction(close)
         present(alert, animated: true, completion: nil)
