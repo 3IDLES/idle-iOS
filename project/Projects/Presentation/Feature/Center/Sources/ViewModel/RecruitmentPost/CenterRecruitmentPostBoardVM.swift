@@ -146,7 +146,11 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
                 message: error.message
             )
         }
-        .subscribe(alert)
+        .subscribe(onNext: { [weak self] alertVO in
+            guard let self else { return }
+            
+            alert.onNext(alertVO)
+        })
         .disposed(by: disposeBag)
     }
     

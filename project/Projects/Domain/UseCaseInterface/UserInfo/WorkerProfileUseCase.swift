@@ -21,6 +21,8 @@ public protocol WorkerProfileUseCase: UseCaseBase {
     /// 5. 특정 요양보호사의 프로필 불러오기
     func getProfile(mode: ProfileMode) -> Single<Result<WorkerProfileVO, DomainError>>
     
+    func getFreshProfile(mode: ProfileMode) -> Single<Result<WorkerProfileVO, DomainError>>
+    
     
     /// 2. 나의(요보) 프로필 정보 업데이트(텍스트 데이터)
     /// 3. 나의(요보) 프로필 정보 업데이트(이미지, pre-signed-url)
