@@ -53,8 +53,12 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         convert(task: repository.getPostDetailForCenter(id: id))
     }
     
-    public func getPostDetailForWorker(id: String) -> RxSwift.Single<Result<Entity.RecruitmentPostForWorkerBundle, Entity.DomainError>> {
-        convert(task: repository.getPostDetailForWorker(id: id))
+    public func getNativePostDetailForWorker(id: String) -> RxSwift.Single<Result<Entity.RecruitmentPostForWorkerBundle, Entity.DomainError>> {
+        convert(task: repository.getNativePostDetailForWorker(id: id))
+    }
+    
+    public func getWorknetPostDetailForWorker(id: String) -> RxSwift.Single<Result<Entity.WorknetRecruitmentPostDetailVO, Entity.DomainError>> {
+        convert(task: repository.getWorknetPostDetailForWorker(id: id))
     }
     
     public func getOngoingPosts() -> RxSwift.Single<Result<[Entity.RecruitmentPostInfoForCenterVO], Entity.DomainError>> {
