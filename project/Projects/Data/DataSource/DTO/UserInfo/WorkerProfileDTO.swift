@@ -20,7 +20,8 @@ public struct CarerProfileDTO: Codable {
     let speciality: String?
     let profileImageUrl: String?
     let jobSearchStatus: String
-    
+    let longitude: String
+    let latitude: String
     
     public func toVO() -> WorkerProfileVO {
         
@@ -37,7 +38,9 @@ public struct CarerProfileDTO: Codable {
                 jibunAddress: lotNumberAddress
             ),
             introductionText: introduce ?? "",
-            specialty: speciality ?? ""
+            specialty: speciality ?? "",
+            longitude: Double(longitude)!,
+            latitude: Double(latitude)!
         )
     }
 }

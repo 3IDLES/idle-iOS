@@ -106,8 +106,8 @@ public struct NativeRecruitmentPostDetailDTO: EntityRepresentable {
         )
         
         let jobLocation: LocationInformation = .init(
-            longitude: Double(longitude)!,
-            latitude: Double(latitude)!
+            longitude: Double(longitude) ?? 0.0,
+            latitude: Double(latitude) ?? 0.0
         )
         
         // MARK: Apply date
