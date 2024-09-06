@@ -13,6 +13,7 @@ public enum APIType {
     case auth
     case users
     case job_postings
+    case crawling_job_postings
     case external(url: String)
     case applys
 }
@@ -36,6 +37,8 @@ public extension BaseAPI {
             baseStr += "/users"
         case .job_postings:
             baseStr += "/job-postings"
+        case .crawling_job_postings:
+            baseStr += "/crawling-job-postings"
         case .applys:
             baseStr += "/applys"
         case .external(let url):
