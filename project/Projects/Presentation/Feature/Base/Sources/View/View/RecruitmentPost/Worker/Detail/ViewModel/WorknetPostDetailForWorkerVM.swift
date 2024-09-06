@@ -33,6 +33,7 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
     // Init
     private let postId: String
     private let recruitmentPostUseCase: RecruitmentPostUseCase
+    private let workerProfileUseCase: WorkerProfileUseCase
     
     // Ouput
     public var postDetail: RxCocoa.Driver<Entity.WorknetRecruitmentPostDetailVO>?
@@ -48,12 +49,14 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
     public init(
             postId: String,
             coordinator: PostDetailForWorkerCoodinator?,
-            recruitmentPostUseCase: RecruitmentPostUseCase
+            recruitmentPostUseCase: RecruitmentPostUseCase,
+            workerProfileUseCase: WorkerProfileUseCase
         )
     {
         self.postId = postId
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
+        self.workerProfileUseCase = workerProfileUseCase
         
         super.init()
         
@@ -81,10 +84,24 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
             .asDriver(onErrorDriveWith: .never())
         
         // MARK: 센터, 워커 위치정보
-        locationInfo = getPostDetailSuccess
-            .map { [weak self] postVO in
+        let requestWorkerLocationResult = requestRefresh
+            .flatMap({ [workerProfileUseCase] _ in
+                workerProfileUseCase
+                    .getProfile(mode: .myProfile)
+            })
+        
+        let requestWorkerLocationSuccess = requestWorkerLocationResult.compactMap { $0.value }
+        let requestWorkerLocationFailure = requestWorkerLocationResult.compactMap { $0.error }
+        
+        locationInfo = Observable
+            .zip(getPostDetailSuccess, requestWorkerLocationSuccess)
+            .map { [weak self] postVO, profile in
+                
                 // 요양보호사 위치 가져오기
-                let workerLocation = self?.getWorkerLocation()
+                let workerLocation: LocationInformation = .init(
+                    longitude: profile.longitude,
+                    latitude: profile.latitude
+                )
                 
                 let workPlaceLocation: LocationInformation = .init(
                     longitude: Double(postVO.longitude) ?? 0.0,
@@ -143,14 +160,6 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
                 alert.onNext(alertVO)
             })
             .disposed(by: disposeBag)
-    }
-    
-    // MARK: Test
-    func getWorkerLocation() -> LocationInformation {
-        return .init(
-            longitude: 127.046425,
-            latitude: 37.504588
-        )
     }
         
     public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: Entity.RecruitmentPostType) -> RxSwift.Single<Bool> {

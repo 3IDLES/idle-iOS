@@ -82,14 +82,6 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
         let getPostDetailSuccess = getPostDetailResult.compactMap { $0.value }
         let getPostDetailFailure = getPostDetailResult.compactMap { $0.error }
         
-        let getPostDetailFailureAlert = getPostDetailFailure
-            .map { error in
-                DefaultAlertContentVO(
-                    title: "공고 불러오기 실패",
-                    message: error.message
-                )
-            }
-        
         postForWorkerBundle = getPostDetailSuccess.asDriver(onErrorRecover: { _ in fatalError() })
         
         // MARK: 센터, 워커 위치정보
@@ -187,6 +179,22 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                     message: error.message
                 )
             }
+        
+        let getPostDetailFailureAlert = getPostDetailFailure
+            .map { error in
+                DefaultAlertContentVO(
+                    title: "공고 불러오기 실패",
+                    message: error.message
+                )
+            }
+        
+        let requestWorkerLocationFailureAlert = requestWorkerLocationFailure
+            .map { error in
+                DefaultAlertContentVO(
+                    title: "요양보호사 위치정보 확인 실패",
+                    message: error.message
+                )
+            }
 
         // MARK: 즐겨찾기
         starButtonRequestResult = starButtonClicked
@@ -215,7 +223,8 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
         Observable
             .merge(
                 getPostDetailFailureAlert,
-                applyRequestFailureAlert
+                applyRequestFailureAlert,
+                requestWorkerLocationFailureAlert
             )
             .subscribe(onNext: { [weak self] alertVO in
                 guard let self else { return }
