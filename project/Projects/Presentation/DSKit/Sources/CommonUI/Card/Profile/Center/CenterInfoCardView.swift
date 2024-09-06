@@ -26,6 +26,17 @@ public class CenterInfoCardView: TappableUIView {
         return label
     }()
     
+    public let locationImageView: UIImageView = {
+        let iamgeView = DSKitAsset.Icons.location.image.toView()
+        iamgeView.tintColor = DSColor.gray400.color
+        return iamgeView
+    }()
+    public let chevronLeftImage: UIImageView = {
+        let view = DSKitAsset.Icons.chevronRight.image.toView()
+        view.tintColor = DSKitAsset.Colors.gray200.color
+        return view
+    }()
+    
     // Observable
     private let disposeBag = DisposeBag()
     
@@ -45,16 +56,7 @@ public class CenterInfoCardView: TappableUIView {
         
     }
     
-    public let chevronLeftImage: UIImageView = {
-        let view = DSKitAsset.Icons.chevronRight.image.toView()
-        view.tintColor = DSKitAsset.Colors.gray200.color
-        return view
-    }()
-    
     private func setLayout() {
-        
-        let locationImageView = DSKitAsset.Icons.location.image.toView()
-        locationImageView.tintColor = DSColor.gray400.color
         
         let locationStack = HStack(
             [
