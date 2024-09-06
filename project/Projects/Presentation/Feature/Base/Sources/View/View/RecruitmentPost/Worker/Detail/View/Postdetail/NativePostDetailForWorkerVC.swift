@@ -260,7 +260,7 @@ public class PostDetailForWorkerContentView: UIView {
     }()
     
     /// 지도뷰
-    public let workPlaceAndWorkerLocationView = WorkPlaceAndWorkerLocationView()
+    let workPlaceAndWorkerLocationView = WorkPlaceAndWorkerLocationView()
     
     /// 공고 상세정보들
     let workConditionView = WorkConditionDisplayingView()
