@@ -73,9 +73,9 @@ public class InitialScreenVM: BaseViewModel {
             // 센터관리자 확인
             printIfDebug("☑️ 센터관리자 정보를 확인합니다.")
             
-            // 저장된 센터정보가 없는 경우
+            // 센터프로필 조회 및 refresh 확인
             let requestCenterInfoResult = centerProfileUseCase
-                .getProfile(mode: .myProfile)
+                .getFreshProfile(mode: .myProfile)
                 .asObservable()
                 .share()
             let success = requestCenterInfoResult.compactMap { $0.value }
@@ -118,9 +118,9 @@ public class InitialScreenVM: BaseViewModel {
                 .disposed(by: disposeBag)
         } else {
             
-            // 요양보호사 확인
+            // 요양보호사프로필 조회 및 refresh 확인
             let requestWorkerInfoResult = workerProfileUseCase
-                .getProfile(mode: .myProfile)
+                .getFreshProfile(mode: .myProfile)
                 .asObservable()
                 .share()
             let success = requestWorkerInfoResult.compactMap { $0.value }

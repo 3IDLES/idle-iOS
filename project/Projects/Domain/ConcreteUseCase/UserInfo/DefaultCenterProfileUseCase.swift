@@ -28,7 +28,11 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
             return .just(.success(cachedProfile))
         }
         
-        return convert(task: userProfileRepository.getCenterProfile(mode: mode))
+        return getFreshProfile(mode: mode)
+    }
+    
+    public func getFreshProfile(mode: Entity.ProfileMode) -> RxSwift.Single<Result<Entity.CenterProfileVO, Entity.DomainError>> {
+        convert(task: userProfileRepository.getCenterProfile(mode: mode))
     }
     
     public func updateProfile(phoneNumber: String?, introduction: String?, imageInfo: ImageUploadInfo?) -> Single<Result<Void, DomainError>> {

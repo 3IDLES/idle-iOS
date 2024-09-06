@@ -20,7 +20,11 @@ public protocol CenterProfileUseCase: UseCaseBase {
     
     /// 1. 나의 센터/다른 센터 프로필 정보 조회
     /// 6. 특정 센터의 프로필 불러오기
+    /// 캐시된 데이터가 있을 경우 해당 데이터를 가져옵니다.
     func getProfile(mode: ProfileMode) -> Single<Result<CenterProfileVO, DomainError>>
+    
+    /// 캐쉬되지 않은 정보를 가져옵니다.
+    func getFreshProfile(mode: ProfileMode) -> Single<Result<CenterProfileVO, DomainError>>
     
     /// 2. 센터 프로필 정보 업데이트(전화번호, 센터소개글)
     /// 3. 센터 프로필 정보 업데이트(이미지, pre-signed-url)

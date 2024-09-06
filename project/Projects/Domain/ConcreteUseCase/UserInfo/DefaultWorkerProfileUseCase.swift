@@ -28,7 +28,11 @@ public class DefaultWorkerProfileUseCase: WorkerProfileUseCase {
             return .just(.success(cachedProfile))
         }
         
-        return convert(task: userProfileRepository.getWorkerProfile(mode: mode))
+        return getFreshProfile(mode: mode)
+    }
+    
+    public func getFreshProfile(mode: Entity.ProfileMode) -> RxSwift.Single<Result<Entity.WorkerProfileVO, Entity.DomainError>> {
+        convert(task: userProfileRepository.getWorkerProfile(mode: mode))
     }
     
     public func updateProfile(stateObject: WorkerProfileStateObject, imageInfo: ImageUploadInfo?) -> Single<Result<Void, DomainError>> {
