@@ -81,7 +81,8 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
             let vm = WorknetPostDetailForWorkerVM(
                 postId: postId,
                 coordinator: self,
-                recruitmentPostUseCase: recruitmentPostUseCase
+                recruitmentPostUseCase: recruitmentPostUseCase,
+                workerProfileUseCase: workerProfileUseCase
             )
             worknetDetailVC.bind(viewModel: vm)
             vc = worknetDetailVC

@@ -41,6 +41,7 @@ public class WorknetPostDetailForWorkerVC: BaseViewController {
         
         setAppearance()
         setLayout()
+        setObservable()
     }
     
     // 모집 요강
@@ -355,7 +356,22 @@ public class WorknetPostDetailForWorkerVC: BaseViewController {
     
     func setObservable() {
         
-        //TODO: 워크넷 딥링크
+        worknetLinkCard
+            .rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self, let url = self.workNetPostLink else { return }
+                
+                _ = openDeepLink(url: url)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func openDeepLink(url: URL) -> Bool {
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            return true
+        }
+        return false
     }
     
     func makeTitleLabel(text: String) -> IdleLabel {
