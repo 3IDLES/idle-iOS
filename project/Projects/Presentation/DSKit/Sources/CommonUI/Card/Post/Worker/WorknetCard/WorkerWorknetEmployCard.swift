@@ -97,7 +97,7 @@ public class WorkerWorknetEmployCard: VStack {
             [
                 worknetTag,
                 beginnerTag,
-                daysUntilDeadlineTag
+                daysUntilDeadlineTag,
             ],
             spacing: 4
         )
@@ -137,6 +137,8 @@ public class WorkerWorknetEmployCard: VStack {
         NSLayoutConstraint.activate([
             timeImage.widthAnchor.constraint(equalToConstant: 24),
             payImage.widthAnchor.constraint(equalToConstant: 24),
+            starButton.widthAnchor.constraint(equalToConstant: 24),
+            starButton.heightAnchor.constraint(equalTo: starButton.widthAnchor),
         ])
         
         let viewList = [
