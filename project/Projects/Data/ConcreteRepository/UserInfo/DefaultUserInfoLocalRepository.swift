@@ -29,7 +29,6 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
     typealias K = UserInfoStorageKey
     
     let localStorageService: LocalStorageService
-    let authService: AuthService = .init()
     
     let jsonDecoder = JSONDecoder()
     let encoder = JSONEncoder()
@@ -85,12 +84,6 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
     public func updateCurrentCenterData(vo: Entity.CenterProfileVO) {
         let encoded = try! encoder.encode(vo)
         localStorageService.saveData(key: K.currentCenter.rawValue, value: encoded)
-    }
-    
-    public func getCenterJoinStatus() -> RxSwift.Single<CenterJoinStatusInfoVO> {
-        authService
-            .request(api: .centerJoinStatus, with: .withToken)
-            .map(CenterJoinStatusInfoVO.self)
     }
     
     public func removeAllData() {
