@@ -91,7 +91,9 @@ class SaveUserInfoDataTests: XCTestCase {
                 expYear: nil,
                 address: .init(roadAddress: "test", jibunAddress: "test"),
                 introductionText: "test",
-                specialty: "test"
+                specialty: "test",
+                longitude: 0.0,
+                latitude: 0.0
             )
         )
         
