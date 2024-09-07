@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RxSwift
 import Entity
 
 public protocol UserInfoLocalRepository {
@@ -28,14 +29,8 @@ public protocol UserInfoLocalRepository {
     /// 로컬에 저장될 유저정보를 업데이트합니다.
     func updateCurrentCenterData(vo: CenterProfileVO)
     
-    /// 센터의 인증 정보를 설정합니다.
-    func setCenterAuthState(state: CenterAuthState)
-    
-    /// 센터의 인증 정보를 가져옵니다.
-    func getCenterAuthState() -> Entity.CenterAuthState?
-    
-    /// 센터의 인증 정보를 가져옵니다.
-//    func getCenterAuthState() -> CenterAuthState
+    /// 센터 인증 상태를 가져옵니다.
+    func getCenterJoinStatus() -> Single<CenterJoinStatusInfoVO>
     
     /// 유저타입, 정보를 모두 삭제합니다.
     func removeAllData()
