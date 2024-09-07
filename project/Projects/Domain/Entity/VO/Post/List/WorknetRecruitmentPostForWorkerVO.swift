@@ -9,7 +9,9 @@ import Foundation
 
 public struct WorknetRecruitmentPostVO: RecruitmentPostForWorkerRepresentable {
     
-    public let postType: RecruitmentPostType
+    // protocol required
+    public var postType: RecruitmentPostType
+    public var beFavoritedTime: Date?
     
     public let id: String
     public let title: String
@@ -29,7 +31,8 @@ public struct WorknetRecruitmentPostVO: RecruitmentPostForWorkerRepresentable {
         payInfo: String,
         applyDeadline: Date,
         isFavorite: Bool,
-        postType: RecruitmentPostType
+        postType: RecruitmentPostType,
+        beFavoritedTime: Date? = nil
     ) {
         self.id = id
         self.title = title
@@ -40,5 +43,6 @@ public struct WorknetRecruitmentPostVO: RecruitmentPostForWorkerRepresentable {
         self.applyDeadline = applyDeadline
         self.isFavorite = isFavorite
         self.postType = postType
+        self.beFavoritedTime = beFavoritedTime
     }
 }

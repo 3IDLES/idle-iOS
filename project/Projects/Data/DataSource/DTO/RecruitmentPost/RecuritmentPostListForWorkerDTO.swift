@@ -13,7 +13,7 @@ public protocol EntityRepresentable: Codable {
     func toEntity() -> Entity
 }
 
-public struct RecruitmentPostListForWorkerDTO<T: EntityRepresentable>: Codable where T.Entity: RecruitmentPostForWorkerRepresentable {
+public struct RecruitmentPostListForWorkerDTO<T: EntityRepresentable>: EntityRepresentable where T.Entity: RecruitmentPostForWorkerRepresentable {
 
     public let items: [T]
     public let next: String?
@@ -29,6 +29,18 @@ public struct RecruitmentPostListForWorkerDTO<T: EntityRepresentable>: Codable w
     }
 }
 
+public struct FavoriteRecruitmentPostListForWorkerDTO<T: EntityRepresentable>: EntityRepresentable where T.Entity: RecruitmentPostForWorkerRepresentable {
+    
+    public let favoriteJobPostings: [T]
+    
+    public func toEntity() -> [RecruitmentPostForWorkerRepresentable] {
+        
+        favoriteJobPostings.map { dto in
+            dto.toEntity()
+        }
+    }
+}
+
 // MARK: Worknet post의 카드 정보
 public struct WorkNetRecruitmentPostForWorkerDTO: EntityRepresentable {
      
@@ -41,6 +53,7 @@ public struct WorkNetRecruitmentPostForWorkerDTO: EntityRepresentable {
     public let applyDeadline: String
     public let isFavorite: Bool
     public let jobPostingType: RecruitmentPostType
+    public let createdAt: String?
     
     public func toEntity() -> WorknetRecruitmentPostVO {
         
@@ -48,6 +61,12 @@ public struct WorkNetRecruitmentPostForWorkerDTO: EntityRepresentable {
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
         let deadlineDate = dateFormatter.date(from: self.applyDeadline)!
+        
+        let iso8601Formatter = ISO8601DateFormatter()
+        var createdDate: Date?
+        if let createdAt {
+            createdDate = iso8601Formatter.date(from: createdAt)
+        }
         
         return .init(
             id: id,
@@ -58,7 +77,8 @@ public struct WorkNetRecruitmentPostForWorkerDTO: EntityRepresentable {
             payInfo: payInfo,
             applyDeadline: deadlineDate,
             isFavorite: isFavorite,
-            postType: jobPostingType
+            postType: jobPostingType,
+            beFavoritedTime: createdDate
         )
     }
 }
@@ -84,6 +104,7 @@ public struct NativeRecruitmentPostForWorkerDTO: EntityRepresentable {
     public let applyTime: String?
     public let isFavorite: Bool
     public let jobPostingType: RecruitmentPostType
+    public let createdAt: String?
     
     public func toEntity() -> NativeRecruitmentPostForWorkerVO {
         
@@ -96,6 +117,12 @@ public struct NativeRecruitmentPostForWorkerDTO: EntityRepresentable {
         
         let deadlineDate = self.applyDeadline != nil ? dateFormatter.date(from: self.applyDeadline!) : nil
         let applyDate = self.applyTime != nil ? dateFormatter.date(from: self.applyDeadline!) : nil
+        
+        let iso8601Formatter = ISO8601DateFormatter()
+        var createdDate: Date?
+        if let createdAt {
+            createdDate = iso8601Formatter.date(from: createdAt)
+        }
         
         return .init(
             postId: id,
@@ -115,7 +142,8 @@ public struct NativeRecruitmentPostForWorkerDTO: EntityRepresentable {
             distanceFromWorkPlace: distance,
             applyTime: applyDate,
             isFavorite: isFavorite,
-            postType: jobPostingType
+            postType: jobPostingType,
+            beFavoritedTime: createdDate
         )
     }
 }

@@ -29,102 +29,53 @@ public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
     public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
     public let recruitmentPostUseCase: RecruitmentPostUseCase
     
-    // Paging
-    /// 값이 nil이라면 요청을 보내지 않습니다.
-    var nextPagingRequest: PostPagingRequestForWorker?
-    /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
-    private let currentPostVO: BehaviorRelay<[RecruitmentPostForWorkerRepresentable]> = .init(value: [])
-    
     public init(coordinator: WorkerRecruitmentBoardCoordinatable, recruitmentPostUseCase: RecruitmentPostUseCase) {
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
-        self.nextPagingRequest = .initial
         
         super.init()
         
-        var loadingStartObservables: [Observable<Void>] = []
-        var loadingEndObservables: [Observable<Void>] = []
-        
         // MARK: 공고리스트 처음부터 요청하기
-        let initialRequest = requestInitialPageRequest
-            .flatMap { [weak self, recruitmentPostUseCase] request in
+        let initialRequestResult = requestInitialPageRequest
+            .flatMap { [weak self, recruitmentPostUseCase] _ in
                 
-                self?.currentPostVO.accept([])
-                self?.nextPagingRequest = .initial
+                self?.showLoading.onNext(())
                 
                 return recruitmentPostUseCase
-                    .getFavoritePostListForWorker(
-                        request: .initial,
-                        postCount: 10
-                    )
+                    .getFavoritePostListForWorker()
             }
             .share()
         
-        // 로딩 시작
-        loadingStartObservables.append(initialRequest.map { _ in })
+        initialRequestResult
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                dismissLoading.onNext(())
+            })
+            .disposed(by: disposeBag)
         
-        // MARK: 공고리스트 페이징 요청
-        let pagingRequest = requestNextPage
-            .compactMap { [weak self] _ in
-                // 요청이 없는 경우 요청을 보내지 않는다.
-                // ThirdPatry에서도 불러올 데이터가 없는 경우입니다.
-                self?.nextPagingRequest
-            }
-            .flatMap { [recruitmentPostUseCase] request in
-                recruitmentPostUseCase
-                    .getFavoritePostListForWorker(
-                        request: request,
-                        postCount: 10
-                    )
-            }
-            
-        let postPageReqeustResult = Observable
-            .merge(initialRequest, pagingRequest)
-            .share()
+        let initialRequestSuccess = initialRequestResult.compactMap { $0.value }
+        let initialRequestFailure = initialRequestResult.compactMap { $0.error }
         
-        // 로딩 종료
-        loadingEndObservables.append(postPageReqeustResult.map { _ in })
-        
-        let requestPostListSuccess = postPageReqeustResult.compactMap { $0.value }
-        let requestPostListFailure = postPageReqeustResult.compactMap { $0.error }
-        
-        postBoardData = Observable
-            .zip(
-                currentPostVO,
-                requestPostListSuccess
-            )
-            .compactMap { [weak self] (prevPostList, fetchedData) -> BoardRefreshResult? in
+        postBoardData = initialRequestSuccess
+            .map({ list in
                 
-                guard let self else { return nil }
-                
-                let isRefreshed: Bool = self.nextPagingRequest == .initial
-                
-                // TODO: ‼️ ‼️ 즐겨찾기 공고의 경우 서버에서 아직 워크넷 공고를 처리하는 방법을 정하지 못했음으로 추후에 수정할 예정입니다.
-                
-                if let next = fetchedData.nextPageId {
-                    // 지원 공고의 경우 써드파티에서 불러올 데이터가 없다.
-                    self.nextPagingRequest = .paging(
-                        source: .native,
-                        nextPageId: next
-                    )
-                } else {
-                    self.nextPagingRequest = nil
+                let sortedList = list.sorted { lhs, rhs in
+                    guard let lhsDate = lhs.beFavoritedTime, let rhsDate = rhs.beFavoritedTime else {
+                        return false
+                    }
+                    
+                    // 최신값을 배열의 앞쪽(화면의 상단)에 노출
+                    
+                    return lhsDate > rhsDate
                 }
                 
-                // 화면에 표시할 전체리스트 도출
-                let fetchedPosts = fetchedData.posts
-                var mergedPosts = currentPostVO.value
-                mergedPosts.append(contentsOf: fetchedPosts)
-                
-                // 최근값 업데이트
-                self.currentPostVO.accept(mergedPosts)
-                
-                return (isRefreshed, mergedPosts)
-            }
+                return (true, sortedList)
+            })
             .asDriver(onErrorDriveWith: .never())
         
         // MARK: 지원하기
         let applyRequest: PublishRelay<String> = .init()
+        
         self.idleAlertVM = applyButtonClicked
             .map { (postId: String, postTitle: String) in
                 DefaultIdleAlertVM(
@@ -136,20 +87,18 @@ public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
                     }
             }
             .asDriver(onErrorDriveWith: .never())
-        
-        // 로딩 시작
-        loadingStartObservables.append(applyRequest.map { _ in })
             
         let applyRequestResult = applyRequest
-            .flatMap { [recruitmentPostUseCase] postId in
+            .flatMap { [weak self, recruitmentPostUseCase] postId in
+                
+                self?.showLoading.onNext(())
+                
                 // 리스트화면에서는 앱내 지원만 지원합니다.
-                recruitmentPostUseCase
+                return recruitmentPostUseCase
                     .applyToPost(postId: postId, method: .app)
             }
             .share()
         
-        // 로딩 종료
-        loadingEndObservables.append(applyRequestResult.map { _ in })
         
         let applyRequestFailure = applyRequestResult.compactMap { $0.error }
         
@@ -161,7 +110,7 @@ public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
                 )
             }
         
-        let requestPostListFailureAlert = requestPostListFailure
+        let requestPostListFailureAlert = initialRequestFailure
             .map { error in
                 DefaultAlertContentVO(
                     title: "즐겨찾기한 공고 불러오기 오류",
@@ -171,19 +120,22 @@ public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
         
         Observable
             .merge(applyRequestFailureAlert, requestPostListFailureAlert)
-            .subscribe(self.alert)
+            .subscribe(onNext: { [weak self] alertVO in
+                guard let self else { return }
+                alert.onNext(alertVO)
+            })
             .disposed(by: disposeBag)
         
-        // MARK: 로딩
+        // MARK: 로딩 종료
         Observable
-            .merge(loadingStartObservables)
-            .subscribe(self.showLoading)
-            .disposed(by: disposeBag)
-        
-        Observable
-            .merge(loadingEndObservables)
-            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
-            .subscribe(self.dismissLoading)
+            .merge(
+                initialRequestResult.map({ _ in }),
+                applyRequestResult.map({ _ in })
+            )
+            .subscribe(onNext: { [weak self] _ in
+                guard let self else { return }
+                dismissLoading.onNext(())
+            })
             .disposed(by: disposeBag)
     }
 }
