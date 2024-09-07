@@ -78,4 +78,8 @@ public class DefaultAuthUseCase: AuthUseCase {
         
         return convert(task: task)
     }
+    
+    public func checkCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>> {
+        convert(task: authRepository.getCenterJoinStatus())
+    }
 }

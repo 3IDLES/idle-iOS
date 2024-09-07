@@ -68,6 +68,12 @@ public extension DefaultAuthRepository {
             )
             .map { _ in }
     }
+    
+    func getCenterJoinStatus() -> RxSwift.Single<CenterJoinStatusInfoVO> {
+        networkService
+            .request(api: .centerJoinStatus, with: .withToken)
+            .map(CenterJoinStatusInfoVO.self)
+    }
 }
 
 // MARK: Worker auth

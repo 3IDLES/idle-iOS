@@ -51,4 +51,7 @@ public protocol AuthUseCase: UseCaseBase {
         phoneNumber: String,
         authNumber: String
     ) -> Single<Result<Void, DomainError>>
+    
+    /// 센터 인증여부 확인
+    func checkCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>>
 }
