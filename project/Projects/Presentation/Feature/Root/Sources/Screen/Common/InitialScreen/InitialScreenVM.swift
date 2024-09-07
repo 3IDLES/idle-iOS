@@ -55,8 +55,6 @@ public class InitialScreenVM: BaseViewModel {
             .disposed(by: disposeBag)
         
         
-        
-        
         viewWillAppear
             .subscribe(onNext: { [weak self] _ in
                 
