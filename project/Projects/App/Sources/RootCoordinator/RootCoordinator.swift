@@ -34,7 +34,8 @@ class RootCoordinator {
         // Root VC
         let vc = InitialScreenVC()
         let vm = InitialScreenVM(
-            coordinator: self,
+            coordinator: self, 
+            authUseCase: injector.resolve(AuthUseCase.self),
             workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self),
             centerProfileUseCase: injector.resolve(CenterProfileUseCase.self),
             userInfoLocalRepository: injector.resolve(UserInfoLocalRepository.self)

@@ -28,6 +28,10 @@ extension RootCoordinator: RootCoorinatable {
         coordinator.start()
     }
     
+    func centerAuth() {
+        
+    }
+    
     /// 요양보호사 메인화면을 실행합니다.
     func workerMain() {
         
