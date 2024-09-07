@@ -114,37 +114,23 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             api: .getOnGoingNativePostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
-        .map(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
-        .catch({ error in
-            if let moyaError = error as? MoyaError, case .objectMapping(let error, _) = moyaError {
-                #if DEBUG
-                print("앱용 공고 전체조회 에러:", error.localizedDescription)
-                #endif
-            }
-            return .error(error)
-        })
-        .map { dto in
-            dto.toEntity()
-        }
+        .mapToEntity(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
     }
     
-    public func getFavoritePostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
+    public func getNativeFavoritePostListForWorker() -> RxSwift.Single<[RecruitmentPostForWorkerRepresentable]> {
         recruitmentPostService.request(
-            api: .getFavoritePostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
+            api: .getNativeFavoritePost,
             with: .withToken
         )
-        .map(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
-        .catch({ error in
-            if let moyaError = error as? MoyaError, case .objectMapping(let error, _) = moyaError {
-                #if DEBUG
-                print("즐겨찾기한 공고 전체조회 에러:",error.localizedDescription)
-                #endif
-            }
-            return .error(error)
-        })
-        .map { dto in
-            dto.toEntity()
-        }
+        .mapToEntity(FavoriteRecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
+    }
+    
+    public func getWorknetFavoritePostListForWorker() -> RxSwift.Single<[RecruitmentPostForWorkerRepresentable]> {
+        crawlingPostService.request(
+            api: .getWorknetFavoritePost,
+            with: .withToken
+        )
+        .mapToEntity(FavoriteRecruitmentPostListForWorkerDTO<WorkNetRecruitmentPostForWorkerDTO>.self)
     }
     
     public func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
@@ -152,18 +138,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             api: .getAppliedPostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
-        .map(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
-        .catch({ error in
-            if let moyaError = error as? MoyaError, case .objectMapping(let error, _) = moyaError {
-                #if DEBUG
-                print("지원한 공고 전체조회 에러:", error.localizedDescription)
-                #endif
-            }
-            return .error(error)
-        })
-        .map { dto in
-            dto.toEntity()
-        }
+        .mapToEntity(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
     }
     
     public func getWorknetPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
@@ -172,19 +147,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
                 api: .getPostList(nextPageId: nextPageId, requestCnt: requestCnt),
                 with: .withToken
             )
-            .map(RecruitmentPostListForWorkerDTO<WorkNetRecruitmentPostForWorkerDTO>.self)
-            .catch({ error in
-                if let moyaError = error as? MoyaError, case .objectMapping(let error, _) = moyaError {
-                    #if DEBUG
-                    print("지원한 공고 전체조회 에러:", error.localizedDescription)
-                    #endif
-                }
-                return .error(error)
-            })
-            .map { dto in
-                dto.toEntity()
-            }
-        
+            .mapToEntity(RecruitmentPostListForWorkerDTO<WorkNetRecruitmentPostForWorkerDTO>.self)
     }
     
     public func applyToPost(postId: String, method: ApplyType) -> Single<Void> {

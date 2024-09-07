@@ -31,8 +31,10 @@ public enum RcruitmentPostAPI {
     
     // Worker
     case getOnGoingNativePostListForWorker(nextPageId: String?, requestCnt: String)
-    case getFavoritePostListForWorker(nextPageId: String?, requestCnt: String)
     case getAppliedPostListForWorker(nextPageId: String?, requestCnt: String)
+    
+    // Favorite posts
+    case getNativeFavoritePost
     case addFavoritePost(id: String, jobPostingType: RecruitmentPostType)
     case removeFavoritePost(id: String)
 }
@@ -73,11 +75,12 @@ extension RcruitmentPostAPI: BaseAPI {
             
         case .getOnGoingNativePostListForWorker:
             ""
-        case .getFavoritePostListForWorker:
-            "/my/favorites"
         case .getAppliedPostListForWorker:
             "/carer/my/applied"
             
+            
+        case .getNativeFavoritePost:
+            "/my/favorites"
         case .addFavoritePost(let id, _):
             "/\(id)/favorites"
         case .removeFavoritePost(let id):
@@ -115,11 +118,11 @@ extension RcruitmentPostAPI: BaseAPI {
             
         case .getOnGoingNativePostListForWorker:
             .get
-        case .getFavoritePostListForWorker:
-            .get
         case .getAppliedPostListForWorker:
             .get
             
+        case .getNativeFavoritePost:
+            .get
         case .addFavoritePost:
             .post
         case .removeFavoritePost:
@@ -131,11 +134,6 @@ extension RcruitmentPostAPI: BaseAPI {
         var params: Parameters = [:]
         switch self {
         case .getOnGoingNativePostListForWorker(let nextPageId, let requestCnt):
-            if let nextPageId {
-                params["next"] = nextPageId
-            }
-            params["limit"] = requestCnt
-        case .getFavoritePostListForWorker(let nextPageId, let requestCnt):
             if let nextPageId {
                 params["next"] = nextPageId
             }
@@ -156,7 +154,6 @@ extension RcruitmentPostAPI: BaseAPI {
     var parameterEncoding: ParameterEncoding {
         switch self {
         case .getOnGoingNativePostListForWorker,
-                .getFavoritePostListForWorker,
                 .getAppliedPostListForWorker:
             return URLEncoding.queryString
         default:
@@ -167,7 +164,6 @@ extension RcruitmentPostAPI: BaseAPI {
     public var task: Moya.Task {
         switch self {
         case .getOnGoingNativePostListForWorker,
-                .getFavoritePostListForWorker,
                 .getAppliedPostListForWorker:
             .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .registerPost(let bodyData):

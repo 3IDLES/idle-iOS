@@ -125,30 +125,18 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         return convert(task: stream)
     }
     
-    public func getFavoritePostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> RxSwift.Single<Result<Entity.RecruitmentPostListForWorkerVO, Entity.DomainError>> {
+    public func getFavoritePostListForWorker() -> RxSwift.Single<Result<[RecruitmentPostForWorkerRepresentable], Entity.DomainError>> {
         
-        let stream: Single<RecruitmentPostListForWorkerVO>!
+        let nativeList = repository.getNativeFavoritePostListForWorker()
+        let worknetList = repository.getWorknetFavoritePostListForWorker()
         
-        switch request {
-        case .initial:
-            stream = repository.getFavoritePostListForWorker(
-                nextPageId: nil,
-                requestCnt: postCount
-            )
-        case .paging(let source, let nextPageId):
-            switch source {
-            case .native:
-                stream = repository.getFavoritePostListForWorker(
-                    nextPageId: nextPageId,
-                    requestCnt: postCount
-                )
-            case .thirdParty:
-                // TODO: ‼️ ‼️워크넷 가져오기 미구현
-                fatalError()
+        let task = Single
+            .zip(nativeList, worknetList)
+            .map { (native, worknet) in
+                native + worknet
             }
-        }
         
-        return convert(task: stream)
+        return convert(task: task)
     }
     
     public func getAppliedPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> RxSwift.Single<Result<Entity.RecruitmentPostListForWorkerVO, Entity.DomainError>> {

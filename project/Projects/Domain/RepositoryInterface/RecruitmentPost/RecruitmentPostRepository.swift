@@ -52,8 +52,11 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     /// 요양보호사가 확인하는 케어밋 자체 공고정보를 가져옵니다.
     func getNativePostListForWorker(nextPageId: String?, requestCnt: Int) -> Single<RecruitmentPostListForWorkerVO>
     
-    /// 요양보호사가 확인하는 케어밋 자체 공고정보를 가져옵니다.
-    func getFavoritePostListForWorker(nextPageId: String?, requestCnt: Int) -> Single<RecruitmentPostListForWorkerVO>
+    /// 요양보호사가 즐겨찾는 케어밋 자체 공고정보를 가져옵니다.
+    func getNativeFavoritePostListForWorker() -> Single<[RecruitmentPostForWorkerRepresentable]>
+    
+    /// 요양보호사가 즐겨찾는 워크넷 공고정보를 가져옵니다.
+    func getWorknetFavoritePostListForWorker() -> Single<[RecruitmentPostForWorkerRepresentable]>
     
     /// 요양보호사가 확인하는 케어밋 자체 공고정보를 가져옵니다.
     func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> Single<RecruitmentPostListForWorkerVO>

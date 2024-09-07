@@ -13,6 +13,7 @@ public enum CrawlingPostAPI {
     
     case getPostList(nextPageId: String?, requestCnt: Int)
     case getDetail(postId: String)
+    case getWorknetFavoritePost
 }
 
 extension CrawlingPostAPI: BaseAPI {
@@ -22,18 +23,22 @@ extension CrawlingPostAPI: BaseAPI {
     
     public var path: String {
         switch self {
-        case .getPostList(let nextPageId, let requestCnt):
+        case .getPostList:
             ""
         case .getDetail(let postId):
             "/\(postId)"
+        case .getWorknetFavoritePost:
+            "/my/favorites"
         }
     }
     
     public var method: Moya.Method {
         switch self {
-        case .getPostList(let nextPageId, let requestCnt):
+        case .getPostList:
             .get
-        case .getDetail(let postId):
+        case .getDetail:
+            .get
+        case .getWorknetFavoritePost:
             .get
         }
     }

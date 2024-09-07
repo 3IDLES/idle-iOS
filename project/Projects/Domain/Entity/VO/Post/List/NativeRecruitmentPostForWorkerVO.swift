@@ -9,7 +9,9 @@ import Foundation
 
 public struct NativeRecruitmentPostForWorkerVO: RecruitmentPostForWorkerRepresentable {
     
+    // protocol required
     public var postType: RecruitmentPostType
+    public var beFavoritedTime: Date?
     
     public let postId: String
     
@@ -34,6 +36,7 @@ public struct NativeRecruitmentPostForWorkerVO: RecruitmentPostForWorkerRepresen
     public let applyTime: Date?
     public let isFavorite: Bool
     
+    
     public init(
         postId: String,
         workDays: [WorkDay],
@@ -52,7 +55,8 @@ public struct NativeRecruitmentPostForWorkerVO: RecruitmentPostForWorkerRepresen
         distanceFromWorkPlace: Int,
         applyTime: Date?,
         isFavorite: Bool,
-        postType: RecruitmentPostType
+        postType: RecruitmentPostType,
+        beFavoritedTime: Date?
     ) {
         self.postId = postId
         self.workDays = workDays
@@ -72,6 +76,7 @@ public struct NativeRecruitmentPostForWorkerVO: RecruitmentPostForWorkerRepresen
         self.applyTime = applyTime
         self.isFavorite = isFavorite
         self.postType = postType
+        self.beFavoritedTime = beFavoritedTime
     }
     
     public static let mock = NativeRecruitmentPostForWorkerVO(
@@ -92,6 +97,7 @@ public struct NativeRecruitmentPostForWorkerVO: RecruitmentPostForWorkerRepresen
         distanceFromWorkPlace: 2500,
         applyTime: Date(),
         isFavorite: true,
-        postType: .native
+        postType: .native,
+        beFavoritedTime: Calendar.current.date(byAdding: .day, value: 7, to: Date())
     )
 }

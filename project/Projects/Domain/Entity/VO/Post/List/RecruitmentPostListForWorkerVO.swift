@@ -19,7 +19,7 @@ public struct RecruitmentPostListForWorkerVO {
         self.fetchedPostCount = fetchedPostCount
     }
 }
-
 public protocol RecruitmentPostForWorkerRepresentable {
     var postType: RecruitmentPostType { get }
+    var beFavoritedTime: Date? { get }
 }
