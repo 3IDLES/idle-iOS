@@ -361,7 +361,11 @@ public class WorknetPostDetailForWorkerVC: BaseViewController {
             .subscribe(onNext: { [weak self] in
                 guard let self, let url = self.workNetPostLink else { return }
                 
-                _ = openDeepLink(url: url)
+                let isSafaiOpended = openDeepLink(url: url)
+                
+                if !isSafaiOpended {
+                    self.showAlert(vo: .init(title: "공고 확인 실패", message: "처리과정에서 문제가 발생했습니다."))
+                }
             })
             .disposed(by: disposeBag)
     }
