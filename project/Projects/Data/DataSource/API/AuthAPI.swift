@@ -14,13 +14,14 @@ public enum AuthAPI {
     // Common
     case startPhoneNumberAuth(phoneNumber: String)
     case checkAuthNumber(phoneNumber: String, authNumber: String)
+    case reissueToken(refreshToken: String)
     
     // Center
+    case centerJoinStatus
     case authenticateBusinessNumber(businessNumber: String)
     case checkIdDuplication(id: String)
     case registerCenterAccount(data: Data)
     case centerLogin(id: String, password: String)
-    case reissueToken(refreshToken: String)
     case deregisterCenterAccount(reason: String, password: String)
     case signoutCenterAccount
     
@@ -38,10 +39,16 @@ extension AuthAPI: BaseAPI {
     public var method: Moya.Method {
         
         switch self {
+        case .reissueToken:
+            return .post
         case .startPhoneNumberAuth:
             return .post
         case .checkAuthNumber:
             return .post
+            
+            
+        case .centerJoinStatus:
+            return .get
         case .authenticateBusinessNumber:
             return .get
         case .checkIdDuplication:
@@ -54,8 +61,8 @@ extension AuthAPI: BaseAPI {
             return .post
         case .deregisterCenterAccount:
             return .post
-        case .reissueToken:
-            return .post
+        
+            
         case .registerWorkerAccount:
             return .post
         case .workerLogin:
@@ -82,7 +89,8 @@ extension AuthAPI: BaseAPI {
         case .checkIdDuplication(id: let id):
             "center/validation/\(id)"
             
-            
+        case .centerJoinStatus:
+            "/center/join/status"
         case .registerCenterAccount:
             "center/join"
         case .centerLogin:

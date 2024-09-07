@@ -29,11 +29,14 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
     typealias K = UserInfoStorageKey
     
     let localStorageService: LocalStorageService
+    let authService: AuthService = .init()
     
     let jsonDecoder = JSONDecoder()
     let encoder = JSONEncoder()
     
-    public init(localStorageService: LocalStorageService) {
+    public init(
+        localStorageService: LocalStorageService
+    ) {
         self.localStorageService = localStorageService
     }
     
@@ -84,16 +87,10 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
         localStorageService.saveData(key: K.currentCenter.rawValue, value: encoded)
     }
     
-    public func setCenterAuthState(state: CenterAuthState) {
-        localStorageService.saveData(key: K.currentCenterAuthState.rawValue, value: state.rawValue)
-    }
-    
-    public func getCenterAuthState() -> Entity.CenterAuthState? {
-        if let centerState: String = localStorageService.fetchData(key: K.currentCenterAuthState.rawValue) {
-            
-            return CenterAuthState(rawValue: centerState)
-        }
-        return nil
+    public func getCenterJoinStatus() -> RxSwift.Single<CenterJoinStatusInfoVO> {
+        authService
+            .request(api: .centerJoinStatus, with: .withToken)
+            .map(CenterJoinStatusInfoVO.self)
     }
     
     public func removeAllData() {
