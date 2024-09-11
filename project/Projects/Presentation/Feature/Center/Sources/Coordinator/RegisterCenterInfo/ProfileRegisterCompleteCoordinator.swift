@@ -45,7 +45,7 @@ public class ProfileRegisterCompleteCoordinator: ChildCoordinator {
 extension ProfileRegisterCompleteCoordinator {
     
     func showCenterProfile() {
-        parent?.showMyCenterProfile()
+        
     }
     
     func registerFinished() {
