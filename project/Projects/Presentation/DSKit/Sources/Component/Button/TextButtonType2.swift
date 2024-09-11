@@ -101,3 +101,9 @@ extension TextButtonType2: DisablableComponent {
         self.backgroundColor = isEnabled ? textOriginColor : DSKitAsset.Colors.gray200.color
     }
 }
+
+@available(iOS 17.0, *)
+#Preview("Preview", traits: .defaultLayout) {
+    
+    TextButtonType2(labelText: "Hello world")
+}

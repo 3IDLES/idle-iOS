@@ -34,7 +34,7 @@ public class CenterAuthOnboardingVC: BaseViewController {
     
     let onboardingImageView: UIImageView = {
         let view = UIImageView()
-        view.contentMode = .scaleAspectFit
+        view.contentMode = .scaleAspectFill
         return view
     }()
     
@@ -84,19 +84,8 @@ public class CenterAuthOnboardingVC: BaseViewController {
             labelStack.rightAnchor.constraint(equalTo: view.rightAnchor),
             
             onboardingImageView.topAnchor.constraint(equalTo: labelStack.bottomAnchor, constant: 32),
-            onboardingImageView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            onboardingImageView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            onboardingImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            onboardingImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
-    }
-    
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        print(#function)
-    }
-    
-    public override func viewDidLayoutSubviews() {
-        print(#function)
     }
     
     private func setObservable() { }
