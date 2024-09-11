@@ -41,3 +41,11 @@ public class TextButtonType3: IdleLabel {
         }
     }
 }
+
+@available(iOS 17.0, *)
+#Preview("Preview", traits: .defaultLayout) {
+    
+    let label = TextButtonType3(typography: .Body3)
+    label.textString = "Hello world"
+    return label
+}

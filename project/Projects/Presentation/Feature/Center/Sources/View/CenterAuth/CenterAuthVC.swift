@@ -19,6 +19,14 @@ public class CenterAuthVC: BaseViewController {
     
     // View
     let dotView = PageControllerDotView(pageCnt: 3)
+    
+    let logoutButton: TextButtonType3 = {
+        let button = TextButtonType3(typography: .Body3)
+        button.textString = "로그아웃"
+        button.attrTextColor = DSColor.gray300.color
+        return button
+    }()
+    
     let pageViewController: UIPageViewController = {
         let vc = UIPageViewController(
             transitionStyle: .scroll,
@@ -84,10 +92,18 @@ public class CenterAuthVC: BaseViewController {
         
         pageViewController.willMove(toParent: self)
         addChild(pageViewController)
+        logoutButton.sizeToFit()
+        
+        let logoutSpacer = Spacer(width: logoutButton.bounds.width)
+        let topContainer = HStack([
+            logoutSpacer,
+            dotView,
+            logoutButton,
+        ], alignment: .center, distribution: .equalSpacing)
         
         let pageControllerView = pageViewController.view!
         [
-            dotView,
+            topContainer,
             pageControllerView,
             requestAuthButton
         ].forEach {
@@ -97,10 +113,11 @@ public class CenterAuthVC: BaseViewController {
         
         NSLayoutConstraint.activate([
             
-            dotView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 29.5),
-            dotView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            topContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 29.5),
+            topContainer.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 35),
+            topContainer.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -35),
             
-            pageControllerView.topAnchor.constraint(equalTo: dotView.bottomAnchor, constant: 28),
+            pageControllerView.topAnchor.constraint(equalTo: topContainer.bottomAnchor, constant: 28),
             pageControllerView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             pageControllerView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             pageControllerView.bottomAnchor.constraint(equalTo: requestAuthButton.topAnchor, constant: -20),
