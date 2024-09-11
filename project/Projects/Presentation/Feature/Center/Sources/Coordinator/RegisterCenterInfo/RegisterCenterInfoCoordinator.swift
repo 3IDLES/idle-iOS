@@ -32,10 +32,7 @@ public class RegisterCenterInfoCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = RegisterCenterInfoVC(coordinator: self)
-        let vm = RegisterCenterInfoVM(
-            coordinator: self,
-            profileUseCase: profileUseCase
-        )
+        let vm = RegisterCenterInfoVM(coordinator: self)
         vc.bind(viewModel: vm)
         
         viewControllerRef = vc

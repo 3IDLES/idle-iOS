@@ -19,7 +19,7 @@ public class ProfileRegisterOverviewVC: BaseViewController {
     
     // View
     lazy var navigationBar: IdleNavigationBar = {
-        let bar = IdleNavigationBar(innerViews: [])
+        let bar = IdleNavigationBar(titleText: "센터 정보 등록")
         return bar
     }()
     
@@ -40,7 +40,6 @@ public class ProfileRegisterOverviewVC: BaseViewController {
     /// Center location label
     let centerLocationLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body2)
-        
         return label
     }()
     
@@ -87,7 +86,7 @@ public class ProfileRegisterOverviewVC: BaseViewController {
         return label
     }()
     private lazy var centerImageView: ImageSelectView = {
-        let view = ImageSelectView(state: .editing, viewController: self)
+        let view = ImageSelectView(state: .normal, viewController: self)
         return view
     }()
     
@@ -130,7 +129,7 @@ public class ProfileRegisterOverviewVC: BaseViewController {
         let centerLocationLabelStack = HStack([locationIcon,centerLocationLabel], spacing: 2)
         let centerInfoStack = VStack([centerNameLabel, centerLocationLabelStack], spacing: 8, alignment: .leading)
         
-        let upperStack = HStack([VStack([confirmLabel, centerInfoStack], spacing: 32, alignment: .leading), Spacer()], alignment: .fill)
+        let upperStack = HStack([VStack([confirmLabel, centerInfoStack], spacing: 32, alignment: .leading), Spacer()], distribution: .fill)
         
         let upperStackBackView = UIView()
         upperStackBackView.layoutMargins = .init(
@@ -142,27 +141,27 @@ public class ProfileRegisterOverviewVC: BaseViewController {
         upperStackBackView.addSubview(upperStack)
         upperStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            upperStack.topAnchor.constraint(equalTo: upperStackBackView.topAnchor),
-            upperStack.leftAnchor.constraint(equalTo: upperStackBackView.leftAnchor),
-            upperStack.rightAnchor.constraint(equalTo: upperStackBackView.rightAnchor),
-            upperStack.bottomAnchor.constraint(equalTo: upperStackBackView.bottomAnchor),
+            upperStack.topAnchor.constraint(equalTo: upperStackBackView.layoutMarginsGuide.topAnchor),
+            upperStack.leftAnchor.constraint(equalTo: upperStackBackView.layoutMarginsGuide.leftAnchor),
+            upperStack.rightAnchor.constraint(equalTo: upperStackBackView.layoutMarginsGuide.rightAnchor),
+            upperStack.bottomAnchor.constraint(equalTo: upperStackBackView.layoutMarginsGuide.bottomAnchor),
         ])
         
         // MARK: BelowView
         let phoneNumberStack = VStack([
             centerPhoneNumeberTitleLabel,
             centerPhoneNumeberLabel
-        ], alignment: .leading)
+        ], spacing: 6, alignment: .leading)
         
         let introduceStack = VStack([
             centerIntroductionTitleLabel,
             centerIntroductionLabel
-        ], alignment: .leading)
+        ], spacing: 6, alignment: .leading)
         
         let centerPhotoStack = VStack([
             centerPictureLabel,
             centerImageView
-        ], alignment: .leading)
+        ], spacing: 6, alignment: .leading)
         
         var belowStack = VStack([
             phoneNumberStack,
@@ -170,31 +169,34 @@ public class ProfileRegisterOverviewVC: BaseViewController {
             centerPhotoStack
         ], spacing: 32, alignment: .fill)
         
+        let buttonStack = HStack([prevButton, confirmButton], spacing: 8, distribution: .fillEqually)
+        
         belowStack = VStack([
             centerDetailLabel,
-            belowStack
+            Spacer(height: 20),
+            belowStack,
+            Spacer(height: 60),
+            buttonStack
         ], alignment: .fill)
         
         let belowStackBackView = UIView()
         belowStackBackView.layoutMargins = .init(
             top: 24,
             left: 20,
-            bottom: 48,
+            bottom: 14,
             right: 20
         )
         belowStackBackView.addSubview(belowStack)
         belowStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            belowStack.topAnchor.constraint(equalTo: belowStackBackView.topAnchor),
-            belowStack.leftAnchor.constraint(equalTo: belowStackBackView.leftAnchor),
-            belowStack.rightAnchor.constraint(equalTo: belowStackBackView.rightAnchor),
-            belowStack.bottomAnchor.constraint(equalTo: belowStackBackView.bottomAnchor),
+            
+            centerImageView.heightAnchor.constraint(equalToConstant: 250),
+            
+            belowStack.topAnchor.constraint(equalTo: belowStackBackView.layoutMarginsGuide.topAnchor),
+            belowStack.leftAnchor.constraint(equalTo: belowStackBackView.layoutMarginsGuide.leftAnchor),
+            belowStack.rightAnchor.constraint(equalTo: belowStackBackView.layoutMarginsGuide.rightAnchor),
+            belowStack.bottomAnchor.constraint(equalTo: belowStackBackView.layoutMarginsGuide.bottomAnchor),
         ])
-        
-        // MARK: ButtonStack
-        
-        let buttonStack = HStack([prevButton, confirmButton], spacing: 8, distribution: .fillEqually)
-        buttonStack.layoutMargins = .init(top: 12, left: 20, bottom: 14, right: 20)
         
         let scrollView = UIScrollView()
         
@@ -203,9 +205,8 @@ public class ProfileRegisterOverviewVC: BaseViewController {
         let contentView = VStack([
             upperStackBackView,
             divider,
-            belowStackBackView,
-            buttonStack,
-        ])
+            belowStackBackView
+        ], alignment: .fill)
        
         scrollView.addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -235,10 +236,10 @@ public class ProfileRegisterOverviewVC: BaseViewController {
             navigationBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             navigationBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             
-            scrollView.topAnchor.constraint(equalTo: navigationBar.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             scrollView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             scrollView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
     
@@ -246,49 +247,35 @@ public class ProfileRegisterOverviewVC: BaseViewController {
         
     }
     
-    public func bind(viewModel: CenterProfileViewModelable) {
+    public func bind(viewModel: RegisterProfileOverviewVM) {
         
         super.bind(viewModel: viewModel)
         
-        // input
+        // Output
+        let ro = viewModel.renderObject
         
-        rx.viewDidLoad
-            .bind(to: viewModel.readyToFetch)
+        centerNameLabel.textString = ro.centerName
+        centerLocationLabel.textString = ro.lotNumberAddress
+        centerPhoneNumeberLabel.textString = ro.officeNumber
+        centerIntroductionLabel.textString = ro.introduce
+        if let imageData = ro.imageInfo?.data {
+            DispatchQueue.main.async { [weak self] in
+                let image = UIImage(data: imageData)
+                self?.centerImageView.displayingImage.accept(image)
+            }
+        }
+        
+        // Input
+        Observable
+            .merge(
+                navigationBar.backButton.rx.tap.asObservable(),
+                prevButton.rx.tap.asObservable()
+            )
+            .bind(to: viewModel.backButtonClicked)
             .disposed(by: disposeBag)
         
-        navigationBar
-            .backButton
-            .rx.tap
-            .bind(to: viewModel.exitButtonClicked)
-            .disposed(by: disposeBag)
-        
-        // output
-        
-        navigationBar.titleLabel.textString = viewModel.navigationBarTitle
-        
-        viewModel
-            .centerName?
-            .drive(centerNameLabel.rx.textString)
-            .disposed(by: disposeBag)
-        
-        viewModel
-            .centerLocation?
-            .drive(centerLocationLabel.rx.textString)
-            .disposed(by: disposeBag)
-        
-        viewModel
-            .centerPhoneNumber?
-            .drive(centerPhoneNumeberLabel.rx.textString)
-            .disposed(by: disposeBag)
-        
-        viewModel
-            .centerIntroduction?
-            .drive(centerIntroductionLabel.rx.textString)
-            .disposed(by: disposeBag)
-        
-        viewModel
-            .displayingImage?
-            .drive(centerImageView.displayingImage)
+        confirmButton.rx.tap
+            .bind(to: viewModel.requestProfileRegister)
             .disposed(by: disposeBag)
     }
 }

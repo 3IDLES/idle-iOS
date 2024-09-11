@@ -24,5 +24,4 @@ public protocol AuthRepository: RepositoryBase {
     func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Void>
     func signoutWorkerAccount() -> Single<Void>
     func deregisterWorkerAccount(reasons: [DeregisterReasonVO]) -> Single<Void>
-    func getCenterJoinStatus() -> RxSwift.Single<CenterJoinStatusInfoVO>
 }

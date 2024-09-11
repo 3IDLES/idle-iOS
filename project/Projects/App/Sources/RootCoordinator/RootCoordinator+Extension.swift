@@ -57,6 +57,7 @@ extension RootCoordinator: RootCoorinatable {
         addChildCoordinator(coordinator)
         
         coordinator.start()
+    }
     
     /// 요양보호사 메인화면을 실행합니다.
     func workerMain() {

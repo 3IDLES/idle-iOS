@@ -32,12 +32,11 @@ public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelabl
     public var addressValidation: Driver<Bool>? = nil
     public var introductionValidation: Driver<Bool>? = nil
     public var imageValidation: Driver<UIImage>? = nil
-    public var profileRegisterSuccess: Driver<CenterProfileCardVO>? = nil
     
     // StatObject
     private let stateObject = CenterProfileRegisterState()
 
-    public init(coordinator: RegisterCenterInfoCoordinator, profileUseCase useCase: CenterProfileUseCase) {
+    public init(coordinator: RegisterCenterInfoCoordinator) {
         self.coordinator = coordinator
         super.init()
         

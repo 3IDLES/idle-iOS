@@ -32,7 +32,6 @@ public protocol RegisterCenterInfoViewModelable: AddressInputViewModelable {
     // Output
     var nameAndNumberValidation: Driver<Bool>? { get }
     var imageValidation: Driver<UIImage>? { get }
-    var profileRegisterSuccess: Driver<CenterProfileCardVO>? { get }
 }
 
 fileprivate protocol RegisterCenterInfoVCViews: UIView {
@@ -509,38 +508,31 @@ extension RegisterCenterInfoVC {
             ])
         }
         
-        public func bind(viewModel vm: RegisterCenterInfoViewModelable) {
+        public func bind(viewModel: RegisterCenterInfoViewModelable) {
             
             // Input
             centerIntroductionField
                 .rx.text
                 .compactMap { $0 }
-                .bind(to: vm.editingCenterIntroduction)
+                .bind(to: viewModel.editingCenterIntroduction)
                 .disposed(by: disposeBag)
             
             centerImageView
                 .selectedImage
                 .compactMap { $0 }
-                .bind(to: vm.editingCenterImage)
+                .bind(to: viewModel.editingCenterImage)
                 .disposed(by: disposeBag)
             
             // 완료버튼
             ctaButton
                 .eventPublisher
-                .bind(to: vm.completeButtonPressed)
+                .bind(to: viewModel.completeButtonPressed)
                 .disposed(by: disposeBag)
             
             // Output
-            vm
+            viewModel
                 .imageValidation?
                 .drive(centerImageView.displayingImage)
-                .disposed(by: disposeBag)
-            
-            vm
-                .profileRegisterSuccess?
-                .drive(onNext: { [weak coordinator] cardVO in
-                    coordinator?.showCompleteScreen(cardVO: cardVO)
-                })
                 .disposed(by: disposeBag)
         }
     }
