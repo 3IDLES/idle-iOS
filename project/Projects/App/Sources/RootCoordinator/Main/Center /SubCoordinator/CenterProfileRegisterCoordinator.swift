@@ -51,14 +51,12 @@ class CenterProfileRegisterCoordinator: CenterProfileRegisterCoordinatable {
 
 extension CenterProfileRegisterCoordinator {
     
-    func showCompleteScreen(cardVO: Entity.CenterProfileCardVO) {
-        let coordinator = ProfileRegisterCompleteCoordinator(
-            cardVO: cardVO,
-            navigationController: navigationController
-        )
-        addChildCoordinator(coordinator)
-        coordinator.parent = self
-        coordinator.start()
+    func showCompleteScreen() {
+        
+    }
+
+    func showPreviewScreen(stateObject: CenterProfileRegisterState) {
+        
     }
     
     func showMyCenterProfile() {
