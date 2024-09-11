@@ -1,5 +1,5 @@
 //
-//  ProfileRegisterOverviewCO.swift
+//  CenterProfileRegisterOverviewCO.swift
 //  CenterFeature
 //
 //  Created by choijunios on 9/12/24.
@@ -10,7 +10,7 @@ import Entity
 import PresentationCore
 import UseCaseInterface
 
-public class ProfileRegisterOverviewCO: ChildCoordinator {
+public class CenterProfileRegisterOverviewCO: ChildCoordinator {
     
     public struct Dependency {
         let navigationController: UINavigationController
@@ -42,7 +42,7 @@ public class ProfileRegisterOverviewCO: ChildCoordinator {
     }
     
     public func start() {
-        let vc = ProfileRegisterOverviewVC()
+        let vc = CenterProfileRegisterOverviewVC()
         let vm = RegisterProfileOverviewVM(
             coordinator: self,
             stateObject: stateObject,

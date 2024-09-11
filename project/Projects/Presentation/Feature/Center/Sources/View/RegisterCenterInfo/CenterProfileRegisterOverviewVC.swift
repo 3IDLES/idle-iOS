@@ -1,5 +1,5 @@
 //
-//  ProfileRegisterOverviewVC.swift
+//  CenterProfileRegisterOverviewVC.swift
 //  CenterFeature
 //
 //  Created by choijunios on 9/12/24.
@@ -13,7 +13,7 @@ import RxSwift
 import Entity
 import DSKit
 
-public class ProfileRegisterOverviewVC: BaseViewController {
+public class CenterProfileRegisterOverviewVC: BaseViewController {
     
     // Init
     
@@ -247,7 +247,7 @@ public class ProfileRegisterOverviewVC: BaseViewController {
         
     }
     
-    public func bind(viewModel: RegisterProfileOverviewVM) {
+    func bind(viewModel: RegisterProfileOverviewVM) {
         
         super.bind(viewModel: viewModel)
         

@@ -171,10 +171,6 @@ public class InitialScreenVM: BaseViewModel {
                 case .approved:
                     return info
                 case .pending, .new:
-                    
-                    // Test
-                    self.coordinator?.makeCenterProfile()
-                  
                     return nil
                 }
             }
