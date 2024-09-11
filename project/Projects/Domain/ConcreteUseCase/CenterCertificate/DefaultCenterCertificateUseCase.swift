@@ -27,6 +27,10 @@ public class DefaultCenterCertificateUseCase: CenterCertificateUseCase {
         convert(task: authRepository.requestCenterJoin())
     }
     
+    public func getCenterJoinStatus() -> RxSwift.Single<Result<Entity.CenterJoinStatusInfoVO, Entity.DomainError>> {
+        convert(task: authRepository.getCenterJoinStatus())
+    }
+    
     // 센터 로그아웃
     public func signoutCenterAccount() -> RxSwift.Single<Result<Void, Entity.DomainError>> {
         let task = authRepository

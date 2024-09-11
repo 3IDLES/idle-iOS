@@ -42,4 +42,26 @@ open class BaseViewModel {
         self.dismissLoadingDriver = dismissLoading
             .asDriver(onErrorDriveWith: .never())
     }
+    
+    public func mapStartLoading<T>(_ target: Observable<T>) -> Observable<T> {
+        
+        target
+            .map { [weak self] item in
+                
+                self?.showLoading.onNext(())
+                
+                return item
+            }
+    }
+    
+    public func mapEndLoading<T>(_ target: Observable<T>) -> Observable<T> {
+        
+        target
+            .map { [weak self] item in
+                
+                self?.dismissLoading.onNext(())
+                
+                return item
+            }
+    }
 }

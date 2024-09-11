@@ -39,6 +39,7 @@ public class CenterCertificateIntroductionVC: BaseViewController {
     let requestAuthButton: IdlePrimaryButton = {
         let button = IdlePrimaryButton(level: .large)
         button.label.textString = "인증 요청하기"
+        button.isUserInteractionEnabled = false
         return button
     }()
     
@@ -133,6 +134,68 @@ public class CenterCertificateIntroductionVC: BaseViewController {
     
     private func setObservable() {
         
+    }
+    
+    func bind(viewModel: CenterCertificateIntroVM) {
+        
+        super.bind(viewModel: viewModel)
+        
+        // Output
+        viewModel
+            .currentStatus?
+            .drive(onNext: { [weak self] status in
+                
+                guard let self else { return }
+                
+                switch status {
+                case .new:
+                    canRequestJoinState()
+                case .pending:
+                    alreadyRequestJoin()
+                case .approved:
+                    return
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .certificateRequestSuccess?
+            .drive(onNext: { [weak self] _ in
+                guard let self else { return }
+                
+                alreadyRequestJoin()
+            })
+            .disposed(by: disposeBag)
+        
+        // Input
+        // - request status
+        Observable
+            .merge(
+                rx.viewDidLoad.asObservable(),
+                NotificationCenter.default.rx.notification(UIApplication.didBecomeActiveNotification).map {_ in }
+            )
+            .bind(to: viewModel.requestCurrentStatus)
+            .disposed(by: disposeBag)
+        
+        logoutButton
+            .eventPublisher
+            .bind(to: viewModel.logoutButtonClicked)
+            .disposed(by: disposeBag)
+        
+        requestAuthButton
+            .rx.tap
+            .bind(to: viewModel.certificateRequestButtonClicked)
+            .disposed(by: disposeBag)
+    }
+    
+    func canRequestJoinState() {
+        requestAuthButton.setEnabled(true)
+        requestAuthButton.label.textString = "인증 요청하기"
+    }
+    
+    func alreadyRequestJoin() {
+        requestAuthButton.setEnabled(false)
+        requestAuthButton.label.textString = "관리자 인증 요청 중이에요"
     }
 }
 

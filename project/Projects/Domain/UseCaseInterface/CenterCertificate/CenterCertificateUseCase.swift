@@ -20,4 +20,7 @@ public protocol CenterCertificateUseCase: UseCaseBase {
     
     /// 센터 인증 요청
     func requestCenterCertificate() -> Single<Result<Void, DomainError>>
+    
+    /// 센터 상태확인
+    func getCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>>
 }
