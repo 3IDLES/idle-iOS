@@ -56,55 +56,35 @@ public class DefaultIdleAlertVM: IdleAlertViewModelable {
     }
 }
 
-public struct IdleAlertObject {
+public class IdleAlertObject {
     
-    var title: String = ""
-    var description: String = ""
-    var acceptButtonLabelText: String = ""
-    var cancelButtonLabelText: String = ""
+    public private(set) var title: String = ""
+    public private(set) var description: String = ""
+    public private(set) var acceptButtonLabelText: String = ""
+    public private(set) var cancelButtonLabelText: String = ""
     
-    var acceptButtonClicked: PublishSubject<Void> = .init()
-    var cancelButtonClicked: PublishSubject<Void> = .init()
+    public private(set) var acceptButtonClicked: Driver<Void>?
+    public private(set) var cancelButtonClicked: Driver<Void>?
     
-    init() { }
+    public init() { }
     
-    mutating func setTitle(_ text: String) -> Self {
+    public func setTitle(_ text: String) -> Self {
         self.title = text
         return self
     }
     
-    mutating func setDescription(_ text: String) -> Self {
+    public func setDescription(_ text: String) -> Self {
         self.description = text
         return self
     }
     
-    mutating func setAcceptButtonLabelText(_ text: String) -> Self {
+    public func setAcceptButtonLabelText(_ text: String) -> Self {
         self.acceptButtonLabelText = text
         return self
     }
     
-    mutating func setCancelButtonLabelText(_ text: String) -> Self {
+    public func setCancelButtonLabelText(_ text: String) -> Self {
         self.cancelButtonLabelText = text
-        return self
-    }
-    
-    func bindAcceptButton<T: ObserverType>(_ observer: T, disposeBag: DisposeBag) -> Self where T.Element == Void {
-        
-        acceptButtonClicked
-            .asObservable()
-            .subscribe(observer)
-            .disposed(by: disposeBag)
-        
-        return self
-    }
-    
-    func bindCancelButton<T: ObserverType>(_ observer: T, disposeBag: DisposeBag) -> Self where T.Element == Void {
-        
-        acceptButtonClicked
-            .asObservable()
-            .subscribe(observer)
-            .disposed(by: disposeBag)
-        
         return self
     }
 }
@@ -269,14 +249,11 @@ public class IdleBigAlertController: UIViewController {
         })
         .disposed(by: disposeBag)
         
-        acceptButton.rx.tap
-            .bind(to: object.acceptButtonClicked)
-            .disposed(by: disposeBag)
-        
-        cancelButton
-            .rx.tap
-            .bind(to: object.cancelButtonClicked)
-            .disposed(by: disposeBag)
+        object.acceptButtonClicked = acceptButton
+            .rx.tap.asDriver(onErrorDriveWith: .never())
+            
+        object.cancelButtonClicked = cancelButton
+            .rx.tap.asDriver(onErrorDriveWith: .never())
     }
     
     public func bind(viewModel vm: IdleAlertViewModelable) {

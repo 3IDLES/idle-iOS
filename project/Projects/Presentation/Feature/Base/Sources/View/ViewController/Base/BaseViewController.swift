@@ -37,6 +37,13 @@ open class BaseViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
+        viewModel
+            .idleAlertDriver?
+            .drive(onNext: { [weak self] object in
+                self?.showIdleModal(object: object)
+            })
+            .disposed(by: disposeBag)
+        
         // 로딩
         viewModel
             .showLoadingDriver?

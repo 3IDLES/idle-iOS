@@ -33,6 +33,24 @@ public class CenterCertificateIntroVM: BaseViewModel {
         super.init()
         
         // MARK: 로그아웃
+        logoutButtonClicked
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
+                let object = IdleAlertObject()
+                    .setTitle("로그아웃하시겠어요?")
+                    .setAcceptButtonLabelText("로그아웃")
+                    .setCancelButtonLabelText("취소하기")
+                
+                object
+                    .acceptButtonClicked?
+                    .asObservable()
+                    .bind(to: signOutButtonComfirmed)
+                    .disposed(by: disposeBag)
+                
+                alertObject.onNext(object)
+            })
+            .disposed(by: disposeBag)
+        
         let signOutRequestResult = signOutButtonComfirmed.flatMap({ [centerCertificateUseCase] _ in
             centerCertificateUseCase.signoutCenterAccount()
         })
@@ -48,21 +66,5 @@ public class CenterCertificateIntroVM: BaseViewModel {
                 
             })
             .disposed(by: disposeBag)
-    }
-    
-    public func createSingOutVM() -> any DSKit.IdleAlertViewModelable {
-        let viewModel = CenterSingOutVM(
-            title: "로그아웃하시겠어요?",
-            description: "",
-            acceptButtonLabelText: "로그아웃",
-            cancelButtonLabelText: "취소하기"
-        )
-        
-        viewModel
-            .acceptButtonClicked
-            .bind(to: signOutButtonComfirmed)
-            .disposed(by: disposeBag)
-        
-        return viewModel
     }
 }
