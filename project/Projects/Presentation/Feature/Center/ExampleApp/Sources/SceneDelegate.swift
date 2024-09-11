@@ -22,6 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         navigationController.setNavigationBarHidden(true, animated: false)
         
         window = UIWindow(windowScene: windowScene)
+      
         window?.rootViewController = AuthStateDisplayVC(state: .requestCenterInfo)
         window?.makeKeyAndVisible()
         
