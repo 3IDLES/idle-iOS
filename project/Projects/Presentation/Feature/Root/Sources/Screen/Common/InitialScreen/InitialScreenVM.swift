@@ -170,10 +170,10 @@ public class InitialScreenVM: BaseViewModel {
                 switch info.centerManagerAccountStatus {
                 case .approved:
                     return info
-                case .pending:
+                case .pending, .new:
                                     
-                    // TODO: 요청화면으로 이동
-                    
+                    self.coordinator?.centerAuth()
+                
                     return nil
                 }
             }
@@ -192,9 +192,10 @@ public class InitialScreenVM: BaseViewModel {
                 
                 switch error {
                 case .centerNotFoundException:
-                    // 센터가 없는 경우 -> 프로필이 등록되지 않음
                     
-                    // TODO: 프로필 등록 유도화면으로 이동
+                    // 센터가 없는 경우 -> 프로필이 등록되지 않음
+                    // 프로필 등록화면으로 이동
+                    self.coordinator?.makeCenterProfile()
                     
                     return
                     

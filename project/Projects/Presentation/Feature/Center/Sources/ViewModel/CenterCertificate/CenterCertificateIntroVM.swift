@@ -97,8 +97,17 @@ public class CenterCertificateIntroVM: BaseViewModel {
         let requestCurrentStatusFailure = requestCurrentStatusResult.compactMap { $0.error }
         
         self.currentStatus = requestCurrentStatusSuccess
-            .map({ vo in
-                vo.centerManagerAccountStatus
+            .compactMap({ [weak self] vo in
+                
+                let status = vo.centerManagerAccountStatus
+                
+                if status == .approved {
+                    
+                    self?.coordinator?.coordinatorDidFinish()
+                    
+                    return nil
+                }
+                return status
             })
             .asDriver(onErrorDriveWith: .never())
         

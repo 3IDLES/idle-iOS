@@ -63,8 +63,8 @@ public class IdleAlertObject {
     public private(set) var acceptButtonLabelText: String = ""
     public private(set) var cancelButtonLabelText: String = ""
     
-    public private(set) var acceptButtonClicked: Driver<Void>?
-    public private(set) var cancelButtonClicked: Driver<Void>?
+    public var acceptButtonClicked: Driver<Void>?
+    public var cancelButtonClicked: Driver<Void>?
     
     public init() { }
     

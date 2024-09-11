@@ -12,12 +12,6 @@ import Entity
 
 public class CenterCertificateCoordinator: ChildCoordinator {
     
-    enum Navigation {
-        case requestProfileInfo
-        case certificationOnGoing
-        case certificateOnBoarding
-    }
-    
     public struct Dependency {
         let navigationController: UINavigationController
         let centerCertificateUseCase: CenterCertificateUseCase
@@ -29,7 +23,7 @@ public class CenterCertificateCoordinator: ChildCoordinator {
     }
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: ParentCoordinator?
+    public weak var parent: RootCoorinatable?
     
     public let navigationController: UINavigationController
     let centerCertificateUseCase: CenterCertificateUseCase
@@ -52,6 +46,10 @@ public class CenterCertificateCoordinator: ChildCoordinator {
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showProfileRegisterScreen() {
+        parent?.makeCenterProfile()
     }
     
     public func coordinatorDidFinish() {
