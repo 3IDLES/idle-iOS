@@ -12,5 +12,6 @@ public protocol RootCoorinatable: ParentCoordinator {
     func centerAuth()
     func workerMain()
     func centerMain()
+    func makeCenterProfile()
     func popToRoot()
 }

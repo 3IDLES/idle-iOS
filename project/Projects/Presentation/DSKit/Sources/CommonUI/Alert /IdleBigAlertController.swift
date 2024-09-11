@@ -56,6 +56,39 @@ public class DefaultIdleAlertVM: IdleAlertViewModelable {
     }
 }
 
+public class IdleAlertObject {
+    
+    public private(set) var title: String = ""
+    public private(set) var description: String = ""
+    public private(set) var acceptButtonLabelText: String = ""
+    public private(set) var cancelButtonLabelText: String = ""
+    
+    public var acceptButtonClicked: PublishRelay<Void> = .init()
+    public var cancelButtonClicked: PublishRelay<Void> = .init()
+    
+    public init() { }
+    
+    public func setTitle(_ text: String) -> Self {
+        self.title = text
+        return self
+    }
+    
+    public func setDescription(_ text: String) -> Self {
+        self.description = text
+        return self
+    }
+    
+    public func setAcceptButtonLabelText(_ text: String) -> Self {
+        self.acceptButtonLabelText = text
+        return self
+    }
+    
+    public func setCancelButtonLabelText(_ text: String) -> Self {
+        self.cancelButtonLabelText = text
+        return self
+    }
+}
+
 
 public class IdleBigAlertController: UIViewController {
     
@@ -192,6 +225,39 @@ public class IdleBigAlertController: UIViewController {
         ])
     }
     
+    public func bindObject(_ object: IdleAlertObject) {
+        
+        titleLabel.textString = object.title
+        
+        descriptionLabel.textString = object.description
+        descriptionLabel.textAlignment = .center
+        
+        acceptButton.label.textString = object.acceptButtonLabelText
+        cancelButton.label.textString = object.cancelButtonLabelText
+        
+        
+        Observable.merge(
+            acceptButton.rx.tap.asObservable(),
+            cancelButton.rx.tap.asObservable()
+        )
+        .asDriver(onErrorDriveWith: .never())
+        .drive(onNext: { [weak self] in
+            
+            guard let self else { return }
+            modalPresentationStyle = .custom
+            dismiss(animated: true)
+        })
+        .disposed(by: disposeBag)
+        
+        acceptButton.rx.tap
+            .bind(to: object.acceptButtonClicked)
+            .disposed(by: disposeBag)
+            
+        cancelButton.rx.tap
+            .bind(to: object.cancelButtonClicked)
+            .disposed(by: disposeBag)
+    }
+    
     public func bind(viewModel vm: IdleAlertViewModelable) {
         
         titleLabel.textString = vm.title
@@ -215,8 +281,7 @@ public class IdleBigAlertController: UIViewController {
             .bind(to: vm.acceptButtonClicked)
             .disposed(by: disposeBag)
         
-        cancelButton
-            .rx.tap
+        cancelButton.rx.tap
             .bind(to: vm.cancelButtonClicked)
             .disposed(by: disposeBag)
     }

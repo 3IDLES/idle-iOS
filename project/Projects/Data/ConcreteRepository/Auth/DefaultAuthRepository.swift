@@ -74,6 +74,12 @@ public extension DefaultAuthRepository {
             .request(api: .centerJoinStatus, with: .withToken)
             .map(CenterJoinStatusInfoVO.self)
     }
+    
+    func requestCenterJoin() -> Single<Void> {
+        networkService
+            .request(api: .requestCenterJoin, with: .withToken)
+            .mapToVoid()
+    }
 }
 
 // MARK: Worker auth

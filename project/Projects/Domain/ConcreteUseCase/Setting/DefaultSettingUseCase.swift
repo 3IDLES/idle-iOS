@@ -98,7 +98,9 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
         let task = authRepository
             .deregisterCenterAccount(reasons: reasons, password: password)
             .map { [weak self] _ in 
-                self?.removeAllLocalData() ?? ()
+                self?.removeAllLocalData()
+                
+                return ()
             }
         return convert(task: task)
     }
@@ -108,7 +110,9 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
         let task = authRepository
             .signoutCenterAccount()
             .map { [weak self] _ in
-                self?.removeAllLocalData() ?? ()
+                self?.removeAllLocalData()
+                
+                return ()
             }
         return convert(task: task)
     }
@@ -118,7 +122,9 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
         let task = authRepository
             .deregisterWorkerAccount(reasons: reasons)
             .map { [weak self] _ in
-                self?.removeAllLocalData() ?? ()
+                self?.removeAllLocalData()
+                
+                return ()
             }
         return convert(task: task)
     }
@@ -128,7 +134,9 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
         let task = authRepository
             .signoutWorkerAccount()
             .map { [weak self] _ in
-                self?.removeAllLocalData() ?? ()
+                self?.removeAllLocalData()
+                
+                return ()
             }
         return convert(task: task)
     }

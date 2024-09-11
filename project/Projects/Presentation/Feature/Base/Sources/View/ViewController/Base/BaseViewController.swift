@@ -37,6 +37,13 @@ open class BaseViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
+        viewModel
+            .alertObjectDriver?
+            .drive(onNext: { [weak self] object in
+                self?.showIdleModal(object: object)
+            })
+            .disposed(by: disposeBag)
+        
         // 로딩
         viewModel
             .showLoadingDriver?
@@ -84,6 +91,16 @@ public extension BaseViewController {
     ) {
         let alertVC = IdleBigAlertController(type: type)
         alertVC.bind(viewModel: viewModel)
+        alertVC.modalPresentationStyle = .custom
+        present(alertVC, animated: true, completion: nil)
+    }
+    
+    func showIdleModal(
+        type: IdleBigAlertController.ButtonType = .red,
+        object: IdleAlertObject
+    ) {
+        let alertVC = IdleBigAlertController(type: type)
+        alertVC.bindObject(object)
         alertVC.modalPresentationStyle = .custom
         present(alertVC, animated: true, completion: nil)
     }

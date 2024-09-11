@@ -7,7 +7,9 @@
 
 import Foundation
 import AuthFeature
+import CenterFeature
 import PresentationCore
+import UseCaseInterface
 
 extension RootCoordinator: RootCoorinatable {
     
@@ -28,9 +30,33 @@ extension RootCoordinator: RootCoorinatable {
         coordinator.start()
     }
     
+    /// 센터 인증화면으로 이동합니다.
     func centerAuth() {
+        let coordinator = CenterCertificateCoordinator(dependency: .init(
+            navigationController: navigationController,
+            centerCertificateUseCase: injector.resolve(CenterCertificateUseCase.self)))
         
+        coordinator.parent = self
+        
+        addChildCoordinator(coordinator)
+        
+        coordinator.start()
     }
+    
+    /// 센터 프로필 정보를 입력합니다.
+    func makeCenterProfile() {
+        let coordinator = CenterProfileRegisterCoordinator(
+            dependency: .init(
+                navigationController: navigationController,
+                injector: injector
+            )
+        )
+        
+        coordinator.parent = self
+        
+        addChildCoordinator(coordinator)
+        
+        coordinator.start()
     
     /// 요양보호사 메인화면을 실행합니다.
     func workerMain() {

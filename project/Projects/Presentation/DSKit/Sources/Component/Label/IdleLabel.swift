@@ -84,7 +84,13 @@ public class IdleLabel: UILabel {
             if let paragraphStyle = wholeRangeParagraphStyle {
                 paragraphStyle.alignment = newValue
 
-                self.attributedText = NSAttributedString(string: textString, attributes: [.paragraphStyle: paragraphStyle])
+                if let attrText = self.attributedText {
+                    let mutableAttr = NSMutableAttributedString(attributedString: attrText)
+                    let range = NSRange(location: 0, length: mutableAttr.length)
+                    mutableAttr.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
+                    
+                    self.attributedText = mutableAttr
+                }
             }
             
             super.textAlignment = newValue

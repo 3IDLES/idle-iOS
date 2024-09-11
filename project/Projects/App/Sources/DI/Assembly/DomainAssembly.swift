@@ -66,5 +66,15 @@ public struct DomainAssembly: Assembly {
                 userInfoLocalRepository: userInfoLocalRepository
             )
         }
+        
+        container.register(CenterCertificateUseCase.self) { resolver in
+            let authRepository = resolver.resolve(AuthRepository.self)!
+            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
+            
+            return DefaultCenterCertificateUseCase(
+                authRepository: authRepository,
+                userInfoLocalRepository: userInfoLocalRepository
+            )
+        }
     }
 }
