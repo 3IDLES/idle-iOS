@@ -58,6 +58,39 @@ public class IdleLabel: UILabel {
         }
     }
     
+    var wholeRangeParagraphStyle: NSMutableParagraphStyle? {
+        
+        if let text = attributedText?.string, text.isEmpty {
+            return nil
+        }
+        
+        var paragraph: NSMutableParagraphStyle
+        
+        if let prevParagraph = self.attributedText?.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSMutableParagraphStyle {
+            paragraph = prevParagraph
+        } else {
+            paragraph = NSMutableParagraphStyle()
+        }
+        
+        return paragraph
+    }
+    
+    public override var textAlignment: NSTextAlignment {
+        get {
+            super.textAlignment
+        }
+        set {
+            
+            if let paragraphStyle = wholeRangeParagraphStyle {
+                paragraphStyle.alignment = newValue
+
+                self.attributedText = NSAttributedString(string: textString, attributes: [.paragraphStyle: paragraphStyle])
+            }
+            
+            super.textAlignment = newValue
+        }
+    }
+    
     public var attrTextColor: UIColor {
         get {
             currentTextColor
@@ -90,10 +123,12 @@ public class IdleLabel: UILabel {
         
         if let fontHeight = (currentTypography.attributes[.font] as? UIFont)?.lineHeight {
             
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.lineSpacing = currentTypography.lineHeight-fontHeight
-            
-            attributedStr.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedStr.length))
+            if let paragraphStyle = wholeRangeParagraphStyle {
+                    
+                paragraphStyle.lineSpacing = currentTypography.lineHeight-fontHeight
+                
+                attributedStr.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedStr.length))
+            }
         }
         
         self.rx.attributedText.onNext(attributedStr)
