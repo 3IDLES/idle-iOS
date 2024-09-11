@@ -18,7 +18,7 @@ open class BaseViewModel {
     var alertDriver: Driver<DefaultAlertContentVO>?
     
     public let alertObject: PublishSubject<IdleAlertObject> = .init()
-    var idleAlertDriver: Driver<IdleAlertObject>?
+    var alertObjectDriver: Driver<IdleAlertObject>?
     
     // 로딩
     public let showLoading: PublishSubject<Void> = .init()
@@ -33,7 +33,7 @@ open class BaseViewModel {
         self.alertDriver = alert
             .asDriver(onErrorDriveWith: .never())
         
-        self.idleAlertDriver = alertObject
+        self.alertObjectDriver = alertObject
             .asDriver(onErrorDriveWith: .never())
             
         self.showLoadingDriver = showLoading

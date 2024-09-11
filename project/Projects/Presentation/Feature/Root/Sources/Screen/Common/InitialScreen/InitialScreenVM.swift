@@ -171,7 +171,9 @@ public class InitialScreenVM: BaseViewModel {
                 case .approved:
                     return info
                 case .pending, .new:
-                                    
+                    
+                    return info
+                    
                     self.coordinator?.centerAuth()
                 
                     return nil
@@ -181,6 +183,7 @@ public class InitialScreenVM: BaseViewModel {
                 centerProfileUseCase
                     .getProfile(mode: .myProfile)
             }
+            .share()
         
         let profileExists = checkProfileRegisterResult.compactMap { $0.value }
         let profileDoentExistOrError = checkProfileRegisterResult.compactMap { $0.error }

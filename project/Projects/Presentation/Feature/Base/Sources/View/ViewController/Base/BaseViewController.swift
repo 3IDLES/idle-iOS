@@ -38,7 +38,7 @@ open class BaseViewController: UIViewController {
             .disposed(by: disposeBag)
         
         viewModel
-            .idleAlertDriver?
+            .alertObjectDriver?
             .drive(onNext: { [weak self] object in
                 self?.showIdleModal(object: object)
             })

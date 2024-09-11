@@ -63,8 +63,8 @@ public class IdleAlertObject {
     public private(set) var acceptButtonLabelText: String = ""
     public private(set) var cancelButtonLabelText: String = ""
     
-    public var acceptButtonClicked: Driver<Void>?
-    public var cancelButtonClicked: Driver<Void>?
+    public var acceptButtonClicked: PublishRelay<Void> = .init()
+    public var cancelButtonClicked: PublishRelay<Void> = .init()
     
     public init() { }
     
@@ -249,11 +249,13 @@ public class IdleBigAlertController: UIViewController {
         })
         .disposed(by: disposeBag)
         
-        object.acceptButtonClicked = acceptButton
-            .rx.tap.asDriver(onErrorDriveWith: .never())
+        acceptButton.rx.tap
+            .bind(to: object.acceptButtonClicked)
+            .disposed(by: disposeBag)
             
-        object.cancelButtonClicked = cancelButton
-            .rx.tap.asDriver(onErrorDriveWith: .never())
+        cancelButton.rx.tap
+            .bind(to: object.cancelButtonClicked)
+            .disposed(by: disposeBag)
     }
     
     public func bind(viewModel vm: IdleAlertViewModelable) {
@@ -279,8 +281,7 @@ public class IdleBigAlertController: UIViewController {
             .bind(to: vm.acceptButtonClicked)
             .disposed(by: disposeBag)
         
-        cancelButton
-            .rx.tap
+        cancelButton.rx.tap
             .bind(to: vm.cancelButtonClicked)
             .disposed(by: disposeBag)
     }

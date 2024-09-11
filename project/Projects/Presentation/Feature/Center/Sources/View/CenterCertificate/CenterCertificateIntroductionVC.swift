@@ -169,6 +169,7 @@ public class CenterCertificateIntroductionVC: BaseViewController {
         
         // Input
         // - request status
+        
         Observable
             .merge(
                 rx.viewDidLoad.asObservable(),

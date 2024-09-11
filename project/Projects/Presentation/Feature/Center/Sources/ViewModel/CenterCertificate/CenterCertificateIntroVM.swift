@@ -51,8 +51,7 @@ public class CenterCertificateIntroVM: BaseViewModel {
                     .setCancelButtonLabelText("취소하기")
                 
                 object
-                    .acceptButtonClicked?
-                    .asObservable()
+                    .acceptButtonClicked
                     .bind(to: signOutButtonComfirmed)
                     .disposed(by: disposeBag)
                 
@@ -86,11 +85,11 @@ public class CenterCertificateIntroVM: BaseViewModel {
         }
         
         // MARK: 현재상태확인하기
-        let requestCurrentStatusResult = mapEndLoading(mapStartLoading(requestCurrentStatus)
+        let requestCurrentStatusResult = requestCurrentStatus
             .flatMap { [centerCertificateUseCase] in
                 centerCertificateUseCase
                     .getCenterJoinStatus()
-            })
+            }
             .share()
         
         let requestCurrentStatusSuccess = requestCurrentStatusResult.compactMap { $0.value }
