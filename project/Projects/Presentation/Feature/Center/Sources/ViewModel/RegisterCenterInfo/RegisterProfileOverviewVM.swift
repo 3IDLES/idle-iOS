@@ -14,10 +14,10 @@ import PresentationCore
 import RxSwift
 import RxCocoa
 
-public class RegisterProfileOverviewVM: BaseViewModel {
+class RegisterProfileOverviewVM: BaseViewModel {
     
     // Init
-    weak var coordinator: ProfileRegisterOverviewCO?
+    weak var coordinator: CenterProfileRegisterOverviewCO?
     let profileUseCase: CenterProfileUseCase
     
     // input
@@ -29,7 +29,7 @@ public class RegisterProfileOverviewVM: BaseViewModel {
     
     
     init(
-        coordinator: ProfileRegisterOverviewCO,
+        coordinator: CenterProfileRegisterOverviewCO,
         stateObject: CenterProfileRegisterState,
         profileUseCase: CenterProfileUseCase
     ) {
@@ -40,8 +40,9 @@ public class RegisterProfileOverviewVM: BaseViewModel {
         super.init()
         
         let registerResult = mapEndLoading(mapStartLoading(requestProfileRegister)
-            .flatMap { [profileUseCase, stateObject] _ in
-                profileUseCase
+            .flatMap { [profileUseCase, stateObject] _ -> Single<Result<Void, DomainError>> in
+                
+                return profileUseCase
                     .registerCenterProfile(state: stateObject)
             })
             .share()
