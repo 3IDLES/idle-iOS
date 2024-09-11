@@ -17,4 +17,7 @@ public protocol CenterCertificateUseCase: UseCaseBase {
     
     /// 요양보호사 로그아웃
     func signoutWorkerAccount() -> Single<Result<Void, DomainError>>
+    
+    /// 센터 인증 요청
+    func requestCenterCertificate() -> Single<Result<Void, DomainError>>
 }

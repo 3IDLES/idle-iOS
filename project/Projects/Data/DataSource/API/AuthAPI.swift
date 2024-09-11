@@ -18,6 +18,7 @@ public enum AuthAPI {
     
     // Center
     case centerJoinStatus
+    case requestCenterJoin
     case authenticateBusinessNumber(businessNumber: String)
     case checkIdDuplication(id: String)
     case registerCenterAccount(data: Data)
@@ -49,6 +50,8 @@ extension AuthAPI: BaseAPI {
             
         case .centerJoinStatus:
             return .get
+        case .requestCenterJoin:
+            return .patch
         case .authenticateBusinessNumber:
             return .get
         case .checkIdDuplication:
@@ -91,6 +94,8 @@ extension AuthAPI: BaseAPI {
             
         case .centerJoinStatus:
             "/center/join/status"
+        case .requestCenterJoin:
+            "/center/join/verify"
         case .registerCenterAccount:
             "center/join"
         case .centerLogin:
