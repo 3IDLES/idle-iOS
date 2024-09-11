@@ -18,41 +18,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-//        let useCase = DefaultCenterProfileUseCase(
-//            repository: DefaultUserProfileRepository(store)
-//        )
-        
         let navigationController = UINavigationController()
         navigationController.setNavigationBarHidden(true, animated: false)
         
+        window = UIWindow(windowScene: windowScene)
+        window?.rootViewController = CenterAuthVC()
+        window?.makeKeyAndVisible()
         
-        
-//        let coordinator = RegisterRecruitmentCoordinator(
-//            viewModel: vm,
-//            navigationController: navigationController
-//        )
-//        
-//        let vm = RegisterRecruitmentPostVM(
-//            registerRecruitmentPostCoordinator: coordinator, recruitmentPostUseCase: DefaultRecruitmentPostUseCase(
-//                repository: DefaultRecruitmentPostRepository()
-//            )
-//        )
-//        
-//        let vc = CenterSettingVC()
-//        let vm = CenterSettingVM(
-//            coordinator: nil,
-//            settingUseCase: DefaultSettingUseCase(repository: DefaultAuthRepository()),
-//            centerProfileUseCase: DefaultCenterProfileUseCase(
-//                repository: DefaultUserProfileRepository()
-//            )
-//        )
-//        
-//        vc.bind(viewModel: vm)
-//        
-//        window = UIWindow(windowScene: windowScene)
-//        window?.rootViewController = vc
-//        window?.makeKeyAndVisible()
-        
-//        coordinator.start()
+
     }
 }
