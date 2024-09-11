@@ -137,9 +137,6 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
         
         signOutSuccess
             .subscribe(onNext: { [weak self] _ in
-                
-                // ‼️ ‼️ 로컬에 저장된 계정 정보 삭제 ‼️ ‼️
-                
                 self?.coordinator?.popToRoot()
             })
             .disposed(by: disposeBag)

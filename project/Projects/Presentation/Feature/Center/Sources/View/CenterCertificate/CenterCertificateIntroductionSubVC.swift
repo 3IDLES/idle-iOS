@@ -1,5 +1,5 @@
 //
-//  CenterAuthOnboardingVC.swift
+//  CenterCertificateIntroductionSubVC.swift
 //  CenterFeature
 //
 //  Created by choijunios on 9/8/24.
@@ -13,7 +13,7 @@ import RxSwift
 import Entity
 import DSKit
 
-public class CenterAuthOnboardingVC: BaseViewController {
+public class CenterCertificateIntroductionSubVC: BaseViewController {
     
     // Init
     

@@ -1,5 +1,5 @@
 //
-//  CenterAuthVC.swift
+//  CenterCertificateIntroductionVC.swift
 //  CenterFeature
 //
 //  Created by choijunios on 9/8/24.
@@ -13,7 +13,7 @@ import Entity
 import DSKit
 import BaseFeature
 
-public class CenterAuthVC: BaseViewController {
+public class CenterCertificateIntroductionVC: BaseViewController {
     
     // Init
     
@@ -74,7 +74,7 @@ public class CenterAuthVC: BaseViewController {
             ("센터 관리자 인증 시", "요양보호사 구인 공고를\n간편하게 등록할 수 있어요", CenterFeatureAsset.postRegisterOnboarding.image),
             ("센터 관리자 인증 시", "요양보호사를 즐겨찾기하고\n직접 연락해 능동적으로 구인해요", CenterFeatureAsset.favoriteWorkerOnboarding.image),
         ].map { (text1, text2, image) in
-            let vc = CenterAuthOnboardingVC(
+            let vc = CenterCertificateIntroductionSubVC(
                 title1Text: text1,
                 title2Text: text2,
                 image: image
@@ -136,7 +136,7 @@ public class CenterAuthVC: BaseViewController {
     }
 }
 
-extension CenterAuthVC: UIPageViewControllerDelegate, UIPageViewControllerDataSource {
+extension CenterCertificateIntroductionVC: UIPageViewControllerDelegate, UIPageViewControllerDataSource {
     
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         let nextIndex = (currentPageIndex+1) % pages.count
