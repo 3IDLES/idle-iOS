@@ -74,9 +74,6 @@ public class CenterAuthOnboardingVC: BaseViewController {
             view.addSubview($0)
         }
         
-        labelStack.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-        onboardingImageView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-        
         NSLayoutConstraint.activate([
             
             labelStack.topAnchor.constraint(equalTo: view.topAnchor),
