@@ -56,6 +56,59 @@ public class DefaultIdleAlertVM: IdleAlertViewModelable {
     }
 }
 
+public struct IdleAlertObject {
+    
+    var title: String = ""
+    var description: String = ""
+    var acceptButtonLabelText: String = ""
+    var cancelButtonLabelText: String = ""
+    
+    var acceptButtonClicked: PublishSubject<Void> = .init()
+    var cancelButtonClicked: PublishSubject<Void> = .init()
+    
+    init() { }
+    
+    mutating func setTitle(_ text: String) -> Self {
+        self.title = text
+        return self
+    }
+    
+    mutating func setDescription(_ text: String) -> Self {
+        self.description = text
+        return self
+    }
+    
+    mutating func setAcceptButtonLabelText(_ text: String) -> Self {
+        self.acceptButtonLabelText = text
+        return self
+    }
+    
+    mutating func setCancelButtonLabelText(_ text: String) -> Self {
+        self.cancelButtonLabelText = text
+        return self
+    }
+    
+    func bindAcceptButton<T: ObserverType>(_ observer: T, disposeBag: DisposeBag) -> Self where T.Element == Void {
+        
+        acceptButtonClicked
+            .asObservable()
+            .subscribe(observer)
+            .disposed(by: disposeBag)
+        
+        return self
+    }
+    
+    func bindCancelButton<T: ObserverType>(_ observer: T, disposeBag: DisposeBag) -> Self where T.Element == Void {
+        
+        acceptButtonClicked
+            .asObservable()
+            .subscribe(observer)
+            .disposed(by: disposeBag)
+        
+        return self
+    }
+}
+
 
 public class IdleBigAlertController: UIViewController {
     
@@ -190,6 +243,40 @@ public class IdleBigAlertController: UIViewController {
             alertContainer.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             alertContainer.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
+    }
+    
+    public func bindObject(_ object: IdleAlertObject) {
+        
+        titleLabel.textString = object.title
+        
+        descriptionLabel.textString = object.description
+        descriptionLabel.textAlignment = .center
+        
+        acceptButton.label.textString = object.acceptButtonLabelText
+        cancelButton.label.textString = object.cancelButtonLabelText
+        
+        
+        Observable.merge(
+            acceptButton.rx.tap.asObservable(),
+            cancelButton.rx.tap.asObservable()
+        )
+        .asDriver(onErrorDriveWith: .never())
+        .drive(onNext: { [weak self] in
+            
+            guard let self else { return }
+            modalPresentationStyle = .custom
+            dismiss(animated: true)
+        })
+        .disposed(by: disposeBag)
+        
+        acceptButton.rx.tap
+            .bind(to: object.acceptButtonClicked)
+            .disposed(by: disposeBag)
+        
+        cancelButton
+            .rx.tap
+            .bind(to: object.cancelButtonClicked)
+            .disposed(by: disposeBag)
     }
     
     public func bind(viewModel vm: IdleAlertViewModelable) {
