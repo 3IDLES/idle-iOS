@@ -74,11 +74,14 @@ public class CenterAuthVC: BaseViewController {
             ("센터 관리자 인증 시", "요양보호사 구인 공고를\n간편하게 등록할 수 있어요", CenterFeatureAsset.postRegisterOnboarding.image),
             ("센터 관리자 인증 시", "요양보호사를 즐겨찾기하고\n직접 연락해 능동적으로 구인해요", CenterFeatureAsset.favoriteWorkerOnboarding.image),
         ].map { (text1, text2, image) in
-            CenterAuthOnboardingVC(
+            let vc = CenterAuthOnboardingVC(
                 title1Text: text1,
                 title2Text: text2,
                 image: image
             )
+            vc.willMove(toParent: pageViewController)
+            pageViewController.addChild(vc)
+            return vc
         }
         
         let firstPage = pages.first!
