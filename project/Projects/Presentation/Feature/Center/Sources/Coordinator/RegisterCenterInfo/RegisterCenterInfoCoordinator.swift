@@ -16,14 +16,13 @@ public class RegisterCenterInfoCoordinator: ChildCoordinator {
     public weak var parent: CenterProfileRegisterCoordinatable?
     
     public let navigationController: UINavigationController
-    
-    public let viewModel: RegisterCenterInfoViewModelable
+    let profileUseCase: CenterProfileUseCase
     
     public init(
         profileUseCase: CenterProfileUseCase,
         navigationController: UINavigationController
     ) {
-        self.viewModel = RegisterCenterInfoVM(profileUseCase: profileUseCase)
+        self.profileUseCase = profileUseCase
         self.navigationController = navigationController
     }
     
@@ -33,7 +32,11 @@ public class RegisterCenterInfoCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = RegisterCenterInfoVC(coordinator: self)
-        vc.bind(viewModel: viewModel)
+        let vm = RegisterCenterInfoVM(
+            coordinator: self,
+            profileUseCase: profileUseCase
+        )
+        vc.bind(viewModel: vm)
         
         viewControllerRef = vc
         
@@ -47,8 +50,8 @@ public class RegisterCenterInfoCoordinator: ChildCoordinator {
 
 extension RegisterCenterInfoCoordinator {
     
-    func showCompleteScreen(cardVO: CenterProfileCardVO) {
-        parent?.showCompleteScreen(cardVO: cardVO)
+    func showPreviewScreen(stateObject: CenterProfileRegisterState) {
+        parent?.showPreviewScreen(stateObject: stateObject)
     }
     
     func registerFinished() {

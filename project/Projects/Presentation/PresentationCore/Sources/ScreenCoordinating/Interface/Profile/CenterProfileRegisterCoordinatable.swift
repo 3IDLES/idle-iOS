@@ -11,6 +11,6 @@ import Entity
 public protocol CenterProfileRegisterCoordinatable: ParentCoordinator {
     
     func registerFinished()
-    func showCompleteScreen(cardVO: CenterProfileCardVO)
-    func showMyCenterProfile()
+    func showPreviewScreen(stateObject: CenterProfileRegisterState)
+    func showCompleteScreen()
 }

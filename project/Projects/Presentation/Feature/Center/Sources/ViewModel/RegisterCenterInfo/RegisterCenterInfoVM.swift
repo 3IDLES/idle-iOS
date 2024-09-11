@@ -15,6 +15,9 @@ import BaseFeature
 
 public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelable {
     
+    // Init
+    weak var coordinator: RegisterCenterInfoCoordinator?
+    
     // Input
     public var editingName: PublishRelay<String> = .init()
     public var editingCenterNumber: PublishRelay<String> = .init()
@@ -34,8 +37,8 @@ public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelabl
     // StatObject
     private let stateObject = CenterProfileRegisterState()
 
-    public init(profileUseCase useCase: CenterProfileUseCase) {
-        
+    public init(coordinator: RegisterCenterInfoCoordinator, profileUseCase useCase: CenterProfileUseCase) {
+        self.coordinator = coordinator
         super.init()
         
         // Set stream
@@ -114,41 +117,25 @@ public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelabl
             }
             .asDriver(onErrorJustReturn: .init())
         
-        let profileRegisterResult = self.completeButtonPressed
-            .flatMap { [useCase, stateObject] _ in
-#if DEBUG
-                return Single<Result<Void, DomainError>>.just(.success(()))
-#endif
-                return useCase.registerCenterProfile(state: stateObject)
-            }
-        
-        profileRegisterSuccess = profileRegisterResult
-            .compactMap { $0.value }
-            .map { [stateObject] in
-                let cardVO = CenterProfileCardVO(
-                    name: stateObject.centerName,
-                    location: stateObject.roadNameAddress
-                )
-                return cardVO
-            }
-            .asDriver(onErrorJustReturn: .default)
-            
-        let profileRegisterFailure = profileRegisterResult
-            .compactMap { $0.error }
-            .map { error in
-                DefaultAlertContentVO(
-                    title: "센터정보 등록 실패",
-                    message: error.message
-                )
-            }
+        self.completeButtonPressed
+            .subscribe(onNext: { [weak self] _ in
+                
+                guard let self else { return }
+                
+                // 프리뷰화면으로 이동
+                coordinator.showPreviewScreen(stateObject: stateObject)
+            })
+            .disposed(by: disposeBag)
         
         // Alert
         Observable
             .merge(
-                imageValidationFailure,
-                profileRegisterFailure
+                imageValidationFailure
             )
-            .subscribe(alert)
+            .subscribe(onNext: { [weak self] alertVO in
+                
+                self?.alert.onNext(alertVO)
+            })
             .disposed(by: disposeBag)
     }
     
