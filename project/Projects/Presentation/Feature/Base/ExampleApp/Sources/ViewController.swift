@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import BaseFeature
 
-class ViewController: UIViewController {
+class ViewController: BaseViewController {
     
     override func viewDidLoad() {
         
@@ -24,6 +25,15 @@ class ViewController: UIViewController {
             initialLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             initialLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        self.viewModel?
+            .snackBar
+            .onNext(.init(titleText: "테스트테스트테스트"))
     }
 }
 

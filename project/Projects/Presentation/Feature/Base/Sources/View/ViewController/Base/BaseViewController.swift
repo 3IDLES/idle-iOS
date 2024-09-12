@@ -146,7 +146,7 @@ extension BaseViewController {
         // 뷰계층에 추가
         view.addSubview(snackBar)
         
-        let snackBarShowingDuration: CGFloat = 0.5
+        let snackBarShowingDuration: CGFloat = 2
         
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn) {
             snackBar.transform = .identity

@@ -21,7 +21,7 @@ open class BaseViewModel {
     var alertObjectDriver: Driver<IdleAlertObject>?
     
     // Snack bar
-    let snackBar: PublishSubject<IdleSnackBarRO> = .init()
+    public let snackBar: PublishSubject<IdleSnackBarRO> = .init()
     var snackBarDriver: Driver<IdleSnackBarRO>?
     
     // 로딩
