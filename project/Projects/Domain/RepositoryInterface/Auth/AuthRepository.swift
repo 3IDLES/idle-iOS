@@ -15,8 +15,9 @@ public protocol AuthRepository: RepositoryBase {
     func requestCenterLogin(id: String, password: String) -> Single<Void>
     func signoutCenterAccount() -> Single<Void>
     func deregisterCenterAccount(reasons: [DeregisterReasonVO], password: String) -> Single<Void>
-    func getCenterJoinStatus() -> RxSwift.Single<CenterJoinStatusInfoVO>
-    func requestCenterJoin() -> RxSwift.Single<Void>
+    func getCenterJoinStatus() -> Single<CenterJoinStatusInfoVO>
+    func requestCenterJoin() -> Single<Void>
+    func setNewPassword(phoneNumber: String, password: String) -> Single<Void>
     
     
     // MARK: Worker
