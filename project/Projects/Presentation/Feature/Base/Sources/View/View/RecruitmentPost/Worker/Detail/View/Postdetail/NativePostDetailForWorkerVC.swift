@@ -47,7 +47,6 @@ public class NativePostDetailForWorkerVC: BaseViewController {
     public override func viewDidLoad() {
         setAppearance()
         setLayout()
-        setObservable()
     }
     
     private func setAppearance() {
@@ -105,24 +104,14 @@ public class NativePostDetailForWorkerVC: BaseViewController {
             buttonStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
         ])
     }
-    
-    private func setObservable() {
-        
-        // '문의하기'버튼 클릭시
-        csButton.rx.tap
-            .subscribe { [weak self] _ in
-                let vc = SelectCSTypeVC()
-                vc.modalPresentationStyle = .overFullScreen
-                self?.present(vc, animated: false)
-            }
-            .disposed(by: disposeBag)
-    }
-    
+
     public func bind(viewModel: NativePostDetailForWorkerViewModelable) {
         
         super.bind(viewModel: viewModel)
         
         // Output
+        let centerPhoneNumber: PublishSubject<String> = .init()
+        
         viewModel
             .postForWorkerBundle?
             .drive(onNext: {
@@ -203,6 +192,22 @@ public class NativePostDetailForWorkerVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        // 문의하기 버튼
+        if let centerInfo = viewModel.centerInfoForCS?.asObservable() {
+            csButton.rx.tap
+                .withLatestFrom(centerInfo.asObservable())
+                .subscribe (onNext: { [weak self] info in
+                    let vc = SelectCSTypeVC()
+                    vc.phoneCSButton.bind(
+                        nameText: info.name,
+                        phoneNumberText: info.phoneNumber
+                    )
+                    vc.modalPresentationStyle = .overFullScreen
+                    self?.present(vc, animated: false)
+                })
+                .disposed(by: disposeBag)
+        }
+        
         // 지원성공시 비활성화
         viewModel
             .applySuccess?
@@ -248,6 +253,7 @@ public class NativePostDetailForWorkerVC: BaseViewController {
             .rx.tap
             .bind(to: viewModel.backButtonClicked)
             .disposed(by: disposeBag)
+
     }
 }
 

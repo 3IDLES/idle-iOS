@@ -19,6 +19,7 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
         let navigationController: UINavigationController
         let recruitmentPostUseCase: RecruitmentPostUseCase
         let workerProfileUseCase: WorkerProfileUseCase
+        let centerProfileUseCase: CenterProfileUseCase
         
         public init(
             postType: RecruitmentPostType,
@@ -26,7 +27,8 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
             parent: WorkerRecruitmentBoardCoordinatable? = nil,
             navigationController: UINavigationController,
             recruitmentPostUseCase: RecruitmentPostUseCase,
-            workerProfileUseCase: WorkerProfileUseCase
+            workerProfileUseCase: WorkerProfileUseCase,
+            centerProfileUseCase: CenterProfileUseCase
         ) {
             self.postType = postType
             self.postId = postId
@@ -34,6 +36,7 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
             self.navigationController = navigationController
             self.recruitmentPostUseCase = recruitmentPostUseCase
             self.workerProfileUseCase = workerProfileUseCase
+            self.centerProfileUseCase = centerProfileUseCase
         }
     }
     
@@ -45,6 +48,7 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
     public let navigationController: UINavigationController
     let recruitmentPostUseCase: RecruitmentPostUseCase
     let workerProfileUseCase: WorkerProfileUseCase
+    let centerProfileUseCase: CenterProfileUseCase
     
     public init(
         dependency: Dependency
@@ -55,6 +59,7 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
         self.navigationController = dependency.navigationController
         self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
         self.workerProfileUseCase = dependency.workerProfileUseCase
+        self.centerProfileUseCase = dependency.centerProfileUseCase
     }
     
     deinit {
@@ -72,7 +77,8 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
                 postId: postId,
                 coordinator: self,
                 recruitmentPostUseCase: recruitmentPostUseCase, 
-                workerProfileUseCase: workerProfileUseCase
+                workerProfileUseCase: workerProfileUseCase,
+                centerProfileUseCase: centerProfileUseCase
             )
             nativeDetailVC.bind(viewModel: vm)
             vc = nativeDetailVC

@@ -12,21 +12,21 @@ import RxSwift
 import Entity
 import DSKit
 
-public class SelectCSTypeVC: IdleBottomSheetVC {
+class SelectCSTypeVC: IdleBottomSheetVC {
     
     // Init
     
     // View
     let phoneCSButton: PhoneCSButton = .init()
     
-    public override init() {
+    override init() {
         super.init()
         setObservable()
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         
         setLayout()
@@ -51,7 +51,6 @@ public class SelectCSTypeVC: IdleBottomSheetVC {
     private func setObservable() {
         
     }
-    
 }
 
 @available(iOS 17.0, *)

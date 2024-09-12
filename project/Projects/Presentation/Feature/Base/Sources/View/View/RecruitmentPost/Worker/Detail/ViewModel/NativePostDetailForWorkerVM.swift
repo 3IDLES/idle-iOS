@@ -15,12 +15,15 @@ import DSKit
 
 public protocol NativePostDetailForWorkerViewModelable: BaseViewModel {
     
+    typealias CenterInfoForCS = (name: String, phoneNumber: String)
+    
     // Output
     var postForWorkerBundle: Driver<RecruitmentPostForWorkerBundle>? { get }
     var locationInfo: Driver<WorkPlaceAndWorkerLocationMapRO>? { get }
     var idleAlertVM: Driver<IdleAlertViewModelable>? { get }
     var starButtonRequestResult: Driver<Bool>? { get }
     var applySuccess: Driver<Void>? { get }
+    var centerInfoForCS: Driver<CenterInfoForCS>? { get }
      
     // Input
     var viewWillAppear: PublishRelay<Void> { get }
@@ -39,6 +42,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     private let postId: String
     private let recruitmentPostUseCase: RecruitmentPostUseCase
     private let workerProfileUseCase: WorkerProfileUseCase
+    private let centerProfileUseCase: CenterProfileUseCase
     
     // Ouput
     public var postForWorkerBundle: RxCocoa.Driver<Entity.RecruitmentPostForWorkerBundle>?
@@ -46,6 +50,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     public var idleAlertVM: Driver<any IdleAlertViewModelable>?
     public var starButtonRequestResult: Driver<Bool>?
     public var applySuccess: RxCocoa.Driver<Void>?
+    public var centerInfoForCS: Driver<CenterInfoForCS>?
     
     // Input
     public var backButtonClicked: RxRelay.PublishRelay<Void> = .init()
@@ -54,18 +59,21 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     public var centerCardClicked: RxRelay.PublishRelay<Void> = .init()
     public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
 
+    private var centerInfoForCSCache: CenterInfoForCS?
     
     public init(
             postId: String,
             coordinator: PostDetailForWorkerCoodinator?,
             recruitmentPostUseCase: RecruitmentPostUseCase,
-            workerProfileUseCase: WorkerProfileUseCase
+            workerProfileUseCase: WorkerProfileUseCase,
+            centerProfileUseCase: CenterProfileUseCase
         )
     {
         self.postId = postId
         self.coordinator = coordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         self.workerProfileUseCase = workerProfileUseCase
+        self.centerProfileUseCase = centerProfileUseCase
         
         super.init()
         
@@ -127,6 +135,44 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                 )
             }
             .asDriver(onErrorRecover: { _ in fatalError() })
+        
+        // MARK: 센터전화번호 가져오기
+        let centerInfoCache = viewWillAppear.compactMap { [weak self] _ in
+            self?.centerInfoForCSCache
+        }
+        
+        let centerProfileRequestResult = getPostDetailSuccess
+            .filter { [weak self] _ in
+                self?.centerInfoForCSCache == nil
+            }
+            .flatMap { [centerProfileUseCase] bundle in
+                
+                let centerId = bundle.centerInfo.centerId
+                
+                return centerProfileUseCase
+                    .getProfile(mode: .otherProfile(id: centerId))
+            }
+            .share()
+        
+        let centerProfileRequestSuccess = centerProfileRequestResult.compactMap { $0.value }
+        let centerProfileRequestFailure = centerProfileRequestResult.compactMap { $0.error }
+        
+        let centerInfoForCS = centerProfileRequestSuccess
+            .map { [weak self] profile in
+                
+                let info = (profile.centerName, profile.officeNumber) as CenterInfoForCS
+                self?.centerInfoForCSCache = info
+                
+                return info
+            }
+        
+        self.centerInfoForCS = Observable
+            .merge(
+                centerInfoForCS,
+                centerInfoCache
+            )
+            .asDriver(onErrorDriveWith: .never())
+        
         
         // MARK: 버튼 처리
         backButtonClicked
@@ -196,6 +242,14 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                     message: error.message
                 )
             }
+        
+        let centerProfileRequestFailureAlert = centerProfileRequestFailure
+            .map { error in
+                DefaultAlertContentVO(
+                    title: "센터정보 불러오기 실패",
+                    message: error.message
+                )
+            }
 
         // MARK: 즐겨찾기
         starButtonRequestResult = starButtonClicked
@@ -225,7 +279,8 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             .merge(
                 getPostDetailFailureAlert,
                 applyRequestFailureAlert,
-                requestWorkerLocationFailureAlert
+                requestWorkerLocationFailureAlert,
+                centerProfileRequestFailureAlert
             )
             .subscribe(onNext: { [weak self] alertVO in
                 guard let self else { return }
