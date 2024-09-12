@@ -82,4 +82,8 @@ public class DefaultAuthUseCase: AuthUseCase {
     public func checkCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>> {
         convert(task: authRepository.getCenterJoinStatus())
     }
+    
+    public func setNewPassword(phoneNumber: String, password: String) -> Single<Result<Void, DomainError>> {
+        convert(task: authRepository.setNewPassword(phoneNumber: phoneNumber, password: password))
+    }
 }

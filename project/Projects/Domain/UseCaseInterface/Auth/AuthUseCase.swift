@@ -9,20 +9,9 @@ import Foundation
 import RxSwift
 import Entity
 
-/// 요구사항
-///     - #1. 센터 회원가입 실행
-///     - #2. 센터 로그인 실행
-///     - #3. 샌터 회원 탈퇴
-///     - #4. 샌터 회원 로그아웃
-///
-///     - #5. 요양보호사 회원가입 실행
-///     - #6. 요양보호사 로그인 실행
-///     - #7. 요양보호사 회원탈퇴 실행
-///     - #8. 요양보호사 로그아웃
-
 public protocol AuthUseCase: UseCaseBase {
     
-    // #1.
+    
     /// 센터 회원가입 실행
     /// - parameters:
     ///     - registerState: CenterRegisterState
@@ -30,7 +19,7 @@ public protocol AuthUseCase: UseCaseBase {
         registerState: CenterRegisterState
     ) -> Single<Result<Void, DomainError>>
     
-    // #2.
+    
     /// 센터 로그인 실행
     /// - parameters:
     ///     - id: String
@@ -40,18 +29,23 @@ public protocol AuthUseCase: UseCaseBase {
         password: String
     ) -> Single<Result<Void, DomainError>>
     
-    // #5
+    /// 센터 인증여부 확인
+    func checkCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>>
+    
+    
+    /// 센터 비밀번호 재설정
+    func setNewPassword(phoneNumber: String, password: String) -> Single<Result<Void, DomainError>>
+    
+    
     /// 요양 보호사 회원가입 실행
     func registerWorkerAccount(
         registerState: WorkerRegisterState
     ) -> Single<Result<Void, DomainError>>
-    // #6
+    
+    
     /// 요양 보호사 로그인 실행
     func loginWorkerAccount(
         phoneNumber: String,
         authNumber: String
     ) -> Single<Result<Void, DomainError>>
-    
-    /// 센터 인증여부 확인
-    func checkCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>>
 }

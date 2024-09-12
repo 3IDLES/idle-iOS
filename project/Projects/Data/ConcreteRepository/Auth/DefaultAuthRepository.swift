@@ -80,6 +80,12 @@ public extension DefaultAuthRepository {
             .request(api: .requestCenterJoin, with: .withToken)
             .mapToVoid()
     }
+    
+    func setNewPassword(phoneNumber: String, password: String) -> Single<Void> {
+        networkService
+            .request(api: .makeNewPassword(phoneNumber: phoneNumber, newPassword: password), with: .withToken)
+            .mapToVoid()
+    }
 }
 
 // MARK: Worker auth
