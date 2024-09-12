@@ -82,9 +82,9 @@ public class ApplicantCardCell: UITableViewCell {
                 .showProfileButton.rx.tap
                 .bind(to: viewModel.showProfileButtonClicked),
             
-            cardView
-                .employButton.rx.tap
-                .bind(to: viewModel.employButtonClicked),
+//            cardView
+//                .employButton.rx.tap
+//                .bind(to: viewModel.employButtonClicked),
         ]
         
         self.disposables = disposables

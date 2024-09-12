@@ -384,7 +384,7 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
         let inputValidationSuccess = inputValidationResult.filter { $0 == nil }
         let inputValidationFailure = inputValidationResult.compactMap { $0 }
         
-        let editingRequestResult = inputValidationSuccess
+        let editingRequestResult = mapEndLoading(mapStartLoading(inputValidationSuccess)
             .flatMap { [weak self] _ -> Single<Result<Void, DomainError>> in
                 guard let self else { return .never() }
                 
@@ -398,7 +398,7 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
                         addressInfo: editing_addressInfo.value
                     )
                 )
-            }
+            })
             .share()
         
         let editingRequestSuccess = editingRequestResult.compactMap { $0.value }

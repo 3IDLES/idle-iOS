@@ -144,11 +144,11 @@ public class ApplicantCard: UIView {
         button.label.textString = "프로필 보기"
         return button
     }()
-    let employButton: IdlePrimaryButton = {
-        let button = IdlePrimaryButton(level: .medium)
-        button.label.textString = "채용하기"
-        return button
-    }()
+//    let employButton: IdlePrimaryButton = {
+//        let button = IdlePrimaryButton(level: .medium)
+//        button.label.textString = "채용하기"
+//        return button
+//    }()
     
     // Observable
     private let disposeBag = DisposeBag()
@@ -228,7 +228,8 @@ public class ApplicantCard: UIView {
 //        ])
         
         let buttonStack = HStack([
-            showProfileButton, employButton
+            showProfileButton, 
+//            employButton
         ], spacing: 8, distribution: .fillEqually)
         
         let mainStack = VStack([

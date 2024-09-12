@@ -95,7 +95,7 @@ public class CustomerInformationDisplayingView: VStack {
             
             let keyStack = VStack([], spacing: 6, alignment: .leading)
             let valueStack = VStack([], spacing: 6, alignment: .leading)
-            let keyValueStack = HStack([keyStack, valueStack, Spacer()], spacing: 32)
+            let keyValueStack = HStack([keyStack, Spacer(width: 32), valueStack, Spacer()])
             
             addViewListToStack(viewList: viewList, keyStack: keyStack, valueStack: valueStack, keyValueStack: keyValueStack)
             
