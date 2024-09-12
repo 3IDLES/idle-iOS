@@ -27,6 +27,8 @@ public enum AuthAPI {
     case deregisterCenterAccount(reason: String, password: String)
     case signoutCenterAccount
     
+    case makeNewPassword(phoneNumber: String, newPassword: String)
+    
     // Worker
     case registerWorkerAccount(data: Data)
     case workerLogin(phoneNumber: String, verificationNumber: String)
@@ -69,6 +71,10 @@ extension AuthAPI: BaseAPI {
             return .post
         
             
+        case .makeNewPassword:
+            return .patch
+            
+            
         case .registerWorkerAccount:
             return .post
         case .workerLogin:
@@ -83,17 +89,17 @@ extension AuthAPI: BaseAPI {
     public var path: String {
         switch self {
         case .startPhoneNumberAuth:
-            "common/send"
+            "/common/send"
         case .checkAuthNumber:
-            "common/confirm"
+            "/common/confirm"
         case .reissueToken:
-            "common/refresh"
+            "/common/refresh"
             
             
         case .authenticateBusinessNumber(let businessNumber):
-            "center/authentication/\(businessNumber)"
+            "/center/authentication/\(businessNumber)"
         case .checkIdDuplication(id: let id):
-            "center/validation/\(id)"
+            "/center/validation/\(id)"
             
         case .centerJoinStatus:
             "/center/join/status"
@@ -102,23 +108,26 @@ extension AuthAPI: BaseAPI {
           
           
         case .registerCenterAccount:
-            "center/join"
+            "/center/join"
         case .centerLogin:
-            "center/login"
+            "/center/login"
         case .signoutCenterAccount:
-            "center/logout"
+            "/center/logout"
         case .deregisterCenterAccount:
-            "center/withdraw"
+            "/center/withdraw"
+            
+        case .makeNewPassword:
+            "/center/password/new"
             
             
         case .registerWorkerAccount:
-            "carer/join"
+            "/carer/join"
         case .workerLogin:
-            "carer/login"
+            "/carer/login"
         case .signoutWorkerAccount:
-            "carer/logout"
+            "/carer/logout"
         case .deregisterWorkerAccount:
-            "carer/withdraw"
+            "/carer/withdraw"
         }
     }
     
@@ -136,6 +145,9 @@ extension AuthAPI: BaseAPI {
         case .deregisterCenterAccount(let reason, let password):
             params["reason"] = reason
             params["password"] = password
+        case .makeNewPassword(let phoneNumber, let newPassword):
+            params["phoneNumber"] = phoneNumber
+            params["newPassword"] = newPassword
         case .reissueToken(let refreshToken):
             params["refreshToken"] = refreshToken
         case .workerLogin(let phoneNumber, let verificationNumber):
@@ -171,6 +183,8 @@ extension AuthAPI: BaseAPI {
         case .centerLogin:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .deregisterCenterAccount:
+            return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
+        case .makeNewPassword:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
         case .reissueToken:
             return .requestParameters(parameters: bodyParameters ?? [:], encoding: parameterEncoding)
