@@ -10,6 +10,22 @@ import RxSwift
 import RxCocoa
 import Entity
 
+public struct IdleSnackBarRO {
+    let titleText: String
+    let icon: UIImage?
+    let backgroundColor: UIColor?
+    
+    public init(
+        titleText: String="완료되었습니다.",
+        icon: UIImage?=DSIcon.successCheck.image,
+        backgroundColor: UIColor?=DSColor.gray500.color
+    ) {
+        self.titleText = titleText
+        self.icon = icon
+        self.backgroundColor = backgroundColor
+    }
+}
+
 public class IdleSnackBar: UIView {
     
     private let titleLabel: IdleLabel = {
@@ -19,8 +35,7 @@ public class IdleSnackBar: UIView {
     }()
     
     private let titleIcon: UIImageView = {
-        let defaultSuccessIcon = DSIcon.successCheck.image
-        let imageView = UIImageView(image: defaultSuccessIcon)
+        let imageView = UIImageView()
         imageView.tintColor = DSColor.gray0.color
         return imageView
     }()
@@ -62,18 +77,10 @@ public class IdleSnackBar: UIView {
         ])
     }
     
-    public func setLabelText(_ text: String) -> Self {
-        titleLabel.textString = text
-        return self
-    }
-    
-    public func setImage(_ image: UIImage) -> Self {
-        titleIcon.image = image
-        return self
-    }
-    
-    public func setBackgroundColor(_ color: UIColor) {
-        self.backgroundColor = color
+    public func applyRO(_ ro: IdleSnackBarRO) {
+        self.backgroundColor = ro.backgroundColor
+        titleLabel.textString = ro.titleText
+        titleIcon.image = ro.icon
     }
 }
 
@@ -85,9 +92,6 @@ public class IdleSnackBar: UIView {
             size: .init(width: 300, height: 48)
         )
     )
-    
-    _ = view
-        .setLabelText("지원이 완료되었어요")
     
     DispatchQueue.main.asyncAfter(deadline: .now()+3) {
         
