@@ -12,13 +12,13 @@ import Entity
 
 public class IdleSnackBar: UIView {
     
-    let titleLabel: IdleLabel = {
+    private let titleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
         label.attrTextColor = DSColor.gray0.color
         return label
     }()
     
-    let titleIcon: UIImageView = {
+    private let titleIcon: UIImageView = {
         let defaultSuccessIcon = DSIcon.successCheck.image
         let imageView = UIImageView(image: defaultSuccessIcon)
         imageView.tintColor = DSColor.gray0.color
@@ -61,6 +61,20 @@ public class IdleSnackBar: UIView {
             mainStack.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
         ])
     }
+    
+    public func setLabelText(_ text: String) -> Self {
+        titleLabel.textString = text
+        return self
+    }
+    
+    public func setImage(_ image: UIImage) -> Self {
+        titleIcon.image = image
+        return self
+    }
+    
+    public func setBackgroundColor(_ color: UIColor) {
+        self.backgroundColor = color
+    }
 }
 
 @available(iOS 17.0, *)
@@ -71,7 +85,9 @@ public class IdleSnackBar: UIView {
             size: .init(width: 300, height: 48)
         )
     )
-    view.titleLabel.textString = "지원이 완료되었어요"
+    
+    _ = view
+        .setLabelText("지원이 완료되었어요")
     
     DispatchQueue.main.asyncAfter(deadline: .now()+3) {
         
