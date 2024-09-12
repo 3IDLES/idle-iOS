@@ -62,9 +62,14 @@ open class BaseViewModel {
                 return bars
             }
             .flatMap { bars in
-                Observable.from(bars)
+                Observable
+                    .from(bars)
+                    .concatMap { ro in
+                        Observable
+                            .just(ro)
+                            .delay(.milliseconds(350), scheduler: MainScheduler.instance)
+                    }
             }
-            .debounce(.milliseconds(350), scheduler: MainScheduler.asyncInstance)
             .bind(to: snackBar)
             .disposed(by: disposeBag)
     }
