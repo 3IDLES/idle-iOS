@@ -70,6 +70,10 @@ public class IdleSnackBar: UIView {
         }
         
         NSLayoutConstraint.activate([
+            
+            titleIcon.widthAnchor.constraint(equalToConstant: 24),
+            titleIcon.heightAnchor.constraint(equalToConstant: 24),
+            
             mainStack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
             mainStack.leftAnchor.constraint(equalTo: self.layoutMarginsGuide.leftAnchor),
             mainStack.rightAnchor.constraint(equalTo: self.layoutMarginsGuide.rightAnchor),

@@ -149,7 +149,7 @@ extension BaseViewController {
         
         // 스낵바를 하단에 감춘다
         snackBar.transform = .init(translationX: 0, y: snackBarHeight+horizontalPadding)
-        snackBar.alpha = 0.5
+        snackBar.alpha = 0.25
         
         // 뷰계층에 추가
         view.addSubview(snackBar)
@@ -163,7 +163,9 @@ extension BaseViewController {
             
             UIView.animate(withDuration: 0.2, delay: snackBarShowingDuration, options: .curveEaseIn) {
                 snackBar.transform = .init(translationX: 0, y: snackBarHeight+horizontalPadding)
-                snackBar.alpha = 0.5
+                snackBar.alpha = 0.25
+            } completion: { _ in
+                snackBar.removeFromSuperview()
             }
         }
     }
