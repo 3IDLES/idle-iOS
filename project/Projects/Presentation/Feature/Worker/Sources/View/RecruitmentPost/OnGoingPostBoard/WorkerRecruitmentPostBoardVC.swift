@@ -68,6 +68,7 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
                 guard let self else { return }
                 
                 self.postData = postData
+                
                 postTableView.reloadData()
                 isPaging = false
                 
@@ -76,6 +77,13 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
                         self?.postTableView.setContentOffset(.zero, animated: false)
                     }
                 }
+                
+                postTableView.layoutIfNeeded()
+                if self.checkScrollViewHasSpace() {
+                    // 빈공간이 있는 경우 바로 다음요청
+                    requestNextPage.accept(())
+                }
+                
                 
                 // 공고가 없을 경우
                 emptyScreen.isHidden = (postData.count != 0)
@@ -159,6 +167,10 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     
     private func setObservable() {
         
+    }
+    
+    func checkScrollViewHasSpace() -> Bool {
+        postTableView.contentSize.height < postTableView.frame.height
     }
 }
 
