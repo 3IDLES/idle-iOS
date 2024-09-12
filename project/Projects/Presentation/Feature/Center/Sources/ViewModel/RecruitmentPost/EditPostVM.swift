@@ -409,7 +409,8 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
                 guard let self else { return }
                 
                 // 성공적으로 수정됨
-                self.editPostCoordinator?.coordinatorDidFinish()
+                self.editPostCoordinator?
+                    .coordinatorDidFinishWithSnackBar(ro: .init(titleText: "공고가 수정되었어요."))
             }
             .disposed(by: disposeBag)
         
