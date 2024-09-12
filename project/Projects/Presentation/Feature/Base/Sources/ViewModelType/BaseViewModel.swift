@@ -77,6 +77,7 @@ open class BaseViewModel {
     public func mapStartLoading<T>(_ target: Observable<T>) -> Observable<T> {
         
         target
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             .map { [weak self] item in
                 
                 self?.showLoading.onNext(())

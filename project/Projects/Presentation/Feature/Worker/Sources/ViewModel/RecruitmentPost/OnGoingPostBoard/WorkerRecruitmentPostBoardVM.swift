@@ -94,9 +94,6 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
         
         super.init()
         
-        var loadingStartObservables: [Observable<Void>] = []
-        var loadingEndObservables: [Observable<Void>] = []
-        
         // MARK: 상단 위치정보 불러오기
         workerLocationTitleText = requestWorkerLocation
             .flatMap { [workerProfileUseCase] _ in
@@ -167,7 +164,7 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
             }
         
         // MARK: 공고리스트 처음부터 요청하기
-        let initialRequest = requestInitialPageRequest
+        let initialRequest = mapEndLoading(mapStartLoading(requestInitialPageRequest.asObservable())
             .flatMap { [weak self, recruitmentPostUseCase] request in
                 
                 self?.currentPostVO.accept([])
@@ -178,11 +175,8 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
                         request: .initial,
                         postCount: 10
                     )
-            }
+            })
             .share()
-        
-        // 로딩 시작
-        loadingStartObservables.append(initialRequest.map { _ in })
         
         // MARK: 공고리스트 페이징 요청
         let pagingRequest = requestNextPage
@@ -202,9 +196,6 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
         let postPageReqeustResult = Observable
             .merge(initialRequest, pagingRequest)
             .share()
-        
-        // 로딩 종료
-        loadingEndObservables.append(postPageReqeustResult.map { _ in })
         
         let requestPostListSuccess = postPageReqeustResult.compactMap { $0.value }
         let requestPostListFailure = postPageReqeustResult.compactMap { $0.error }
@@ -287,19 +278,6 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
                 requestPostListFailureAlert
             )
             .subscribe(self.alert)
-            .disposed(by: dispostBag)
-        
-        // MARK: 로딩
-        Observable
-            .merge(loadingStartObservables)
-            .subscribe(self.showLoading)
-            .disposed(by: dispostBag)
-            
-        
-        Observable
-            .merge(loadingEndObservables)
-            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
-            .subscribe(self.dismissLoading)
             .disposed(by: dispostBag)
     }
     

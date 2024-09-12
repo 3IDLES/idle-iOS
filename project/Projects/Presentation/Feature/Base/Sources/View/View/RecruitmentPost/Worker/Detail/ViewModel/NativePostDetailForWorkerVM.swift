@@ -20,6 +20,7 @@ public protocol NativePostDetailForWorkerViewModelable: BaseViewModel {
     var locationInfo: Driver<WorkPlaceAndWorkerLocationMapRO>? { get }
     var idleAlertVM: Driver<IdleAlertViewModelable>? { get }
     var starButtonRequestResult: Driver<Bool>? { get }
+    var applySuccess: Driver<Void>? { get }
      
     // Input
     var viewWillAppear: PublishRelay<Void> { get }
@@ -44,6 +45,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     public var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
     public var idleAlertVM: Driver<any IdleAlertViewModelable>?
     public var starButtonRequestResult: Driver<Bool>?
+    public var applySuccess: RxCocoa.Driver<Void>?
     
     // Input
     public var backButtonClicked: RxRelay.PublishRelay<Void> = .init()
@@ -66,11 +68,6 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
         self.workerProfileUseCase = workerProfileUseCase
         
         super.init()
-        
-        // MARK: 로딩 옵저버블
-        var loadingStartObservables: [Observable<Void>] = []
-        var loadingEndObservables: [Observable<Void>] = []
-        
         
         let getPostDetailResult = viewWillAppear
             .flatMap { [recruitmentPostUseCase] _ in
@@ -153,24 +150,28 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                     }
             }
             .asDriver(onErrorDriveWith: .never())
-
-        // 로딩 시작
-        loadingStartObservables.append(applyRequest.map { _ in })
         
-        let applyRequestResult = applyRequest
+        let applyRequestResult = mapEndLoading(mapStartLoading(applyRequest.asObservable())
             .flatMap { [recruitmentPostUseCase] _ in
                 
                 // 리스트화면에서는 앱내 지원만 지원합니다.
-                return recruitmentPostUseCase
+                recruitmentPostUseCase
                     .applyToPost(postId: postId, method: .app)
-            }
+            })
             .share()
-        
-        // 로딩 종료
-        loadingEndObservables.append(applyRequestResult.map { _ in })
         
         let applyRequestSuccess = applyRequestResult.compactMap { $0.value }
         let applyRequestFailure = applyRequestResult.compactMap { $0.error }
+        
+        self.applySuccess = applyRequestSuccess
+            .asDriver(onErrorDriveWith: .never())
+        
+        applyRequestSuccess
+            .subscribe { [weak self] _ in
+                guard let self else { return }
+                self.snackBar.onNext(.init(titleText: "지원이 완료되었어요."))
+            }
+            .disposed(by: disposeBag)
         
         let applyRequestFailureAlert = applyRequestFailure
             .map { error in
@@ -229,24 +230,6 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             .subscribe(onNext: { [weak self] alertVO in
                 guard let self else { return }
                 alert.onNext(alertVO)
-            })
-            .disposed(by: disposeBag)
-        
-        // MARK: 로딩
-        Observable
-            .merge(loadingStartObservables)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                showLoading.onNext(())
-            })
-            .disposed(by: disposeBag)
-        
-        Observable
-            .merge(loadingEndObservables)
-            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                dismissLoading.onNext(())
             })
             .disposed(by: disposeBag)
     }

@@ -203,10 +203,12 @@ public class NativePostDetailForWorkerVC: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        // 지원성공시 비활성화
         viewModel
-            .alertDriver?
-            .drive(onNext: { [weak self] alertVO in
-                self?.showAlert(vo: alertVO)
+            .applySuccess?
+            .drive(onNext: { [weak self] in
+                guard let self else { return }
+                self.applyButton.setEnabled(false)
             })
             .disposed(by: disposeBag)
         
