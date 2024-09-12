@@ -12,6 +12,7 @@ import Entity
 import PresentationCore
 import UseCaseInterface
 import BaseFeature
+import DSKit
 
 public protocol PostDetailViewModelable:
     AnyObject,
@@ -221,10 +222,18 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
         let removePostSuccess = removePostResult.compactMap { $0.value }
         let removePostFailure = removePostResult.compactMap { $0.error }
         
+        
+        let closePostSuccessSnackBarRO = closePostSuccess
+            .map { _ in IdleSnackBarRO(titleText: "채용을 종료했어요.") }
+        
+        let removePostSuccessSnackBarRO = removePostSuccess
+            .map { _ in IdleSnackBarRO(titleText: "공고를 삭제했어요.") }
+        
         Observable
-            .merge(closePostSuccess, removePostSuccess)
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
+            .merge(closePostSuccessSnackBarRO, removePostSuccessSnackBarRO)
+            .subscribe(onNext: { [weak self] ro in
+                self?.coordinator?
+                    .coordinatorDidFinishWithSnackBar(ro: ro)
             })
             .disposed(by: disposeBag)
         
