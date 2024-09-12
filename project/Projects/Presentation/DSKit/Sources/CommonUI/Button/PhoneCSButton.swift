@@ -107,6 +107,16 @@ public class PhoneCSButton: TappableUIView {
         
         self.nameLabel.textString = nameText
         self.phoneNumberLabel.textString = phoneNumberText
+        
+        self
+            .rx.tap
+            .subscribe(onNext: {
+                
+                if let phoneURL = URL(string: "tel://\(phoneNumberText)"), UIApplication.shared.canOpenURL(phoneURL) {
+                            UIApplication.shared.open(phoneURL, options: [:], completionHandler: nil)
+                        }
+            })
+            .disposed(by: disposeBag)
     }
 }
 
