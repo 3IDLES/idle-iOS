@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import BaseFeature
 import PresentationCore
 import UseCaseInterface
 import Entity
+import DSKit
 
 public class PostDetailForCenterCoordinator: ChildCoordinator {
     
@@ -63,6 +65,21 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
     public func coordinatorDidFinish() {
         popViewController()
         parent?.removeChildCoordinator(self)
+    }
+    
+    public func coordinatorDidFinishWithSnackBar(ro: IdleSnackBarRO) {
+        let belowIndex = navigationController.children.count-2
+        
+        if belowIndex >= 0 {
+            let belowVC = navigationController.children[belowIndex]
+            
+            if let baseVC = belowVC as? BaseViewController {
+                
+                baseVC.viewModel?.addSnackBar(ro: ro)
+            }
+        }
+        
+        coordinatorDidFinish()
     }
 }
 

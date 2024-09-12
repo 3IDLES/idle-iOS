@@ -124,6 +124,12 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
         
         // 새로고침
         closePostSuccess
+            .map({ [weak self] value in
+                // 스낵바
+                self?.snackBar.onNext(.init(titleText: "채용을 종료했어요."))
+                
+                return value
+            })
             .bind(to: requestOngoingPost)
             .disposed(by: disposeBag)
         

@@ -29,6 +29,12 @@ open class BaseViewController: UIViewController {
         
         self.viewModel = viewModel
         
+        // Life cycle
+        rx.viewDidAppear
+            .map({ _ in })
+            .bind(to: viewModel.viewDidAppear)
+            .disposed(by: disposeBag)
+        
         // Alert
         viewModel
             .alertDriver?
