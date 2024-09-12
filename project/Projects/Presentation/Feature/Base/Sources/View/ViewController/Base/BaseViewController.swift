@@ -44,6 +44,14 @@ open class BaseViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
+        // Snack bar
+        viewModel
+            .snackBarDriver?
+            .drive(onNext: { [weak self] snackBarRO in
+                self?.showSnackBar(ro: snackBarRO)
+            })
+            .disposed(by: disposeBag)
+        
         // 로딩
         viewModel
             .showLoadingDriver?
@@ -103,6 +111,53 @@ public extension BaseViewController {
         alertVC.bindObject(object)
         alertVC.modalPresentationStyle = .custom
         present(alertVC, animated: true, completion: nil)
+    }
+}
+
+// MARK: Snack bar
+extension BaseViewController {
+    
+    func showSnackBar(ro: IdleSnackBarRO) {
+        
+        let viewSize = self.view.bounds.size
+        let horizontalPadding: CGFloat = 20
+        let bottomPadding: CGFloat = 20
+        
+        let snackBarHeight: CGFloat = 48
+        let snackBarWidth: CGFloat = viewSize.width - horizontalPadding*2
+        
+        let snackBarXPos: CGFloat = horizontalPadding
+        let snackBarYPos: CGFloat = viewSize.height - bottomPadding - snackBarHeight
+        
+        let snackBar = IdleSnackBar(
+            frame: .init(
+                origin: .init(x: snackBarXPos, y: snackBarYPos),
+                size: .init(width: snackBarWidth, height: snackBarHeight)
+            )
+        )
+        
+        // ro적용
+        snackBar.applyRO(ro)
+        
+        // 스낵바를 하단에 감춘다
+        snackBar.transform = .init(translationX: 0, y: snackBarHeight+horizontalPadding)
+        snackBar.alpha = 0.5
+        
+        // 뷰계층에 추가
+        view.addSubview(snackBar)
+        
+        let snackBarShowingDuration: CGFloat = 0.5
+        
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn) {
+            snackBar.transform = .identity
+            snackBar.alpha = 1.0
+        } completion: { _ in
+            
+            UIView.animate(withDuration: 0.2, delay: snackBarShowingDuration, options: .curveEaseIn) {
+                snackBar.transform = .init(translationX: 0, y: snackBarHeight+horizontalPadding)
+                snackBar.alpha = 0.5
+            }
+        }
     }
 }
 

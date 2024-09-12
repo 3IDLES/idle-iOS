@@ -20,6 +20,10 @@ open class BaseViewModel {
     public let alertObject: PublishSubject<IdleAlertObject> = .init()
     var alertObjectDriver: Driver<IdleAlertObject>?
     
+    // Snack bar
+    let snackBar: PublishSubject<IdleSnackBarRO> = .init()
+    var snackBarDriver: Driver<IdleSnackBarRO>?
+    
     // 로딩
     public let showLoading: PublishSubject<Void> = .init()
     public let dismissLoading: PublishSubject<Void> = .init()
@@ -34,6 +38,9 @@ open class BaseViewModel {
             .asDriver(onErrorDriveWith: .never())
         
         self.alertObjectDriver = alertObject
+            .asDriver(onErrorDriveWith: .never())
+        
+        self.snackBarDriver = snackBar
             .asDriver(onErrorDriveWith: .never())
             
         self.showLoadingDriver = showLoading
