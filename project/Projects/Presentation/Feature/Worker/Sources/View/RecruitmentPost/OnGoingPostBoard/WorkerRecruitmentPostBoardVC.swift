@@ -90,6 +90,11 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
             .disposed(by: disposeBag)
         
         // Input
+        self.emptyScreen
+            .editProfile.rx.tap
+            .bind(to: viewModel.editProfileButtonClicked)
+            .disposed(by: disposeBag)
+        
         self.rx.viewDidLoad
             .bind(to: viewModel.requestWorkerLocation)
             .disposed(by: disposeBag)

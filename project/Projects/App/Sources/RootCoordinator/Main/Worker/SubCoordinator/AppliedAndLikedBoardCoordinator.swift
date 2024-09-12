@@ -92,4 +92,6 @@ extension AppliedAndLikedBoardCoordinator {
         coordinator.parent = self
         coordinator.start()
     }
+    
+    func showWorkerProfile() { }
 }

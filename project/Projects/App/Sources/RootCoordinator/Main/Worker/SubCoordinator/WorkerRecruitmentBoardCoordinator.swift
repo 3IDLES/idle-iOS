@@ -81,5 +81,18 @@ extension WorkerRecruitmentBoardCoordinator {
         coordinator.parent = self
         coordinator.start()
     }
+    
+    public func showWorkerProfile() {
+        let coordinator = WorkerProfileCoordinator(
+            dependency: .init(
+                profileMode: .myProfile,
+                navigationController: navigationController,
+                workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
+            )
+        )
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
+    }
 }
 
