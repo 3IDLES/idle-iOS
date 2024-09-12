@@ -21,6 +21,8 @@ open class BaseViewController: UIViewController {
     private var loadingDimissionRequested: Bool = false
     private var loadingVC: UIViewController?
     
+    open var snackBarBottomPadding: CGFloat = 0.0
+    
     /// disposeBag
     public let disposeBag = DisposeBag()
     
@@ -127,7 +129,7 @@ extension BaseViewController {
         
         let viewSize = self.view.bounds.size
         let horizontalPadding: CGFloat = 20
-        let bottomPadding: CGFloat = 20
+        let bottomPadding: CGFloat = 20 + snackBarBottomPadding
         
         let snackBarHeight: CGFloat = 48
         let snackBarWidth: CGFloat = viewSize.width - horizontalPadding*2
