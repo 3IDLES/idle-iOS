@@ -123,23 +123,28 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
                     }
             }
             .asDriver(onErrorDriveWith: .never())
-
-        // 로딩 시작
-        loadingStartObservables.append(applyRequest.map { _ in })
         
-        let applyRequestResult = applyRequest
+        let applyRequestResult = mapEndLoading(mapStartLoading(applyRequest.asObservable())
             .flatMap { [recruitmentPostUseCase] postId in
                 
                 // 리스트화면에서는 앱내 지원만 지원합니다.
                 return recruitmentPostUseCase
                     .applyToPost(postId: postId, method: .app)
-            }
+            })
             .share()
         
-        // 로딩 종료
-        loadingEndObservables.append(applyRequestResult.map { _ in })
         
-        let applyRequestSuccess = applyRequestResult.compactMap { $0.value }
+        let applyRequestSuccess = applyRequestResult.compactMap { $0.value }.share()
+        
+        // 스낵바
+        applyRequestSuccess
+            .subscribe { [weak self] _ in
+                
+                self?.snackBar.onNext(
+                    .init(titleText: "지원이 완료되었어요.")
+                )
+            }
+            .disposed(by: dispostBag)
         
         // 지원하기 성공시 새로고침
         applyRequestSuccess
@@ -155,7 +160,6 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
                     message: error.message
                 )
             }
-
         
         // MARK: 공고리스트 처음부터 요청하기
         let initialRequest = requestInitialPageRequest
