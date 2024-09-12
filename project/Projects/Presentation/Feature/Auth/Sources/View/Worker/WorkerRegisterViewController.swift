@@ -12,7 +12,7 @@ import RxSwift
 import PresentationCore
 import BaseFeature
 
-class WorkerRegisterViewController: DisposableViewController {
+class WorkerRegisterViewController: BaseViewController {
     
     var coordinator: WorkerRegisterCoordinator?
     
@@ -21,10 +21,8 @@ class WorkerRegisterViewController: DisposableViewController {
     let pageCount: Int
     
     // View
-    let navigationBar: NavigationBarType1 = {
-        let bar = NavigationBarType1(
-            navigationTitle: "요양보호사 회원가입"
-        )
+    let navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(titleText: "요양보호사 회원가입")
         return bar
     }()
     
@@ -36,8 +34,6 @@ class WorkerRegisterViewController: DisposableViewController {
         )
         return view
     }()
-    
-    private let disposeBag = DisposeBag()
     
     init(
         pageCount: Int,
@@ -76,9 +72,9 @@ class WorkerRegisterViewController: DisposableViewController {
         
         NSLayoutConstraint.activate([
             
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
-            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            navigationBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             
             statusBar.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 7),
             statusBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -93,7 +89,7 @@ class WorkerRegisterViewController: DisposableViewController {
     
     func setObservable() {
         navigationBar
-            .eventPublisher
+            .backButton.rx.tap
             .subscribe { [weak self] _ in
                 self?.coordinator?.prev()
             }
@@ -108,7 +104,6 @@ class WorkerRegisterViewController: DisposableViewController {
             })
             .disposed(by: disposeBag)
     }
-    
     
     func cleanUp() {
         

@@ -207,6 +207,8 @@ where
         
         guard let viewModel = self.viewModel as? T else { return }
         
+        
+        
         // MARK: Input
         let input = viewModel.input
         

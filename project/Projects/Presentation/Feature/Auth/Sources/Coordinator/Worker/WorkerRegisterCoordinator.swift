@@ -38,24 +38,19 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
     public weak var viewControllerRef: UIViewController?
     weak var pageViewController: UIPageViewController?
     
+    
+    let inputValidationUseCase: AuthInputValidationUseCase
+    let authUseCase: AuthUseCase
+    
     // MARK: Stage
     var stageViewControllers: [UIViewController] = []
     private var currentStage: WorkerRegisterStage!
     
     public init(dependency: Dependency) {
     
+        self.inputValidationUseCase = dependency.inputValidationUseCase
+        self.authUseCase = dependency.authUseCase
         self.navigationController = dependency.navigationController
-        
-        let vm = WorkerRegisterViewModel(
-            inputValidationUseCase: dependency.inputValidationUseCase,
-            authUseCase: dependency.authUseCase
-        )
-        
-        self.stageViewControllers = [
-            ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
-            EntetPersonalInfoViewController(coordinator: self, viewModel: vm),
-            EnterAddressViewController(coordinator: self, viewModel: vm),
-        ]
     }
     
     deinit {
@@ -70,18 +65,30 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
             options: nil
         )
         
+        let vm = WorkerRegisterViewModel(
+            inputValidationUseCase: inputValidationUseCase,
+            authUseCase: authUseCase
+        )
+        
+        self.stageViewControllers = [
+            ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
+            EntetPersonalInfoViewController(coordinator: self, viewModel: vm),
+            EnterAddressViewController(coordinator: self, viewModel: vm),
+        ]
+        
         self.pageViewController = pageViewController
         
-        let viewController = WorkerRegisterViewController(
+        let vc = WorkerRegisterViewController(
             pageCount: stageViewControllers.count,
             pageViewController: pageViewController
         )
+        vc.bind(viewModel: vm)
         
-        viewController.coordinator = self
+        vc.coordinator = self
         
-        viewControllerRef = viewController
+        viewControllerRef = vc
         
-        navigationController.pushViewController(viewController, animated: true)
+        navigationController.pushViewController(vc, animated: true)
         
         excuteStage(.info, moveTo: .next)
     }

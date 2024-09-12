@@ -92,34 +92,22 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        registerInOut()
-    }
-    
-    private func validateBirthYear(_ year: Int) -> Bool {
-        let currentYear: Int = Calendar.current.component(.year, from: Date())
-        return (1900..<currentYear).contains(year)
-    }
-    
-    private func registerInOut() {
         
-        let registerValidation = input
-            .ctaButtonClicked
-            .compactMap { $0 }
+        // MARK: 회원가입 최종 등록
+        let registerValidation = input.ctaButtonClicked.compactMap { $0 }
             .flatMap { [authUseCase, stateObject] _ in
                 authUseCase.registerWorkerAccount(registerState: stateObject)
             }
             .share()
         
-        output.registerValidation = registerValidation
-            .compactMap { $0.value }
+        output.registerValidation = registerValidation.compactMap { $0.value }
             .map {
                 print("✅ 회원가입 성공")
                 return ()
             }
             .asDriver(onErrorJustReturn: ())
         
-        let failureAlert = registerValidation
-            .compactMap { $0.error }
+        let registerFailureAlert = registerValidation.compactMap { $0.error }
             .map { error in
                 print("❌ 회원가입 실패 \n 에러내용: \(error.message)")
                 return DefaultAlertContentVO(
@@ -128,9 +116,21 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
                 )
             }
         
-        failureAlert
-            .subscribe(self.alert)
+        Observable
+            .merge(
+                input.alert,
+                registerFailureAlert
+            )
+            .subscribe(onNext: { [weak self] alertVO in
+                
+                self?.alert.onNext(alertVO)
+            })
             .disposed(by: disposeBag)
+    }
+    
+    private func validateBirthYear(_ year: Int) -> Bool {
+        let currentYear: Int = Calendar.current.component(.year, from: Date())
+        return (1900..<currentYear).contains(year)
     }
 }
 

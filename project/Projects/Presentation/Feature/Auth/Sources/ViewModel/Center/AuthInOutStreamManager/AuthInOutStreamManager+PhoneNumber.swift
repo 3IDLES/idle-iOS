@@ -55,6 +55,7 @@ public extension AuthInOutStreamManager {
 #endif
                 return useCase.requestPhoneNumberAuthentication(phoneNumber: formatted)
             }
+            .share()
         
         output
             .phoneNumberValidation = phoneNumberAuthRequestResult
@@ -180,7 +181,9 @@ public extension AuthInOutStreamManager {
             }
         
         failureAlert
-            .subscribe(input.alert)
+            .subscribe(onNext: { [input] alertVO in
+                input.alert.onNext(alertVO)
+            })
             .disposed(by: disposeBag)
     }
 }
