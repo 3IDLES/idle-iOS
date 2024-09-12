@@ -74,7 +74,8 @@ extension AppliedAndLikedBoardCoordinator {
                 parent: self,
                 navigationController: navigationController,
                 recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self),
-                workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
+                workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self),
+                centerProfileUseCase: injector.resolve(CenterProfileUseCase.self)
             )
         )
         addChildCoordinator(coodinator)
