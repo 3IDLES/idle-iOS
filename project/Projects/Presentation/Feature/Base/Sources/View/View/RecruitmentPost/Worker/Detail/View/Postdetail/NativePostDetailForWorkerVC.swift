@@ -35,6 +35,7 @@ public class NativePostDetailForWorkerVC: BaseViewController {
     let applyButton: IdlePrimaryButton = {
         let btn = IdlePrimaryButton(level: .medium)
         btn.label.textString = "지원하기"
+        btn.setEnabled(false)
         return btn
     }()
     
@@ -110,8 +111,6 @@ public class NativePostDetailForWorkerVC: BaseViewController {
         super.bind(viewModel: viewModel)
         
         // Output
-        let centerPhoneNumber: PublishSubject<String> = .init()
-        
         viewModel
             .postForWorkerBundle?
             .drive(onNext: {
@@ -123,6 +122,14 @@ public class NativePostDetailForWorkerVC: BaseViewController {
                 let cardRO: WorkerNativeEmployCardRO = .create(vo: cardVO)
                 
                 contentView.cardView.bind(ro: cardRO)
+                
+                if bundle.applyDate != nil {
+                    // 지원한 공고인 경우
+                    applyButton.setEnabled(false)
+                } else {
+                    // 지원하지 않은 공고인 경우
+                    applyButton.setEnabled(true)
+                }
                 
                 // 근무 조건
                 contentView.workConditionView.bind(
