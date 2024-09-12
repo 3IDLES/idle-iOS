@@ -27,65 +27,55 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
     public init(
         authUseCase: AuthUseCase,
         inputValidationUseCase: AuthInputValidationUseCase) {
-        self.authUseCase = authUseCase
-        self.inputValidationUseCase = inputValidationUseCase
+            self.authUseCase = authUseCase
+            self.inputValidationUseCase = inputValidationUseCase
             
             super.init()
             
-        setObservable()
-    }
-    
-    deinit {
-        printIfDebug("deinit \(Self.self)")
-    }
-    
-    func setObservable() {
-        
-        // 비밀번호
-        AuthInOutStreamManager.passwordInOut(
-            input: input,
-            output: output,
-            useCase: inputValidationUseCase) { [weak self] validPassword in
-                // 🚀 상태추적 🚀
-                self?.validPassword = validPassword
-            }
-        
-        // 휴대전화 인증
-        AuthInOutStreamManager.validatePhoneNumberInOut(
+            // 비밀번호
+            AuthInOutStreamManager.passwordInOut(
+                input: input,
+                output: output,
+                useCase: inputValidationUseCase) { [weak self] validPassword in
+                    // 🚀 상태추적 🚀
+                    self?.validPassword = validPassword
+                }
+            
+            // 휴대전화 인증
+            AuthInOutStreamManager.validatePhoneNumberInOut(
                 input: input,
                 output: output,
                 useCase: inputValidationUseCase,
                 disposeBag: disposeBag
-        ) { _ in }
-        
-        changePasswordInOut()
-    }
-    
-    private func changePasswordInOut() {
-        
-        let changePasswordResult = input.changePasswordButtonClicked
-            .flatMap { [weak self] _ in
-                
-                printIfDebug("변경 요청 비밀번호 \(self?.validPassword ?? "")")
-                
-                // TODO: 비밀번호 변경 API 연동
-                // 이벤트 전송
-                return Single.just(Result<Void, HTTPResponseException>.success(()))
-            }
-            .share()
-        
-        output.changePasswordValidation = changePasswordResult
-            .map { result in
-                switch result {
-                case .success:
-                    printIfDebug("비밀번호 변경 성공")
-                    return true
-                case .failure(let error):
-                    printIfDebug("비밀번호 변경 실패")
-                    return false
+            ) { _ in }
+            
+            let changePasswordResult = input.changePasswordButtonClicked
+                .flatMap { [weak self] _ in
+                    
+                    printIfDebug("변경 요청 비밀번호 \(self?.validPassword ?? "")")
+                    
+                    // TODO: 비밀번호 변경 API 연동
+                    // 이벤트 전송
+                    return Single.just(Result<Void, HTTPResponseException>.success(()))
                 }
-            }
-            .asDriver(onErrorJustReturn: false)
+                .share()
+            
+            output.changePasswordValidation = changePasswordResult
+                .map { result in
+                    switch result {
+                    case .success:
+                        printIfDebug("비밀번호 변경 성공")
+                        return true
+                    case .failure(let error):
+                        printIfDebug("비밀번호 변경 실패")
+                        return false
+                    }
+                }
+                .asDriver(onErrorJustReturn: false)
+        }
+    
+    deinit {
+        printIfDebug("deinit \(Self.self)")
     }
 }
 
