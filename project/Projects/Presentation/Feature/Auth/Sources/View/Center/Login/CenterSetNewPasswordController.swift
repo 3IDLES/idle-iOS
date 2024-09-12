@@ -12,7 +12,7 @@ import RxCocoa
 import PresentationCore
 import BaseFeature
 
-class CenterSetNewPasswordController: DisposableViewController {
+class CenterSetNewPasswordController: BaseViewController {
     
     // Init
     var pageViewController: UIPageViewController
@@ -20,8 +20,6 @@ class CenterSetNewPasswordController: DisposableViewController {
     let pageCount: Int
     
     var coordinator: CenterSetNewPasswordCoordinator?
-    
-    let disposeBag = DisposeBag()
     
     public init(pageViewController: UIPageViewController, pageCount: Int) {
         self.pageViewController = pageViewController

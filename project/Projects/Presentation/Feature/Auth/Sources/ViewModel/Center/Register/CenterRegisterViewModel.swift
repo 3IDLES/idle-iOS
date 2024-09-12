@@ -138,6 +138,7 @@ extension CenterRegisterViewModel {
         
         // Register success
         public var registerValidation: Driver<Void>?
+        public var loginValidation: Driver<Void>?
     }
 }
 

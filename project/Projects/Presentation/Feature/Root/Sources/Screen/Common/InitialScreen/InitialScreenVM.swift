@@ -171,6 +171,9 @@ public class InitialScreenVM: BaseViewModel {
                 case .approved:
                     return info
                 case .pending, .new:
+                    
+                    self.coordinator?.centerAuth()
+                    
                     return nil
                 }
             }

@@ -17,6 +17,7 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
     // Init
     let authUseCase: AuthUseCase
     let inputValidationUseCase: AuthInputValidationUseCase
+    weak var coordinator: CenterSetNewPasswordCoordinator?
     
     public var input: Input = .init()
     public var output: Output = .init()
@@ -26,8 +27,10 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
     private var authenticatedPhoneNumebr: String?
     
     public init(
+        coordinator: CenterSetNewPasswordCoordinator,
         authUseCase: AuthUseCase,
         inputValidationUseCase: AuthInputValidationUseCase) {
+            self.coordinator = coordinator
             self.authUseCase = authUseCase
             self.inputValidationUseCase = inputValidationUseCase
             
@@ -55,7 +58,7 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
             let changePasswordResult = input.changePasswordButtonClicked
                 .compactMap({ [weak self] _ -> (String, String)? in
                     
-                    guard let phoneNumber = self?.validPassword, let validPassword = self?.validPassword else {
+                    guard let phoneNumber = self?.authenticatedPhoneNumebr, let validPassword = self?.validPassword else {
                         return nil
                     }
                     
@@ -67,19 +70,37 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
                         .setNewPassword(phoneNumber: phoneNumber, password: validPassword)
                 }
                 .share()
-            
-            output.changePasswordValidation = changePasswordResult
-                .map { result in
+                
+            changePasswordResult
+                .subscribe(onNext: {
+                    [weak self] result in
+                    
+                    guard let self else { return }
+                    
                     switch result {
                     case .success:
-                        printIfDebug("비밀번호 변경 성공")
-                        return true
+                        self.coordinator?
+                            .coordinatorDidFinishWithSnackBar(
+                                ro: .init(
+                                    titleText: "비밀번호 변경 성공"
+                                )
+                            )
                     case .failure(let error):
-                        printIfDebug("비밀번호 변경 실패")
-                        return false
+                        self.alert.onNext(
+                            .init(
+                                title: "비밀번호 변경 실패",
+                                message: error.message
+                            )
+                        )
                     }
-                }
-                .asDriver(onErrorJustReturn: false)
+                })
+                .disposed(by: disposeBag)
+            
+            input.alert
+                .subscribe(onNext: { [weak self] alertVO in
+                    self?.alert.onNext(alertVO)
+                })
+                .disposed(by: disposeBag)
         }
     
     deinit {
@@ -118,8 +139,7 @@ public extension CenterSetNewPasswordViewModel {
         // Password
         public var passwordValidation: Driver<PasswordValidationState>?
         
-        // Change password
-        public var changePasswordValidation: Driver<Bool>?
+        public var loginValidation: Driver<Void>?
     }
 }
 
@@ -131,4 +151,3 @@ extension CenterSetNewPasswordViewModel.Input: SetPasswordInputable { }
 extension CenterSetNewPasswordViewModel.Output: SetPasswordOutputable { }
 
 extension CenterSetNewPasswordViewModel.Input: ChangePasswordSuccessInputable { }
-extension CenterSetNewPasswordViewModel.Output: ChangePasswordSuccessOutputable { }

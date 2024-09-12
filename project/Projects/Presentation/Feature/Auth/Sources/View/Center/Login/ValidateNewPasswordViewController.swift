@@ -16,15 +16,12 @@ public protocol ChangePasswordSuccessInputable {
     var changePasswordButtonClicked: PublishRelay<Void> { get }
 }
 
-public protocol ChangePasswordSuccessOutputable {
-    var changePasswordValidation: Driver<Bool>? { get set }
-}
 
-class ValidateNewPasswordViewController<T: ViewModelType>: BaseViewController
+class ValidateNewPasswordViewController<T: ViewModelType>: UIViewController
 where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
-      T.Output: SetPasswordOutputable & ChangePasswordSuccessOutputable, T: BaseViewModel {
+      T.Output: SetPasswordOutputable {
     
-    var coordinator: Coordinator?
+    let viewModel: T
     
     // View
     private let processTitle: IdleLabel = {
@@ -89,13 +86,11 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
         return button
     }()
     
-    public init(coordinator: Coordinator, viewModel: T) {
-        
-        self.coordinator = coordinator
-        
+    let disposeBag = DisposeBag()
+    
+    public init(viewModel: T) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        
-        super.bind(viewModel: viewModel)
         
         setAppearance()
         setAutoLayout()
@@ -174,8 +169,6 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
     
     func setObservable() {
         
-        guard let viewModel = self.viewModel as? T else { return }
-        
         // MARK: Input
         let input = viewModel.input
         
@@ -223,22 +216,6 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
                 }
             })
             .disposed(by: disposeBag)
-        
-        output
-            .changePasswordValidation?
-            .drive (onNext: { [weak self] isSuccess in
-                
-                if isSuccess {
-                    // 비밀번호 변경 성공
-                    self?.coordinator?.next()
-                    
-                } else {
-                    // 비밀번호 변경 실패
-                    self?.ctaButton.setEnabled(true)
-                }
-            })
-            .disposed(by: disposeBag)
-    
     }
     
     private func onPasswordMatched() {
