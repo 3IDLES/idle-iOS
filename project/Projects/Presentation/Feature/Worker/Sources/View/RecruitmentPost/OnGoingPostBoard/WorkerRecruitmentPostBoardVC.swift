@@ -25,6 +25,11 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     }()
     let postTableView = UITableView()
     let tableHeader = BoardSortigHeaderView()
+    let emptyScreen: WorkerBoardEmptyView = {
+        let view = WorkerBoardEmptyView()
+        view.isHidden = true
+        return view
+    }()
     
     // Paging
     var isPaging = true
@@ -61,6 +66,7 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
             .postBoardData?
             .drive(onNext: { [weak self] (isRefreshed: Bool, postData) in
                 guard let self else { return }
+                
                 self.postData = postData
                 postTableView.reloadData()
                 isPaging = false
@@ -70,6 +76,9 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
                         self?.postTableView.setContentOffset(.zero, animated: false)
                     }
                 }
+                
+                // 공고가 없을 경우
+                emptyScreen.isHidden = (postData.count != 0)
             })
             .disposed(by: disposeBag)
         
@@ -119,7 +128,8 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         
         [
             topContainer,
-            postTableView
+            postTableView,
+            emptyScreen,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -127,13 +137,18 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
         
         NSLayoutConstraint.activate([
             topContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            topContainer.leftAnchor.constraint(equalTo: view.leftAnchor),
-            topContainer.rightAnchor.constraint(equalTo: view.rightAnchor),
+            topContainer.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            topContainer.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             
             postTableView.topAnchor.constraint(equalTo: topContainer.bottomAnchor),
-            postTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            postTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            postTableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            postTableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             postTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            emptyScreen.topAnchor.constraint(equalTo: topContainer.bottomAnchor),
+            emptyScreen.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            emptyScreen.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            emptyScreen.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
     
