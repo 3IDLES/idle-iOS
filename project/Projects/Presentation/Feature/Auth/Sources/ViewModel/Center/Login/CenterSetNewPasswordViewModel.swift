@@ -23,6 +23,7 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
     
     // State
     private var validPassword: String?
+    private var authenticatedPhoneNumebr: String?
     
     public init(
         authUseCase: AuthUseCase,
@@ -46,17 +47,24 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
                 input: input,
                 output: output,
                 useCase: inputValidationUseCase,
-                disposeBag: disposeBag
-            ) { _ in }
+                disposeBag: disposeBag) { [weak self] phoneNumber in
+                    // 🚀 상태추적 🚀
+                    self?.authenticatedPhoneNumebr = phoneNumber
+                }
             
             let changePasswordResult = input.changePasswordButtonClicked
-                .flatMap { [weak self] _ in
+                .compactMap({ [weak self] _ -> (String, String)? in
                     
-                    printIfDebug("변경 요청 비밀번호 \(self?.validPassword ?? "")")
+                    guard let phoneNumber = self?.validPassword, let validPassword = self?.validPassword else {
+                        return nil
+                    }
                     
-                    // TODO: 비밀번호 변경 API 연동
-                    // 이벤트 전송
-                    return Single.just(Result<Void, HTTPResponseException>.success(()))
+                    return (phoneNumber, validPassword)
+                })
+                .flatMap { [authUseCase] (phoneNumber, validPassword) in
+                    
+                    authUseCase
+                        .setNewPassword(phoneNumber: phoneNumber, password: validPassword)
                 }
                 .share()
             

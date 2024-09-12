@@ -70,6 +70,10 @@ public class CenterRegisterViewModel: BaseViewModel, ViewModelType {
                     // 🚀 상태추적 🚀
                     self?.stateObject.password = validPassword
                 }
+            
+            input.alert
+                .bind(to: self.alert)
+                .disposed(by: disposeBag)
         }
     
     deinit {
