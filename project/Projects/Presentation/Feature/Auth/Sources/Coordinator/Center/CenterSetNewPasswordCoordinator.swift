@@ -8,6 +8,8 @@
 import UIKit
 import PresentationCore
 import UseCaseInterface
+import BaseFeature
+import DSKit
 
 enum SetNewPasswordStage: Int {
     
@@ -56,14 +58,16 @@ public class CenterSetNewPasswordCoordinator: ChildCoordinator {
     public func start() {
         
         let vm = CenterSetNewPasswordViewModel(
+            coordinator: self,
             authUseCase: authUseCase,
             inputValidationUseCase: inputValidationUseCase
         )
         
         // stageViewControllerss에 자기자신과 ViewModel할당
+        
         self.stageViewControllers = [
             ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
-            ValidateNewPasswordViewController(coordinator: self, viewModel: vm)
+            ValidateNewPasswordViewController(viewModel: vm)
         ]
         
         let pageViewController = UIPageViewController(
@@ -74,20 +78,37 @@ public class CenterSetNewPasswordCoordinator: ChildCoordinator {
         
         self.pageViewController = pageViewController
         
-        let viewController = CenterSetNewPasswordController(
+        let vc = CenterSetNewPasswordController(
             pageViewController: pageViewController,
             pageCount: stageViewControllers.count
         )
-        viewController.coordinator = self
+        vc.bind(viewModel: vm)
+        vc.coordinator = self
         
-        navigationController.pushViewController(viewController, animated: true)
+        navigationController.pushViewController(vc, animated: true)
         excuteStage(.phoneNumber, moveTo: .next)
     }
     
     public func coordinatorDidFinish() {
         
         stageViewControllers = []
+        popViewController()
         parent?.removeChildCoordinator(self)
+    }
+    
+    public func coordinatorDidFinishWithSnackBar(ro: IdleSnackBarRO) {
+        let belowIndex = navigationController.children.count-2
+        
+        if belowIndex >= 0 {
+            let belowVC = navigationController.children[belowIndex]
+            
+            if let baseVC = belowVC as? BaseViewController {
+                
+                baseVC.viewModel?.addSnackBar(ro: ro)
+            }
+        }
+        
+        coordinatorDidFinish()
     }
 }
 
@@ -114,7 +135,6 @@ extension CenterSetNewPasswordCoordinator {
         currentStage = stage
         switch stage {
         case .findPasswordFinished, .finish:
-            popViewController()
             coordinatorDidFinish()
         default:
             let vc = stageViewControllers[stage.rawValue-1]

@@ -32,16 +32,14 @@ public protocol AuthPhoneNumberOutputable {
     // 요양보호사 로그인에 성공한 경우(요양보호사 한정 로직)
     var loginValidation: Driver<Void>? { get set }
 }
-public extension AuthPhoneNumberOutputable {
-    var loginValidation: Driver<Void>? { get { nil } set { } }
-}
 
-class ValidatePhoneNumberViewController<T: ViewModelType>: BaseViewController
+class ValidatePhoneNumberViewController<T: ViewModelType>: UIViewController
 where
     T.Input: AuthPhoneNumberInputable,
-    T.Output: AuthPhoneNumberOutputable, T: BaseViewModel {
+    T.Output: AuthPhoneNumberOutputable {
     
     var coordinator: Coordinator?
+    let viewModel: T
     
     // View
     private let processTitle: ResizableUILabel = {
@@ -114,15 +112,16 @@ where
         return button
     }()
     
+    let disposeBag = DisposeBag()
+        
     public init(
         coordinator: Coordinator? = nil,
         viewModel: T
     ) {
         self.coordinator = coordinator
+        self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
-        
-        super.bind(viewModel: viewModel)
         
         setAppearance()
         setAutoLayout()
@@ -203,12 +202,7 @@ where
         ctaButton.setEnabled(false)
     }
     
-    private func setObservable() {
-        
-        guard let viewModel = self.viewModel as? T else { return }
-        
-        
-        
+    public func setObservable() {
         // MARK: Input
         let input = viewModel.input
         

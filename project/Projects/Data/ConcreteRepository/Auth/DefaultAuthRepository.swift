@@ -83,7 +83,7 @@ public extension DefaultAuthRepository {
     
     func setNewPassword(phoneNumber: String, password: String) -> Single<Void> {
         networkService
-            .request(api: .makeNewPassword(phoneNumber: phoneNumber, newPassword: password), with: .withToken)
+            .request(api: .makeNewPassword(phoneNumber: phoneNumber, newPassword: password), with: .plain)
             .mapToVoid()
     }
 }

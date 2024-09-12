@@ -41,6 +41,7 @@ class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidation
     var canSubmitAuthNumber: RxCocoa.Driver<Bool>?
     var phoneNumberValidation: RxCocoa.Driver<Bool>?
     var authNumberValidation: RxCocoa.Driver<Bool>?
+    var loginValidation: RxCocoa.Driver<Void>?
     
     init(
             coordinator: PhoneNumberValidationForDeregisterCoordinator?,

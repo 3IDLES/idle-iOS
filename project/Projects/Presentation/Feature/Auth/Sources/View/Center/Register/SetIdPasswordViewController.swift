@@ -288,7 +288,17 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
         let idDuplicationValidation = output
             .idDuplicationValidation?
             .map { [weak self] isSuccess in
-                self?.idField.idleTextField.setEnabled(isSuccess)
+                
+                self?.idField.idleTextField.setEnabled(true)
+                
+                if !isSuccess {
+                    self?.idField.idleTextField.textField.textString = ""
+                    self?.showAlert(vo: .init(
+                        title: "사용불가한 아이디",
+                        message: "다른 아이디를 사용해주세요.")
+                    )
+                }
+                
                 return isSuccess
             }
             .asObservable() ?? .empty()

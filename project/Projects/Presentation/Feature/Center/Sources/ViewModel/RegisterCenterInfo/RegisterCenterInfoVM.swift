@@ -122,7 +122,7 @@ public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelabl
                 guard let self else { return }
                 
                 // 프리뷰화면으로 이동
-                coordinator.showPreviewScreen(stateObject: stateObject)
+                self.coordinator?.showPreviewScreen(stateObject: stateObject)
             })
             .disposed(by: disposeBag)
         
