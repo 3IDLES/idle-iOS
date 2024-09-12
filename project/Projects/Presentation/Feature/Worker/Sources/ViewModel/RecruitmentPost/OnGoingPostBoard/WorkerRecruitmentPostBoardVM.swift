@@ -45,6 +45,9 @@ public protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable
     /// 요양보호사 위치정보를 요청합니다.
     var requestWorkerLocation: PublishRelay<Void> { get }
     
+    /// 프로필 수정버튼이 눌린 경우
+    var editProfileButtonClicked: PublishRelay<Void> { get }
+    
     /// 요양보호사 위치 정보를 전달합니다.
     var workerLocationTitleText: Driver<String>? { get }
 }
@@ -56,7 +59,9 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
     public var workerLocationTitleText: Driver<String>?
     public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
+    
     // Input
+    public var editProfileButtonClicked: PublishRelay<Void> = .init()
     public var requestInitialPageRequest: PublishRelay<Void> = .init()
     public var requestWorkerLocation: PublishRelay<Void> = .init()
     public var requestNextPage: PublishRelay<Void> = .init()
@@ -266,6 +271,15 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
                     message: error.message
                 )
             }
+        
+        // MARK: 프로필 수정
+        editProfileButtonClicked
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
+                self.coordinator?.showWorkerProfile()
+            })
+            .disposed(by: dispostBag)
         
         Observable
             .merge(

@@ -14,4 +14,7 @@ public protocol WorkerRecruitmentBoardCoordinatable: ParentCoordinator {
     
     /// 센터 프로필을 표시합니다.
     func showCenterProfile(centerId: String)
+    
+    /// 요양보호사의 프로필을 표시합니다.
+    func showWorkerProfile()
 }
