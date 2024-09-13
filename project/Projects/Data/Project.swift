@@ -30,7 +30,8 @@ let project = Project(
                 D.Data.DataSource,
                 
                 // ThirdParty
-                D.ThirdParty.RxSwift
+                D.ThirdParty.RxSwift,
+                D.ThirdParty.FirebaseRemoteConfig
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"]

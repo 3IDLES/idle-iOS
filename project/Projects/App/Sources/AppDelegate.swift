@@ -9,6 +9,8 @@ import UIKit
 import AppTrackingTransparency
 import AdSupport
 import PresentationCore
+import FirebaseCore
+
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,6 +22,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: { [weak self] in
             self?.requestTrackingAuthorization()
         })
+        
+        // FireBase setting
+        FirebaseApp.configure()
         
         return true
     }
