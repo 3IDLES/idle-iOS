@@ -5,14 +5,17 @@
 //  Created by choijunios on 8/25/24.
 //
 
-import RxSwift
-import RxCocoa
 import Foundation
+import Network
+
 import PresentationCore
 import UseCaseInterface
 import RepositoryInterface
 import BaseFeature
 import Entity
+
+import RxSwift
+import RxCocoa
 
 public class InitialScreenVM: BaseViewModel {
     
@@ -26,6 +29,11 @@ public class InitialScreenVM: BaseViewModel {
     let workerProfileUseCase: WorkerProfileUseCase
     let centerProfileUseCase: CenterProfileUseCase
     let userInfoLocalRepository: UserInfoLocalRepository
+    
+    // network monitoring
+    private let networkMonitor: NWPathMonitor = .init()
+    private let networkMonitoringQueue = DispatchQueue.global(qos: .background)
+    private let networtIsAvailablePublisher: PublishSubject<Bool> = .init()
     
     public init(
             coordinator: RootCoorinatable?,
@@ -54,8 +62,47 @@ public class InitialScreenVM: BaseViewModel {
             })
             .disposed(by: disposeBag)
         
+        // MARK: 네트워크 모니터링 시작
+        let networkConnected: ReplaySubject<Void> = .create(bufferSize: 1)
         
-        viewWillAppear
+        // 최초 1회 네트워크 연결이벤트 전송
+        networtIsAvailablePublisher
+            .filter { $0 }
+            .take(1)
+            .map { _ in }
+            .bind(to: networkConnected)
+            .disposed(by: disposeBag)
+        
+        // 네트워크가 연결되지 않은 경우 재시도 하며, 재시도 실패시 같은 플로우 반복
+        networtIsAvailablePublisher.filter { !$0 }
+            .subscribe(onNext: { [weak self] _ in
+                
+                let alertVO = DefaultAlertContentVO(
+                    title: "인터넷 연결이 불안정해요",
+                    message: "Wi-Fi 또는 셀룰러 데이터 연결을 확인한 후 다시 시도해 주세요.",
+                    dismissButtonLabelText: "다시 시도하기") { [weak self] in
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now()+1) { [weak self] in
+                            guard let self else { return }
+                            
+                            if self.networkMonitor.currentPath.status == .unsatisfied {
+                                
+                                self.networtIsAvailablePublisher.onNext(false)
+                            }
+                        }
+                    }
+                
+                // 네트워크 연결되지 않음
+                self?.alert.onNext(alertVO)
+            })
+            .disposed(by: disposeBag)
+        
+        startNeworkMonitoring()
+        
+        // MARK: 플로우 시작
+        // 네트워크 연결이 최초 1회 확인된 이후 플로우 시작
+        Observable
+            .combineLatest(viewWillAppear, networkConnected)
             .subscribe(onNext: { [weak self] _ in
                 
                 guard let self else { exit(0) }
@@ -127,6 +174,35 @@ public class InitialScreenVM: BaseViewModel {
             .disposed(by: disposeBag)
     }
     
+    deinit {
+        networkMonitor.cancel()
+    }
+    
+    func startNeworkMonitoring() {
+        
+        networkMonitor.pathUpdateHandler = { [weak self] path in
+            
+            DispatchQueue.main.async {
+                self?.checkNetworkStatusAndPublish(status: path.status, delay: 0)
+            }
+        }
+        
+        networkMonitor.start(queue: networkMonitoringQueue)
+    }
+    
+    func checkNetworkStatusAndPublish(status: NWPath.Status, delay: Int) {
+        
+        switch status {
+        case .requiresConnection, .satisfied:
+            // requiresConnection는 일반적으로 즉시 연결이 가능한 상태
+            networtIsAvailablePublisher.onNext(true)
+            return
+        default:
+            networtIsAvailablePublisher.onNext(false)
+            return
+        }
+    }
+    
     func centerInitialFlow() {
         
         // #1. 센터 상태를 확인함과 동시에 토큰 유효성 확인
@@ -144,7 +220,7 @@ public class InitialScreenVM: BaseViewModel {
                 guard let self else { return }
                 
                 switch error {
-                case .tokenExpiredException:
+                case .tokenExpiredException, .tokenNotFound:
                     // 토큰이 만료된 경우
                     coordinator?.auth()
                 default:

@@ -44,8 +44,11 @@ public class InitialScreenVC: BaseViewController {
         
         super.bind(viewModel: viewModel)
         
-        self.rx.viewWillAppear
-            .map { _ in () }
+        self.rx.viewDidAppear
+            .map { _ in
+                
+                printIfDebug("InitialScreenVC viewWillAppear")
+            }
             .bind(to: viewModel.viewWillAppear)
             .disposed(by: disposeBag)
     }

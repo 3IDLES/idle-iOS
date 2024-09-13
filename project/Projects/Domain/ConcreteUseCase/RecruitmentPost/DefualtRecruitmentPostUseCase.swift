@@ -157,7 +157,8 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
                     requestCnt: postCount
                 )
             case .thirdParty:
-                return .just(.failure(.undefinedError))
+                // Presentation에서 에초에 호출하지 않음
+                return .just(.failure(.undefinedCode))
             }
         }
         
