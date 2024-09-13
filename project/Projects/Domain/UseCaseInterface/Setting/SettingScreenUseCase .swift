@@ -15,7 +15,7 @@ public enum NotificationApproveAction: Equatable {
     case error(message: String)
 }
 
-public protocol SettingScreenUseCase: UseCaseBase {
+public protocol SettingScreenUseCase: BaseUseCase {
     
     /// 현재 알람수신 동의 여부를 확인합니다.
     func checkPushNotificationApproved() -> Single<Bool>

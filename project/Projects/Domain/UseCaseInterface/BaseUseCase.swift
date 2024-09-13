@@ -9,9 +9,9 @@ import Foundation
 import RxSwift
 import Entity
 
-public protocol UseCaseBase: AnyObject { }
+public protocol BaseUseCase: AnyObject { }
 
-public extension UseCaseBase {
+public extension BaseUseCase {
     
     /// Repository로 부터 전달받은 언어레벨의 에러를 도메인 특화 에러로 변경하고, error를 Result의 Failure로, 성공을 Success로 변경합니다.
     func convert<T>(task: Single<T>) -> Single<Result<T, DomainError>> {
@@ -28,7 +28,8 @@ public extension UseCaseBase {
     
     // MARK: InputValidationError
     private func toDomainError(error: Error) -> DomainError {
-
+        
+        // 네트워크 에러
         if let httpError = error as? HTTPResponseException {
             
             if let code = httpError.rawCode {
@@ -49,6 +50,14 @@ public extension UseCaseBase {
             #endif
         }
         
-        return DomainError.undefinedError
+        // 네트워크 에러보다 근본적인 에러
+        if let underlyingError = error as? UnderLyingError {
+            
+            let domainError: DomainError = .undelyingError(error: underlyingError)
+            
+            return domainError
+        }
+         
+        return DomainError.undelyingError(error: .unHandledError)
     }
 }

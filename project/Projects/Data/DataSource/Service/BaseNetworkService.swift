@@ -186,14 +186,36 @@ public extension BaseNetworkService {
         provider.rx
             .request(api)
             .catch { error in
-                if let moyaError = error as? MoyaError {
-                    
-                    var response: Response?
-                    
-                    if case let .underlying(_, res) = moyaError { response = res }
-                    if case let .statusCode(res) = moyaError { response = res }
-                    if let response { return .error(HTTPResponseException(response: response)) }
+                
+                let moyaError = error as! MoyaError
+                
+                // 네트워크 에러
+                if case let .statusCode(response) = moyaError {
+                    return .error(
+                        HTTPResponseException(response: response)
+                    )
                 }
+                
+                // 네트워에러보다 근본적인 에러
+                if case let .underlying(error, response) = moyaError, let urlError = error as? URLError {
+                    
+                    var underlyingError: UnderLyingError!
+                    
+                    switch urlError.code {
+                    case .notConnectedToInternet:
+                        underlyingError = .internetNotConnected
+                    case .networkConnectionLost:
+                        underlyingError = .networkConnectionLost
+                    case .timedOut:
+                        underlyingError = .timeout
+                    default:
+                        underlyingError = .unHandledError
+                    }
+                    
+                    return .error(underlyingError)
+                }
+                
+                // 실행되지 않음
                 return .error(error)
             }
     }

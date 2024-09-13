@@ -19,7 +19,7 @@ import Entity
 ///     - #7. 아이디 중복확인
 ///     - #8. 패스워드 유효성 확인
 
-public protocol AuthInputValidationUseCase: UseCaseBase {
+public protocol AuthInputValidationUseCase: BaseUseCase {
     
     // #1.
     /// 전화번호 인증 요청

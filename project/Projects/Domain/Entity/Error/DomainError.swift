@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum DomainError: Error {
+public enum DomainError: Error, Equatable {
     
     // API
     case invalidParameter
@@ -58,10 +58,8 @@ public enum DomainError: Error {
     
     // undefinedError
     case undefinedCode
-    case undefinedError
     
-    // Not Implemented
-    case notImplemented
+    case undelyingError(error: UnderLyingError)
     
     public init(code: String) {
         switch code {
@@ -123,7 +121,7 @@ public enum DomainError: Error {
             self = .geoCodingFailure
             
         default:
-            self = .undefinedError
+            self = .undefinedCode
         }
     }
     
@@ -199,11 +197,20 @@ public enum DomainError: Error {
         case .geoCodingFailure:
             return "입력된 주소로 지리 정보를 찾을 수 없습니다. 주소를 다시 확인해주세요."
             
-        case .undefinedCode, .undefinedError:
-            return "예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+        case .undefinedCode:
+            return "처리되지 않은 HTTP코드입니다."
             
-        case .notImplemented:
-            return "아직 개발되지 않은 기능입니다."
+        case .undelyingError(let underlyingError):
+            switch underlyingError {
+            case .internetNotConnected:
+                return "인터넷이 연결되지 않았습니다."
+            case .timeout:
+                return "요청시간을 초과했습니다."
+            case .networkConnectionLost:
+                return "연결상태가 변경됬습니다."
+            case .unHandledError:
+                return "알 수 없는 문제가 발생했습니다."
+            }
         }
     }
 }

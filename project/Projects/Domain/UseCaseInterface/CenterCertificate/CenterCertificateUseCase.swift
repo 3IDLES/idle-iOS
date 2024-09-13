@@ -10,7 +10,7 @@ import Entity
 
 import RxSwift
 
-public protocol CenterCertificateUseCase: UseCaseBase {
+public protocol CenterCertificateUseCase: BaseUseCase {
     
     /// 센터 로그아웃
     func signoutCenterAccount() -> Single<Result<Void, DomainError>>
