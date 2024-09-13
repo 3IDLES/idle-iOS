@@ -41,6 +41,8 @@ let package = Package(
         // Naver map
         .package(url: "https://github.com/J0onYEong/NaverMapSDKForSPM.git", from: "1.0.0"),
         // KingFisher
-        .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.12.0")
+        .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.12.0"),
+        // Firebase
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "11.2.0"),
     ]
 )
