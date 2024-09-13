@@ -13,6 +13,8 @@ public enum IdleInfoPlist {
         
         "CFBundleDisplayName": "케어밋",
         
+        "CFBundleShortVersionString" : "1.0.0",
+        
         "NSAppTransportSecurity" : [
             "NSAllowsArbitraryLoads" : true
         ],

@@ -38,7 +38,8 @@ public class DefaultIdleAlertVM: IdleAlertViewModelable {
         description: String,
         acceptButtonLabelText: String,
         cancelButtonLabelText: String,
-        onAccepted: (() -> ())? = nil
+        onAccepted: (() -> ())? = nil,
+        onCanceled: (() -> ())? = nil
     ) {
         self.title = title
         self.description = description
@@ -50,7 +51,9 @@ public class DefaultIdleAlertVM: IdleAlertViewModelable {
                 acceptButtonClicked
                     .map({ _ in onAccepted?() })
                     .asObservable(),
-                cancelButtonClicked.asObservable()
+                cancelButtonClicked
+                    .map({ _ in onCanceled?() })
+                    .asObservable()
             )
             .asDriver(onErrorDriveWith: .never())
     }

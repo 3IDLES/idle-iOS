@@ -6,13 +6,15 @@
 //
 
 import Foundation
+import Entity
+
 import RxSwift
 
 public protocol RemoteConfigRepository: RepositoryBase {
     
-    /// Remote config의 특정 키값에 매칭되는 값을 가져옵니다.
-    func getConfigValue(key: String) -> Single<String?>
+    /// RemoteConfig를 fetch합니다.
+    func fetchRemoteConfig() -> Single<Result<Bool, Error>>
     
-    /// Remote config가 변경되었는지 확인합니다.
-    func checkConfigIsChange() -> Single<Bool>
+    /// 강제업데이트 정보를 가져옵니다.
+    func getForceUpdateInfo() -> ForceUpdateInfo?
 }
