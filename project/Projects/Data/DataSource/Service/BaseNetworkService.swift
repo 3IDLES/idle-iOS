@@ -159,10 +159,10 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
         let configuration = URLSessionConfiguration.default
         
         // 단일 요청이 완료되는데 걸리는 최대 시간, 초과시 타임아웃
-        configuration.timeoutIntervalForRequest = 10
+        configuration.timeoutIntervalForRequest = 20
         
         // 하나의 리소스를 로드하는데 걸리는 시간, 재시도를 포함한다 초과시 타임아웃
-        configuration.timeoutIntervalForResource = 10
+        configuration.timeoutIntervalForResource = 20
         
         // Cache policy: 로컬캐시를 무시하고 항상 새로운 데이터를 가져온다.
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData

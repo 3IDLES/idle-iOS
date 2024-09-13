@@ -195,7 +195,7 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         
         
         // 최신 값들 + 버튼이 눌릴 경우 변경 로직이 실행된다.
-        let editingRequestResult = editingFinishButtonPressed
+        let editingRequestResult = mapEndLoading(mapStartLoading(editingFinishButtonPressed.asObservable())
             .map({ [unowned self] _ in
                 checkModification()
             })
@@ -214,7 +214,7 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
                     introduction: introduction,
                     imageInfo: imageInfo
                 )
-            }
+            })
             .share()
         
         let editingValidation = editingRequestResult
@@ -235,8 +235,8 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             .map({ error in
                 // 변경 실패 Alert
                 return DefaultAlertContentVO(
-                    title: "변경 실패",
-                    message: "변경 싪패 이유"
+                    title: "프로필 수정 실패",
+                    message: error.message
                 )
             })
         

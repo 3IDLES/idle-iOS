@@ -88,10 +88,14 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
             .disposed(by: disposbag)
         
         phoneCallButtonClicked
-            .subscribe(onNext: { _ in
+            .withLatestFrom(fetchedProfileVOSuccess)
+            .subscribe(onNext: { profileVO in
                 
-                // 안심번호 전화연결
+                let phoneNumber = profileVO.phoneNumber
                 
+                if let phoneURL = URL(string: "tel://\(phoneNumber)"), UIApplication.shared.canOpenURL(phoneURL) {
+                            UIApplication.shared.open(phoneURL, options: [:], completionHandler: nil)
+                        }
             })
             .disposed(by: disposbag)
         
