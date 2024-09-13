@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 import Entity
 
-public protocol AuthUseCase: UseCaseBase {
+public protocol AuthUseCase: BaseUseCase {
     
     
     /// 센터 회원가입 실행

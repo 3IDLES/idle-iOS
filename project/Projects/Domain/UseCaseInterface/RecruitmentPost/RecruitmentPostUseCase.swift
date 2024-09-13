@@ -9,7 +9,7 @@ import Foundation
 import Entity
 import RxSwift
 
-public protocol RecruitmentPostUseCase: UseCaseBase {
+public protocol RecruitmentPostUseCase: BaseUseCase {
  
     // MARK: Center
     

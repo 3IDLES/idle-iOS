@@ -16,7 +16,7 @@ import Entity
 /// 5. 센터 프로필 최초 등록
 /// 6. 특정 센터의 프로필 불러오기
 
-public protocol CenterProfileUseCase: UseCaseBase {
+public protocol CenterProfileUseCase: BaseUseCase {
     
     /// 1. 나의 센터/다른 센터 프로필 정보 조회
     /// 6. 특정 센터의 프로필 불러오기
