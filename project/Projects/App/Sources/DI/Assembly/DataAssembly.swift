@@ -46,5 +46,10 @@ public struct DataAssembly: Assembly {
         container.register(RecruitmentPostRepository.self) { _ in
             return DefaultRecruitmentPostRepository()
         }
+        
+        // MARK: RemoteConfig
+        container.register(RemoteConfigRepository.self) { _ in
+            return DefaultRemoteConfigRepository()
+        }
     }
 }

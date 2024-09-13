@@ -38,7 +38,8 @@ class RootCoordinator {
             authUseCase: injector.resolve(AuthUseCase.self),
             workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self),
             centerProfileUseCase: injector.resolve(CenterProfileUseCase.self),
-            userInfoLocalRepository: injector.resolve(UserInfoLocalRepository.self)
+            userInfoLocalRepository: injector.resolve(UserInfoLocalRepository.self),
+            remoteConfigRepository: injector.resolve(RemoteConfigRepository.self)
         )
         
         vc.bind(viewModel: vm)

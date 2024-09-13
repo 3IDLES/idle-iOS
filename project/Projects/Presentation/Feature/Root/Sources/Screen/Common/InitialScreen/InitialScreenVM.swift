@@ -5,7 +5,7 @@
 //  Created by choijunios on 8/25/24.
 //
 
-import Foundation
+import UIKit
 import Network
 
 import PresentationCore
@@ -13,6 +13,7 @@ import UseCaseInterface
 import RepositoryInterface
 import BaseFeature
 import Entity
+import DSKit
 
 import RxSwift
 import RxCocoa
@@ -29,6 +30,7 @@ public class InitialScreenVM: BaseViewModel {
     let workerProfileUseCase: WorkerProfileUseCase
     let centerProfileUseCase: CenterProfileUseCase
     let userInfoLocalRepository: UserInfoLocalRepository
+    let remoteConfigRepository: RemoteConfigRepository
     
     // network monitoring
     private let networkMonitor: NWPathMonitor = .init()
@@ -40,7 +42,8 @@ public class InitialScreenVM: BaseViewModel {
             authUseCase: AuthUseCase,
             workerProfileUseCase: WorkerProfileUseCase,
             centerProfileUseCase: CenterProfileUseCase,
-            userInfoLocalRepository: UserInfoLocalRepository
+            userInfoLocalRepository: UserInfoLocalRepository,
+            remoteConfigRepository: RemoteConfigRepository
         )
     {
         self.coordinator = coordinator
@@ -48,19 +51,9 @@ public class InitialScreenVM: BaseViewModel {
         self.workerProfileUseCase = workerProfileUseCase
         self.centerProfileUseCase = centerProfileUseCase
         self.userInfoLocalRepository = userInfoLocalRepository
+        self.remoteConfigRepository = remoteConfigRepository
         
         super.init()
-        
-        // MARK: 로그아웃, 회원탈퇴시
-        NotificationCenter.default.rx.notification(.popToInitialVC)
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                
-                guard let self else { return }
-                
-                self.coordinator?.popToRoot()
-            })
-            .disposed(by: disposeBag)
         
         // MARK: 네트워크 모니터링 시작
         let networkConnected: ReplaySubject<Void> = .create(bufferSize: 1)
@@ -99,10 +92,95 @@ public class InitialScreenVM: BaseViewModel {
         
         startNeworkMonitoring()
         
+        
+        // MARK: 강제업데이트 확인
+        // 네트워크 확인 -> 강제업데이트 확인
+        let fetchRemoteConfig = networkConnected
+            .flatMap { [remoteConfigRepository] _ in
+                remoteConfigRepository.fetchRemoteConfig()
+            }
+        
+        let needsForceUpdate = fetchRemoteConfig
+            .compactMap { $0.value }
+            .map { [remoteConfigRepository] isConfigFetched in
+                
+                if !isConfigFetched {
+                    
+                    // ‼️ Config로딩 불가시 크래쉬
+                    exit(0)
+                }
+                
+                // ‼️ fetch 불가시 크래쉬
+                return remoteConfigRepository.getForceUpdateInfo()!
+            }
+            .map { info in
+                
+                let minAppVersion = info.minVersion
+                
+                let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
+                print("앱 버전: \(appVersion) 최소앱버전: \(minAppVersion)")
+                
+                return minAppVersion > appVersion
+            }
+            .share()
+        	
+        // 강제업데이트 필요
+        needsForceUpdate
+            .filter { $0 }
+            .subscribe(onNext: {
+                [weak self] _ in
+                
+                guard let self else { return }
+                
+                // 네트워크 연결되지 않음
+                let object = IdleAlertObject()
+                    .setTitle("최신 버전의 앱이 있어요")
+                    .setDescription("유저분들의 의견을 반영해 앱을 더 발전시켰어요.\n보다 좋은 서비스를 만나기 위해, 업데이트해주세요.")
+                    .setAcceptButtonLabelText("앱 종료")
+                    .setCancelButtonLabelText("앱 업데이트")
+                
+                object
+                    .cancelButtonClicked
+                    .subscribe(onNext: { [weak self] in
+                        self?.openAppStoreForUpdate()
+                    })
+                    .disposed(by: disposeBag)
+                
+                object
+                    .acceptButtonClicked
+                    .subscribe(onNext: {
+                        exit(0)
+                    })
+                    .disposed(by: disposeBag)
+                
+                alertObject.onNext(object)
+            })
+            .disposed(by: disposeBag)
+        
+        // 강제업데이트 필요하지 않음
+        let forceUpdateChecked = needsForceUpdate.filter { !$0 }
+        
+        // MARK: 로그아웃, 회원탈퇴시
+        NotificationCenter.default.rx.notification(.popToInitialVC)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                
+                guard let self else { return }
+                
+                self.coordinator?.popToRoot()
+            })
+            .disposed(by: disposeBag)
+
         // MARK: 플로우 시작
-        // 네트워크 연결이 최초 1회 확인된 이후 플로우 시작
+        // 네트워크 연결확인 -> 강제업데이트 확인 -> 유저별 플로우 시작
         Observable
-            .combineLatest(viewWillAppear, networkConnected)
+            .combineLatest(
+                // 강제업데이트 확인 완료
+                forceUpdateChecked,
+                
+                // viewWillAppear
+                viewWillAppear
+            )
             .subscribe(onNext: { [weak self] _ in
                 
                 guard let self else { exit(0) }
@@ -303,5 +381,12 @@ public class InitialScreenVM: BaseViewModel {
             })
             .disposed(by: disposeBag)
     }
-
+    
+    func openAppStoreForUpdate() {
+        let url = "itms-apps://itunes.apple.com/app/6670529341";
+        if let url = URL(string: url), UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:])
+        }
+    }
 }
+
