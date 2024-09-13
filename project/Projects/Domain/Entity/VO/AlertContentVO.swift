@@ -11,11 +11,13 @@ public struct DefaultAlertContentVO {
     
     public let title: String
     public let message: String
+    public let dismissButtonLabelText: String
     public let onDismiss: (() -> ())?
     
-    public init(title: String, message: String, onDismiss: (() -> ())? = nil) {
+    public init(title: String, message: String, dismissButtonLabelText: String = "닫기", onDismiss: (() -> ())? = nil) {
         self.title = title
         self.message = message
+        self.dismissButtonLabelText = dismissButtonLabelText
         self.onDismiss = onDismiss
     }
     

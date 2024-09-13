@@ -91,7 +91,7 @@ public extension BaseViewController {
             message: vo.message,
             preferredStyle: .alert
         )
-        let close = UIAlertAction(title: "닫기", style: .default) { [weak self] _ in
+        let close = UIAlertAction(title: vo.dismissButtonLabelText, style: .default) { [weak self] _ in
             self?.alert(vo: vo)
             
             // dismiss

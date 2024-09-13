@@ -189,33 +189,48 @@ public extension BaseNetworkService {
                 
                 let moyaError = error as! MoyaError
                 
-                // 네트워크 에러
+                // 재시도 실패 or 근본적인 에러(Ex 타임아웃, 네트워크 끊어짐)
+                if case let .underlying(error, response) = moyaError {
+                    
+                    // 리타리어 실패
+                    if let afError = error.asAFError {
+                        
+                        if case .requestRetryFailed = afError, let response {
+                            
+                            return .error(
+                                HTTPResponseException(response: response)
+                            )
+                        }
+                    }
+                    
+                    // 근본적인 문제
+                    if let urlError = error as? URLError {
+                        
+                        var underlyingError: UnderLyingError!
+                        
+                        switch urlError.code {
+                        case .notConnectedToInternet:
+                            underlyingError = .internetNotConnected
+                        case .networkConnectionLost:
+                            underlyingError = .networkConnectionLost
+                        case .timedOut:
+                            underlyingError = .timeout
+                        default:
+                            underlyingError = .unHandledError
+                        }
+                        
+                        return .error(underlyingError)
+                    }
+                }
+                
+                // HTTP통신 에러
                 if case let .statusCode(response) = moyaError {
                     return .error(
                         HTTPResponseException(response: response)
                     )
                 }
                 
-                // 네트워에러보다 근본적인 에러
-                if case let .underlying(error, response) = moyaError, let urlError = error as? URLError {
-                    
-                    var underlyingError: UnderLyingError!
-                    
-                    switch urlError.code {
-                    case .notConnectedToInternet:
-                        underlyingError = .internetNotConnected
-                    case .networkConnectionLost:
-                        underlyingError = .networkConnectionLost
-                    case .timedOut:
-                        underlyingError = .timeout
-                    default:
-                        underlyingError = .unHandledError
-                    }
-                    
-                    return .error(underlyingError)
-                }
-                
-                // 실행되지 않음
+                // 엣지 케이스
                 return .error(error)
             }
     }
