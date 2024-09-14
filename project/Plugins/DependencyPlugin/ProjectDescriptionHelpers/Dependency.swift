@@ -45,6 +45,8 @@ public extension ModuleDependency {
         public static let NaverMapSDKForSPM: TargetDependency = .external(name: "Junios.NMapSDKForSPM")
         public static let KingFisher: TargetDependency = .external(name: "Kingfisher")
         public static let FirebaseRemoteConfig: TargetDependency = .external(name: "FirebaseRemoteConfig")
+        public static let FirebaseCrashlytics: TargetDependency = .external(name: "FirebaseCrashlytics")
+        public static let FirebaseAnalytics: TargetDependency = .external(name: "FirebaseAnalytics")
     }
 }
 

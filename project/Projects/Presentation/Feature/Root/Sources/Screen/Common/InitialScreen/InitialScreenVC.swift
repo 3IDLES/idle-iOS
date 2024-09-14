@@ -8,10 +8,11 @@
 import UIKit
 import BaseFeature
 import PresentationCore
-import RxCocoa
-import RxSwift
 import Entity
 import DSKit
+
+import RxCocoa
+import RxSwift
 
 public class InitialScreenVC: BaseViewController {
     
@@ -45,10 +46,7 @@ public class InitialScreenVC: BaseViewController {
         super.bind(viewModel: viewModel)
         
         self.rx.viewDidAppear
-            .map { _ in
-                
-                printIfDebug("InitialScreenVC viewWillAppear")
-            }
+            .map({ _ in })
             .bind(to: viewModel.viewWillAppear)
             .disposed(by: disposeBag)
     }

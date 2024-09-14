@@ -118,7 +118,8 @@ public class InitialScreenVM: BaseViewModel {
                 let minAppVersion = info.minVersion
                 
                 let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
-                print("앱 버전: \(appVersion) 최소앱버전: \(minAppVersion)")
+                
+                printIfDebug("앱 버전: \(appVersion) 최소앱버전: \(minAppVersion)")
                 
                 return minAppVersion > appVersion
             }
@@ -159,19 +160,8 @@ public class InitialScreenVM: BaseViewModel {
         
         // 강제업데이트 필요하지 않음
         let forceUpdateChecked = needsForceUpdate.filter { !$0 }
-        
-        // MARK: 로그아웃, 회원탈퇴시
-        NotificationCenter.default.rx.notification(.popToInitialVC)
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                
-                guard let self else { return }
-                
-                self.coordinator?.popToRoot()
-            })
-            .disposed(by: disposeBag)
 
-        // MARK: 플로우 시작
+        // MARK: 유저별 플로우 시작
         // 네트워크 연결확인 -> 강제업데이트 확인 -> 유저별 플로우 시작
         Observable
             .combineLatest(
@@ -199,6 +189,18 @@ public class InitialScreenVM: BaseViewModel {
                     workerInitialFlow()
                 }
                 
+            })
+            .disposed(by: disposeBag)
+        
+        
+        // MARK: 로그아웃, 회원탈퇴시
+        NotificationCenter.default.rx.notification(.popToInitialVC)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                
+                guard let self else { return }
+                
+                self.coordinator?.popToRoot()
             })
             .disposed(by: disposeBag)
     }
@@ -274,6 +276,8 @@ public class InitialScreenVM: BaseViewModel {
         case .requiresConnection, .satisfied:
             // requiresConnection는 일반적으로 즉시 연결이 가능한 상태
             networtIsAvailablePublisher.onNext(true)
+            networtIsAvailablePublisher.onCompleted()
+            networkMonitor.cancel()
             return
         default:
             networtIsAvailablePublisher.onNext(false)
@@ -382,6 +386,7 @@ public class InitialScreenVM: BaseViewModel {
             .disposed(by: disposeBag)
     }
     
+    /// 앱스토에에서 해당앱을 엽니다.
     func openAppStoreForUpdate() {
         let url = "itms-apps://itunes.apple.com/app/6670529341";
         if let url = URL(string: url), UIApplication.shared.canOpenURL(url) {
