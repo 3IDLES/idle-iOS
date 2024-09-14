@@ -191,9 +191,9 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                     title: "공고에 지원하시겠어요?",
                     description: "",
                     acceptButtonLabelText: "지원하기",
-                    cancelButtonLabelText: "취소하기") {
+                    cancelButtonLabelText: "취소하기", onCanceled:  {
                         applyRequest.accept(())
-                    }
+                    })
             }
             .asDriver(onErrorDriveWith: .never())
         

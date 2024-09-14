@@ -95,23 +95,23 @@ public class InitialScreenVM: BaseViewModel {
         
         // MARK: 강제업데이트 확인
         // 네트워크 확인 -> 강제업데이트 확인
-        let fetchRemoteConfig = networkConnected
+        let needsForceUpdate = networkConnected
             .flatMap { [remoteConfigRepository] _ in
                 remoteConfigRepository.fetchRemoteConfig()
             }
-        
-        let needsForceUpdate = fetchRemoteConfig
             .compactMap { $0.value }
             .map { [remoteConfigRepository] isConfigFetched in
                 
                 if !isConfigFetched {
-                    
+                    printIfDebug("Remote Config 로딩 실패")
+                }
+                
+                guard let config = remoteConfigRepository.getForceUpdateInfo() else {
                     // ‼️ Config로딩 불가시 크래쉬
                     exit(0)
                 }
                 
-                // ‼️ fetch 불가시 크래쉬
-                return remoteConfigRepository.getForceUpdateInfo()!
+                return config
             }
             .map { info in
                 
@@ -384,6 +384,11 @@ public class InitialScreenVM: BaseViewModel {
                 coordinator?.centerMain()
             })
             .disposed(by: disposeBag)
+    }
+    
+    func checkForceUpdate() {
+        
+        
     }
     
     /// 앱스토에에서 해당앱을 엽니다.
