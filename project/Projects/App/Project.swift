@@ -27,6 +27,9 @@ let project = Project(
             infoPlist: IdleInfoPlist.appDefault,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
+            scripts: [
+                .crashlyticsScript
+            ],
             dependencies: [
                 
                 // Presentation
@@ -39,7 +42,9 @@ let project = Project(
                 D.Data.ConcreteRepository,
                 
                 // ThirdParty
-                D.ThirdParty.Swinject
+                D.ThirdParty.Swinject,
+                D.ThirdParty.FirebaseCrashlytics,
+                D.ThirdParty.FirebaseAnalytics,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.appConfigurations
