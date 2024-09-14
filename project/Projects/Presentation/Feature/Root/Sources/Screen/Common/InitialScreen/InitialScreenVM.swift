@@ -17,6 +17,8 @@ import DSKit
 
 import RxSwift
 import RxCocoa
+import FirebaseCrashlytics
+
 
 public class InitialScreenVM: BaseViewModel {
     
@@ -103,12 +105,13 @@ public class InitialScreenVM: BaseViewModel {
             .map { [remoteConfigRepository] isConfigFetched in
                 
                 if !isConfigFetched {
-                    printIfDebug("Remote Config 로딩 실패")
+                    Crashlytics.crashlytics().log("Remote Config fetch실패")
                 }
                 
                 guard let config = remoteConfigRepository.getForceUpdateInfo() else {
                     // ‼️ Config로딩 불가시 크래쉬
-                    exit(0)
+                    Crashlytics.crashlytics().log("Remote Config획득 실패")
+                    fatalError("Remote Config fetching에러")
                 }
                 
                 return config

@@ -39,6 +39,8 @@ let project = Project(
                 D.ThirdParty.RxSwift,
                 D.ThirdParty.RxCocoa,
                 D.ThirdParty.NaverMapSDKForSPM,
+                D.ThirdParty.FirebaseCrashlytics,
+                D.ThirdParty.FirebaseAnalytics,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

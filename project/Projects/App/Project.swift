@@ -43,8 +43,6 @@ let project = Project(
                 
                 // ThirdParty
                 D.ThirdParty.Swinject,
-                D.ThirdParty.FirebaseCrashlytics,
-                D.ThirdParty.FirebaseAnalytics,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.appConfigurations
