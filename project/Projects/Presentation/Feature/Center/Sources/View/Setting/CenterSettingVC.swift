@@ -101,6 +101,21 @@ public class CenterSettingVC: BaseViewController {
             .bind(to: viewModel.removeAccountButtonClicked)
             .disposed(by: disposeBag)
         
+        // 설정화면에 종속적인 뷰들입니다.
+        Observable
+            .merge(
+                frequentQuestionButton.rx.tap
+                    .map { _ in SettingAdditionalInfoType.frequentQuestion },
+                askButton.rx.tap
+                    .map { _ in SettingAdditionalInfoType.contact },
+                applicationPolicyButton.rx.tap
+                    .map { _ in SettingAdditionalInfoType.termsandPolicies },
+                personalDataProcessingPolicyButton.rx.tap
+                    .map { _ in SettingAdditionalInfoType.privacyPolicy }
+            )
+            .bind(to: viewModel.additionalInfoButtonClieck)
+            .disposed(by: disposeBag)
+        
         // Output
         viewModel
             .pushNotificationApproveState?
@@ -215,39 +230,6 @@ public class CenterSettingVC: BaseViewController {
     }
     
     private func setObservable() {
-        
-        // 설정화면에 종속적인 뷰들입니다.
-        frequentQuestionButton.rx.tap
-            .subscribe(onNext: {
-                
-                // 자주하는 질문뷰
-                
-            })
-            .disposed(by: disposeBag)
-        
-        askButton.rx.tap
-            .subscribe(onNext: {
-                
-                // 문의하기 뷰
-                
-            })
-            .disposed(by: disposeBag)
-        
-        applicationPolicyButton.rx.tap
-            .subscribe(onNext: {
-                
-                // 약관및 정책
-                
-            })
-            .disposed(by: disposeBag)
-        
-        personalDataProcessingPolicyButton.rx.tap
-            .subscribe(onNext: {
-                
-                // 개인정보 처리방침
-                
-            })
-            .disposed(by: disposeBag)
         
         signOutButton
             .rx.tap
