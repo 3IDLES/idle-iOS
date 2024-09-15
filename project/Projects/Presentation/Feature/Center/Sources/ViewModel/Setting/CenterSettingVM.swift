@@ -25,6 +25,8 @@ public protocol CenterSettingVMable: BaseViewModel {
     var signOutButtonComfirmed: PublishRelay<Void> { get }
     var removeAccountButtonClicked: PublishRelay<Void> { get }
     
+    var additionalInfoButtonClieck: PublishRelay<SettingAdditionalInfoType> { get }
+    
     // Output
     var pushNotificationApproveState: Driver<Bool>? { get }
     var showSettingAlert: Driver<Void>? { get }
@@ -40,12 +42,14 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
     weak var coordinator: CenterSettingScreenCoordinator?
     let settingUseCase: SettingScreenUseCase
     
-    public var viewWillAppear: RxRelay.PublishRelay<Void> = .init()
-    public var myCenterProfileButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var approveToPushNotification: RxRelay.PublishRelay<Bool> = .init()
+    public var viewWillAppear: PublishRelay<Void> = .init()
+    public var myCenterProfileButtonClicked: PublishRelay<Void> = .init()
+    public var approveToPushNotification: PublishRelay<Bool> = .init()
     
-    public var signOutButtonComfirmed: RxRelay.PublishRelay<Void> = .init()
-    public var removeAccountButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    public var signOutButtonComfirmed: PublishRelay<Void> = .init()
+    public var removeAccountButtonClicked: PublishRelay<Void> = .init()
+    
+    public let additionalInfoButtonClieck: PublishRelay<SettingAdditionalInfoType> = .init()
     
     public var pushNotificationApproveState: RxCocoa.Driver<Bool>?
     public var centerInfo: RxCocoa.Driver<(name: String, location: String)>?
@@ -126,7 +130,24 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
             .disposed(by: disposeBag)
         
         // MARK: 추가정보
-        
+        additionalInfoButtonClieck
+            .subscribe(onNext: {
+                [weak self] type in
+                guard let self else { return }
+                
+                let url = type.getWebUrl()
+                
+                if !openURL(url) {
+                    
+                    alert.onNext(
+                        .init(
+                            title: "오류가 발생했습니다.",
+                            message: "잠시후 다시시도해 주세요."
+                        )
+                    )
+                }
+            })
+            .disposed(by: disposeBag)
         
         
         // MARK: 로그아웃
@@ -183,6 +204,14 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
             .disposed(by: disposeBag)
         
         return viewModel
+    }
+    
+    private func openURL(_ url: URL) -> Bool {
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:])
+            return true
+        }
+        return false
     }
 }
 
