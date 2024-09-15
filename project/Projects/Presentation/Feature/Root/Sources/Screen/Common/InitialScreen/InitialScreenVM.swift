@@ -389,11 +389,6 @@ public class InitialScreenVM: BaseViewModel {
             .disposed(by: disposeBag)
     }
     
-    func checkForceUpdate() {
-        
-        
-    }
-    
     /// 앱스토에에서 해당앱을 엽니다.
     func openAppStoreForUpdate() {
         let url = "itms-apps://itunes.apple.com/app/6670529341";
