@@ -125,6 +125,9 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
             })
             .disposed(by: disposeBag)
         
+        // MARK: 추가정보
+        
+        
         
         // MARK: 로그아웃
         let signOutRequestResult = signOutButtonComfirmed.flatMap({ [settingUseCase] _ in
