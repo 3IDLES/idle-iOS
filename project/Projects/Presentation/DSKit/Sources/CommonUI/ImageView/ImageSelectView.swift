@@ -92,7 +92,7 @@ public class ImageSelectView: UIImageView {
         
         self.layer.cornerRadius = 6
         self.clipsToBounds = true
-        self.contentMode = .scaleToFill
+        self.contentMode = .scaleAspectFill
     }
     
     private func setLayout() {

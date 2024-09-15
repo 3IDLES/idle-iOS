@@ -176,7 +176,7 @@ public class InitialScreenVM: BaseViewModel {
             )
             .subscribe(onNext: { [weak self] _ in
                 
-                guard let self else { exit(0) }
+                guard let self else { return }
                 
                 // 유저타입이 없는 경우 Auth로 이동
                 guard let userType = userInfoLocalRepository.getUserType() else {
@@ -246,8 +246,8 @@ public class InitialScreenVM: BaseViewModel {
                     let alertVO = DefaultAlertContentVO(
                         title: "초기화면 오류",
                         message: error.message) {
-                            // 어플리케이션 종료
-                            exit(0)
+                            // 비정상 종료, 어플리케이션 종료
+                            exit(1)
                         }
                     
                     // 어플리케이션 종료 이벤트
