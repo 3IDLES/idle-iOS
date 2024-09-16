@@ -35,7 +35,7 @@ public protocol SettingScreenUseCase: BaseUseCase {
     
     /// 요양보호사 회원 탈퇴
     func deregisterWorkerAccount(
-        reasons: [DeregisterReasonVO]
+        reasons: [String]
     ) -> Single<Result<Void, DomainError>>
     
     /// 요양보호사 로그아웃
@@ -48,7 +48,7 @@ public protocol SettingScreenUseCase: BaseUseCase {
     
     /// 센터 회원 탈퇴
     func deregisterCenterAccount(
-        reasons: [DeregisterReasonVO],
+        reasons: [String],
         password: String
     ) -> Single<Result<Void, DomainError>>
     

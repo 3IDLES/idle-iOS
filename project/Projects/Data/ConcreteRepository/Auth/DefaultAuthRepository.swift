@@ -54,9 +54,9 @@ public extension DefaultAuthRepository {
             .map {  _ in }
     }
     
-    func deregisterCenterAccount(reasons: [DeregisterReasonVO], password: String) -> RxSwift.Single<Void> {
+    func deregisterCenterAccount(reasons: [String], password: String) -> RxSwift.Single<Void> {
         
-        let reasonString = reasons.map { $0.reasonText }.joined(separator: "|")
+        let reasonString = reasons.joined(separator: "|")
         
         return networkService
             .request(
@@ -119,8 +119,8 @@ public extension DefaultAuthRepository {
             .map {  _ in }
     }
     
-    func deregisterWorkerAccount(reasons: [Entity.DeregisterReasonVO]) -> RxSwift.Single<Void> {
-        let reasonString = reasons.map { $0.reasonText }.joined(separator: "|")
+    func deregisterWorkerAccount(reasons: [String]) -> RxSwift.Single<Void> {
+        let reasonString = reasons.joined(separator: "|")
         
         return networkService
             .request(

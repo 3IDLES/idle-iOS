@@ -18,6 +18,8 @@ public class MultiLineTextField: UITextView {
         let label = IdleLabel(typography: typography)
         label.attrTextColor = DSKitAsset.Colors.gray200.color
         label.textAlignment = .left
+        label.numberOfLines = 0
+        label.lineBreakMode = .byCharWrapping
         return label
     }()
     
@@ -88,10 +90,12 @@ public class MultiLineTextField: UITextView {
         self.addSubview(placeHolderLabel)
         placeHolderLabel.translatesAutoresizingMaskIntoConstraints = false
         
+        let frameGuide = self.frameLayoutGuide
+        let textContainerInset = self.textContainerInset
         NSLayoutConstraint.activate([
-            placeHolderLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: self.textContainerInset.top),
-            placeHolderLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: self.textContainerInset.left),
-            placeHolderLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: self.textContainerInset.right),
+            placeHolderLabel.topAnchor.constraint(equalTo: frameGuide.topAnchor, constant: textContainerInset.top),
+            placeHolderLabel.leftAnchor.constraint(equalTo: frameGuide.leftAnchor, constant: textContainerInset.left),
+            placeHolderLabel.rightAnchor.constraint(equalTo: frameGuide.rightAnchor, constant: -textContainerInset.right),
         ])
     }
     

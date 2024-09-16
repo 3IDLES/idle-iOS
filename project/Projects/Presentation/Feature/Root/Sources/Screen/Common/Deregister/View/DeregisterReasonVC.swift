@@ -15,9 +15,10 @@ import DSKit
 import Entity
 
 public protocol DeregisterReasonVMable: BaseViewModel {
+    var userType: UserType { get }
     var coordinator: SelectReasonCoordinator? { get }
     var exitButonClicked: PublishRelay<Void> { get }
-    var acceptDeregisterButonClicked: PublishRelay<[DeregisterReasonVO]> { get }
+    var acceptDeregisterButonClicked: PublishRelay<[String]> { get }
 }
 
 public class DeregisterReasonVC: BaseViewController {
@@ -43,7 +44,7 @@ public class DeregisterReasonVC: BaseViewController {
         label.attrTextColor = DSColor.gray300.color
         return label
     }()
-    var itemViewList: [CheckBoxWithLabelView] = {
+    let itemViewList: [CheckBoxWithLabelView] = {
         DeregisterReasonVO.allCases.map { vo in
             return CheckBoxWithLabelView(
                 item: vo,
@@ -56,6 +57,7 @@ public class DeregisterReasonVC: BaseViewController {
         let label = IdleLabel(typography: .caption)
         label.textString = "탈퇴 버튼 선택 시 모든 정보가 삭제되며, 되돌릴 수 없습니다."
         label.attrTextColor = DSColor.red100.color
+        label.textAlignment = .center
         return label
     }()
     
@@ -70,6 +72,24 @@ public class DeregisterReasonVC: BaseViewController {
         button.label.textString = "탈퇴하기"
         button.setEnabled(false)
         return button
+    }()
+    
+    fileprivate let deregisterReasonField1: DeregisterInputField = {
+        let field = DeregisterInputField(
+            titleText: "어떤 부분에서 불편함을 느끼셨나요?",
+            fieldText: "어떤 부분에서 불편함을 느끼셨나요? 보내주신 의견은 플랫폼 개선에 큰 도움이 됩니다!"
+        )
+        field.isHidden = true
+        return field
+    }()
+    
+    fileprivate let deregisterReasonField2: DeregisterInputField = {
+        let field = DeregisterInputField(
+            titleText: "어떤 기능이 필요하신가요?",
+            fieldText: "어떤 기능이 필요하신가요? 보내주신 의견은 개발 담당자에게 즉시 전달됩니다."
+        )
+        field.isHidden = true
+        return field
     }()
     
     // Observable
@@ -104,6 +124,11 @@ public class DeregisterReasonVC: BaseViewController {
         let contentGuide = checkListScrollView.contentLayoutGuide
         let frameGuide = checkListScrollView.frameLayoutGuide
         let contentStack = VStack(itemViewList, spacing: 16, alignment: .fill)
+        
+        // inputField 삽입
+        contentStack.insertArrangedSubview(deregisterReasonField1, at: 2)
+        contentStack.insertArrangedSubview(deregisterReasonField2, at: 6)
+        
         checkListScrollView.addSubview(contentStack)
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         
@@ -112,7 +137,7 @@ public class DeregisterReasonVC: BaseViewController {
             contentStack.bottomAnchor.constraint(equalTo: contentGuide.bottomAnchor, constant: -20),
             
             contentStack.leftAnchor.constraint(equalTo: frameGuide.leftAnchor, constant: 20),
-            contentStack.rightAnchor.constraint(equalTo: frameGuide.rightAnchor, constant: 20),
+            contentStack.rightAnchor.constraint(equalTo: frameGuide.rightAnchor, constant: -20),
         ])
         
         let titleLabelStack = VStack([
@@ -129,13 +154,17 @@ public class DeregisterReasonVC: BaseViewController {
             alignment: .center,
             distribution: .fillEqually
         )
+        
+        let bottomStack = VStack([
+            finalWarningLabel,
+            buttonStack
+        ], spacing: 12, alignment: .fill)
             
         [
             navigationBar,
             titleLabelStack,
             checkListScrollView,
-            finalWarningLabel,
-            buttonStack
+            bottomStack,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -153,14 +182,11 @@ public class DeregisterReasonVC: BaseViewController {
             checkListScrollView.topAnchor.constraint(equalTo: titleLabelStack.bottomAnchor),
             checkListScrollView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             checkListScrollView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-            checkListScrollView.bottomAnchor.constraint(equalTo: finalWarningLabel.bottomAnchor),
+            checkListScrollView.bottomAnchor.constraint(equalTo: bottomStack.topAnchor),
             
-            finalWarningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            finalWarningLabel.bottomAnchor.constraint(equalTo: buttonStack.topAnchor, constant: -12),
-            
-            buttonStack.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 20),
-            buttonStack.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
-            buttonStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -14),
+            bottomStack.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 20),
+            bottomStack.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
+            bottomStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -14),
         ])
     }
     
@@ -194,12 +220,46 @@ public class DeregisterReasonVC: BaseViewController {
         
         super.bind(viewModel: viewModel)
         
+        if viewModel.userType == .worker {
+            
+            itemViewList[1]
+                .opTap
+                .subscribe { [weak self] _ in
+                    self?.deregisterReasonField1.isHidden.toggle()
+                }
+                .disposed(by: disposeBag)
+            
+            itemViewList[4]
+                .opTap
+                .subscribe { [weak self] _ in
+                    self?.deregisterReasonField2.isHidden.toggle()
+                }
+                .disposed(by: disposeBag)
+        }
+        
         acceptDeregisterButton
             .rx.tap
             .map { [weak self] _ in
-                let reasons = self?.selectedReasons.filter({ (reason, isActive) in isActive}).map { (key, _) in
-                    key
+                
+                // 선택항목
+                var reasons = self?.selectedReasons.filter({ (reason, isActive) in isActive}).map { (key, _) in
+                    key.reasonText
                 }
+                
+                // 불편했던 점
+                if let str = self?.deregisterReasonField1.reasonField.attributedText.string, !str.isEmpty {
+                    let formedStr = "불편했던 점: \(str)"
+                    reasons?.append(formedStr)
+                }
+                
+                // 필요한 기능
+                if let str = self?.deregisterReasonField2.reasonField.attributedText.string, !str.isEmpty {
+                    let formedStr = "필요한 기능: \(str)"
+                    reasons?.append(formedStr)
+                }
+                
+                // 어떤 기능
+                
                 return reasons ?? []
             }
             .bind(to: viewModel.acceptDeregisterButonClicked)
@@ -215,3 +275,31 @@ public class DeregisterReasonVC: BaseViewController {
     }
 }
 
+
+fileprivate class DeregisterInputField: VStack {
+    
+    let titleLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Subtitle4)
+        label.textAlignment = .left
+        label.attrTextColor = DSColor.gray500.color
+        return label
+    }()
+    
+    let reasonField: MultiLineTextField = {
+        let field = MultiLineTextField(typography: .Body3)
+        field.isScrollEnabled = false
+        return field
+    }()
+    
+    init(titleText: String, fieldText: String) {
+        self.titleLabel.textString = titleText
+        self.reasonField.placeholderText = fieldText
+        super.init([titleLabel, reasonField], spacing: 6, alignment: .fill)
+        
+        NSLayoutConstraint.activate([
+            reasonField.heightAnchor.constraint(equalToConstant: 156)
+        ])
+    }
+    
+    required init(coder: NSCoder) { fatalError() }
+}

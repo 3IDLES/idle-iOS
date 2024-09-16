@@ -45,7 +45,7 @@ class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidation
     
     init(
             coordinator: PhoneNumberValidationForDeregisterCoordinator?,
-            deregisterReasons: [DeregisterReasonVO],
+            deregisterReasons: [String],
             inputValidationUseCase: AuthInputValidationUseCase,
             settingUseCase: SettingScreenUseCase
         )

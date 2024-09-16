@@ -17,10 +17,10 @@ public protocol DeregisterCoordinatable: ParentCoordinator {
     func cancelDeregister()
     
     /// 센터관리자: 마지막으로 비밀번호를 입력합니다.
-    func showFinalPasswordScreen(reasons: [DeregisterReasonVO])
+    func showFinalPasswordScreen(reasons: [String])
     
     /// 요양보호사: 마지막으로 전화번호를 입력합니다.
-    func showFinalPhoneAuthScreen(reasons: [DeregisterReasonVO])
+    func showFinalPhoneAuthScreen(reasons: [String])
     
     /// 최초화면으로 돌아갑니다.
     func popToRoot()

@@ -22,7 +22,7 @@ public class PasswordForDeregisterVM: BaseViewModel {
     let settingUseCase: SettingScreenUseCase
     
     public init(
-        deregisterReasons: [DeregisterReasonVO],
+        deregisterReasons: [String],
         coordinator: PasswordForDeregisterCoordinator,
         settingUseCase: SettingScreenUseCase
     ) {
