@@ -47,6 +47,7 @@ public extension ModuleDependency {
         public static let FirebaseRemoteConfig: TargetDependency = .external(name: "FirebaseRemoteConfig")
         public static let FirebaseCrashlytics: TargetDependency = .external(name: "FirebaseCrashlytics")
         public static let FirebaseAnalytics: TargetDependency = .external(name: "FirebaseAnalytics")
+        public static let Amplitude: TargetDependency = .external(name: "AmplitudeSwift")
     }
 }
 

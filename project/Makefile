@@ -1,5 +1,8 @@
 # Module creation
 
+generate:
+	TUIST_ROOT_DIR=${PWD} tuist generate
+
 USER_NAME = $(shell python3 Scaffold/Scripts/author_name.py)
 CURRENT_DATE = $(shell pipenv run python Scaffold/Scripts/current_date.py)
 
