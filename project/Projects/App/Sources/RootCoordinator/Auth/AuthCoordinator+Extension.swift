@@ -40,6 +40,10 @@ extension AuthCoordinator: AuthCoordinatable {
         coordinator.start()
     }
     
+    public func showCompleteScreen() {
+        
+    }
+    
     public func startCenterLoginFlow() {
         
         let coordinator = CanterLoginFlowCoordinator(

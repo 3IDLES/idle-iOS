@@ -58,7 +58,7 @@ public class CenterRegisterCoordinator: ChildCoordinator {
         // stageViewControllerss에 자기자신과 ViewModel할당
         self.stageViewControllers = [
             EnterNameViewController(coordinator: self, viewModel: vm),
-            ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
+            ValidatePhoneNumberViewController(viewModel: vm),
             AuthBusinessOwnerViewController(coordinator: self, viewModel: vm),
             SetIdPasswordViewController(coordinator: self, viewModel: vm),
         ]

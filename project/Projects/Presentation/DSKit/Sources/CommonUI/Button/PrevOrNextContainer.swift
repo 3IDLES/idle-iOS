@@ -12,13 +12,13 @@ import RxCocoa
 public class PrevOrNextContainer: HStack {
     
     // View
-    private let prevButton: IdleThirdinaryButton = {
+    public let prevButton: IdleThirdinaryButton = {
         let button = IdleThirdinaryButton(level: .medium)
         button.label.textString = "이전"
         return button
     }()
     
-    private let nextButton: IdlePrimaryButton = {
+    public let nextButton: IdlePrimaryButton = {
         let button = IdlePrimaryButton(level: .medium)
         button.label.textString = "다음"
         return button

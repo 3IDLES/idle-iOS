@@ -92,7 +92,7 @@ public extension AuthInOutStreamManager {
                 .share()
             
             // 로그인 성공
-            output.loginValidation = loginResult
+            output.loginSuccess = loginResult
                 .compactMap { $0.value }
                 .map { phoneNumber in
                     printIfDebug("✅ 요양보호사 로그인 성공")
