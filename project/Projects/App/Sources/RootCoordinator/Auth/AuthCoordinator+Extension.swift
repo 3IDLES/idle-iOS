@@ -10,17 +10,14 @@ import AuthFeature
 import PresentationCore
 import UseCaseInterface
 import RepositoryInterface
+import BaseFeature
 
 extension AuthCoordinator: AuthCoordinatable {
     
     public func registerAsWorker() {
         
         let coordinator = WorkerRegisterCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self),
-                authUseCase: injector.resolve(AuthUseCase.self)
-            )
+            dependency: .init(navigationController: navigationController)
         )
         coordinator.parent = self
         addChildCoordinator(coordinator)
@@ -29,19 +26,23 @@ extension AuthCoordinator: AuthCoordinatable {
     
     public func registerAsCenter() {
         let coordinator = CenterRegisterCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self),
-                authUseCase: injector.resolve(AuthUseCase.self)
-            )
+            dependency: .init(navigationController: navigationController)
         )
         coordinator.parent = self
         addChildCoordinator(coordinator)
         coordinator.start()
     }
     
-    public func showCompleteScreen() {
+    public func showCompleteScreen(ro: AnonymousCompleteVCRenderObject) {
+        let vc = AnonymousCompleteVC()
+        vc.applyRO(ro)
         
+        let coordinator = CoordinatorWrapper(
+            parent: self,
+            nav: navigationController,
+            vc: vc
+        )
+        coordinator.start()
     }
     
     public func startCenterLoginFlow() {

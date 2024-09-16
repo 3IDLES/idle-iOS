@@ -104,16 +104,12 @@ where
         return label
     }()
     
-    private let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        
-        return button
-    }()
+    private let buttonContainer = PrevOrNextContainer()
     
     let disposeBag = DisposeBag()
         
     public init(viewModel: T) {
+        
         self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
@@ -145,7 +141,7 @@ where
             authNumberLabel,
             authNumberField,
             authSuccessText,
-            ctaButton,
+            buttonContainer,
         ].forEach {
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -177,9 +173,9 @@ where
             authSuccessText.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             authSuccessText.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            ctaButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            buttonContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            buttonContainer.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            buttonContainer.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         ])
     }
         
@@ -194,7 +190,7 @@ where
         authNumberField.button.setEnabled(false)
         
         // - CTA버튼 비활성화
-        ctaButton.setEnabled(false)
+        buttonContainer.nextButton.setEnabled(false)
     }
     
     public func setObservable() {
@@ -268,16 +264,16 @@ where
         
         // MARK: ViewController한정 로직
         // CTA버튼 클릭시 화면전환
-        ctaButton
-            .eventPublisher
+        buttonContainer.nextBtnClicked
+            .asObservable()
             .bind(to: input.nextButtonClicked)
             .disposed(by: disposeBag)
+        
+        buttonContainer.prevBtnClicked
+            .asObservable()
+            .bind(to: input.prevButtonClicked)
+            .disposed(by: disposeBag)
     }
-}
-
-extension ValidatePhoneNumberViewController {
-    
-    
 }
 
 extension ValidatePhoneNumberViewController {
@@ -305,6 +301,6 @@ extension ValidatePhoneNumberViewController {
         authSuccessText.isHidden = false
         
         // CTA버튼 활성화
-        ctaButton.setEnabled(true)
+        buttonContainer.nextButton.setEnabled(true)
     }
 }

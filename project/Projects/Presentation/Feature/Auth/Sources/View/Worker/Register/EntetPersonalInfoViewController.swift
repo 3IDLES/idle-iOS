@@ -74,7 +74,11 @@ where T.Input: WorkerPersonalInfoInputable & PageProcessInputable,
         return btn
     }()
     
-    private let buttonContainer = PrevOrNextContainer()
+    private let buttonContainer: PrevOrNextContainer = {
+        let container = PrevOrNextContainer()
+        container.nextButton.setEnabled(false)
+        return container
+    }()
     
     public init(viewModel: T) {
 
@@ -215,7 +219,7 @@ where T.Input: WorkerPersonalInfoInputable & PageProcessInputable,
         // CTA버튼 클릭시 화면전환
         buttonContainer.prevBtnClicked
             .asObservable()
-            .bind(to: input.nextButtonClicked)
+            .bind(to: input.prevButtonClicked)
             .disposed(by: disposeBag)
         
         buttonContainer.nextBtnClicked

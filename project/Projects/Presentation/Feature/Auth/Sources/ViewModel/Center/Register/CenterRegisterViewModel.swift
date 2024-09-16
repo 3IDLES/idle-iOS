@@ -15,66 +15,86 @@ import BaseFeature
 
 public class CenterRegisterViewModel: BaseViewModel, ViewModelType {
     
+    // Init
+    weak var coordinator: CenterRegisterCoordinator?
+    
     // UseCase
-    public let inputValidationUseCase: AuthInputValidationUseCase
-    public let authUseCase: AuthUseCase
+    @Injected var inputValidationUseCase: AuthInputValidationUseCase
+    @Injected var authUseCase: AuthUseCase
     
     // Input은 모든 ViewController에서 공유한다. (다만, 각가의 ViewController의 Input프로토콜에 의해 제한된다.)
     public let input = Input()
     public let output = Output()
     
     internal let stateObject = CenterRegisterState()
+    
+    public init(coordinator: CenterRegisterCoordinator) {
         
-    public init(
-        inputValidationUseCase: AuthInputValidationUseCase,
-        authUseCase: AuthUseCase) {
-            self.inputValidationUseCase = inputValidationUseCase
-            self.authUseCase = authUseCase
-            
-            super.init()
-            
-            AuthInOutStreamManager.enterNameInOut(
-                input: input,
-                output: output,
-                useCase: inputValidationUseCase) { [weak self] validName in
-                    // 🚀 상태추적 🚀
-                    self?.stateObject.name = validName
-                }
-            
-            AuthInOutStreamManager.validatePhoneNumberInOut(
-                input: input,
-                output: output,
-                useCase: inputValidationUseCase,
-                disposeBag: disposeBag
-            ) { [weak self] authedPhoneNumber in
-                    // 🚀 상태추적 🚀
-                    self?.stateObject.phoneNumber = authedPhoneNumber
-                }
-            
-            // viewmodel native
-            registerInOut()
-            validateBusinessNumberInOut()
-            
-            AuthInOutStreamManager.idInOut(
-                input: input,
-                output: output,
-                useCase: inputValidationUseCase) { [weak self] validId in
-                    // 🚀 상태추적 🚀
-                    self?.stateObject.id = validId
-                }
-            
-            AuthInOutStreamManager.passwordInOut(
-                input: input,
-                output: output,
-                useCase: inputValidationUseCase) { [weak self] validPassword in
-                    // 🚀 상태추적 🚀
-                    self?.stateObject.password = validPassword
-                }
-            
-            input.alert
-                .bind(to: self.alert)
-                .disposed(by: disposeBag)
+        self.coordinator = coordinator
+        
+        super.init()
+        
+        AuthInOutStreamManager.enterNameInOut(
+            input: input,
+            output: output,
+            useCase: inputValidationUseCase) { [weak self] validName in
+                // 🚀 상태추적 🚀
+                self?.stateObject.name = validName
+            }
+        
+        AuthInOutStreamManager.validatePhoneNumberInOut(
+            input: input,
+            output: output,
+            useCase: inputValidationUseCase,
+            disposeBag: disposeBag
+        ) { [weak self] authedPhoneNumber in
+            // 🚀 상태추적 🚀
+            self?.stateObject.phoneNumber = authedPhoneNumber
         }
+        
+        // viewmodel native
+        registerInOut()
+        validateBusinessNumberInOut()
+        
+        AuthInOutStreamManager.idInOut(
+            input: input,
+            output: output,
+            useCase: inputValidationUseCase) { [weak self] validId in
+                // 🚀 상태추적 🚀
+                self?.stateObject.id = validId
+            }
+        
+        AuthInOutStreamManager.passwordInOut(
+            input: input,
+            output: output,
+            useCase: inputValidationUseCase) { [weak self] validPassword in
+                // 🚀 상태추적 🚀
+                self?.stateObject.password = validPassword
+            }
+        
+        input.alert
+            .subscribe(onNext: { [weak self] alertVO in
+                self?.alert.onNext(alertVO)
+            })
+            .disposed(by: disposeBag)
+        
+        // MARK: 화면 페이지네이션
+        input
+            .nextButtonClicked
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
+                self.coordinator?.next()
+            })
+            .disposed(by: disposeBag)
+        
+        input
+            .prevButtonClicked
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
+                self.coordinator?.prev()
+            })
+            .disposed(by: disposeBag)
+    }
     
     deinit {
         printIfDebug("deinit \(Self.self)")
@@ -87,7 +107,9 @@ extension CenterRegisterViewModel {
     public class Input {
         
         // CTA 버튼 클릭시
-        public var ctaButtonClicked: PublishRelay<Void> = .init()
+        public var nextButtonClicked: PublishSubject<Void> = .init()
+        public var prevButtonClicked: PublishSubject<Void> = .init()
+        public var completeButtonClicked: PublishSubject<Void> = .init()
         
         // 이름입력
         public var editingName: PublishRelay<String> = .init()
@@ -137,8 +159,7 @@ extension CenterRegisterViewModel {
         public var passwordValidation: Driver<PasswordValidationState>?
         
         // Register success
-        public var registerValidation: Driver<Void>?
-        public var loginValidation: Driver<Void>?
+        public var loginSuccess: Driver<Void>?
     }
 }
 
@@ -146,16 +167,18 @@ extension CenterRegisterViewModel {
     
     func registerInOut() {
         // MARK: 최종 회원가입 버튼
-        let registerValidation = input
-            .ctaButtonClicked
+        let registerResult = input
+            .completeButtonClicked
             .flatMap { [unowned self] _ in
                 self.authUseCase
                     .registerCenterAccount(registerState: self.stateObject)
             }
             .share()
         
-        let loginResult = registerValidation
-            .compactMap { $0.value }
+        let registerSuccess = registerResult.compactMap { $0.value }
+        let registerFailure = registerResult.compactMap { $0.error }
+        
+        let loginResult = registerSuccess
             .map { [unowned self] _ in
                 printIfDebug("[\(#function)] ✅ 회원가입 성공 \n 가임정보 \(stateObject.description)")
                 return (id: stateObject.id, password: stateObject.password)
@@ -165,15 +188,18 @@ extension CenterRegisterViewModel {
                 return authUseCase
                     .loginCenterAccount(id: id, password: pw)
             }
-            .map { [weak self] _ in
-                // 로그인 결과무시
-                self?.stateObject.clear()
-                return ()
-            }
-        output.registerValidation = loginResult.asDriver(onErrorJustReturn: ())
         
-        let registrationFailureAlert = registerValidation
-            .compactMap { $0.error }
+        let loginSuccess = loginResult.compactMap { $0.value }
+        let loginFailure = loginResult.compactMap { $0.error }
+        
+        loginSuccess
+            .subscribe(onNext: { [weak self] in
+                self?.coordinator?.showCompleteScreen()
+            })
+            .disposed(by: disposeBag)
+        
+        let registrationFailureAlert = Observable
+            .merge(registerFailure, loginFailure)
             .map { error in
                 printIfDebug("❌ 회원가입 실패: \(error.message)")
                 return DefaultAlertContentVO(
@@ -183,7 +209,9 @@ extension CenterRegisterViewModel {
             }
         
         registrationFailureAlert
-            .subscribe(self.alert)
+            .subscribe(onNext: { [weak self] alertVO in
+                self?.alert.onNext(alertVO)
+            })
             .disposed(by: disposeBag)
     }
 }
@@ -256,14 +284,12 @@ extension CenterRegisterViewModel {
             })
             .disposed(by: disposeBag)
     }
-
 }
-
 
 // MARK: Input Validation
 
 // CTAButton
-extension CenterRegisterViewModel.Input: CTAButtonEnableInputable { }
+extension CenterRegisterViewModel.Input: PageProcessInputable { }
 
 // Enter name
 extension CenterRegisterViewModel.Input: EnterNameInputable { }
@@ -283,5 +309,3 @@ extension CenterRegisterViewModel.Input: SetPasswordInputable { }
 extension CenterRegisterViewModel.Output: SetIdOutputable { }
 extension CenterRegisterViewModel.Output: SetPasswordOutputable { }
 
-// Register
-extension CenterRegisterViewModel.Output: RegisterValidationOutputable { }

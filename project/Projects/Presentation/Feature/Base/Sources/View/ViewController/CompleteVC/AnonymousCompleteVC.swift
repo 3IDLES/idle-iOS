@@ -13,37 +13,20 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-public struct CompleteVCRenderObject {
-    let titleText: String
-    let descriptionText: String
-    let completeButtonText: String
-    let onComplete: (() -> ())?
-    
-    public init(
-        titleText: String,
-        descriptionText: String,
-        completeButtonText: String,
-        onComplete: (() -> Void)?
-    ) {
-        self.titleText = titleText
-        self.descriptionText = descriptionText
-        self.completeButtonText = completeButtonText
-        self.onComplete = onComplete
-    }
-}
-
 public class AnonymousCompleteVC: BaseViewController {
     
     // View
     public let titleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Heading1)
         label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     public let descriptionLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     
@@ -117,7 +100,7 @@ public class AnonymousCompleteVC: BaseViewController {
     
     private func setObservable() { }
     
-    public func applyRO(_ ro: CompleteVCRenderObject) {
+    public func applyRO(_ ro: AnonymousCompleteVCRenderObject) {
         
         titleLabel.textString = ro.titleText
         descriptionLabel.textString = ro.descriptionText

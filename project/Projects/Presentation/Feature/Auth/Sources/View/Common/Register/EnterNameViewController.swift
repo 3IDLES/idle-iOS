@@ -21,9 +21,7 @@ public protocol EnterNameOutputable {
 }
 
 public class EnterNameViewController<T: ViewModelType>: DisposableViewController
-where T.Input: EnterNameInputable, T.Output: EnterNameOutputable {
-    
-    public var coordinator: Coordinator?
+where T.Input: EnterNameInputable & PageProcessInputable, T.Output: EnterNameOutputable {
     
     private let viewModel: T
     
@@ -57,9 +55,8 @@ where T.Input: EnterNameInputable, T.Output: EnterNameOutputable {
     
     private let disposeBag = DisposeBag()
     
-    public init(coordinator: Coordinator? = nil, viewModel: T) {
+    public init(viewModel: T) {
         
-        self.coordinator = coordinator
         self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
@@ -153,7 +150,7 @@ where T.Input: EnterNameInputable, T.Output: EnterNameOutputable {
         // CTA버튼 클릭시 화면전환
         ctaButton
             .eventPublisher
-            .subscribe { [weak self] _ in self?.coordinator?.next() }
+            .bind(to: input.nextButtonClicked)
             .disposed(by: disposeBag)
     }
     

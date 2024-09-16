@@ -57,16 +57,12 @@ public class CenterSetNewPasswordCoordinator: ChildCoordinator {
     
     public func start() {
         
-        let vm = CenterSetNewPasswordViewModel(
-            coordinator: self,
-            authUseCase: authUseCase,
-            inputValidationUseCase: inputValidationUseCase
-        )
+        let vm = CenterSetNewPasswordViewModel(coordinator: self)
         
         // stageViewControllerss에 자기자신과 ViewModel할당
         
         self.stageViewControllers = [
-            ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
+            ValidatePhoneNumberViewController(viewModel: vm),
             ValidateNewPasswordViewController(viewModel: vm)
         ]
         

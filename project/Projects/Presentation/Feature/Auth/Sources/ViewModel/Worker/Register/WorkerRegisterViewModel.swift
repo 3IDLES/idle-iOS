@@ -35,7 +35,7 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
     
     private func setInput() {
         
-        // MARK: 화면 페이지 네이션
+        // MARK: 화면 페이지네이션
         input
             .nextButtonClicked
             .subscribe(onNext: { [weak self] in
@@ -123,10 +123,10 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
             .share()
         
         registerValidation.compactMap { $0.value }
-            .subscribe { [weak self] _ in
+            .subscribe (onNext: { [weak self] _ in
                 guard let self else { return }
                 self.coordinator?.showCompleteScreen()
-            }
+            })
             .disposed(by: disposeBag)
         
         let registerFailureAlert = registerValidation.compactMap { $0.error }

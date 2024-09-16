@@ -25,9 +25,7 @@ public protocol AuthBusinessOwnerOutputable {
 }
 
 public class AuthBusinessOwnerViewController<T: ViewModelType>: BaseViewController
-where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable, T: BaseViewModel {
-    
-    public var coordinator: CenterRegisterCoordinator?
+where T.Input: AuthBusinessOwnerInputable & PageProcessInputable, T.Output: AuthBusinessOwnerOutputable, T: BaseViewModel {
     
     // View
     private let processTitle: ResizableUILabel = {
@@ -77,15 +75,9 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
         
     }()
     
-    private let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        
-        return button
-    }()
+    private let buttonContainer = PrevOrNextContainer()
     
-    public init(coordinator: CenterRegisterCoordinator?, viewModel: T) {
-        self.coordinator = coordinator
+    public init(viewModel: T) {
         
         super.init(nibName: nil, bundle: nil)
         
@@ -116,7 +108,7 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
             businessNumberField,
             isThatRightLabel,
             centerInfoBox,
-            ctaButton,
+            buttonContainer,
         ].forEach {
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -139,9 +131,9 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
             centerInfoBox.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             centerInfoBox.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            ctaButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            buttonContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -14),
+            buttonContainer.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor),
+            buttonContainer.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor),
         ])
     }
     
@@ -154,7 +146,7 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
         businessNumberField.button.setEnabled(false)
         
         // - CTA버튼 비활성화
-        ctaButton.setEnabled(false)
+        buttonContainer.nextButton.setEnabled(false)
     }
     
     private func setObservable() {
@@ -179,6 +171,17 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
             .bind(to: input.requestBusinessNumberValidation)
             .disposed(by: disposeBag)
         
+        // 화면전환
+        buttonContainer.nextBtnClicked
+            .asObservable()
+            .bind(to: input.nextButtonClicked)
+            .disposed(by: disposeBag)
+        
+        buttonContainer.prevBtnClicked
+            .asObservable()
+            .bind(to: input.prevButtonClicked)
+            .disposed(by: disposeBag)
+        
         // MARK: Output
         let output = viewModel.output
         
@@ -196,7 +199,7 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
             .drive(onNext: { [weak self] vo in
                 printIfDebug("✅ \(vo.name) 조회결과")
                 self?.displayCenterInfo(vo: vo)
-                self?.ctaButton.setEnabled(true)
+                self?.buttonContainer.nextButton.setEnabled(true)
             })
             .disposed(by: disposeBag)
         
@@ -205,15 +208,7 @@ where T.Input: AuthBusinessOwnerInputable, T.Output: AuthBusinessOwnerOutputable
             .drive(onNext: { [weak self] in
                 // 정보가 없는 경우
                 self?.dismissCenterInfo()
-                self?.ctaButton.setEnabled(false)
             })
-            .disposed(by: disposeBag)
-        
-        // MARK: ViewController한정 로직
-        // CTA버튼 클릭시 화면전환
-        ctaButton
-            .eventPublisher
-            .subscribe { [weak self] _ in self?.coordinator?.next() }
             .disposed(by: disposeBag)
     }
     
