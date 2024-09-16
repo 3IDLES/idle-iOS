@@ -30,15 +30,14 @@ public protocol AuthPhoneNumberOutputable {
     var authNumberValidation: Driver<Bool>? { get set }
     
     // 요양보호사 로그인에 성공한 경우(요양보호사 한정 로직)
-    var loginValidation: Driver<Void>? { get set }
+    var loginSuccess: Driver<Void>? { get set }
 }
 
 class ValidatePhoneNumberViewController<T: ViewModelType>: UIViewController
 where
-    T.Input: AuthPhoneNumberInputable,
+    T.Input: AuthPhoneNumberInputable & PageProcessInputable,
     T.Output: AuthPhoneNumberOutputable {
     
-    var coordinator: Coordinator?
     let viewModel: T
     
     // View
@@ -114,11 +113,7 @@ where
     
     let disposeBag = DisposeBag()
         
-    public init(
-        coordinator: Coordinator? = nil,
-        viewModel: T
-    ) {
-        self.coordinator = coordinator
+    public init(viewModel: T) {
         self.viewModel = viewModel
         
         super.init(nibName: nil, bundle: nil)
@@ -271,19 +266,11 @@ where
             })
             .disposed(by: disposeBag)
         
-        output
-            .loginValidation?
-            .drive(onNext: { [weak self] _ in
-                guard let self else { return }
-                (coordinator as! WorkerRegisterCoordinator).authFinished()
-            })
-            .disposed(by: disposeBag)
-        
         // MARK: ViewController한정 로직
         // CTA버튼 클릭시 화면전환
         ctaButton
             .eventPublisher
-            .subscribe { [weak self] _ in self?.coordinator?.next() }
+            .bind(to: input.nextButtonClicked)
             .disposed(by: disposeBag)
     }
 }

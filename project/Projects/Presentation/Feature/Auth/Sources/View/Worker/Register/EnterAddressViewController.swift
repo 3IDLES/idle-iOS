@@ -53,11 +53,10 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
         return button
     }()
     
-    private let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "완료")
-        button.setEnabled(false)
-        return button
+    private let buttonContainer: PrevOrNextContainer = {
+        let container = PrevOrNextContainer()
+        container.nextButton.label.textString = "완료"
+        return container
     }()
     
     public init(coordinator: WorkerRegisterCoordinator? = nil, viewModel: T) {
@@ -99,7 +98,7 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
         [
             stack1,
             stack2,
-            ctaButton
+            buttonContainer
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.view.addSubview($0)
@@ -114,9 +113,9 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
             stack2.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             stack2.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
         
-            ctaButton.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
-            ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            buttonContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -14),
+            buttonContainer.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor),
+            buttonContainer.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor),
         ])
     }
     
@@ -131,7 +130,7 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
         addressPublisher
             .compactMap { $0 }
             .map({ [weak self] info in
-                self?.ctaButton.setEnabled(true)
+                self?.buttonContainer.nextButton.setEnabled(true)
                 return info
             })
             .bind(to: input.addressInformation)
@@ -144,12 +143,8 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
             }
             .disposed(by: disposeBag)
         
-        ctaButton
-            .eventPublisher
-            .map({ [weak self] _ in
-                self?.ctaButton.setEnabled(false)
-                return ()
-            })
+        buttonContainer.nextBtnClicked
+            .asObservable()
             .bind(to: input.ctaButtonClicked)
             .disposed(by: disposeBag)
         

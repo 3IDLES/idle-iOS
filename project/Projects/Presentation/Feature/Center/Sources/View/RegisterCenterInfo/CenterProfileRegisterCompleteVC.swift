@@ -22,9 +22,7 @@ public class CenterProfileRegisterCompleteVC: BaseViewController {
     
     // View
     private let ctaButton: CTAButtonType1 = {
-        
         let button = CTAButtonType1(labelText: "확인")
-        
         return button
     }()
     

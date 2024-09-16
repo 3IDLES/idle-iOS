@@ -6,37 +6,51 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 import PresentationCore
 import UseCaseInterface
 import Entity
 import BaseFeature
 
+import RxSwift
+import RxCocoa
+
 public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
     
-    // UseCase
-    public let inputValidationUseCase: AuthInputValidationUseCase
-    public let authUseCase: AuthUseCase
+    // Init
+    weak var coordinator: WorkerRegisterCoordinator?
+    @Injected var inputValidationUseCase: AuthInputValidationUseCase
+    @Injected var authUseCase: AuthUseCase
     
     public var input: Input = .init()
     public var output: Output = .init()
     
     private let stateObject = WorkerRegisterState()
     
-    public init(
-        inputValidationUseCase: AuthInputValidationUseCase,
-        authUseCase: AuthUseCase
-    ) {
-        self.inputValidationUseCase = inputValidationUseCase
-        self.authUseCase = authUseCase
-        
+    public init(coordinator: WorkerRegisterCoordinator) {
+        self.coordinator = coordinator
         super.init()
         
         setInput()
     }
     
     private func setInput() {
+        
+        // MARK: 화면 페이지 네이션
+        input
+            .nextButtonClicked
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
+                self.coordinator?.next()
+            })
+            .disposed(by: disposeBag)
+        
+        input
+            .prevButtonClicked
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
+                self.coordinator?.prev()
+            })
+            .disposed(by: disposeBag)
         
         // MARK: 이름 입력
         AuthInOutStreamManager.enterNameInOut(
@@ -83,6 +97,14 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
                 self?.stateObject.phoneNumber = authedPhoneNumber
             }
         
+        // 로그인 완료화면으로 이동
+        output
+            .loginSuccess?
+            .drive(onNext: { [weak self] _ in
+                self?.coordinator?.showCompleteScreen()
+            })
+            .disposed(by: disposeBag)
+        
         // MARK: 주소 입력
         // 예외적으로 ViewModel에서 구독처리
         input
@@ -94,18 +116,18 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
         
         
         // MARK: 회원가입 최종 등록
-        let registerValidation = input.ctaButtonClicked.compactMap { $0 }
+        let registerValidation = mapEndLoading(mapStartLoading(input.completeButtonClicked)
             .flatMap { [authUseCase, stateObject] _ in
                 authUseCase.registerWorkerAccount(registerState: stateObject)
-            }
+            })
             .share()
         
-        output.registerValidation = registerValidation.compactMap { $0.value }
-            .map {
-                print("✅ 회원가입 성공")
-                return ()
+        registerValidation.compactMap { $0.value }
+            .subscribe { [weak self] _ in
+                guard let self else { return }
+                self.coordinator?.showCompleteScreen()
             }
-            .asDriver(onErrorJustReturn: ())
+            .disposed(by: disposeBag)
         
         let registerFailureAlert = registerValidation.compactMap { $0.error }
             .map { error in
@@ -159,7 +181,9 @@ extension WorkerRegisterViewModel {
     
     public class Input {
         // CTA 버튼 클릭시
-        public var ctaButtonClicked: PublishRelay<Void> = .init()
+        public var nextButtonClicked: PublishSubject<Void> = .init()
+        public var prevButtonClicked: PublishSubject<Void> = .init()
+        public var completeButtonClicked: PublishSubject<Void> = .init()
         
         // 이름입력, 생년월일 입력, 성별 선택
         public var editingName: PublishRelay<String> = .init()
@@ -193,16 +217,13 @@ extension WorkerRegisterViewModel {
         public var phoneNumberValidation: Driver<Bool>?
         public var authNumberValidation: Driver<Bool>?
         
-        // 회원가입 성공 여부
-        public var registerValidation: Driver<Void>?
-        
         // 요양보호사 로그인 성공 여부
-        public var loginValidation: Driver<Void>?
+        public var loginSuccess: Driver<Void>?
     }
 }
 
 // CTAButton
-extension WorkerRegisterViewModel.Input: CTAButtonEnableInputable { }
+extension WorkerRegisterViewModel.Input: PageProcessInputable { }
 
 // Enter personal info
 extension WorkerRegisterViewModel.Input: WorkerPersonalInfoInputable { }
@@ -214,5 +235,3 @@ extension WorkerRegisterViewModel.Output: AuthPhoneNumberOutputable { }
 
 // Postal code
 extension WorkerRegisterViewModel.Input: EnterAddressInputable { }
-
-extension WorkerRegisterViewModel.Output: RegisterValidationOutputable { }

@@ -65,15 +65,12 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
             options: nil
         )
         
-        let vm = WorkerRegisterViewModel(
-            inputValidationUseCase: inputValidationUseCase,
-            authUseCase: authUseCase
-        )
+        let vm = WorkerRegisterViewModel(coordinator: self)
         
         self.stageViewControllers = [
-            ValidatePhoneNumberViewController(coordinator: self, viewModel: vm),
-            EntetPersonalInfoViewController(coordinator: self, viewModel: vm),
-            EnterAddressViewController(coordinator: self, viewModel: vm),
+            ValidatePhoneNumberViewController(viewModel: vm),
+            EntetPersonalInfoViewController(viewModel: vm),
+            EnterAddressViewController(viewModel: vm),
         ]
         
         self.pageViewController = pageViewController
@@ -146,6 +143,11 @@ extension WorkerRegisterCoordinator {
             direction: moveTo == .next ? .forward : .reverse,
             animated: true
         )
+    }
+    
+    func showCompleteScreen() {
+        
+        
     }
     
     func authFinished() {

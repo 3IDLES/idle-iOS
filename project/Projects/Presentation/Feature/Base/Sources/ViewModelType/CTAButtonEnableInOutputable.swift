@@ -10,19 +10,14 @@ import RxSwift
 import RxCocoa
 import Entity
 
-public protocol RegisterValidationOutputable {
-    var registerValidation: Driver<Void>? { get }
-}
-
-public enum CTAButtonAction {
+public enum PageProcessAction {
     case next
     case complete
 }
 
-public protocol CTAButtonEnableInputable {
-    var ctaButtonClicked: PublishRelay<Void> { get set }
+public protocol PageProcessInputable {
+    var nextButtonClicked: PublishSubject<Void> { get }
+    var prevButtonClicked: PublishSubject<Void> { get }
+    var completeButtonClicked: PublishSubject<Void> { get }
 }
 
-public protocol CTAButtonEnableOutPutable {
-    var ctaButtonEnabled: Driver<Bool>? { get }
-}

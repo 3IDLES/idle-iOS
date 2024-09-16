@@ -16,6 +16,7 @@ public enum AuthType {
 public protocol AuthCoordinatable: ParentCoordinator {
     
     func authFinished()
+    func showCompleteScreen()
     func registerAsWorker()
     func registerAsCenter()
     func startCenterLoginFlow()

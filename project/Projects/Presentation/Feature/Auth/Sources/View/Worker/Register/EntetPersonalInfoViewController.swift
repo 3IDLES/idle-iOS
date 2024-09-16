@@ -22,11 +22,9 @@ protocol WorkerPersonalInfoOutputable: EnterNameOutputable, SelectGenderOutputab
 }
 
 class EntetPersonalInfoViewController<T: ViewModelType>: BaseViewController
-where T.Input: WorkerPersonalInfoInputable & CTAButtonEnableInputable,
+where T.Input: WorkerPersonalInfoInputable & PageProcessInputable,
       T.Output: WorkerPersonalInfoOutputable, T: BaseViewModel
 {
-    
-    var coordinator: WorkerRegisterCoordinator?
     
     // View
     
@@ -76,19 +74,10 @@ where T.Input: WorkerPersonalInfoInputable & CTAButtonEnableInputable,
         return btn
     }()
     
-    private let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
-    }()
+    private let buttonContainer = PrevOrNextContainer()
     
-    public init(
-        coordinator: WorkerRegisterCoordinator? = nil,
-        viewModel: T
-    ) {
-        self.coordinator = coordinator
-        
+    public init(viewModel: T) {
+
         super.init(nibName: nil, bundle: nil)
         
         self.bind(viewModel: viewModel)
@@ -133,7 +122,7 @@ where T.Input: WorkerPersonalInfoInputable & CTAButtonEnableInputable,
             nameField,
             birthYearField,
             genderButtonStack,
-            ctaButton
+            buttonContainer
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -157,9 +146,9 @@ where T.Input: WorkerPersonalInfoInputable & CTAButtonEnableInputable,
             genderButtonStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             genderButtonStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            ctaButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            buttonContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -14),
+            buttonContainer.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor),
+            buttonContainer.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor),
         ])
     }
     
@@ -218,16 +207,20 @@ where T.Input: WorkerPersonalInfoInputable & CTAButtonEnableInputable,
             .map { $0 && $1 && $2 }
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isAllValid in
-                self?.ctaButton.setEnabled(isAllValid)
+                self?.buttonContainer.nextButton.setEnabled(isAllValid)
             })
             .disposed(by: disposeBag)
         
         // MARK: ViewController한정 로직
         // CTA버튼 클릭시 화면전환
-        ctaButton
-            .eventPublisher
-            .subscribe { [weak self] _ in self?.coordinator?.next() }
+        buttonContainer.prevBtnClicked
+            .asObservable()
+            .bind(to: input.nextButtonClicked)
             .disposed(by: disposeBag)
-
+        
+        buttonContainer.nextBtnClicked
+            .asObservable()
+            .bind(to: input.nextButtonClicked)
+            .disposed(by: disposeBag)
     }
 }
