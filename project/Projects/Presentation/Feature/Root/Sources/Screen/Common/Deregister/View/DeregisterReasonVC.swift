@@ -44,6 +44,9 @@ public class DeregisterReasonVC: BaseViewController {
         label.attrTextColor = DSColor.gray300.color
         return label
     }()
+    
+    private let mainScrollView = UIScrollView()
+    
     let itemViewList: [CheckBoxWithLabelView] = {
         DeregisterReasonVO.allCases.map { vo in
             return CheckBoxWithLabelView(
@@ -112,6 +115,7 @@ public class DeregisterReasonVC: BaseViewController {
         setAppearance()
         setLayout()
         setObservable()
+        setKeyboardAvoidance()
     }
     
     private func setAppearance() {
@@ -119,32 +123,58 @@ public class DeregisterReasonVC: BaseViewController {
     }
     
     private func setLayout() {
-        let checkListScrollView = UIScrollView()
-        checkListScrollView.contentInset.top = 32
-        let contentGuide = checkListScrollView.contentLayoutGuide
-        let frameGuide = checkListScrollView.frameLayoutGuide
-        let contentStack = VStack(itemViewList, spacing: 16, alignment: .fill)
+        
+        mainScrollView.contentInset.top = 36
+        mainScrollView.contentInset.bottom = 12
+
+        let contentView: UIView = .init()
+        let contentGuide = mainScrollView.contentLayoutGuide
+        let frameGuide = mainScrollView.frameLayoutGuide
+        
+        // MARK: 체크리스트 + 텍스트필드
+        let checkListStack = VStack(itemViewList, spacing: 16, alignment: .fill)
         
         // inputField 삽입
-        contentStack.insertArrangedSubview(deregisterReasonField1, at: 2)
-        contentStack.insertArrangedSubview(deregisterReasonField2, at: 6)
-        
-        checkListScrollView.addSubview(contentStack)
-        contentStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            contentStack.topAnchor.constraint(equalTo: contentGuide.topAnchor),
-            contentStack.bottomAnchor.constraint(equalTo: contentGuide.bottomAnchor, constant: -20),
-            
-            contentStack.leftAnchor.constraint(equalTo: frameGuide.leftAnchor, constant: 20),
-            contentStack.rightAnchor.constraint(equalTo: frameGuide.rightAnchor, constant: -20),
-        ])
+        checkListStack.insertArrangedSubview(deregisterReasonField1, at: 2)
+        checkListStack.insertArrangedSubview(deregisterReasonField2, at: 6)
         
         let titleLabelStack = VStack([
             titleLabel,
             subTitleLabel
         ], spacing: 8, alignment: .leading)
         
+        [
+            titleLabelStack,
+            checkListStack,
+            finalWarningLabel,
+        ].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            contentView.addSubview($0)
+        }
+        
+        mainScrollView.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            
+            titleLabelStack.topAnchor.constraint(equalTo: contentView.topAnchor),
+            titleLabelStack.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+            titleLabelStack.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+            
+            checkListStack.topAnchor.constraint(equalTo: titleLabelStack.bottomAnchor, constant: 32),
+            checkListStack.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+            checkListStack.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+            checkListStack.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
+            
+            // contentView - ScrollView
+            contentView.topAnchor.constraint(equalTo: contentGuide.topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: contentGuide.bottomAnchor),
+            
+            contentView.leftAnchor.constraint(equalTo: frameGuide.leftAnchor, constant: 20),
+            contentView.rightAnchor.constraint(equalTo: frameGuide.rightAnchor, constant: -20),
+        ])
+            
+        // MARK: 하단 버튼
         let buttonStack = HStack(
             [
                 cancelButton,
@@ -159,11 +189,11 @@ public class DeregisterReasonVC: BaseViewController {
             finalWarningLabel,
             buttonStack
         ], spacing: 12, alignment: .fill)
-            
+        
+        // MARK: main
         [
             navigationBar,
-            titleLabelStack,
-            checkListScrollView,
+            mainScrollView,
             bottomStack,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -175,14 +205,10 @@ public class DeregisterReasonVC: BaseViewController {
             navigationBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             navigationBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             
-            titleLabelStack.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 24),
-            titleLabelStack.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 20),
-            titleLabelStack.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
-            
-            checkListScrollView.topAnchor.constraint(equalTo: titleLabelStack.bottomAnchor),
-            checkListScrollView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            checkListScrollView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-            checkListScrollView.bottomAnchor.constraint(equalTo: bottomStack.topAnchor),
+            mainScrollView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
+            mainScrollView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            mainScrollView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            mainScrollView.bottomAnchor.constraint(equalTo: bottomStack.topAnchor),
             
             bottomStack.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 20),
             bottomStack.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
@@ -272,6 +298,17 @@ public class DeregisterReasonVC: BaseViewController {
             )
             .bind(to: viewModel.exitButonClicked)
             .disposed(by: disposeBag)
+    }
+    
+    func setKeyboardAvoidance() {
+        
+        [
+            deregisterReasonField1.reasonField,
+            deregisterReasonField2.reasonField
+        ].forEach { (view: IdleKeyboardAvoidable) in
+            
+            view.setKeyboardAvoidance(movingView: mainScrollView)
+        }
     }
 }
 
