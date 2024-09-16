@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import PresentationCore
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -20,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         
         let rootNavigationController = UINavigationController()
-        let injector = DependencyInjector()
+        let injector = DependencyInjector.shared
         
         injector
             .assemble([

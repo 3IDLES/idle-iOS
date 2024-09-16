@@ -120,10 +120,7 @@ let project = Project(
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["LoggerInterface/source/**"],
             dependencies: [
-                D.Domain.Entity,
-                
                 // ThirdParty
-                D.ThirdParty.RxSwift,
                 D.ThirdParty.Amplitude,
             ],
             settings: .settings(

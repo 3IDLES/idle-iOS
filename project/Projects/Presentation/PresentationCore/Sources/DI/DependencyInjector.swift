@@ -1,6 +1,6 @@
 //
 //  DependencyInjector.swift
-//  Idle-iOS
+//  PresentationCore
 //
 //  Created by 최준영 on 6/22/24.
 //
@@ -15,15 +15,19 @@ public protocol DependencyAssemblable {
 
 /// DI 등록한 서비스 사용
 public protocol DependencyResolvable {
+    func resolve<T>() -> T
     func resolve<T>(_ serviceType: T.Type) -> T
 }
 
 public typealias Injector = DependencyAssemblable & DependencyResolvable
 
 public final class DependencyInjector: Injector {
+    
+    public static let shared: DependencyInjector = .init()
+    
     private let container: Container
     
-    public init(container: Container = Container()) {
+    private init(container: Container = Container()) {
         self.container = container
     }
     
@@ -37,7 +41,11 @@ public final class DependencyInjector: Injector {
         container.register(serviceType) { _ in object }
     }
     
+    public func resolve<T>() -> T {
+        container.resolve(T.self)!
+    }
+    
     public func resolve<T>(_ serviceType: T.Type) -> T {
-        container.resolve(serviceType)!
+        container.resolve(T.self)!
     }
 }

@@ -8,8 +8,10 @@
 import Foundation
 import RepositoryInterface
 import ConcreteRepository
-import Swinject
 import DataSource
+
+
+import Swinject
 
 public struct DataAssembly: Assembly {
     public func assemble(container: Container) {
