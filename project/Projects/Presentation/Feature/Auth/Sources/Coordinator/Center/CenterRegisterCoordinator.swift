@@ -23,13 +23,9 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
     public struct Dependency {
         let navigationController: UINavigationController
-        let inputValidationUseCase: AuthInputValidationUseCase
-        let authUseCase: AuthUseCase
         
-        public init(navigationController: UINavigationController, inputValidationUseCase: AuthInputValidationUseCase, authUseCase: AuthUseCase) {
+        public init(navigationController: UINavigationController) {
             self.navigationController = navigationController
-            self.inputValidationUseCase = inputValidationUseCase
-            self.authUseCase = authUseCase
         }
     }
     
@@ -50,17 +46,14 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     ) {
         self.navigationController = dependency.navigationController
         
-        let vm = CenterRegisterViewModel(
-            inputValidationUseCase: dependency.inputValidationUseCase,
-            authUseCase: dependency.authUseCase
-        )
+        let vm = CenterRegisterViewModel(coordinator: self)
         
         // stageViewControllerss에 자기자신과 ViewModel할당
         self.stageViewControllers = [
-            EnterNameViewController(coordinator: self, viewModel: vm),
+            EnterNameViewController(viewModel: vm),
             ValidatePhoneNumberViewController(viewModel: vm),
-            AuthBusinessOwnerViewController(coordinator: self, viewModel: vm),
-            SetIdPasswordViewController(coordinator: self, viewModel: vm),
+            AuthBusinessOwnerViewController(viewModel: vm),
+            SetIdPasswordViewController(viewModel: vm),
         ]
     }
     
@@ -155,6 +148,16 @@ extension CenterRegisterCoordinator {
         stageViewControllers = []
         popViewController()
         parent?.removeChildCoordinator(self)
+    }
+    
+    func showCompleteScreen() {
+        let renderObject: AnonymousCompleteVCRenderObject = .init(
+            titleText: "센터관리자 로그인을\n완료했어요!",
+            descriptionText: "로그인 정보는 마지막 접속일부터\n180일간 유지될 예정이에요.",
+            completeButtonText: "시작하기") { [weak self] in
+                self?.authFinished()
+            }
+        parent?.showCompleteScreen(ro: renderObject)
     }
 }
 

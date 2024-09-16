@@ -99,7 +99,7 @@ class CenterRegisterViewController: DisposableViewController {
         navigationBar
             .eventPublisher
             .subscribe { [weak self] _ in
-                self?.coordinator?.prev()
+                self?.coordinator?.coordinatorDidFinish()
             }
             .disposed(by: disposeBag)
         

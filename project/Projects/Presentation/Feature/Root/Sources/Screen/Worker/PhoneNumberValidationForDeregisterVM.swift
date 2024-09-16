@@ -22,6 +22,8 @@ public protocol PhoneNumberValidationForDeregisterVMable: BaseViewModel, AuthPho
 
 class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidationForDeregisterVMable {
     
+    var loginSuccess: RxCocoa.Driver<Void>?
+    
     // Init
     weak var coordinator: PhoneNumberValidationForDeregisterCoordinator?
     let inputValidationUseCase: AuthInputValidationUseCase
@@ -77,8 +79,6 @@ class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidation
         deregisterSuccess
             .observe(on: MainScheduler.asyncInstance)
             .subscribe(onNext: { [weak self] _ in
-                
-                // ‼️ ‼️ 로컬에 저장된 계정 정보 삭제 ‼️ ‼️
                 
                 // RootCoordinator로 이동
                 self?.coordinator?.popToRoot()

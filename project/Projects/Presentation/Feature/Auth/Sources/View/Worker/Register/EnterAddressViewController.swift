@@ -18,9 +18,7 @@ public protocol EnterAddressInputable {
 }
 
 public class EnterAddressViewController<T: ViewModelType>: BaseViewController
-where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: RegisterValidationOutputable, T: BaseViewModel {
-    
-    public var coordinator: WorkerRegisterCoordinator?
+where T.Input: EnterAddressInputable & PageProcessInputable, T: BaseViewModel {
     
     // View
     private let processTitle1: IdleLabel = {
@@ -56,11 +54,11 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
     private let buttonContainer: PrevOrNextContainer = {
         let container = PrevOrNextContainer()
         container.nextButton.label.textString = "완료"
+        container.nextButton.setEnabled(false)
         return container
     }()
     
-    public init(coordinator: WorkerRegisterCoordinator? = nil, viewModel: T) {
-        self.coordinator = coordinator
+    public init(viewModel: T) {
        
         super.init(nibName: nil, bundle: nil)
         
@@ -145,16 +143,12 @@ where T.Input: EnterAddressInputable & CTAButtonEnableInputable, T.Output: Regis
         
         buttonContainer.nextBtnClicked
             .asObservable()
-            .bind(to: input.ctaButtonClicked)
+            .bind(to: input.completeButtonClicked)
             .disposed(by: disposeBag)
         
-        let output = viewModel.output
-        
-        output
-            .registerValidation?
-            .drive(onNext: { [weak self] _ in
-                self?.coordinator?.next()
-            })
+        buttonContainer.prevBtnClicked
+            .asObservable()
+            .bind(to: input.prevButtonClicked)
             .disposed(by: disposeBag)
     }
     

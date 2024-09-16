@@ -32,8 +32,8 @@ public protocol SetPasswordOutputable {
 }
 
 class SetIdPasswordViewController<T: ViewModelType>: BaseViewController
-where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
-      T.Output: SetIdOutputable & SetPasswordOutputable & RegisterValidationOutputable, T: BaseViewModel {
+where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
+      T.Output: SetIdOutputable & SetPasswordOutputable, T: BaseViewModel {
     
     var coordinator: CenterRegisterCoordinator?
     
@@ -129,16 +129,13 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
         return textField
     }()
     
-    private let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "완료")
-        
+    private let buttonContainer: PrevOrNextContainer = {
+        let button = PrevOrNextContainer()
+        button.nextButton.label.textString = "완료"
         return button
     }()
     
-    public init(coordinator: CenterRegisterCoordinator?, viewModel: T) {
-        
-        self.coordinator = coordinator
+    public init(viewModel: T) {
         
         super.init(nibName: nil, bundle: nil)
         
@@ -174,7 +171,7 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
             thisIsValidPasswordLabel,
             checlPasswordLabel,
             checkPasswordField,
-            ctaButton,
+            buttonContainer,
         ].forEach {
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -218,9 +215,9 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
             checkPasswordField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             checkPasswordField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            ctaButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            ctaButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            buttonContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -14),
+            buttonContainer.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor),
+            buttonContainer.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor),
         ])
     }
     
@@ -232,7 +229,7 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
         thisIsValidPasswordLabel.isHidden = true
         
         // - CTA버튼 비활성화
-        ctaButton.setEnabled(false)
+        buttonContainer.nextButton.setEnabled(false)
     }
     
     private func setObservable() {
@@ -257,9 +254,14 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
             .bind(to: input.editingPasswords)
             .disposed(by: disposeBag)
         
-        ctaButton
-            .eventPublisher
-            .bind(to: input.ctaButtonClicked)
+        buttonContainer.nextBtnClicked
+            .asObservable()
+            .bind(to: input.completeButtonClicked)
+            .disposed(by: disposeBag)
+        
+        buttonContainer.prevBtnClicked
+            .asObservable()
+            .bind(to: input.prevButtonClicked)
             .disposed(by: disposeBag)
         
         // id 중복확인 요청 버튼
@@ -318,27 +320,7 @@ where T.Input: SetIdInputable & SetPasswordInputable & CTAButtonEnableInputable,
                 passwordValidationResult
             )
             .map { $0 && $1 }
-            .subscribe(onNext: { [weak self] in self?.ctaButton.setEnabled($0) })
-            .disposed(by: disposeBag)
-        
-        output
-            .registerValidation?
-            .drive { [weak self] isSuccess in
-                
-                // 로그인 시도
-                
-                // 회원가입 성공
-                self?.coordinator?.next()
-            }
-            .disposed(by: disposeBag)
-        
-        // MARK: ViewController한정 로직
-        // CTA버튼 클릭시 버튼 비활성화
-        ctaButton
-            .eventPublisher
-            .subscribe { [weak self] _ in
-                self?.ctaButton.setEnabled(false)
-            }
+            .subscribe(onNext: { [weak self] in self?.buttonContainer.nextButton.setEnabled($0) })
             .disposed(by: disposeBag)
     }
     

@@ -56,7 +56,7 @@ let project = Project(
             name: "ConcreteLogger",
             destinations: DeploymentSettings.platforms,
             product: .framework,
-            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
+            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER).concretelogger",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["ConcreteLogger/source/**"],
             dependencies: [

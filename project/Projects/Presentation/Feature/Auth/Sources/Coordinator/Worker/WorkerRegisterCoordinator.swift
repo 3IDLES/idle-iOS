@@ -22,13 +22,9 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
 
     public struct Dependency {
         let navigationController: UINavigationController
-        let inputValidationUseCase: AuthInputValidationUseCase
-        let authUseCase: AuthUseCase
         
-        public init(navigationController: UINavigationController, inputValidationUseCase: AuthInputValidationUseCase, authUseCase: AuthUseCase) {
+        public init(navigationController: UINavigationController) {
             self.navigationController = navigationController
-            self.inputValidationUseCase = inputValidationUseCase
-            self.authUseCase = authUseCase
         }
     }
     
@@ -37,19 +33,13 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
     public let navigationController: UINavigationController
     public weak var viewControllerRef: UIViewController?
     weak var pageViewController: UIPageViewController?
-    
-    
-    let inputValidationUseCase: AuthInputValidationUseCase
-    let authUseCase: AuthUseCase
+
     
     // MARK: Stage
     var stageViewControllers: [UIViewController] = []
     private var currentStage: WorkerRegisterStage!
     
     public init(dependency: Dependency) {
-    
-        self.inputValidationUseCase = dependency.inputValidationUseCase
-        self.authUseCase = dependency.authUseCase
         self.navigationController = dependency.navigationController
     }
     
@@ -93,8 +83,8 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
     public func coordinatorDidFinish() {
         
         stageViewControllers = []
-        
         parent?.removeChildCoordinator(self)
+        popViewController()
     }
 }
 
@@ -146,8 +136,13 @@ extension WorkerRegisterCoordinator {
     }
     
     func showCompleteScreen() {
-        
-        
+        let renderObject: AnonymousCompleteVCRenderObject = .init(
+            titleText: "요양보호사 로그인을\n완료했어요!",
+            descriptionText: "로그인 정보는 마지막 접속일부터\n180일간 유지될 예정이에요.",
+            completeButtonText: "시작하기") { [weak self] in
+                self?.authFinished()
+            }
+        parent?.showCompleteScreen(ro: renderObject)
     }
     
     func authFinished() {

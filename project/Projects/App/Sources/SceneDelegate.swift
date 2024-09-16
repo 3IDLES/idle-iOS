@@ -27,7 +27,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             .assemble([
                 DataAssembly(),
                 DomainAssembly(),
-                AuthAssembly(),
             ])
         
         rootCoordinator = RootCoordinator(

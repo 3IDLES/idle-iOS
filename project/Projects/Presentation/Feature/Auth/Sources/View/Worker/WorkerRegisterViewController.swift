@@ -91,7 +91,7 @@ class WorkerRegisterViewController: BaseViewController {
         navigationBar
             .backButton.rx.tap
             .subscribe { [weak self] _ in
-                self?.coordinator?.prev()
+                self?.coordinator?.coordinatorDidFinish()
             }
             .disposed(by: disposeBag)
         
