@@ -61,11 +61,11 @@ public class SelectReasonCoordinator: ChildCoordinator {
         parent?.removeChildCoordinator(self)
     }
     
-    public func showPasswordAuthScreen(reasons: [DeregisterReasonVO]) {
+    public func showPasswordAuthScreen(reasons: [String]) {
         parent?.showFinalPasswordScreen(reasons: reasons)
     }
     
-    public func showPhoneNumberAuthScreen(reasons: [DeregisterReasonVO]) {
+    public func showPhoneNumberAuthScreen(reasons: [String]) {
         parent?.showFinalPhoneAuthScreen(reasons: reasons)
     }
 }

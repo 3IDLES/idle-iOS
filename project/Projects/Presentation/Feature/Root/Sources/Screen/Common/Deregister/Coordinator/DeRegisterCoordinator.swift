@@ -62,7 +62,7 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
         coordinator.start()
     }
     
-    public func showFinalPasswordScreen(reasons: [Entity.DeregisterReasonVO]) {
+    public func showFinalPasswordScreen(reasons: [String]) {
     
         let coordinator = PasswordForDeregisterCoordinator(
             dependency: .init(
@@ -76,7 +76,7 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
         coordinator.start()
     }
     
-    public func showFinalPhoneAuthScreen(reasons: [Entity.DeregisterReasonVO]) {
+    public func showFinalPhoneAuthScreen(reasons: [String]) {
         let coordinator = PhoneNumberValidationForDeregisterCoordinator(
             dependency: .init(
                 settingUseCase: settingUseCase,

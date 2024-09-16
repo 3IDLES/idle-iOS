@@ -14,7 +14,8 @@ public class WorkerDeregisterReasonsVM: BaseViewModel, DeregisterReasonVMable {
     
     public weak var coordinator: SelectReasonCoordinator?
     public var exitButonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var acceptDeregisterButonClicked: PublishRelay<[DeregisterReasonVO]> = .init()
+    public var acceptDeregisterButonClicked: PublishRelay<[String]> = .init()
+    public var userType: Entity.UserType = .worker
     
     public init(coordinator: SelectReasonCoordinator) {
         self.coordinator = coordinator

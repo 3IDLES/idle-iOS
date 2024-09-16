@@ -94,7 +94,7 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
     
     // MARK: 회원탈퇴 & 로그아웃
     // 센터 회원탈퇴
-    public func deregisterCenterAccount(reasons: [Entity.DeregisterReasonVO], password: String) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
+    public func deregisterCenterAccount(reasons: [String], password: String) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
         let task = authRepository
             .deregisterCenterAccount(reasons: reasons, password: password)
             .map { [weak self] _ in 
@@ -118,7 +118,7 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
     }
     
     // 요양보호사 회원탈퇴
-    public func deregisterWorkerAccount(reasons: [Entity.DeregisterReasonVO]) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
+    public func deregisterWorkerAccount(reasons: [String]) -> RxSwift.Single<Result<Void, Entity.DomainError>> {
         let task = authRepository
             .deregisterWorkerAccount(reasons: reasons)
             .map { [weak self] _ in

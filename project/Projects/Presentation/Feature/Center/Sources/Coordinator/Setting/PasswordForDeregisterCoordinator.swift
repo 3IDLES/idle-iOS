@@ -14,10 +14,10 @@ public class PasswordForDeregisterCoordinator: ChildCoordinator {
     
     public struct Dependency {
         let settingUseCase: SettingScreenUseCase
-        let reasons: [DeregisterReasonVO]
+        let reasons: [String]
         let navigationController: UINavigationController
         
-        public init(settingUseCase: SettingScreenUseCase, reasons: [DeregisterReasonVO], navigationController: UINavigationController) {
+        public init(settingUseCase: SettingScreenUseCase, reasons: [String], navigationController: UINavigationController) {
             self.settingUseCase = settingUseCase
             self.reasons = reasons
             self.navigationController = navigationController
@@ -29,7 +29,7 @@ public class PasswordForDeregisterCoordinator: ChildCoordinator {
     
     public let navigationController: UINavigationController
     let settingUseCase: SettingScreenUseCase
-    let reasons: [DeregisterReasonVO]
+    let reasons: [String]
     
     public init(
         dependency: Dependency

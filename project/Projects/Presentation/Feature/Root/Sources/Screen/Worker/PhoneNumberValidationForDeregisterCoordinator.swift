@@ -15,10 +15,10 @@ class PhoneNumberValidationForDeregisterCoordinator: ChildCoordinator {
     struct Dependency {
         let settingUseCase: SettingScreenUseCase
         let inputValidationUseCase: AuthInputValidationUseCase
-        let reasons: [DeregisterReasonVO]
+        let reasons: [String]
         let navigationController: UINavigationController
         
-        init(settingUseCase: SettingScreenUseCase, inputValidationUseCase: AuthInputValidationUseCase, reasons: [DeregisterReasonVO], navigationController: UINavigationController) {
+        init(settingUseCase: SettingScreenUseCase, inputValidationUseCase: AuthInputValidationUseCase, reasons: [String], navigationController: UINavigationController) {
             self.settingUseCase = settingUseCase
             self.inputValidationUseCase = inputValidationUseCase
             self.reasons = reasons
@@ -28,7 +28,7 @@ class PhoneNumberValidationForDeregisterCoordinator: ChildCoordinator {
     
     let settingUseCase: SettingScreenUseCase
     let inputValidationUseCase: AuthInputValidationUseCase
-    let reasons: [DeregisterReasonVO]
+    let reasons: [String]
     
     weak var viewControllerRef: UIViewController?
     weak var parent: DeregisterCoordinatable?
