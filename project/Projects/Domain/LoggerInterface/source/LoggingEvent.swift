@@ -8,8 +8,8 @@
 import Foundation
 
 public struct LoggingEvent {
-    let type: EventType
-    var properties: [String: Any?]?
+    public let type: EventType
+    public var properties: [String: Any?]?
 }
 
 public enum EventType: String {

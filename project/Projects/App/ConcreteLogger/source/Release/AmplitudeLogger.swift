@@ -10,6 +10,8 @@ import LoggerInterface
 
 public class AmplitudeLogger: IdleLogger {
     
+    public init() { }
+    
     public func logEvent(event: LoggerInterface.LoggingEvent) {
         
     }
