@@ -27,6 +27,7 @@ let proejct = Project(
                 // ThirdParty
                 D.ThirdParty.RxSwift,
                 D.ThirdParty.RxCocoa,
+                D.ThirdParty.Swinject,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
