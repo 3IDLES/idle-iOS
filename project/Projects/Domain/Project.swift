@@ -109,7 +109,28 @@ let project = Project(
                 base: ["ENABLE_TESTABILITY": "YES"],
                 configurations: IdleConfiguration.domainConfigurations
             )
-        )
+        ),
+        
+        /// Logger interface
+        .target(
+            name: "LoggerInterface",
+            destinations: DeploymentSettings.platforms,
+            product: .framework,
+            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
+            deploymentTargets: DeploymentSettings.deployment_version,
+            sources: ["LoggerInterface/source/**"],
+            dependencies: [
+                D.Domain.Entity,
+                
+                // ThirdParty
+                D.ThirdParty.RxSwift,
+                D.ThirdParty.Amplitude,
+            ],
+            settings: .settings(
+                base: ["ENABLE_TESTABILITY": "YES"],
+                configurations: IdleConfiguration.domainConfigurations
+            )
+        ),
     ],
     schemes: [
         Scheme.makeTestableSchemes(
