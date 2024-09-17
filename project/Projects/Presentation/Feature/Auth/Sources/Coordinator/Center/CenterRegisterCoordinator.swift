@@ -146,13 +146,12 @@ extension CenterRegisterCoordinator {
         case .finish:
             authFinished()
         default:
-            let vc = stageViewControllers[stage.rawValue-1]
-            
             // MARK: 로깅
             if moveTo == .next {
                 logger.logCenterRegisterStep(stepName: stage.screenName)
             }
             
+            let vc = stageViewControllers[stage.rawValue-1]
             showStage(viewController: vc, moveTo: moveTo)
         }
     }
