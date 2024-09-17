@@ -19,6 +19,21 @@ enum RegisterRecruitmentPage: Int, CaseIterable {
     case customerInformation = 2
     case customerRequirement = 3
     case additionalInfo = 4
+    
+    var screenName: String {
+        switch self {
+        case .workTimeAndPayment:
+            "workTimeAndPayment"
+        case .workPlaceAddress:
+            "workPlaceAddress"
+        case .customerInformation:
+            "customerInformation"
+        case .customerRequirement:
+            "customerRequirement"
+        case .additionalInfo:
+            "applyInformation"
+        }
+    }
 }
 
 public protocol RegisterRecruitmentPostVMBindable {
@@ -39,9 +54,7 @@ public protocol RegisterRecruitmentPostViewModelable:
 
 public class RegisterRecruitmentPostVC: BaseViewController {
     
-    // Init
-    
-    // Not Init
+    @Injected var logger: PostRegisterLogger
     
     /// 현재 스크린의 넓이를 의미합니다.
     private var screenWidth: CGFloat {
@@ -169,6 +182,12 @@ public class RegisterRecruitmentPostVC: BaseViewController {
         // 첫번째 뷰를 최상단으로
         view.bringSubviewToFront(pageViews.first!)
         
+        // MARK: 로깅
+        logger.logPostRegisterStep(
+            stepName: RegisterRecruitmentPage(rawValue: currentIndex)!.screenName,
+            stepIndex: currentIndex
+        )
+        
         // 옵저버블 설정
         let nextButtonClickedObservables = pageViews
             .map { $0.nextButtonClicked }
@@ -202,7 +221,15 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     
     private func next(animated: Bool = true) {
         
-        if let nextIndex = RegisterRecruitmentPage(rawValue: currentIndex+1)?.rawValue {
+        if let nextStage = RegisterRecruitmentPage(rawValue: currentIndex+1) {
+            
+            let nextIndex = nextStage.rawValue
+            
+            // MARK: 로깅
+            logger.logPostRegisterStep(
+                stepName: nextStage.screenName,
+                stepIndex: nextIndex
+            )
             
             // Status바 이동
             statusBar.moveToSignal.onNext(.next)
