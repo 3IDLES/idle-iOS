@@ -9,6 +9,6 @@ import Foundation
 
 public protocol CenterRegisterLogger {
     
-    func logCenterRegisterStep(stepName: String)
+    func logCenterRegisterStep(stepName: String, stepIndex: Int)
 }
 

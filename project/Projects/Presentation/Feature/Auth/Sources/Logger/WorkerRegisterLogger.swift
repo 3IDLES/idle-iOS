@@ -9,6 +9,6 @@ import Foundation
 
 public protocol WorkerRegisterLogger {
     
-    func logWorkerRegisterStep(stepName: String)
+    func logWorkerRegisterStep(stepName: String, stepIndex: Int)
 }
 

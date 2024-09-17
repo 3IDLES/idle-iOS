@@ -148,7 +148,10 @@ extension CenterRegisterCoordinator {
         default:
             // MARK: 로깅
             if moveTo == .next {
-                logger.logCenterRegisterStep(stepName: stage.screenName)
+                logger.logCenterRegisterStep(
+                    stepName: stage.screenName,
+                    stepIndex: stage.rawValue-1
+                )
             }
             
             let vc = stageViewControllers[stage.rawValue-1]
