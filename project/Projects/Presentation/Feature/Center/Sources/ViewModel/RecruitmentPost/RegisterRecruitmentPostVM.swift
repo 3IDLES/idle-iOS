@@ -38,10 +38,9 @@ public enum RegisterRecruitmentPostInputSection: CaseIterable {
 
 public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostViewModelable {
     
-
     //Init
     let recruitmentPostUseCase: RecruitmentPostUseCase
-    public weak var registerRecruitmentPostCoordinator: (any PresentationCore.RegisterRecruitmentPostCoordinatable)?
+    public weak var coordinator: (any PresentationCore.RegisterRecruitmentPostCoordinatable)?
     
     // MARK: Edit Screen
     public weak var editPostCoordinator: EditPostCoordinator?
@@ -142,7 +141,7 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         registerRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable,
         recruitmentPostUseCase: RecruitmentPostUseCase
     ) {
-        self.registerRecruitmentPostCoordinator = registerRecruitmentPostCoordinator
+        self.coordinator = registerRecruitmentPostCoordinator
         self.recruitmentPostUseCase = recruitmentPostUseCase
         
         super.init()
@@ -414,7 +413,7 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         
         postEditButtonClicked
             .subscribe(onNext: { [weak self] _ in
-                self?.registerRecruitmentPostCoordinator?.showEditPostScreen()
+                self?.coordinator?.showEditPostScreen()
             })
             .disposed(by: disposeBag)
         
@@ -487,7 +486,7 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         registerPostResult
             .compactMap { $0.value }
             .subscribe { [weak self] _ in
-                self?.registerRecruitmentPostCoordinator?.showRegisterCompleteScreen()
+                self?.coordinator?.showRegisterCompleteScreen()
             }
             .disposed(by: disposeBag)
             
@@ -572,5 +571,13 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         state_customerInformation = editing_customerInformation.value.copy() as! CustomerInformationStateObject
         state_applicationDetail = editing_applicationDetail.value.copy() as! ApplicationDetailStateObject
         state_addressInfo = editing_addressInfo.value.copy() as! AddressInputStateObject
+    }
+    
+    public func showOverView() {
+        coordinator?.showOverViewScreen()
+    }
+    
+    public func exit() {
+        coordinator?.registerFinished()
     }
 }

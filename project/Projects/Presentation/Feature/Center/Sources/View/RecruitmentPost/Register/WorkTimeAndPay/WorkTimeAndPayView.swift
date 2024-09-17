@@ -38,6 +38,9 @@ public class WorkTimeAndPayView: UIView, RegisterRecruitmentPostViews {
         return button
     }()
     
+    lazy var nextButtonClicked: Observable<Void> = ctaButton.eventPublisher
+    lazy var prevButtonClicked: Observable<Void> = .never()
+    
     private let disposeBag = DisposeBag()
     
     public init() {

@@ -33,8 +33,8 @@ public protocol RegisterRecruitmentPostViewModelable:
     // 오버뷰 화면 요구 사항
     PostOverviewViewModelable
 {
-    /// 코디네이터
-    var registerRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable? { get }
+    func showOverView()
+    func exit()
 }
 
 public class RegisterRecruitmentPostVC: BaseViewController {
@@ -55,6 +55,8 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     private var pagesAreSetted = false
     
     var currentIndex: Int = 0
+    
+    let exitEvent: PublishSubject<Void> = .init()
 
     // View
     let navigationBar: NavigationBarType1 = {
@@ -98,6 +100,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
     
     
     private func setAppearance() {
+        view.clipsToBounds = true
         view.backgroundColor = .white
         view.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
     }
@@ -126,9 +129,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
         // 뒤로가기 바인딩
         navigationBar
             .eventPublisher
-            .subscribe { [weak self] _ in
-                self?.prev()
-            }
+            .bind(to: exitEvent)
             .disposed(by: disposeBag)
     }
     
@@ -169,14 +170,23 @@ public class RegisterRecruitmentPostVC: BaseViewController {
         view.bringSubviewToFront(pageViews.first!)
         
         // 옵저버블 설정
-        let observables = pageViews
-            .map { view in
-                view.ctaButton.eventPublisher
-            }
+        let nextButtonClickedObservables = pageViews
+            .map { $0.nextButtonClicked }
+        
         Observable
-            .merge(observables)
+            .merge(nextButtonClickedObservables)
             .subscribe(onNext: { [weak self] _ in
                 self?.next()
+            })
+            .disposed(by: disposeBag)
+        
+        let prevButtonClickedObservables = pageViews
+            .map { $0.prevButtonClicked }
+        
+        Observable
+            .merge(prevButtonClickedObservables)
+            .subscribe(onNext: { [weak self] _ in
+                self?.prev()
             })
             .disposed(by: disposeBag)
     }
@@ -212,7 +222,7 @@ public class RegisterRecruitmentPostVC: BaseViewController {
             guard let vm = viewModel as? RegisterRecruitmentPostViewModelable else { return }
             
             // 오버뷰화면으로 이동
-            vm.registerRecruitmentPostCoordinator?.showOverViewScreen()
+            vm.showOverView()
         }
     }
     
@@ -234,16 +244,21 @@ public class RegisterRecruitmentPostVC: BaseViewController {
             }
         } else {
             
-            guard let vm = viewModel as? RegisterRecruitmentPostViewModelable else { return }
-            
             // 돌아가기, Coordinator호출
-            vm.registerRecruitmentPostCoordinator?.registerFinished()
+            exitEvent.onNext(())
         }
     }
     
     public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
         
         self.viewModel = viewModel
+        
+        exitEvent
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [viewModel] in
+                viewModel.exit()
+            })
+            .disposed(by: disposeBag)
         
         pageViews
             .forEach { view in
@@ -253,7 +268,8 @@ public class RegisterRecruitmentPostVC: BaseViewController {
 }
 
 protocol RegisterRecruitmentPostViews: UIView, RegisterRecruitmentPostVMBindable {
-    var ctaButton: CTAButtonType1 { get }
+    var nextButtonClicked: Observable<Void> { get }
+    var prevButtonClicked: Observable<Void> { get }
 }
 
 extension AddressView: RegisterRecruitmentPostViews { }

@@ -29,12 +29,14 @@ class AddressView: UIView {
     let contentView: AddressContentView
     
     // 하단 버튼
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
+    private let buttonContainer: PrevOrNextContainer = {
+        let container = PrevOrNextContainer()
+        container.nextButton.setEnabled(false)
+        return container
     }()
+    
+    lazy var nextButtonClicked: Observable<Void> = buttonContainer.nextBtnClicked.asObservable()
+    lazy var prevButtonClicked: Observable<Void> = buttonContainer.prevBtnClicked.asObservable()
     
     // Observable
     private let disposeBag = DisposeBag()
@@ -59,7 +61,7 @@ class AddressView: UIView {
         [
             processTitle,
             contentView,
-            ctaButton
+            buttonContainer
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview($0)
@@ -75,9 +77,9 @@ class AddressView: UIView {
             contentView.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
             
-            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+            buttonContainer.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            buttonContainer.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            buttonContainer.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -14)
         ])
     }
     
@@ -89,8 +91,8 @@ class AddressView: UIView {
         // output
         vm
             .addressValidation?
-            .drive(onNext: { [ctaButton] isValid in
-                ctaButton.setEnabled(isValid)
+            .drive(onNext: { [buttonContainer] isValid in
+                buttonContainer.nextButton.setEnabled(isValid)
             })
             .disposed(by: disposeBag)
     }
@@ -102,8 +104,8 @@ class AddressView: UIView {
         // Output
         viewModel
             .addressInputNextable?
-            .drive(onNext: { [ctaButton] isNextable in
-                ctaButton.setEnabled(isNextable)
+            .drive(onNext: { [buttonContainer] isNextable in
+                buttonContainer.nextButton.setEnabled(isNextable)
             })
             .disposed(by: disposeBag)
     }
