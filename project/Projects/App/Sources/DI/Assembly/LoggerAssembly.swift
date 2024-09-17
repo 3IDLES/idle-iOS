@@ -10,6 +10,7 @@ import LoggerInterface
 import ConcreteLogger
 import RootFeature
 import AuthFeature
+import CenterFeature
 
 import Swinject
 
@@ -34,6 +35,11 @@ public struct LoggerAssembly: Assembly {
         }
         
         container.register(WorkerRegisterLogger.self) { resolver in
+            let overallLogger = resolver.resolve(OverallLogger.self)!
+            return overallLogger
+        }
+        
+        container.register(PostRegisterLogger.self) { resolver in
             let overallLogger = resolver.resolve(OverallLogger.self)!
             return overallLogger
         }
