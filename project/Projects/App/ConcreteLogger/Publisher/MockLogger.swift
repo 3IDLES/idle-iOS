@@ -21,6 +21,7 @@ public class DebugLogger: LoggerMessagePublisher {
     
     public func send(event: LoggingEvent) {
         print("""
+        [Mock Logger]
         - 현재 유저id: \(currentUser ?? "정보 없음")
         - 이벤트 타입: \(event.type.rawValue)
         - 프로퍼티 키:
