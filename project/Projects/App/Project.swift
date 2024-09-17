@@ -55,7 +55,10 @@ let project = Project(
             product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER).concretelogger",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["ConcreteLogger/**"],
+            sources: [
+                "ConcreteLogger/**",
+                SecretSource.amplitudeConfig,
+            ],
             dependencies: [
                 
                 D.Presentation.RootFeature,

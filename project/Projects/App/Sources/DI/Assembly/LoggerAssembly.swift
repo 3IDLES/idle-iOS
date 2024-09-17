@@ -19,7 +19,7 @@ public struct LoggerAssembly: Assembly {
         
         // MARK: Message pusher
         container.register(LoggerMessagePublisher.self) { _ in
-            DebugLogger()
+            AmplitudeLogger()
         }
         
         // MARK: Overall logger

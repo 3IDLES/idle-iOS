@@ -11,4 +11,6 @@ import ProjectDescription
 public enum SecretSource {
     
     public static let networkDataSource: SourceFileGlob = .glob(.relativeToRoot("Secrets/SwiftCode/NetworkDataSource/**"))
+    
+    public static let amplitudeConfig: SourceFileGlob = .glob(.relativeToRoot("Secrets/SwiftCode/Amplitude/**"))
 }
