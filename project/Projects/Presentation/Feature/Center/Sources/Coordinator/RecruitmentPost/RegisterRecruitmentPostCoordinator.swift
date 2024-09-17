@@ -14,6 +14,8 @@ import BaseFeature
 
 public class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable {
     
+    @Injected var logger: PostRegisterLogger
+    
     public struct Dependency {
         let navigationController: UINavigationController
         let recruitmentPostUseCase: RecruitmentPostUseCase
@@ -51,6 +53,9 @@ public class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordina
             vc: vc
         )
         coordinator.start()
+        
+        // MARK: 로깅
+        logger.startPostRegister()
     }
 }
 
@@ -87,6 +92,9 @@ public extension RegisterRecruitmentPostCoordinator {
         coordinator.parent = self
         addChildCoordinator(coordinator)
         coordinator.start()
+        
+        // MARK: 로깅
+        logger.logPostRegisterDuration()
     }
     
     func registerFinished() {
