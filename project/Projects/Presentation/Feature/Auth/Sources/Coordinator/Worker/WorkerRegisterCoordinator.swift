@@ -16,9 +16,26 @@ enum WorkerRegisterStage: Int {
     case phoneNumber=2
     case address=3
     case finish=4
+    
+    var screenName: String {
+        switch self {
+        case .registerFinished:
+            ""
+        case .info:
+            "input|personalInfo"
+        case .phoneNumber:
+            "input|phoneNumber"
+        case .address:
+            "input|address"
+        case .finish:
+            ""
+        }
+    }
 }
 
 public class WorkerRegisterCoordinator: ChildCoordinator {
+    
+    @Injected var logger: WorkerRegisterLogger
 
     public struct Dependency {
         let navigationController: UINavigationController
@@ -121,6 +138,11 @@ extension WorkerRegisterCoordinator {
         case .finish:
             authFinished()
         default:
+            // MARK: 로깅
+            if moveTo == .next {
+                logger.logWorkerRegisterStep(stepName: stage.screenName)
+            }
+            
             let vc = stageViewControllers[stage.rawValue-1]
             showStage(viewController: vc, moveTo: moveTo)
         }
