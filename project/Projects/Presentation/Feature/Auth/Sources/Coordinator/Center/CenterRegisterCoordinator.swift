@@ -8,6 +8,7 @@
 import UIKit
 import UseCaseInterface
 import PresentationCore
+import LoggerInterface
 
 enum CenterRegisterStage: Int {
     
@@ -17,9 +18,28 @@ enum CenterRegisterStage: Int {
     case businessOwner=3
     case idPassword=4
     case finish=5
+    
+    var screenName: String {
+        switch self {
+        case .registerFinished:
+            ""
+        case .name:
+            "input|name"
+        case .phoneNumber:
+            "input|phoneNumber"
+        case .businessOwner:
+            "input|businessOwner"
+        case .idPassword:
+            "input|idPassword"
+        case .finish:
+            ""
+        }
+    }
 }
 
 public class CenterRegisterCoordinator: ChildCoordinator {
+    
+    @Injected var logger: CenterRegisterLogger
     
     public struct Dependency {
         let navigationController: UINavigationController
@@ -127,6 +147,12 @@ extension CenterRegisterCoordinator {
             authFinished()
         default:
             let vc = stageViewControllers[stage.rawValue-1]
+            
+            // MARK: 로깅
+            if moveTo == .next {
+                logger.logCenterRegisterStep(stepName: stage.screenName)
+            }
+            
             showStage(viewController: vc, moveTo: moveTo)
         }
     }
