@@ -95,6 +95,9 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
         navigationController.pushViewController(vc, animated: true)
         
         excuteStage(.info, moveTo: .next)
+        
+        // MARK: 시작 로깅
+        logger.startWorkerRegister()
     }
 
     public func coordinatorDidFinish() {
@@ -168,6 +171,9 @@ extension WorkerRegisterCoordinator {
                 self?.authFinished()
             }
         parent?.showCompleteScreen(ro: renderObject)
+        
+        // MARK: 완료 로깅
+        logger.startWorkerRegister()
     }
     
     func authFinished() {
