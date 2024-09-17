@@ -101,6 +101,9 @@ public class CenterRegisterCoordinator: ChildCoordinator {
         navigationController.pushViewController(viewController, animated: true)
         
         excuteStage(.name, moveTo: .next)
+        
+        // MARK: 시작 로깅
+        logger.startCenterRegister()
     }
     
     public func coordinatorDidFinish() {
@@ -186,6 +189,9 @@ extension CenterRegisterCoordinator {
                 self?.authFinished()
             }
         parent?.showCompleteScreen(ro: renderObject)
+        
+        // MARK: 종료 로깅
+        logger.logCenterRegisterDuration()
     }
 }
 
