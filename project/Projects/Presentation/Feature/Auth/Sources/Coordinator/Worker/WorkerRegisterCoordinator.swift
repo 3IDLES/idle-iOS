@@ -140,7 +140,10 @@ extension WorkerRegisterCoordinator {
         default:
             // MARK: 로깅
             if moveTo == .next {
-                logger.logWorkerRegisterStep(stepName: stage.screenName)
+                logger.logWorkerRegisterStep(
+                    stepName: stage.screenName,
+                    stepIndex: stage.rawValue-1
+                )
             }
             
             let vc = stageViewControllers[stage.rawValue-1]

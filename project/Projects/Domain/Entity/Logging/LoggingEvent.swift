@@ -1,21 +1,21 @@
 //
 //  LoggingEvent.swift
-//  LoggerInterface
+//  Entity
 //
 //  Created by choijunios on 9/16/24.
 //
 
 import Foundation
 
-public struct LoggingEvent {
+public class LoggingEvent {
     public let type: EventType
-    private var properties: [PropertiesKeys: Any] = [:]
+    public var properties: [PropertiesKeys: Any] = [:]
     
     public init(type: EventType) {
         self.type = type
     }
     
-    public mutating func addValue(_ key: PropertiesKeys, value: Any) -> Self {
+    public func addValue(_ key: PropertiesKeys, value: Any) -> Self {
         self.properties[key] = value
         return self
     }

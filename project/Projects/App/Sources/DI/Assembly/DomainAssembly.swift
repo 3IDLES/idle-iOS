@@ -18,16 +18,6 @@ import Swinject
 public struct DomainAssembly: Assembly {
     public func assemble(container: Container) {
         
-        // MARK: Logger
-        container.register(IdleLogger.self) { resolver in
-            
-            #if DEBUG
-            return DebugLogger()
-            #endif
-            
-            return AmplitudeLogger()
-        }
-        
         // MARK: UseCase
         container.register(AuthInputValidationUseCase.self) { resolver in
             let repository = resolver.resolve(AuthInputValidationRepository.self)!

@@ -7,8 +7,9 @@
 
 import Foundation
 import LoggerInterface
+import Entity
 
-public class DebugLogger: IdleLogger {
+public class DebugLogger: LoggerMessagePublisher {
     
     public private(set) var currentUser: String?
     
@@ -18,15 +19,15 @@ public class DebugLogger: IdleLogger {
     
     public init() { }
     
-    public func logEvent(event: LoggerInterface.LoggingEvent) {
+    public func send(event: LoggingEvent) {
         print("""
         - 현재 유저id: \(currentUser ?? "정보 없음")
         - 이벤트 타입: \(event.type.rawValue)
         - 프로퍼티 키:
             \(
                 {
-                    let propList = event.properties?.map({ key, value in
-                        "\(key) : \(value!)"
+                    let propList = event.properties.map({ key, value in
+                        "\(key) : \(value)"
                     }).joined(separator: "\n")
                             
                     return propList

@@ -25,6 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         injector
             .assemble([
+                LoggerAssembly(),
                 DataAssembly(),
                 DomainAssembly(),
             ])

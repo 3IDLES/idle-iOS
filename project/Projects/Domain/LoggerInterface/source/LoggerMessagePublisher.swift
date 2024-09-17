@@ -1,19 +1,20 @@
 //
-//  IdleLogger.swift
+//  LoggerMessagePublisher.swift
 //  LoggerInterface
 //
 //  Created by choijunios on 9/16/24.
 //
 
 import Foundation
+import Entity
 
-public protocol IdleLogger: AnyObject {
+public protocol LoggerMessagePublisher: AnyObject {
     
     var timerDict: [String: Date] { get set }
     var timerQueue: DispatchQueue { get }
     
     /// 이벤트를 로깅합니다.
-    func logEvent(event: LoggingEvent)
+    func send(event: LoggingEvent)
     
     /// 이벤트의 주체를 설정합니다.
     func setUserId(id: String)
@@ -25,29 +26,23 @@ public protocol IdleLogger: AnyObject {
     func endTimer(screenName: String, actionName: String, isSuccess: Bool)
 }
 
-public extension IdleLogger {
+public extension LoggerMessagePublisher {
     
     /// 특정 스크린 진입 이벤트를 로깅합니다.
-    func logScreen(screenName: String) {
-        let event = LoggingEvent(
-            type: .screenView,
-            properties: [
-                PropertiesKeys.screenName: screenName
-            ]
-        )
-        logEvent(event: event)
+    func sendScreen(screenName: String) {
+        let event = LoggingEvent(type: .screenView)
+            .addValue(.screenName, value: screenName)
+        
+        send(event: event)
     }
     
     /// 특정버튼 클릭이벤트를 로깅합니다.
-    func logButtonClick(screenName: String, buttonId: String) {
-        let event = LoggingEvent(
-            type: .buttonClick,
-            properties: [
-                PropertiesKeys.screenName: screenName,
-                PropertiesKeys.buttonId: buttonId
-            ]
-        )
-        logEvent(event: event)
+    func sendButtonClick(screenName: String, buttonId: String) {
+        let event = LoggingEvent(type: .buttonClick)
+            .addValue(.screenName, value: screenName)
+            .addValue(.buttonId, value: buttonId)
+                                 
+        send(event: event)
     }
     
     func startTimer(screenName: String, actionName: String) {
@@ -80,15 +75,12 @@ public extension IdleLogger {
     
     /// 특정 동작의 지속시간을 로깅합니다.
     private func logActionDuration(screenName: String, actionName: String, isSuccess: Bool, duration: Double) {
-        let event = LoggingEvent(
-            type: .action,
-            properties: [
-                PropertiesKeys.screenName: screenName,
-                PropertiesKeys.actionName: actionName,
-                PropertiesKeys.actionResult: isSuccess,
-                PropertiesKeys.duration: duration,
-            ]
-        )
-        logEvent(event: event)
+        let event = LoggingEvent(type: .action)
+            .addValue(.screenName, value: screenName)
+            .addValue(.actionName, value: actionName)
+            .addValue(.actionResult, value: isSuccess)
+            .addValue(.duration, value: duration)
+        
+        send(event: event)
     }
 }

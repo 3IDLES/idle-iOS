@@ -120,8 +120,7 @@ let project = Project(
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["LoggerInterface/source/**"],
             dependencies: [
-                // ThirdParty
-                D.ThirdParty.Amplitude,
+                D.Domain.Entity,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"],

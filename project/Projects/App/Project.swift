@@ -43,9 +43,6 @@ let project = Project(
                 
                 // Logger
                 D.App.ConcreteLogger,
-                
-                // ThirdParty
-                D.ThirdParty.Amplitude,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.appConfigurations
@@ -55,17 +52,17 @@ let project = Project(
         .target(
             name: "ConcreteLogger",
             destinations: DeploymentSettings.platforms,
-            product: .framework,
+            product: .staticLibrary,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER).concretelogger",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["ConcreteLogger/source/**"],
+            sources: ["ConcreteLogger/**"],
             dependencies: [
                 
+                D.Presentation.RootFeature,
                 D.Domain.LoggerInterface,
                 
                 // ThirdParty
                 D.ThirdParty.Amplitude,
-                D.ThirdParty.RxSwift,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"],
