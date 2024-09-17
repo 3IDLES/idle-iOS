@@ -30,12 +30,14 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
     
     let contentView = CustomerInformationContentView()
     
-    let ctaButton: CTAButtonType1 = {
-        
-        let button = CTAButtonType1(labelText: "다음")
-        button.setEnabled(false)
-        return button
+    private let buttonContainer: PrevOrNextContainer = {
+        let container = PrevOrNextContainer()
+        container.nextButton.setEnabled(false)
+        return container
     }()
+    
+    lazy var nextButtonClicked: Observable<Void> = buttonContainer.nextBtnClicked.asObservable()
+    lazy var prevButtonClicked: Observable<Void> = buttonContainer.prevBtnClicked.asObservable()
     
     private let disposeBag = DisposeBag()
     
@@ -85,7 +87,7 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             
             scrollView,
             
-            ctaButton
+            buttonContainer
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview($0)
@@ -100,11 +102,11 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
             scrollView.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
             scrollView.leftAnchor.constraint(equalTo: self.leftAnchor),
             scrollView.rightAnchor.constraint(equalTo: self.rightAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: buttonContainer.topAnchor, constant: -12),
             
-            ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+            buttonContainer.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+            buttonContainer.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+            buttonContainer.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -14)
         ])
     }
 
@@ -119,8 +121,8 @@ public class CustomerInformationView: UIView, RegisterRecruitmentPostViews {
         // Output
         viewModel
             .customerInformationNextable?
-            .drive(onNext: { [ctaButton] nextable in
-                ctaButton.setEnabled(nextable)
+            .drive(onNext: { [buttonContainer] nextable in
+                buttonContainer.nextButton.setEnabled(nextable)
             })
             .disposed(by: disposeBag)
     }

@@ -35,7 +35,10 @@ public protocol RegisterCenterInfoViewModelable: AddressInputViewModelable {
 }
 
 fileprivate protocol RegisterCenterInfoVCViews: UIView {
-    var ctaButton: CTAButtonType1 { get }
+    
+    var nextButtonClicked: Observable<Void> { get }
+    var prevButtonClicked: Observable<Void> { get }
+    
     func bind(viewModel vm: RegisterCenterInfoViewModelable)
 }
 
@@ -106,6 +109,7 @@ public class RegisterCenterInfoVC: BaseViewController {
     }
     
     private func setAppearance() {
+        view.clipsToBounds = true
         view.backgroundColor = .white
         view.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
     }
@@ -116,7 +120,7 @@ public class RegisterCenterInfoVC: BaseViewController {
         navigationBar
             .eventPublisher
             .subscribe { [weak self] _ in
-                self?.prev()
+                self?.coordinator?.coordinatorDidFinish()
             }
             .disposed(by: disposeBag)
     }
@@ -179,14 +183,23 @@ public class RegisterCenterInfoVC: BaseViewController {
         view.bringSubviewToFront(pageViews.first!)
         
         // 옵저버블 설정
-        let observables = pageViews
-            .map { view in
-                view.ctaButton.eventPublisher
-            }
+        let nextButtonClickedObservables = pageViews
+            .map { $0.nextButtonClicked }
+        
         Observable
-            .merge(observables)
+            .merge(nextButtonClickedObservables)
             .subscribe(onNext: { [weak self] _ in
                 self?.next()
+            })
+            .disposed(by: disposeBag)
+        
+        let prevButtonClickedObservables = pageViews
+            .map { $0.prevButtonClicked }
+        
+        Observable
+            .merge(prevButtonClickedObservables)
+            .subscribe(onNext: { [weak self] _ in
+                self?.prev()
             })
             .disposed(by: disposeBag)
     }
@@ -294,6 +307,9 @@ extension RegisterCenterInfoVC {
             button.setEnabled(false)
             return button
         }()
+        
+        lazy var nextButtonClicked: Observable<Void> = ctaButton.eventPublisher
+        var prevButtonClicked: Observable<Void> = .never()
         
         init() {
             super.init(frame: .zero)
@@ -405,10 +421,14 @@ extension RegisterCenterInfoVC {
         }()
         
         // 하단 버튼
-        let ctaButton: CTAButtonType1 = {
-            let button = CTAButtonType1(labelText: "다음")
-            return button
+        private let buttonContainer: PrevOrNextContainer = {
+            let container = PrevOrNextContainer()
+            container.nextButton.label.textString = "완료"
+            return container
         }()
+        
+        lazy var nextButtonClicked: Observable<Void> = .never()
+        lazy var prevButtonClicked: Observable<Void> = buttonContainer.prevBtnClicked.asObservable()
         
         // Observable
         private let disposeBag = DisposeBag()
@@ -491,7 +511,7 @@ extension RegisterCenterInfoVC {
             
             [
                 scrollView,
-                ctaButton,
+                buttonContainer,
             ].forEach {
                 $0.translatesAutoresizingMaskIntoConstraints = false
                 self.addSubview($0)
@@ -500,11 +520,11 @@ extension RegisterCenterInfoVC {
                 scrollView.topAnchor.constraint(equalTo: self.topAnchor),
                 scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
                 scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-                scrollView.bottomAnchor.constraint(equalTo: ctaButton.topAnchor),
+                scrollView.bottomAnchor.constraint(equalTo: buttonContainer.topAnchor, constant: -12),
                 
-                ctaButton.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-                ctaButton.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-                ctaButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16)
+                buttonContainer.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
+                buttonContainer.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
+                buttonContainer.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -14)
             ])
         }
         
@@ -524,8 +544,8 @@ extension RegisterCenterInfoVC {
                 .disposed(by: disposeBag)
             
             // 완료버튼
-            ctaButton
-                .eventPublisher
+            buttonContainer
+                .nextBtnClicked.asObservable()
                 .bind(to: viewModel.completeButtonPressed)
                 .disposed(by: disposeBag)
             

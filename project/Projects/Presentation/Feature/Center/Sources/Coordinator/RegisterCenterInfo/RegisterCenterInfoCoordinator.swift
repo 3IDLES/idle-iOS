@@ -42,6 +42,7 @@ public class RegisterCenterInfoCoordinator: ChildCoordinator {
     
     public func coordinatorDidFinish() {
         parent?.removeChildCoordinator(self)
+        popViewController()
     }
 }
 
