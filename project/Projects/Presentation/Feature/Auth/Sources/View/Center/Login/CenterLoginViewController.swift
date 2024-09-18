@@ -36,6 +36,7 @@ public class CenterLoginViewController: BaseViewController {
             placeHolderText: "비밀번호를 입력해주세요.",
             isCompletionImageAvailable: false
         )
+        field.uITextField.isSecureTextEntry = true
         
         return field
     }()
