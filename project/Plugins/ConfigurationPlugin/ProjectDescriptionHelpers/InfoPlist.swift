@@ -18,6 +18,7 @@ public enum IdleInfoPlist {
         "NSAppTransportSecurity" : [
             "NSAllowsArbitraryLoads" : true
         ],
+        
         "UILaunchStoryboardName": "LaunchScreen.storyboard",
         "UIApplicationSceneManifest": [
             "UIApplicationSupportsMultipleScenes": false,
@@ -33,6 +34,16 @@ public enum IdleInfoPlist {
         
         // 멀티 스크린 미지원
         "UIRequiresFullScreen": true,
+        
+        // 지원하는 화면 모드
+        "UISupportedInterfaceOrientations" : [
+            "UIInterfaceOrientationPortrait"
+        ],
+        
+        // iPad 지원하는 화면 모드
+        "UISupportedInterfaceOrientations~ipad" : [
+            "UIInterfaceOrientationPortrait"
+        ],
         
         "NMFClientId": "$(NAVER_API_CLIENT_ID)",
         

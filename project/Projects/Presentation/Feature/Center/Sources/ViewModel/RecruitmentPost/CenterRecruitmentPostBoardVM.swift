@@ -105,10 +105,11 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
                     title: "채용을 종료하시겠어요?",
                     description: "채용 종료 시 지원자 정보는 초기화됩니다.",
                     acceptButtonLabelText: "종료하기",
-                    cancelButtonLabelText: "취소하기"
-                ) { [closePostConfirmed] in
-                    closePostConfirmed.accept(postId)
-                }
+                    cancelButtonLabelText: "취소하기",
+                    onAccepted: { [closePostConfirmed] in
+                        closePostConfirmed.accept(postId)
+                    }
+                )
                 return vm
             })
             .asDriver(onErrorDriveWith: .never())
