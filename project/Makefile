@@ -1,5 +1,8 @@
 # Module creation
 
+test:
+	TUIST_ROOT_DIR=${PWD} tuist test
+
 generate:
 	TUIST_ROOT_DIR=${PWD} tuist generate
 
