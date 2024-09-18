@@ -120,9 +120,11 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
                     title: "'\(postTitle)'\n공고에 지원하시겠어요?",
                     description: "",
                     acceptButtonLabelText: "지원하기",
-                    cancelButtonLabelText: "취소하기") { [applyRequest] in
+                    cancelButtonLabelText: "취소하기",
+                    onAccepted: { [applyRequest] in
                         applyRequest.accept(postId)
                     }
+                )
             }
             .asDriver(onErrorDriveWith: .never())
         
