@@ -122,7 +122,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             api: .getNativeFavoritePost,
             with: .withToken
         )
-        .mapToEntity(FavoriteRecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
+        .mapToEntity(FavoriteNativeRecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
     }
     
     public func getWorknetFavoritePostListForWorker() -> RxSwift.Single<[RecruitmentPostForWorkerRepresentable]> {
@@ -130,7 +130,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             api: .getWorknetFavoritePost,
             with: .withToken
         )
-        .mapToEntity(FavoriteRecruitmentPostListForWorkerDTO<WorkNetRecruitmentPostForWorkerDTO>.self)
+        .mapToEntity(FavoriteWorknetRecruitmentPostListForWorkerDTO<WorkNetRecruitmentPostForWorkerDTO>.self)
     }
     
     public func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {

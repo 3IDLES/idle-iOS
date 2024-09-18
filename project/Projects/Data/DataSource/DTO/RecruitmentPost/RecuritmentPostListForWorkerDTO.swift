@@ -29,13 +29,25 @@ public struct RecruitmentPostListForWorkerDTO<T: EntityRepresentable>: EntityRep
     }
 }
 
-public struct FavoriteRecruitmentPostListForWorkerDTO<T: EntityRepresentable>: EntityRepresentable where T.Entity: RecruitmentPostForWorkerRepresentable {
+public struct FavoriteNativeRecruitmentPostListForWorkerDTO<T: EntityRepresentable>: EntityRepresentable where T.Entity: RecruitmentPostForWorkerRepresentable {
     
     public let favoriteJobPostings: [T]
     
     public func toEntity() -> [RecruitmentPostForWorkerRepresentable] {
         
         favoriteJobPostings.map { dto in
+            dto.toEntity()
+        }
+    }
+}
+
+public struct FavoriteWorknetRecruitmentPostListForWorkerDTO<T: EntityRepresentable>: EntityRepresentable where T.Entity: RecruitmentPostForWorkerRepresentable {
+    
+    public let favoriteCrawlingJobPostings: [T]
+    
+    public func toEntity() -> [RecruitmentPostForWorkerRepresentable] {
+        
+        favoriteCrawlingJobPostings.map { dto in
             dto.toEntity()
         }
     }

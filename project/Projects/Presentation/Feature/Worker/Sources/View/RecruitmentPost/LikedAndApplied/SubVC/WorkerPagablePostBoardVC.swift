@@ -96,7 +96,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
         // Output
         viewModel
             .postBoardData?
-            .drive(onNext: { [weak self] (isRefreshed, postData) in
+            .drive(onNext: { [weak self] (isRefreshed, cellData) in
                 guard let self else { return }
                 self.postData = postData
                 self.postTableView.reloadData()
@@ -130,7 +130,7 @@ public class WorkerPagablePostBoardVC: BaseViewController {
             .postBoardData?
             .drive(onNext: { [weak self] (isRefreshed, cellData) in
                 guard let self else { return }
-                self.postData = postData
+                self.postData = cellData
                 self.postTableView.reloadData()
                 isPaging = false
                 

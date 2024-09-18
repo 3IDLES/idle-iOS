@@ -36,27 +36,17 @@ public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
         super.init()
         
         // MARK: 공고리스트 처음부터 요청하기
-        let initialRequestResult = requestInitialPageRequest
-            .flatMap { [weak self, recruitmentPostUseCase] _ in
-                
-                self?.showLoading.onNext(())
-                
-                return recruitmentPostUseCase
+        let initialRequestResult = mapEndLoading(mapStartLoading(requestInitialPageRequest.asObservable())
+            .flatMap { [recruitmentPostUseCase] _ in
+                recruitmentPostUseCase
                     .getFavoritePostListForWorker()
-            }
-            .share()
-        
-        initialRequestResult
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                dismissLoading.onNext(())
             })
-            .disposed(by: disposeBag)
+            .share()
         
         let initialRequestSuccess = initialRequestResult.compactMap { $0.value }
         let initialRequestFailure = initialRequestResult.compactMap { $0.error }
         
-        postBoardData = initialRequestSuccess
+        self.postBoardData = initialRequestSuccess
             .map({ list in
                 
                 let sortedList = list.sorted { lhs, rhs in
