@@ -212,6 +212,11 @@ extension NMFNaverMapView {
             paddingInsets: paddingInsets
         )
         self.mapView.moveCamera(camerUpdate)
+        
+        if mapView.zoomLevel > 18 {
+            mapView.zoomLevel = 18
+        }
+        
         // 지도 Config
         let map = self.mapView
         map.mapType = .basic

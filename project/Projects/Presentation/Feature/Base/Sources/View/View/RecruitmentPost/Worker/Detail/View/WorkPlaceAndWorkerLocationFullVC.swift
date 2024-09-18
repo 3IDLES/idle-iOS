@@ -94,8 +94,8 @@ public class WorkPlaceAndWorkerLocationFullVC: BaseViewController {
         )
         
         // 지도 뷰 Config
-        mapView.showLocationButton = true
-        mapView.showZoomControls = false
+        mapView.showLocationButton = false
+        mapView.showZoomControls = true
     }
 }
 
