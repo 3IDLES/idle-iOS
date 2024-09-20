@@ -103,7 +103,8 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
             .bind(to: viewModel.editProfileButtonClicked)
             .disposed(by: disposeBag)
         
-        self.rx.viewDidLoad
+        self.rx.viewWillAppear
+            .map { _ in () }
             .bind(to: viewModel.requestWorkerLocation)
             .disposed(by: disposeBag)
         
