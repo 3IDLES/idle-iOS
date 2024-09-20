@@ -25,8 +25,9 @@ public class AmplitudeLogger: LoggerMessagePublisher {
                 apiKey: AmplitudeConfig.apiKey
             )
         )
-        
-        setUserId(id: "AnonymousIOSUser")
+            
+        // 유저 아이디 설정
+        setUserId(id: getAnonymousUserId())
     }
     
     public func send(event: LoggingEvent) {

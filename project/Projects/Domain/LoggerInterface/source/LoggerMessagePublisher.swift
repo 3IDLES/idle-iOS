@@ -18,12 +18,6 @@ public protocol LoggerMessagePublisher: AnyObject {
     
     /// 이벤트의 주체를 설정합니다.
     func setUserId(id: String)
-    
-    /// 이벤트의 시작시간을 알립니다.
-    func startTimer(screenName: String, actionName: String)
-    
-    /// 이벤트의 종료를 알리며, 지속시간을 기록합니다.
-    func endTimer(screenName: String, actionName: String, isSuccess: Bool)
 }
 
 public extension LoggerMessagePublisher {
@@ -45,6 +39,7 @@ public extension LoggerMessagePublisher {
         send(event: event)
     }
     
+    /// 이벤트의 시작시간을 알립니다.
     func startTimer(screenName: String, actionName: String) {
         timerQueue.sync {
             let key = screenName + actionName
@@ -52,6 +47,7 @@ public extension LoggerMessagePublisher {
         }
     }
     
+    /// 이벤트의 종료를 알리며, 지속시간을 기록합니다.
     func endTimer(screenName: String, actionName: String, isSuccess: Bool) {
         timerQueue.sync {
             let key = screenName + actionName
@@ -82,5 +78,22 @@ public extension LoggerMessagePublisher {
             .addValue(.duration, value: duration)
         
         send(event: event)
+    }
+    
+    /// 피로깅의 주체를 인식하는 식별자를 반환합니다.
+    func getAnonymousUserId() -> String {
+        
+        let key = "AnonymousUserIdForDevice"
+        
+        if let cachedId = UserDefaults.standard.string(forKey: key) {
+            
+            return cachedId
+        }
+        
+        let id = UUID().uuidString
+        
+        UserDefaults.standard.setValue(id, forKey: key)
+        
+        return id
     }
 }
