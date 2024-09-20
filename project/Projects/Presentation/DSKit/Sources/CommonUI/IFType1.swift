@@ -61,7 +61,7 @@ public class IFType1: UIStackView {
 
     func setStack() {
         
-        self.alignment = .top
+        self.alignment = .fill
         self.axis = .horizontal
         self.spacing = 4.0
     }
