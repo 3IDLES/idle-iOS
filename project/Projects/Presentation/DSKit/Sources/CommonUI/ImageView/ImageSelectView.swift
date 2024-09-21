@@ -139,6 +139,11 @@ public class ImageSelectView: UIImageView {
                 guard let self else { return }
                 
                 if image != nil {
+                    
+                    UIView.transition(with: self, duration: 0.2, options: .transitionCrossDissolve) {
+                        self.image = image
+                    }
+                    
                     placeholderViewForEdit.isHidden = true
                     placeholderViewForNormal.isHidden = true
                     centerImageEditButton.isHidden = state == .normal
