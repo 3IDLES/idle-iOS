@@ -28,11 +28,11 @@ public class BottomSheetButton: TappableUIView {
     
     private let disposeBag = DisposeBag()
     
-    public init(image: UIImage, titleText: String, color: UIColor) {
+    public init(image: UIImage, titleText: String, imageColor: UIColor, textColor: UIColor) {
         self.imageView.image = image
-        self.imageView.tintColor = color
+        self.imageView.tintColor = imageColor
         self.titleLabel.textString = titleText
-        self.titleLabel.attrTextColor = color
+        self.titleLabel.attrTextColor = textColor
         
         super.init()
         

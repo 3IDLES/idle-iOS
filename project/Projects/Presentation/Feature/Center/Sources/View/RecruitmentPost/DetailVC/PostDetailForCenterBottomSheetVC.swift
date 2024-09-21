@@ -25,8 +25,18 @@ class OngoingPostOptionVC: IdleBottomSheetVC {
         label.textAlignment = .center
         return label
     }()
-    let editPostButton: BottomSheetButton = .init(image: DSIcon.postEdit.image, titleText: "공고 수정하기", color: DSColor.gray900.color)
-    private let closePostButton: BottomSheetButton = .init(image: DSIcon.postCheck.image, titleText: "채용 종료하기", color: DSColor.red200.color)
+    let editPostButton: BottomSheetButton = .init(
+        image: DSIcon.postEdit.image,
+        titleText: "공고 수정하기",
+        imageColor: DSColor.gray500.color,
+        textColor: DSColor.gray900.color
+    )
+    private let closePostButton: BottomSheetButton = .init(
+        image: DSIcon.postCheck.image,
+        titleText: "채용 종료하기",
+        imageColor: DSColor.red200.color,
+        textColor: DSColor.red200.color
+    )
     let closePostConfirmed: PublishRelay<Void> = .init()
     
     public override init() {
