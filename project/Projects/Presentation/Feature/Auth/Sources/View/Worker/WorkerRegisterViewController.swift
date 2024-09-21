@@ -80,7 +80,7 @@ class WorkerRegisterViewController: BaseViewController {
             statusBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            pageViewController.view.topAnchor.constraint(equalTo: statusBar.bottomAnchor, constant: 32),
+            pageViewController.view.topAnchor.constraint(equalTo: statusBar.bottomAnchor),
             pageViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             pageViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             pageViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
