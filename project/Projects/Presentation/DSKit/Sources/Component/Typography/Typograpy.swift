@@ -184,9 +184,13 @@ public enum Typography {
         
         let paragraphStyle = NSMutableParagraphStyle()
         
+        var baseLineOffset: CGFloat = 0.0
+        
         if let lineHeight {
             paragraphStyle.minimumLineHeight = lineHeight
             paragraphStyle.maximumLineHeight = lineHeight
+            
+            baseLineOffset = (lineHeight-size)/2
         }
         
         return [
@@ -194,6 +198,7 @@ public enum Typography {
             .foregroundColor: color,
             .kern: letterSpacing,
             .paragraphStyle : paragraphStyle,
+            .baselineOffset : baseLineOffset
         ]
     }
 }
