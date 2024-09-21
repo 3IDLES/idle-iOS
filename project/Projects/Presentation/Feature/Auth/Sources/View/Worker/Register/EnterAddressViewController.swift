@@ -73,10 +73,11 @@ where T.Input: EnterAddressInputable & PageProcessInputable, T: BaseViewModel {
     
     private func setAppearance() {
         self.view.backgroundColor = .white
-        view.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
     }
     
     private func setAutoLayout() {
+        
+        view.layoutMargins = .init(top: 28, left: 20, bottom: 0, right: 20)
         
         let stack1 = VStack(
             [

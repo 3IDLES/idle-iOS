@@ -96,10 +96,12 @@ where T.Input: WorkerPersonalInfoInputable & PageProcessInputable,
     
     func setAppearance() {
         self.view.backgroundColor = .white
-        view.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
     }
     
     private func setAutoLayout() {
+        
+        view.layoutMargins = .init(top: 28, left: 20, bottom: 0, right: 20)
+        
         let genderButtonStack = VStack(
             [
                 {
