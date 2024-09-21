@@ -99,10 +99,17 @@ open class IdleBottomSheetVC: BaseViewController {
     
     func setGesture() {
         
-        let recognizer = UIPanGestureRecognizer()
-        recognizer.addTarget(self, action: #selector(onPanGesture(_:)))
+        // MARK: 드래그
+        let dragRecognizer = UIPanGestureRecognizer()
+        dragRecognizer.addTarget(self, action: #selector(onPanGesture(_:)))
         
-        view.addGestureRecognizer(recognizer)
+        dragSpace.addGestureRecognizer(dragRecognizer)
+        
+        // MARK: 탭
+        let tapGesture = UITapGestureRecognizer()
+        tapGesture.addTarget(self, action: #selector(tapForDismiss(_:)))
+        
+        view.addGestureRecognizer(tapGesture)
     }
 }
 
@@ -124,7 +131,7 @@ extension IdleBottomSheetVC {
         sheetView.isUserInteractionEnabled = false
         sheetView.transform = .init(translationX: 0, y: height)
         
-        UIView.animate(withDuration: 0.35) { [sheetView, weak view] in
+        UIView.animate(withDuration: 0.35) { [sheetView, view] in
             sheetView.transform = .identity
             view?.backgroundColor = .black.withAlphaComponent(0.5)
         } completion: { [sheetView] _ in
@@ -137,7 +144,7 @@ extension IdleBottomSheetVC {
         let height = sheetView.bounds.height
         sheetView.isUserInteractionEnabled = false
         
-        UIView.animate(withDuration: 0.2) { [sheetView, weak view] in
+        UIView.animate(withDuration: 0.2) { [sheetView, view] in
             sheetView.transform = .init(translationX: 0, y: height)
             view?.backgroundColor = .black.withAlphaComponent(0.0)
         } completion: { [weak self] _ in
@@ -150,6 +157,19 @@ extension IdleBottomSheetVC {
 
 /// 제스처 동작
 extension IdleBottomSheetVC {
+    
+    @objc
+    func tapForDismiss(_ gesture: UITapGestureRecognizer) {
+        
+        var tapArea = view.frame
+        tapArea.size.height = sheetView.frame.origin.y
+        
+        let loc = gesture.location(in: view)
+        
+        if tapArea.contains(loc) {
+            dismissView()
+        }
+    }
     
     @objc
     func onPanGesture(_ gesture: UIPanGestureRecognizer) {
