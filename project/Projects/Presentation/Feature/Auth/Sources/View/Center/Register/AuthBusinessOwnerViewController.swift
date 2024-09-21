@@ -114,7 +114,7 @@ where T.Input: AuthBusinessOwnerInputable & PageProcessInputable, T.Output: Auth
         }
         
         NSLayoutConstraint.activate([
-            processTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            processTitle.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
             processTitle.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             processTitle.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
