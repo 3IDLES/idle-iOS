@@ -43,6 +43,7 @@ public class IdleContentTitleLabel: UIStackView {
         
         self.axis = .horizontal
         self.alignment = .center
+        self.spacing = 4
         
         [
             titleLabel,
