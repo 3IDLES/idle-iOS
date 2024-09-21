@@ -38,25 +38,19 @@ where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
     var coordinator: CenterRegisterCoordinator?
     
     // View
-    private let processTitle: ResizableUILabel = {
-       
-        let label = ResizableUILabel()
-        
-        label.text = "아이디와 비밀번호를 설정해주세요."
-        label.font = DSKitFontFamily.Pretendard.bold.font(size: 20)
+    private let processTitleLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Heading2)
+        label.textString = "아이디와 비밀번호를 설정해주세요."
         label.textAlignment = .left
-        
         return label
     }()
     
     // MARK: Id 입력
-    private let idLabel: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
-        label.text = "아이디 설정"
+    private let idLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Subtitle4)
+        label.textString = "아이디 설정"
+        label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
-        
         return label
     }()
     private let idField: IFType1 = {
@@ -82,13 +76,11 @@ where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
     }()
     
     // MARK: 비밀번호 입력
-    private let passwordLabel: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
-        label.text = "비밀번호 설정"
+    private let passwordLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Subtitle4)
+        label.textString = "비밀번호 설정"
+        label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
-        
         return label
     }()
     private let passwordField: IdleOneLineInputField = {
@@ -111,13 +103,11 @@ where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
     }()
     
     // MARK: 비밀번호 확인 입력
-    private let checlPasswordLabel: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 14)
-        label.text = "비밀번호 확인"
+    private let checlPasswordLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Subtitle4)
+        label.textString = "비밀번호 확인"
+        label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
-        
         return label
     }()
     private let checkPasswordField: IdleOneLineInputField = {
@@ -161,7 +151,7 @@ where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
         view.layoutMargins = .init(top: 28, left: 20, bottom: 0, right: 20)
         
         [
-            processTitle,
+            processTitleLabel,
             idLabel,
             idField,
             thisIsValidIdLabel,
@@ -178,11 +168,11 @@ where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
         
         NSLayoutConstraint.activate([
                 
-            processTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            processTitle.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            processTitle.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            processTitleLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+            processTitleLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            processTitleLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            idLabel.topAnchor.constraint(equalTo: processTitle.bottomAnchor, constant: 32),
+            idLabel.topAnchor.constraint(equalTo: processTitleLabel.bottomAnchor, constant: 32),
             idLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             idLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
