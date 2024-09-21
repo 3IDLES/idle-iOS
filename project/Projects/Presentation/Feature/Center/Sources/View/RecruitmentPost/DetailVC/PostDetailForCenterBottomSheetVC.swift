@@ -119,7 +119,12 @@ class ClosedPostOptionVC: IdleBottomSheetVC {
         label.textAlignment = .center
         return label
     }()
-    let removePostButton: BottomSheetButton = .init(image: DSIcon.trashBox.image, titleText: "공고 삭제하기", color: DSColor.red200.color)
+    let removePostButton: BottomSheetButton = .init(
+        image: DSIcon.trashBox.image,
+        titleText: "공고 삭제하기",
+        imageColor: DSColor.red200.color,
+        textColor: DSColor.red200.color
+    )
     
     let removeConfirmed: PublishRelay<Void> = .init()
     
