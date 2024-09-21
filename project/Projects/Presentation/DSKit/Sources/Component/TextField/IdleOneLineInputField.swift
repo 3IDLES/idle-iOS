@@ -101,7 +101,7 @@ public class IdleOneLineInputField: UIView {
         self.layer.borderColor = borderColor.cgColor
         
         // Initial setting
-        textField.placeholder = placeHolderText
+        textField.attrPlaceholder = placeHolderText
         textField.keyboardType = keyboardType
         textField.contentVerticalAlignment = .center
         

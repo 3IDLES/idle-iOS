@@ -136,25 +136,6 @@ public extension IdleTextField {
     }
     
     private func setInset(bounds: CGRect) -> CGRect {
-        let height = (currentTypography.attributes[.font] as! UIFont).lineHeight
-        
-        let verticalInset = currentTextFieldInsets.top + currentTextFieldInsets.bottom
-        
-        // 실제 폰트와 attribute의 라인 Height이 상이함으로 이를 조정하는 과정입니다.
-        var topInset: CGFloat = 0
-        var bottomInset: CGFloat = 0
-        
-        if verticalInset > 0, let lineHeight = currentTypography.lineHeight {
-            topInset = (lineHeight+verticalInset - height) * (currentTextFieldInsets.top/verticalInset)
-            
-            bottomInset = (lineHeight+verticalInset - height) * (currentTextFieldInsets.bottom/verticalInset)
-        }
-        
-        return bounds.inset(by: .init(
-            top: topInset,
-            left: currentTextFieldInsets.left,
-            bottom: bottomInset,
-            right: currentTextFieldInsets.right
-        ))
+        bounds.inset(by: currentTextFieldInsets)
     }
 }

@@ -53,7 +53,7 @@ public class CenterProfileViewController: BaseViewController {
     
     /// ☑️ 센터 상세정보 ☑️
     let centerDetailLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Body2)
+        let label = IdleLabel(typography: .Subtitle1)
         label.textString = "센터 상세 정보"
         return label
     }()
