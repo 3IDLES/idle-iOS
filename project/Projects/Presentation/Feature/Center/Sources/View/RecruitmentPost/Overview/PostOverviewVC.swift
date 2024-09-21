@@ -64,7 +64,7 @@ public class PostOverviewVC: BaseViewController {
     
     let titleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Heading1)
-        label.textString = "다음의 공고 정보가 맞지\n확인해주세요."
+        label.textString = "다음의 공고 정보가 맞는지\n확인해주세요."
         label.textAlignment = .left
         label.numberOfLines = 2
         return label
@@ -78,7 +78,7 @@ public class PostOverviewVC: BaseViewController {
     
     let sampleCard: WorkerNativeEmployCard = {
         let card = WorkerNativeEmployCard()
-        card.starButton.isUserInteractionEnabled = false
+        card.starButton.isHidden = true
         return card
     }()
     
