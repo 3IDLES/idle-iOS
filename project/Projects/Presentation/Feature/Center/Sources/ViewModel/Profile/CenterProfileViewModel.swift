@@ -12,6 +12,7 @@ import RxCocoa
 import PresentationCore
 import UseCaseInterface
 import BaseFeature
+import SDWebImageWebPCoder
 
 struct ChangeCenterInformation {
     let phoneNumber: String?
@@ -81,6 +82,9 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
     // 요구사항 X
     public var editingValidation: Driver<Void>?
+    
+    // Image
+    private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     func checkModification() -> (String?, String?, ImageUploadInfo?) {
         
@@ -154,18 +158,26 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             }
             .asDriver(onErrorJustReturn: "")
         
-        let fetchCenterImage = profileRequestSuccess
-            .map { $0.profileImageURL }
-            .compactMap { $0 }
-            .observe(on: OperationQueueScheduler.init(operationQueue: .init(), queuePriority: .high))
-            .map({ [weak self] imageUrl in
-                if let data = try? Data(contentsOf: imageUrl) {
-                    let image = UIImage(data: data)
-                    self?.fetchedImage = image
-                    return image
+        let fetchCenterImageInfo = profileRequestSuccess
+            .compactMap { $0.profileImageInfo }
+            .observe(on: imageDownLoadScheduler)
+            .map { downloadInfo -> UIImage? in
+                
+                if let data = try? Data(contentsOf: downloadInfo.imageURL) {
+                    
+                    if downloadInfo.imageFormat == .webp {
+
+                        // 넓이*3 * 높이*3 * 1byte
+                        let limitBytes = 320 * 250 * 9
+                        let image = SDImageWebPCoder.shared.decodedImage(with: data, options: [.decodeScaleDownLimitBytes: limitBytes])
+                        
+                        return image
+                    }
+                    
+                    return UIImage(data: data)
                 }
                 return nil
-            })
+            }
         
         // MARK: image validation
         let imageValidationResult = selectedImage
@@ -188,8 +200,8 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         
         let displayingImageDriver = Observable
             .merge(
-                fetchCenterImage,
-                imageValidationResult.compactMap { $0 }
+                fetchCenterImageInfo,
+                imageValidationResult
             )
             .asDriver(onErrorJustReturn: .init())
         

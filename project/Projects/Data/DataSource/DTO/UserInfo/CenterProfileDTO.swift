@@ -23,7 +23,23 @@ public struct CenterProfileDTO: Codable {
 public extension CenterProfileDTO {
     
     func toEntity() -> CenterProfileVO {
-        CenterProfileVO(
+        
+        var imageInfo: ImageDownLoadInfo? = nil
+        
+        if let url = profileImageUrl, let expString = url.split(separator: ".").last {
+            
+            let imageFormat = expString.uppercased()
+            
+            if let format = ImageFormat(rawValue: imageFormat) {
+                    
+                imageInfo = .init(
+                    imageURL: URL(string: url)!,
+                    imageFormat: format
+                )
+            }
+        }
+        
+        return .init(
             centerName: centerName,
             officeNumber: officeNumber,
             roadNameAddress: roadNameAddress,
@@ -32,7 +48,7 @@ public extension CenterProfileDTO {
             longitude: longitude ?? "",
             latitude: latitude ?? "",
             introduce: introduce ?? "",
-            profileImageURL: URL(string: profileImageUrl ?? "")
+            profileImageInfo: imageInfo
         )
     }
 }
