@@ -16,9 +16,9 @@ public class CenterProfileVO: Codable {
     public let longitude: String
     public let latitude: String
     public let introduce: String
-    public let profileImageURL: URL?
+    public let profileImageInfo: ImageDownLoadInfo?
     
-    public init(centerName: String, officeNumber: String, roadNameAddress: String, lotNumberAddress: String, detailedAddress: String, longitude: String, latitude: String, introduce: String, profileImageURL: URL?) {
+    public init(centerName: String, officeNumber: String, roadNameAddress: String, lotNumberAddress: String, detailedAddress: String, longitude: String, latitude: String, introduce: String, profileImageInfo: ImageDownLoadInfo?) {
         self.centerName = centerName
         self.officeNumber = officeNumber
         self.roadNameAddress = roadNameAddress
@@ -27,6 +27,6 @@ public class CenterProfileVO: Codable {
         self.longitude = longitude
         self.latitude = latitude
         self.introduce = introduce
-        self.profileImageURL = profileImageURL
+        self.profileImageInfo = profileImageInfo
     }
 }
