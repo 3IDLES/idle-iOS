@@ -109,11 +109,9 @@ public class InfoBox: UIView {
         valueStack.setContentCompressionResistancePriority(.init(750), for: .horizontal)
         
         // mainStack
-        [
-            titleLabel,
-            keyValueStack
-        ].forEach {
-            mainStack.addArrangedSubview($0)
+        mainStack.addArrangedSubview(titleLabel)
+        if keyStack.arrangedSubviews.count > 0 {
+            mainStack.addArrangedSubview(keyValueStack)
         }
         
         [
