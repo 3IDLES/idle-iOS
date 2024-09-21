@@ -12,7 +12,7 @@ import RxCocoa
 public class IdleUnderLineLabelButton: TappableUIView {
     
     let label: IdleLabel = {
-        let label = IdleLabel(typography: .Body2)
+        let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSColor.gray300.color
         label.setAttr(attr: .underlineStyle, value: NSUnderlineStyle.single.rawValue)
         return label
