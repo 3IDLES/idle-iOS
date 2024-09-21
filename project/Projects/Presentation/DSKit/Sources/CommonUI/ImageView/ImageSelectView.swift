@@ -133,12 +133,12 @@ public class ImageSelectView: UIImageView {
                 displayingImage,
                 state
             )
-            .subscribe(onNext: { [weak self] (image, state) in
+            .asDriver(onErrorDriveWith: .never())
+            .drive(onNext: { [weak self] (image, state) in
                 
                 guard let self else { return }
                 
                 if image != nil {
-                    self.image = image
                     placeholderViewForEdit.isHidden = true
                     placeholderViewForNormal.isHidden = true
                     centerImageEditButton.isHidden = state == .normal

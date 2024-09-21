@@ -21,7 +21,7 @@ public struct ImageDownLoadInfo: Codable {
     }
 }
 
-public enum ImageFormat: String, Codable {
+public enum ImageFormat: String, Codable, Equatable {
     case jpg = "JPG"
     case jpeg = "JPEG"
     case png = "PNG"
