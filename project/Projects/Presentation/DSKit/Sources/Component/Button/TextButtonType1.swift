@@ -23,7 +23,7 @@ public class TextButtonType1: UIView {
         let label = IdleLabel(typography: .Subtitle4)
         
         label.textString = labelText
-        label.textColor = .white
+        label.attrTextColor = .white
         label.textAlignment = .center
         
         return label

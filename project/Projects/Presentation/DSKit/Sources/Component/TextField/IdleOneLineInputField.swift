@@ -261,6 +261,7 @@ extension IdleOneLineInputField: DisablableComponent {
         self.isEnabled = isEnabled
         self.isUserInteractionEnabled = isEnabled
         
+        clearButton.isHidden = true
         textField.textColor = isEnabled ? .black : DSKitAsset.Colors.gray300.color
         self.backgroundColor = isEnabled ? .white : DSKitAsset.Colors.gray050.color
         
