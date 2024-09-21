@@ -9,7 +9,7 @@ import Foundation
 
 public struct WorkerProfileVO: Codable {
     
-    public let profileImageURL: String?
+    public let profileImageInfo: ImageDownLoadInfo?
     public let longitude: Double
     public let latitude: Double
     public let nameText: String
@@ -23,7 +23,7 @@ public struct WorkerProfileVO: Codable {
     public let specialty: String
     
     public init(
-        profileImageURL: String?,
+        profileImageInfo: ImageDownLoadInfo?,
         nameText: String,
         phoneNumber: String,
         isLookingForJob: Bool,
@@ -36,7 +36,7 @@ public struct WorkerProfileVO: Codable {
         longitude: Double,
         latitude: Double
     ) {
-        self.profileImageURL = profileImageURL
+        self.profileImageInfo = profileImageInfo
         self.nameText = nameText
         self.phoneNumber = phoneNumber
         self.isLookingForJob = isLookingForJob
@@ -53,7 +53,7 @@ public struct WorkerProfileVO: Codable {
 
 public extension WorkerProfileVO {
     static let mock: WorkerProfileVO = .init(
-        profileImageURL: nil,
+        profileImageInfo: nil,
         nameText: "",
         phoneNumber: "",
         isLookingForJob: true,

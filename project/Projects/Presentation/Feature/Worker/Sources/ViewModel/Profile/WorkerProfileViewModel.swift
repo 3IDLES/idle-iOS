@@ -39,6 +39,10 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
     
     public var profileRenderObject: Driver<WorkerProfileRenderObject>?
     private let rederingState: BehaviorRelay<WorkerProfileRenderObject> = .init(value: .createRO(isMyProfile: true, vo: .mock))
+    public var displayingImage: RxCocoa.Driver<UIImage?>?
+    
+    // Image
+    private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     // Editing & State
     var willSubmitImage: UIImage?
@@ -81,6 +85,14 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
                 return vo
             }
         
+        displayingImage = fetchedProfileVOSuccess
+            .compactMap { $0.profileImageInfo }
+            .observe(on: imageDownLoadScheduler)
+            .map { downloadInfo in
+                UIImage.create(downloadInfo: downloadInfo)   
+            }
+            .asDriver(onErrorJustReturn: nil)
+        
         exitButtonClicked
             .subscribe(onNext: { [weak self] in
                 self?.coordinator?.coordinatorDidFinish()
@@ -107,7 +119,7 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
             .bind(to: rederingState)
             .disposed(by: disposbag)
         
-        profileRenderObject = rederingState.asDriver(onErrorRecover: { _ in fatalError() })
+        profileRenderObject = rederingState.asDriver(onErrorDriveWith: .never())
     }
     
     private func fetchProfileVO() -> Single<Result<WorkerProfileVO, DomainError>> {

@@ -20,5 +20,6 @@ public protocol WorkerProfileViewModelable {
     var exitButtonClicked: PublishRelay<Void> { get }
     
     // Output
+    var displayingImage: Driver<UIImage?>? { get }
     var profileRenderObject: Driver<WorkerProfileRenderObject>? { get }
 }

@@ -7,11 +7,13 @@
 
 import UIKit
 import Entity
-import RxSwift
-import RxCocoa
 import PresentationCore
 import UseCaseInterface
 import BaseFeature
+
+
+import RxSwift
+import RxCocoa
 import SDWebImageWebPCoder
 
 struct ChangeCenterInformation {
@@ -59,7 +61,6 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     private var fetchedImage: UIImage?
     
     private var editingImageInfo: ImageUploadInfo?
-    
     
     public var readyToFetch: PublishRelay<Void> = .init()
     public var editingButtonPressed: PublishRelay<Void> = .init()
@@ -161,22 +162,8 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         let fetchCenterImageInfo = profileRequestSuccess
             .compactMap { $0.profileImageInfo }
             .observe(on: imageDownLoadScheduler)
-            .map { downloadInfo -> UIImage? in
-                
-                if let data = try? Data(contentsOf: downloadInfo.imageURL) {
-                    
-                    if downloadInfo.imageFormat == .webp {
-
-                        // 넓이*3 * 높이*3 * 1byte
-                        let limitBytes = 320 * 250 * 9
-                        let image = SDImageWebPCoder.shared.decodedImage(with: data, options: [.decodeScaleDownLimitBytes: limitBytes])
-                        
-                        return image
-                    }
-                    
-                    return UIImage(data: data)
-                }
-                return nil
+            .map { downloadInfo in
+                UIImage.create(downloadInfo: downloadInfo)
             }
         
         // MARK: image validation

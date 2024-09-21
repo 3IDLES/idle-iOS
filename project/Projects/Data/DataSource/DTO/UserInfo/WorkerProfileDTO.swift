@@ -25,8 +25,23 @@ public struct CarerProfileDTO: Codable {
     
     public func toVO() -> WorkerProfileVO {
         
+        var imageInfo: ImageDownLoadInfo? = nil
+        
+        if let url = profileImageUrl, let expString = url.split(separator: ".").last {
+            
+            let imageFormat = expString.uppercased()
+            
+            if let format = ImageFormat(rawValue: imageFormat) {
+                    
+                imageInfo = .init(
+                    imageURL: URL(string: url)!,
+                    imageFormat: format
+                )
+            }
+        }
+        
         return .init(
-            profileImageURL: profileImageUrl,
+            profileImageInfo: imageInfo,
             nameText: carerName,
             phoneNumber: phoneNumber,
             isLookingForJob: jobSearchStatus == "YES",

@@ -410,9 +410,15 @@ public class EditWorkerProfileViewController: BaseViewController {
                 addressSearchButton.label.textString = ro.address
                 introductionInputField.textString = ro.oneLineIntroduce
                 abilityInputField.textString = ro.specialty
-                
-                if let imageUrl = ro.imageUrl {
-                    workerProfileImage.setImage(url: imageUrl)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .displayingImage?
+            .drive(onNext: { [weak self] image in
+                guard let self else { return }
+                UIView.transition(with: view, duration: 0.2) {
+                    self.workerProfileImage .image = image
                 }
             })
             .disposed(by: disposeBag)
