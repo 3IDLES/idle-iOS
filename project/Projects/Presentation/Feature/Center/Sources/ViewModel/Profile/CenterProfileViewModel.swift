@@ -293,11 +293,6 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     }
     
     func validateSelectedImage(image: UIImage) -> ImageUploadInfo? {
-        if let pngData = image.pngData() {
-            return .init(data: pngData, ext: "PNG")
-        } else if let jpegData = image.jpegData(compressionQuality: 1) {
-            return .init(data: jpegData, ext: "JPEG")
-        }
-        return nil
+        .create(image: image)
     }
 }

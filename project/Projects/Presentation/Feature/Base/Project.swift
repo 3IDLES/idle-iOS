@@ -41,6 +41,7 @@ let project = Project(
                 D.ThirdParty.NaverMapSDKForSPM,
                 D.ThirdParty.FirebaseCrashlytics,
                 D.ThirdParty.FirebaseAnalytics,
+                D.ThirdParty.SDWebImageWebPCoder,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
