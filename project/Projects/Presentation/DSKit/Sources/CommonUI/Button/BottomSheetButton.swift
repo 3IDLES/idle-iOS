@@ -89,6 +89,7 @@ public class BottomSheetButton: TappableUIView {
     BottomSheetButton(
         image: DSIcon.postCheck.image,
         titleText: "채용 종료하기",
-        color: DSColor.red100.color
+        imageColor: DSColor.red100.color,
+        textColor: DSColor.red100.color
     )
 }
