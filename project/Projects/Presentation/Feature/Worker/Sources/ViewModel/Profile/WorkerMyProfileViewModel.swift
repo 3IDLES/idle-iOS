@@ -7,11 +7,15 @@
 
 import UIKit
 import PresentationCore
-import RxSwift
-import RxCocoa
 import DSKit
 import Entity
 import UseCaseInterface
+import BaseFeature
+
+
+import RxSwift
+import RxCocoa
+import SDWebImageWebPCoder
 
 public protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
     
@@ -22,6 +26,7 @@ public protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
     var editingAddress: PublishRelay<AddressInformation> { get }
     var editingIntroduce: PublishRelay<String> { get }
     var editingSpecialty: PublishRelay<String> { get }
+    
     
     var uploadSuccess: Driver<Void>? { get }
     var alert: Driver<DefaultAlertContentVO>? { get }
@@ -52,7 +57,11 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     public var alert: Driver<Entity.DefaultAlertContentVO>?
     
     public var profileRenderObject: Driver<WorkerProfileRenderObject>?
+    public var displayingImage: Driver<UIImage?>?
     private let rederingState: BehaviorRelay<WorkerProfileRenderObject> = .init(value: .createRO(isMyProfile: true, vo: .mock))
+    
+    // Image
+    private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     // Editing & State
     var willSubmitImageInfo: ImageUploadInfo?
@@ -95,12 +104,21 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
             
         
         fetchedProfileVOSuccess
-            .asObservable()
             .map({ vo in
-                WorkerProfileRenderObject.createRO(isMyProfile: true, vo: vo)
+                WorkerProfileRenderObject
+                    .createRO(isMyProfile: true, vo: vo)
             })
             .bind(to: rederingState)
             .disposed(by: disposbag)
+        
+        displayingImage = fetchedProfileVOSuccess
+            .compactMap { $0.profileImageInfo }
+            .observe(on: imageDownLoadScheduler)
+            .map { downloadInfo in
+                UIImage.create(downloadInfo: downloadInfo)
+                
+            }
+            .asDriver(onErrorJustReturn: nil)
         
         exitButtonClicked
             .subscribe(onNext: { [weak self] in
@@ -220,12 +238,7 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     }
     
     func validateSelectedImage(image: UIImage) -> ImageUploadInfo? {
-        if let pngData = image.pngData() {
-            return .init(data: pngData, ext: "PNG")
-        } else if let jpegData = image.jpegData(compressionQuality: 1) {
-            return .init(data: jpegData, ext: "JPEG")
-        }
-        return nil
+        .create(image: image)
     }
 }
 

@@ -479,11 +479,17 @@ public class WorkerProfileViewController: DisposableViewController {
                 expLabel.textString = ro.expText
                 
                 addressLabel.textString = ro.address
-                introductionLabel.textString = ro.oneLineIntroduce.emptyDefault("-")
-                abilityLabel.textString = ro.specialty.emptyDefault("-")
-                
-                if let imageUrl = ro.imageUrl {
-                    workerProfileImage.setImage(url: imageUrl)
+                introductionLabel.textString = ro.oneLineIntroduce
+                abilityLabel.textString = ro.specialty
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .displayingImage?
+            .drive(onNext: { [weak self] image in
+                guard let self else { return }
+                UIView.transition(with: view, duration: 0.2) {
+                    self.workerProfileImage .image = image
                 }
             })
             .disposed(by: disposeBag)
