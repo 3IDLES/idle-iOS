@@ -124,7 +124,7 @@ public class IdleOneLineInputField: UIView {
     private func setAutoLayout() {
         
         [
-            stack   
+            stack
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview($0)

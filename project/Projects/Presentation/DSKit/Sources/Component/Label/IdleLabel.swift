@@ -28,16 +28,6 @@ public class IdleLabel: UILabel {
     
     public required init?(coder: NSCoder) { fatalError() }
     
-    public override var intrinsicContentSize: CGSize {
-        
-        let size = super.intrinsicContentSize
-        
-        if currentLineCount != 0 {
-            return CGSize(width: size.width, height: typography.lineHeight * CGFloat(currentLineCount))
-        }
-        return super.intrinsicContentSize
-    }
-    
     public var typography: Typography {
         get {
             currentTypography
@@ -58,42 +48,17 @@ public class IdleLabel: UILabel {
         }
     }
     
-    var wholeRangeParagraphStyle: NSMutableParagraphStyle? {
-        
-        if let text = attributedText?.string, text.isEmpty {
-            return nil
-        }
-        
-        var paragraph: NSMutableParagraphStyle
-        
-        if let prevParagraph = self.attributedText?.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSMutableParagraphStyle {
-            paragraph = prevParagraph
-        } else {
-            paragraph = NSMutableParagraphStyle()
-        }
-        
-        return paragraph
-    }
-    
     public override var textAlignment: NSTextAlignment {
         get {
             super.textAlignment
         }
         set {
             
-            if let paragraphStyle = wholeRangeParagraphStyle {
-                paragraphStyle.alignment = newValue
-
-                if let attrText = self.attributedText {
-                    let mutableAttr = NSMutableAttributedString(attributedString: attrText)
-                    let range = NSRange(location: 0, length: mutableAttr.length)
-                    mutableAttr.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
-                    
-                    self.attributedText = mutableAttr
-                }
-            }
-            
+            let paragraphStyle = currentAttributes[.paragraphStyle] as! NSMutableParagraphStyle
+            paragraphStyle.alignment = newValue
             super.textAlignment = newValue
+            
+            updateText()
         }
     }
     
@@ -121,23 +86,12 @@ public class IdleLabel: UILabel {
         let newAttr: [NSAttributedString.Key: Any] = [attr: value]
         currentAttributes = newAttr.merging(currentAttributes) { first, _ in first }
         updateText()
-        invalidateIntrinsicContentSize()
     }
     
     private func updateText() {
-        let attributedStr = NSMutableAttributedString(string: textString, attributes: currentAttributes)
+        let attributedStr = NSMutableAttributedString(string: currentText, attributes: currentAttributes)
         
-        if let fontHeight = (currentTypography.attributes[.font] as? UIFont)?.lineHeight {
-            
-            if let paragraphStyle = wholeRangeParagraphStyle {
-                    
-                paragraphStyle.lineSpacing = currentTypography.lineHeight-fontHeight
-                
-                attributedStr.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedStr.length))
-            }
-        }
-        
-        self.rx.attributedText.onNext(attributedStr)
-        invalidateIntrinsicContentSize()
+        self.attributedText = attributedStr
+        self.sizeToFit()
     }
 }

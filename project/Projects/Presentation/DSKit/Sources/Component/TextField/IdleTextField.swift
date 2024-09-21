@@ -144,10 +144,10 @@ public extension IdleTextField {
         var topInset: CGFloat = 0
         var bottomInset: CGFloat = 0
         
-        if verticalInset > 0 {
-            topInset = (currentTypography.lineHeight+verticalInset - height) * (currentTextFieldInsets.top/verticalInset)
+        if verticalInset > 0, let lineHeight = currentTypography.lineHeight {
+            topInset = (lineHeight+verticalInset - height) * (currentTextFieldInsets.top/verticalInset)
             
-            bottomInset = (currentTypography.lineHeight+verticalInset - height) * (currentTextFieldInsets.bottom/verticalInset)
+            bottomInset = (lineHeight+verticalInset - height) * (currentTextFieldInsets.bottom/verticalInset)
         }
         
         return bounds.inset(by: .init(
