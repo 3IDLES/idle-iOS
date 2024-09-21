@@ -41,7 +41,7 @@ public class WorkerSettingVC: BaseViewController {
         return button
     }()
     let applicationPolicyButton: FullRowButton = {
-        let button = FullRowButton(labelText: "약관및 정책")
+        let button = FullRowButton(labelText: "약관 및 정책")
         return button
     }()
     let personalDataProcessingPolicyButton: FullRowButton = {
