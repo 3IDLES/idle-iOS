@@ -126,7 +126,7 @@ where T.Input: AuthBusinessOwnerInputable & PageProcessInputable, T.Output: Auth
             isThatRightLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             isThatRightLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            centerInfoBox.topAnchor.constraint(equalTo: isThatRightLabel.bottomAnchor, constant: 20),
+            centerInfoBox.topAnchor.constraint(equalTo: isThatRightLabel.bottomAnchor, constant: 6),
             centerInfoBox.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             centerInfoBox.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
