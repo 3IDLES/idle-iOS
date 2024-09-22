@@ -59,7 +59,7 @@ class SaveUserInfoDataTests: XCTestCase {
                 longitude: "test",
                 latitude: "test",
                 introduce: "test",
-                profileImageURL: nil
+                profileImageInfo: nil
             )
         )
         
@@ -82,7 +82,7 @@ class SaveUserInfoDataTests: XCTestCase {
         
         repository.updateCurrentWorkerData(
             vo: .init(
-                profileImageURL: nil,
+                profileImageInfo: nil,
                 nameText: "test",
                 phoneNumber: "test",
                 isLookingForJob: true,

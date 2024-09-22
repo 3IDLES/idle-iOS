@@ -31,7 +31,8 @@ let project = Project(
                 
                 // ThirdParty
                 D.ThirdParty.RxSwift,
-                D.ThirdParty.FirebaseRemoteConfig
+                D.ThirdParty.FirebaseRemoteConfig,
+                D.ThirdParty.SDWebImageWebPCoder,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"]

@@ -157,6 +157,7 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
                 self?.editingState.experienceYear = exp
             }
             .disposed(by: disposbag)
+
         
         editingAddress
             .subscribe(onNext: { [weak self] address in
