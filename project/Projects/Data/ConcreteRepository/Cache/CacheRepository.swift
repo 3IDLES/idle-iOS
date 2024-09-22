@@ -122,7 +122,7 @@ public class DefaultCacheRepository: CacheRepository {
                         self?.createImageFile(imageURL: imageInfo.imageURL, contents: contents)
                         
                         // UIImage생성
-                        if let image = self?.createImage(data: contents, format: imageInfo.imageFormat) {
+                        if let image = self?.createUIImage(data: contents, format: imageInfo.imageFormat) {
                             
                             // 캐싱정보 지정
                             let cacheInfo = ImageCacheInfo(
@@ -205,9 +205,7 @@ extension DefaultCacheRepository {
         let imageDirectory = path.appendingPathComponent("Image")
         try? FileManager.default.createDirectory(at: imageDirectory, withIntermediateDirectories: true)
         
-        let imageFileName = url
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: ":", with: "_")
+        let imageFileName = safeFileName(from: url)
         
         let imageURL = imageDirectory
             .appendingPathComponent(imageFileName)
@@ -234,7 +232,7 @@ extension DefaultCacheRepository {
             
             if let data = FileManager.default.contents(atPath: imagePath.path) {
                 
-                return createImage(data: data, format: info.imageFormat)
+                return createUIImage(data: data, format: info.imageFormat)
             }
             
             #if DEBUG
@@ -299,7 +297,7 @@ extension DefaultCacheRepository {
         #endif
     }
     
-    func createImage(data: Data, format: ImageFormat) -> UIImage? {
+    func createUIImage(data: Data, format: ImageFormat) -> UIImage? {
         var image: UIImage?
         if format == .webp {
             image = SDImageWebPCoder.shared.decodedImage(with: data)
@@ -315,5 +313,35 @@ extension DefaultCacheRepository {
         #if DEBUG
         print("이미지 다운로드 싪패")
         #endif
+    }
+    
+    func safeFileName(from url: String) -> String {
+        let unsafeCharacters: [String: String] = [
+            "/": "_",    // 슬래시 -> 언더바
+            ":": "_",    // 콜론 -> 언더바
+            "?": "_",    // 물음표 -> 언더바
+            "=": "_",    // 등호 -> 언더바
+            "&": "_",    // 앰퍼샌드 -> 언더바
+            "%": "_",    // 퍼센트 -> 언더바
+            "#": "_",    // 해시 -> 언더바
+            " ": "_",    // 공백 -> 언더바
+            "\"": "_",   // 쌍따옴표 -> 언더바
+            "'": "_",    // 작은따옴표 -> 언더바
+            "<": "_",    // 꺾쇠 -> 언더바
+            ">": "_",    // 꺾쇠 -> 언더바
+            "\\": "_",   // 역슬래시 -> 언더바
+            "|": "_",    // 파이프 -> 언더바
+            "*": "_",    // 별표 -> 언더바
+            ";": "_",    // 세미콜론 -> 언더바
+        ]
+
+        var safeFileName = url
+
+        // 각 특수 문자를 안전한 문자로 변환
+        for (unsafe, safe) in unsafeCharacters {
+            safeFileName = safeFileName.replacingOccurrences(of: unsafe, with: safe)
+        }
+
+        return safeFileName
     }
 }
