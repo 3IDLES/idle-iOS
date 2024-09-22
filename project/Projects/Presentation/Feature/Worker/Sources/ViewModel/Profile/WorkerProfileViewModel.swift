@@ -7,11 +7,14 @@
 
 import UIKit
 import PresentationCore
-import RxSwift
-import RxCocoa
 import DSKit
 import Entity
 import UseCaseInterface
+import ConcreteRepository
+
+
+import RxSwift
+import RxCocoa
 
 /// 자신의 프로필을 확인하는 경우가 아닌 센터측에서 요양보호사를 보는 경우
 public protocol OtherWorkerProfileViewModelable: WorkerProfileViewModelable {
@@ -20,6 +23,8 @@ public protocol OtherWorkerProfileViewModelable: WorkerProfileViewModelable {
 }
 
 public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
+    
+    @Injected var cacheRepository: CacheRepository
     
     public weak var coordinator: WorkerProfileCoordinator?
     
@@ -88,10 +93,14 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
         displayingImage = fetchedProfileVOSuccess
             .compactMap { $0.profileImageInfo }
             .observe(on: imageDownLoadScheduler)
-            .map { downloadInfo in
-                UIImage.create(downloadInfo: downloadInfo)   
+            .flatMap { [cacheRepository] downloadInfo in
+                cacheRepository
+                    .getImage(imageInfo: downloadInfo)
             }
-            .asDriver(onErrorJustReturn: nil)
+            .map({ image -> UIImage? in
+                image
+            })
+            .asDriver(onErrorDriveWith: .never())
         
         exitButtonClicked
             .subscribe(onNext: { [weak self] in

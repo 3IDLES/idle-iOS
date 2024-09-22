@@ -11,6 +11,7 @@ import DSKit
 import Entity
 import UseCaseInterface
 import BaseFeature
+import ConcreteRepository
 
 
 import RxSwift
@@ -33,6 +34,8 @@ public protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
 }
 
 public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
+    
+    @Injected var cacheRepository: CacheRepository
     
     public weak var coordinator: WorkerProfileCoordinator?
     
@@ -114,10 +117,13 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
         displayingImage = fetchedProfileVOSuccess
             .compactMap { $0.profileImageInfo }
             .observe(on: imageDownLoadScheduler)
-            .map { downloadInfo in
-                UIImage.create(downloadInfo: downloadInfo)
-                
+            .flatMap { [cacheRepository] downloadInfo in
+                cacheRepository
+                    .getImage(imageInfo: downloadInfo)
             }
+            .map({ image -> UIImage? in
+                image
+            })
             .asDriver(onErrorJustReturn: nil)
         
         exitButtonClicked

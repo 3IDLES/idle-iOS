@@ -9,20 +9,10 @@ import Foundation
 import Entity
 import UIKit
 import UniformTypeIdentifiers
+import RepositoryInterface
 
 import SDWebImageWebPCoder
 import RxSwift
-
-public class CachedImageObject {
-    
-    let downloadInfo: ImageDownLoadInfo
-    let data: Data
-    
-    public init(downloadInfo: ImageDownLoadInfo, data: Data) {
-        self.downloadInfo = downloadInfo
-        self.data = data
-    }
-}
 
 public protocol CacheRepository {
     
@@ -224,11 +214,8 @@ extension DefaultCacheRepository {
             // 이미지 파일이 존재
             
             #if DEBUG
-            print("\(info.imageURL) : 파일이 존재함, 디스크 히트")
+            print("\(info.imageURL) : 디스크에 파일이 존재함")
             #endif
-            
-            // 접근시간 업데이트
-            updateLastReadTime(cacheInfoKey: info.imageURL.absoluteString)
             
             if let data = FileManager.default.contents(atPath: imagePath.path) {
                 

@@ -34,6 +34,9 @@ let project = Project(
                 // Domain
                 D.Domain.UseCaseInterface,
                 D.Domain.RepositoryInterface,
+                
+                // Data
+                D.Data.ConcreteRepository,
 
                 // ThirdParty
                 D.ThirdParty.RxSwift,

@@ -21,6 +21,11 @@ public struct DataAssembly: Assembly {
             return DefaultLocalStorageService()
         }
         
+        // MARK: 캐싱 레포지토리
+        container.register(CacheRepository.self) { _ in
+            return DefaultCacheRepository()
+        }
+        
         // MARK: 로컬에 저장된 유저정보 레포지토리
         container.register(UserInfoLocalRepository.self) { resolver in
             let localStorageService = resolver.resolve(LocalStorageService.self)!
