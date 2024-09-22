@@ -103,10 +103,14 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
                     latitude: profile.latitude
                 )
                 
-                let workPlaceLocation: LocationInformation = .init(
-                    longitude: Double(postVO.longitude) ?? 0.0,
-                    latitude: Double(postVO.latitude) ?? 0.0
-                )
+                var workPlaceLocation: LocationInformation = .notFound
+                
+                if let longitude = postVO.longitude, let latitude = postVO.latitude {
+                    workPlaceLocation = .init(
+                        longitude: Double(longitude) ?? 0.0,
+                        latitude: Double(latitude) ?? 0.0
+                    )
+                }
                 
                 let roadAddress = postVO.clientAddress
                 let text = "거주지에서 \(roadAddress) 까지"

@@ -30,6 +30,7 @@ public class WorkPlaceAndWorkerLocationView: VStack {
     // View
     let walkToLocationLabel: UILabel = {
         let label = UILabel()
+        label.numberOfLines = 0
         return label
     }()
     
@@ -109,15 +110,22 @@ public class WorkPlaceAndWorkerLocationView: VStack {
         walkToLocationLabel.attributedText = locationRO.homeToworkPlaceText
         estimatedArrivalTimeTextLabel.textString = locationRO.estimatedArrivalTimeText
         
-        mapView.bind(
-            locationRO: locationRO,
-            paddingInsets: .init(
-                top: 42,
-                left: 59,
-                bottom: 44,
-                right: 59
+        if locationRO.workPlaceLocation != .notFound {
+            
+            mapView.bind(
+                locationRO: locationRO,
+                paddingInsets: .init(
+                    top: 42,
+                    left: 59,
+                    bottom: 44,
+                    right: 59
+                )
             )
-        )
+        } else {
+            
+            // 맵뷰 숨김처리
+            mapViewBackGround.isHidden = true
+        }
         
         // - 제스처 끄기
         mapView.mapView.isScrollGestureEnabled = false

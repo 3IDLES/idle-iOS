@@ -42,15 +42,15 @@ public class WorkerWorknetEmployCard: VStack {
         )
         return tag
     }()
-    let daysUntilDeadlineTag: TagLabel = {
-        let tag = TagLabel(
-            text: "",
-            typography: .caption,
-            textColor: DSKitAsset.Colors.orange500.color,
-            backgroundColor: DSKitAsset.Colors.orange100.color
-        )
-        return tag
-    }()
+//    let daysUntilDeadlineTag: TagLabel = {
+//        let tag = TagLabel(
+//            text: "",
+//            typography: .caption,
+//            textColor: DSKitAsset.Colors.orange500.color,
+//            backgroundColor: DSKitAsset.Colors.orange100.color
+//        )
+//        return tag
+//    }()
     
     
     let titleLabel: IdleLabel = {
@@ -101,7 +101,7 @@ public class WorkerWorknetEmployCard: VStack {
             [
                 worknetTag,
                 beginnerTag,
-                daysUntilDeadlineTag,
+//                daysUntilDeadlineTag,
             ],
             spacing: 4
         )
@@ -169,7 +169,6 @@ public class WorkerWorknetEmployCard: VStack {
     public func applyRO(ro: WorkerWorknetEmployCardRO) {
         
         beginnerTag.isHidden = !ro.showBeginnerTag
-        daysUntilDeadlineTag.textString = ro.leftDayUnitlDeadlineText
         starButton.setState(ro.isStarred ? .accent : .normal)
         titleLabel.textString = ro.titleText
         estimatedArrivalTimeLabel.textString = ro.timeDurationForWalkingText
@@ -207,7 +206,6 @@ func hexStringToUIColor(hex: String) -> UIColor {
     cardView.applyRO(
         ro: .init(
             showBeginnerTag: true,
-            leftDayUnitlDeadlineText: "D-10",
             titleText: "[수원 매탄동] 방문요양 주 3회 (4등급 여자 어르신)",
             timeDurationForWalkingText: "도보 15분~20분",
             workTimeInfoText: "주 6일 근무 | (오전) 1시 00분 ~ (오후) 4시 00분 ",

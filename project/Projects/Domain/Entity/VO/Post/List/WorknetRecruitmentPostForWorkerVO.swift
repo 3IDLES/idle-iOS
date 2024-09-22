@@ -19,7 +19,7 @@ public struct WorknetRecruitmentPostVO: RecruitmentPostForWorkerRepresentable {
     public let workingTime: String
     public let workingSchedule: String
     public let payInfo: String
-    public let applyDeadline: Date
+    public let applyDeadlineString: String
     public let isFavorite: Bool
     
     public init(
@@ -29,7 +29,7 @@ public struct WorknetRecruitmentPostVO: RecruitmentPostForWorkerRepresentable {
         workingTime: String,
         workingSchedule: String,
         payInfo: String,
-        applyDeadline: Date,
+        applyDeadlineString: String,
         isFavorite: Bool,
         postType: RecruitmentPostType,
         beFavoritedTime: Date? = nil
@@ -40,7 +40,7 @@ public struct WorknetRecruitmentPostVO: RecruitmentPostForWorkerRepresentable {
         self.workingTime = workingTime
         self.workingSchedule = workingSchedule
         self.payInfo = payInfo
-        self.applyDeadline = applyDeadline
+        self.applyDeadlineString = applyDeadlineString
         self.isFavorite = isFavorite
         self.postType = postType
         self.beFavoritedTime = beFavoritedTime

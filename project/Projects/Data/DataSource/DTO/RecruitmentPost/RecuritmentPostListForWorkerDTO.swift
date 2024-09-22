@@ -72,8 +72,6 @@ public struct WorkNetRecruitmentPostForWorkerDTO: EntityRepresentable {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
-        let deadlineDate = dateFormatter.date(from: self.applyDeadline)!
-        
         let iso8601Formatter = ISO8601DateFormatter()
         var createdDate: Date?
         if let createdAt {
@@ -87,7 +85,7 @@ public struct WorkNetRecruitmentPostForWorkerDTO: EntityRepresentable {
             workingTime: workingTime,
             workingSchedule: workingSchedule,
             payInfo: payInfo,
-            applyDeadline: deadlineDate,
+            applyDeadlineString: applyDeadline,
             isFavorite: isFavorite,
             postType: jobPostingType,
             beFavoritedTime: createdDate

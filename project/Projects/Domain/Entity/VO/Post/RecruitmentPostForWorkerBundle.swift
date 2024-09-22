@@ -8,7 +8,7 @@
 import Foundation
  
 /// 위도경도 좌표를 담고 있습니다.
-public struct LocationInformation {
+public struct LocationInformation: Equatable {
     public let longitude: Double
     public let latitude: Double
     
@@ -16,6 +16,11 @@ public struct LocationInformation {
         self.longitude = longitude
         self.latitude = latitude
     }
+    
+    public static let notFound: LocationInformation = .init(
+        longitude: -1,
+        latitude: -1
+    )
 }
 
 public class RecruitmentPostForWorkerBundle {
