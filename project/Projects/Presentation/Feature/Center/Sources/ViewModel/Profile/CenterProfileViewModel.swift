@@ -9,6 +9,8 @@ import UIKit
 import Entity
 import PresentationCore
 import UseCaseInterface
+import RepositoryInterface
+import ConcreteRepository
 import BaseFeature
 
 
@@ -51,6 +53,8 @@ public protocol CenterProfileOutputable {
 
 public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
+    @Injected var cacheRepository: CacheRepository
+     
     let profileUseCase: CenterProfileUseCase
     weak var coordinator: CenterProfileCoordinator?
     
@@ -162,8 +166,11 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         let fetchCenterImageInfo = profileRequestSuccess
             .compactMap { $0.profileImageInfo }
             .observe(on: imageDownLoadScheduler)
-            .map { downloadInfo in
-                UIImage.create(downloadInfo: downloadInfo)
+            .flatMap { [cacheRepository] downloadInfo in
+                cacheRepository
+                    .getImage(imageInfo: downloadInfo)
+            }.map { image -> UIImage? in
+                image
             }
         
         // MARK: image validation
