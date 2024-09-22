@@ -10,12 +10,10 @@ import PresentationCore
 import RxCocoa
 import RxSwift
 import Entity
-import Kingfisher
 import Entity
 
 public struct ApplicantCardRO {
     
-    public let profileUrl: URL?
     public let isJobFinding: Bool
 //    public let isStared: Bool
     public let name: String
@@ -24,7 +22,6 @@ public struct ApplicantCardRO {
     public let expText: String
     
     public init(
-        profileUrl: URL?,
         isJobFinding: Bool,
 //        isStared: Bool,
         name: String,
@@ -32,7 +29,6 @@ public struct ApplicantCardRO {
         genderText: String,
         expText: String
     ) {
-        self.profileUrl = profileUrl
         self.isJobFinding = isJobFinding
 //        self.isStared = isStared
         self.name = name
@@ -42,7 +38,6 @@ public struct ApplicantCardRO {
     }
     
     public static let mock: ApplicantCardRO = .init(
-        profileUrl: URL(string: "https://dummyimage.com/600x400/00ffbf/0011ff&text=worker+profile"),
         isJobFinding: false,
 //        isStared: false,
         name: "홍길동",
@@ -53,7 +48,6 @@ public struct ApplicantCardRO {
     
     public static func create(vo: PostApplicantVO) -> ApplicantCardRO {
         .init(
-            profileUrl: vo.profileUrl,
             isJobFinding: vo.isJobFinding,
 //            isStared: vo.isStared,
             name: vo.name,
@@ -73,6 +67,7 @@ public protocol ApplicantCardViewModelable {
     
     // Output
     var renderObject: Driver<ApplicantCardRO>? { get }
+    var displayingImage: Driver<UIImage>? { get }
 }
 
 public class ApplicantCard: UIView {
@@ -257,11 +252,6 @@ public class ApplicantCard: UIView {
     }
     
     public func bind(ro: ApplicantCardRO) {
-        
-        if let imageUrl = ro.profileUrl {
-            workerProfileImage
-                .setImage(url: imageUrl)
-        }
         
         workingTag.textString = ro.isJobFinding ? "구직중" : "휴식중"
 //        starButton.setState(ro.isStared ? .accent : .normal)

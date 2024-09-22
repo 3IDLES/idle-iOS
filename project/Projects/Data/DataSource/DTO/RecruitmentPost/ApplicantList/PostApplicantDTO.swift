@@ -20,14 +20,24 @@ public struct PostApplicantDTO: Codable {
     
     public func toVO() -> PostApplicantVO {
         
-        var profileUrl: URL?
-        if let profileImageUrl {
-            profileUrl = URL(string: profileImageUrl)
+        var imageInfo: ImageDownLoadInfo? = nil
+        
+        if let url = profileImageUrl, let expString = url.split(separator: ".").last {
+            
+            let imageFormat = expString.uppercased()
+            
+            if let format = ImageFormat(rawValue: imageFormat) {
+                    
+                imageInfo = .init(
+                    imageURL: URL(string: url)!,
+                    imageFormat: format
+                )
+            }
         }
         
         return .init(
             workerId: carerId,
-            profileUrl: profileUrl,
+            imageInfo: imageInfo,
             isJobFinding: jobSearchStatus == "YES",
             
             // MARK:  센터가 즐겨찾기하는 요양보호사 추후 개발예정

@@ -25,6 +25,7 @@ public struct DataAssembly: Assembly {
         container.register(CacheRepository.self) { _ in
             return DefaultCacheRepository()
         }
+        .inObjectScope(.container)
         
         // MARK: 로컬에 저장된 유저정보 레포지토리
         container.register(UserInfoLocalRepository.self) { resolver in
