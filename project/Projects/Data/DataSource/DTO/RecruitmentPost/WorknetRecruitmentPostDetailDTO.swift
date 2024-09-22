@@ -14,8 +14,8 @@ public struct WorknetRecruitmentPostDetailDTO: EntityRepresentable {
     let title: String
     let content: String
     let clientAddress: String
-    let longitude: String
-    let latitude: String
+    let longitude: String?
+    let latitude: String?
     let distance: Int
     let createdAt: String
     let payInfo: String

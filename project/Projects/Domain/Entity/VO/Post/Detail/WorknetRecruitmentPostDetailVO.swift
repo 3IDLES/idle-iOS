@@ -13,8 +13,8 @@ public struct WorknetRecruitmentPostDetailVO: Decodable {
     public let title: String
     public let content: String
     public let clientAddress: String
-    public let longitude: String
-    public let latitude: String
+    public let longitude: String?
+    public let latitude: String?
     public let distance: Int
     public let createdAt: Date
     public let payInfo: String
@@ -35,8 +35,8 @@ public struct WorknetRecruitmentPostDetailVO: Decodable {
         title: String,
         content: String,
         clientAddress: String,
-        longitude: String,
-        latitude: String,
+        longitude: String?,
+        latitude: String?,
         distance: Int,
         createdAt: Date,
         payInfo: String,

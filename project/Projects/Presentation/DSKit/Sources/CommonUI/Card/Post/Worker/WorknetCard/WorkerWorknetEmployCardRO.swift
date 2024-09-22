@@ -11,7 +11,6 @@ import Entity
 public struct WorkerWorknetEmployCardRO {
     
     public let showBeginnerTag: Bool
-    public let leftDayUnitlDeadlineText: String
     public let titleText: String
     public let timeDurationForWalkingText: String
     public let workTimeInfoText: String
@@ -20,7 +19,6 @@ public struct WorkerWorknetEmployCardRO {
     
     public init(
         showBeginnerTag: Bool,
-        leftDayUnitlDeadlineText: String,
         titleText: String,
         timeDurationForWalkingText: String,
         workTimeInfoText: String,
@@ -28,7 +26,6 @@ public struct WorkerWorknetEmployCardRO {
         isStarred: Bool
     ) {
         self.showBeginnerTag = showBeginnerTag
-        self.leftDayUnitlDeadlineText = leftDayUnitlDeadlineText
         self.titleText = titleText
         self.timeDurationForWalkingText = timeDurationForWalkingText
         self.workTimeInfoText = workTimeInfoText
@@ -38,19 +35,10 @@ public struct WorkerWorknetEmployCardRO {
     
     public static func create(vo: WorknetRecruitmentPostDetailVO) -> WorkerWorknetEmployCardRO {
         
-        var leftDayUnitlDeadlineText: String = "타임존 다름"
-        if let dateDiff = Calendar.current.dateComponents([.day], from: .now, to: vo.applyDeadline).day {
-            leftDayUnitlDeadlineText = "D-\(dateDiff)"
-            if dateDiff == 0 {
-                leftDayUnitlDeadlineText = "D-Day"
-            }
-        }
-        
         let durationText = Self.timeForDistance(meter: vo.distance)
         
         return .init(
             showBeginnerTag: false,
-            leftDayUnitlDeadlineText: leftDayUnitlDeadlineText,
             titleText: vo.title,
             timeDurationForWalkingText: durationText,
             workTimeInfoText: "\(vo.workingSchedule) | \(vo.workingTime)",
@@ -61,19 +49,10 @@ public struct WorkerWorknetEmployCardRO {
     
     public static func create(vo: WorknetRecruitmentPostVO) -> WorkerWorknetEmployCardRO {
         
-        var leftDayUnitlDeadlineText: String = "타임존 다름"
-        if let dateDiff = Calendar.current.dateComponents([.day], from: .now, to: vo.applyDeadline).day {
-            leftDayUnitlDeadlineText = "D-\(dateDiff)"
-            if dateDiff == 0 {
-                leftDayUnitlDeadlineText = "D-Day"
-            }
-        }
-        
         let durationText = Self.timeForDistance(meter: vo.distance)
         
         return .init(
             showBeginnerTag: false,
-            leftDayUnitlDeadlineText: leftDayUnitlDeadlineText,
             titleText: vo.title,
             timeDurationForWalkingText: durationText,
             workTimeInfoText: "\(vo.workingSchedule) | \(vo.workingTime)",
