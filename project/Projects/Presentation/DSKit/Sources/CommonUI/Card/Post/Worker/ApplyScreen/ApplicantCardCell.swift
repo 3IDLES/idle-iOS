@@ -69,6 +69,17 @@ public class ApplicantCardCell: UITableViewCell {
                 .drive(onNext: { [cardView] ro in
                     cardView.bind(ro: ro)
                 }),
+            
+            viewModel
+                .displayingImage?
+                .drive(onNext: { [weak self] image in
+                    
+                    guard let self else { return }
+                   
+                    UIView.transition(with: contentView, duration: 0.1) {
+                        self.cardView.workerProfileImage.image = image
+                    }
+                }),
    
             // Input
 //            cardView

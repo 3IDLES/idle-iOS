@@ -15,7 +15,7 @@ public struct PostApplicantVO {
     public let workerId: String
     
     // For Render
-    public let profileUrl: URL?
+    public let imageInfo: ImageDownLoadInfo?
     public let isJobFinding: Bool
     public let isStared: Bool
     public let name: String
@@ -23,9 +23,9 @@ public struct PostApplicantVO {
     public let gender: Gender
     public let expYear: Int?
     
-    public init(workerId: String, profileUrl: URL?, isJobFinding: Bool, isStared: Bool, name: String, age: Int, gender: Gender, expYear: Int?) {
+    public init(workerId: String, imageInfo: ImageDownLoadInfo?, isJobFinding: Bool, isStared: Bool, name: String, age: Int, gender: Gender, expYear: Int?) {
         self.workerId = workerId
-        self.profileUrl = profileUrl
+        self.imageInfo = imageInfo
         self.isJobFinding = isJobFinding
         self.isStared = isStared
         self.name = name
@@ -36,7 +36,7 @@ public struct PostApplicantVO {
     
     public static let mock: PostApplicantVO = .init(
         workerId: "testworkerId",
-        profileUrl: URL(string: "https://dummyimage.com/600x400/00ffbf/0011ff&text=worker+profile"),
+        imageInfo: nil,
         isJobFinding: false,
         isStared: false,
         name: "홍길동",

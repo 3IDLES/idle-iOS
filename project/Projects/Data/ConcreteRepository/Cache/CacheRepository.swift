@@ -100,6 +100,9 @@ public class DefaultCacheRepository: CacheRepository {
                     // 접근시간 업데이트
                     self?.updateLastReadTime(cacheInfoKey: cacheInfoKey)
                     
+                    // 메모리 캐시에 올리기
+                    self?.imageMemoryCache.setObject(image, forKey: memoryKey)
+                    
                     observer(.success(image))
                     
                 } else {

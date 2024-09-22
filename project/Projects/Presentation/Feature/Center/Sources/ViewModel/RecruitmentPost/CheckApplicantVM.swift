@@ -5,14 +5,17 @@
 //  Created by choijunios on 8/13/24.
 //
 
-import Foundation
-import RxSwift
-import RxCocoa
+import UIKit
 import Entity
 import DSKit
 import PresentationCore
 import UseCaseInterface
 import BaseFeature
+import ConcreteRepository
+
+
+import RxSwift
+import RxCocoa
 
 public protocol CheckApplicantViewModelable: BaseViewModel {
     // Input
@@ -70,6 +73,7 @@ public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
             .map({ screenData in screenData.applicantList })
             .asDriver(onErrorDriveWith: .never())
         
+        
         postCardVO = requestScreenDataSuccess
             .map({ screenData in screenData.summaryCardVO })
             .asDriver(onErrorDriveWith: .never())
@@ -95,6 +99,7 @@ public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
 
 // MARK: ApplicantCardVM
 public class ApplicantCardVM: ApplicantCardViewModelable {
+    @Injected var cacheRepository: CacheRepository
     
     // Init
     let id: String
@@ -105,6 +110,9 @@ public class ApplicantCardVM: ApplicantCardViewModelable {
     public var staredThisWorker: PublishRelay<Bool> = .init()
     
     public var renderObject: Driver<ApplicantCardRO>?
+    public var displayingImage: RxCocoa.Driver<UIImage>?
+    
+    private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     let disposeBag = DisposeBag()
     
@@ -116,7 +124,16 @@ public class ApplicantCardVM: ApplicantCardViewModelable {
         let publishRelay: BehaviorRelay<ApplicantCardRO> = .init(value: .mock)
         renderObject = publishRelay.asDriver(onErrorJustReturn: .mock)
         
-        publishRelay.accept(ApplicantCardRO.create(vo: vo))
+        if let imageInfo = vo.imageInfo {
+            
+            displayingImage = cacheRepository
+                .getImage(imageInfo: imageInfo)
+                .subscribe(on: imageDownLoadScheduler)
+                .asDriver(onErrorDriveWith: .never())
+        }
+        
+        publishRelay
+            .accept(ApplicantCardRO.create(vo: vo))
         
         // MARK: 버튼 처리
         showProfileButtonClicked
