@@ -553,8 +553,9 @@ extension EditWorkerProfileViewController: UIImagePickerControllerDelegate, UINa
             let imageUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL,
             let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
         {
-                        
-            workerProfileImage.setImage(url: imageUrl)
+            UIView.transition(with: view, duration: 0.1) {
+                self.workerProfileImage.image = image
+            }
             imagePublisher.accept(image)
             
             picker.dismiss(animated: true)
