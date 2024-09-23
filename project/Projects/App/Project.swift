@@ -24,7 +24,7 @@ let project = Project(
             productName: DeploymentSettings.productName,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            infoPlist: IdleInfoPlist.appDefault,
+            infoPlist: IdleInfoPlist.mainApp,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             scripts: [
@@ -68,7 +68,9 @@ let project = Project(
                 D.ThirdParty.Amplitude,
             ],
             settings: .settings(
-                base: ["ENABLE_TESTABILITY": "YES"],
+                base: [
+                    "ENABLE_TESTABILITY": "YES",
+                ],
                 configurations: IdleConfiguration.appConfigurations
             )
         ),
@@ -116,6 +118,22 @@ let project = Project(
             ),
             runAction: .runAction(configuration: IdleConfiguration.releaseConfigName),
             archiveAction: .archiveAction(configuration: IdleConfiguration.releaseConfigName)
+        ),
+        .scheme(
+            name: "Idle-iOS_QA",
+            buildAction: .buildAction(
+                targets: [
+                    .target("Idle-iOS")
+                ]
+            ),
+            testAction: .targets(
+                [
+                    .testableTarget(target: .target("IdleAppTests"))
+                ],
+                configuration: IdleConfiguration.qaConfigName
+            ),
+            runAction: .runAction(configuration: IdleConfiguration.qaConfigName),
+            archiveAction: .archiveAction(configuration: IdleConfiguration.qaConfigName)
         )
     ]
 )
