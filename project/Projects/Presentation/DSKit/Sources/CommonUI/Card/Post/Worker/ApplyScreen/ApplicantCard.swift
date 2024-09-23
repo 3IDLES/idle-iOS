@@ -189,9 +189,6 @@ public class ApplicantCard: UIView {
         
         NSLayoutConstraint.activate([
             
-            profileImageContainer.widthAnchor.constraint(equalToConstant: 72),
-            profileImageContainer.heightAnchor.constraint(equalTo: profileImageContainer.widthAnchor),
-            
             workerProfileImage.topAnchor.constraint(equalTo: profileImageContainer.topAnchor),
             workerProfileImage.leftAnchor.constraint(equalTo: profileImageContainer.leftAnchor),
             workerProfileImage.rightAnchor.constraint(equalTo: profileImageContainer.rightAnchor),
@@ -233,10 +230,14 @@ public class ApplicantCard: UIView {
 //            starButton
         ], spacing: 16, alignment: .top)
         
-//        NSLayoutConstraint.activate([
+        NSLayoutConstraint.activate([
+            
+            profileImageContainer.widthAnchor.constraint(equalToConstant: 72),
+            profileImageContainer.heightAnchor.constraint(equalTo: profileImageContainer.widthAnchor),
+            
 //            starButton.widthAnchor.constraint(equalToConstant: 22),
 //            starButton.heightAnchor.constraint(equalTo: starButton.widthAnchor),
-//        ])
+        ])
         
         let buttonStack = HStack([
             showProfileButton, 
