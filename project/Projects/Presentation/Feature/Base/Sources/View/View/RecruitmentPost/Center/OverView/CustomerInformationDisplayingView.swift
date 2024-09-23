@@ -22,6 +22,8 @@ public protocol CustomerInformationDisplayingVMable {
 
 public class CustomerInformationDisplayingView: VStack {
     
+    let userType: UserType
+    
     // Init
     
     // View
@@ -51,7 +53,8 @@ public class CustomerInformationDisplayingView: VStack {
     // Observable
     private let disposeBag = DisposeBag()
     
-    public init() {
+    public init(userType: UserType) {
+        self.userType = userType
         super.init([], spacing: 16, alignment: .fill)
         setAppearance()
         setLayout()
@@ -65,12 +68,17 @@ public class CustomerInformationDisplayingView: VStack {
     private func setLayout() {
         
         // 1
-        let viewList1: [KeyValueListViewComponent] = [
+        var viewList1: [KeyValueListViewComponent] = [
             .init(title: "이름", valueLabelView: nameLabel, subValue: "고객 이름은 센터 측에서만 볼 수 있어요."),
             .init(title: "성별", valueLabelView: genderLabel),
             .init(title: "출생년도", valueLabelView: birthYearLabel),
             .init(title: "몸무게", valueLabelView: weightLabel),
         ]
+        
+        if userType == .worker {
+            // 유저타입이 요양보호사인 경우 이름 열 삭제
+            viewList1.remove(at: 0)
+        }
         
         // 2
         let viewList2: [KeyValueListViewComponent] = [

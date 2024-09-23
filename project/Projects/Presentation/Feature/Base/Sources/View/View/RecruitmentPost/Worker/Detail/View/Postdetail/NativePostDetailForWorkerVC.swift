@@ -279,7 +279,7 @@ public class PostDetailForWorkerContentView: UIView {
     
     /// 공고 상세정보들
     let workConditionView = WorkConditionDisplayingView()
-    let customerInfoView = CustomerInformationDisplayingView()
+    let customerInfoView = CustomerInformationDisplayingView(userType: .worker)
     let applicationDetailView = ApplicationDetailDisplayingView()
     
     /// 센터 프로필로 이동하는 카드및 센터정보 표시

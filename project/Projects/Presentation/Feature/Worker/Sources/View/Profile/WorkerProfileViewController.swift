@@ -221,7 +221,7 @@ public class WorkerProfileViewController: DisposableViewController {
                 nameTitleLabel
             ],
             spacing: 4,
-            alignment: .bottom
+            alignment: .center
         )
         let tagNameStack = VStack(
             [
@@ -351,7 +351,7 @@ public class WorkerProfileViewController: DisposableViewController {
             tagNameStack.topAnchor.constraint(equalTo: profileImageContainer.bottomAnchor, constant: 16),
             tagNameStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
-            humanInfoStack.topAnchor.constraint(equalTo: tagNameStack.bottomAnchor, constant: 16),
+            humanInfoStack.topAnchor.constraint(equalTo: tagNameStack.bottomAnchor, constant: 2),
             humanInfoStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             contactButtonsAndDivider.topAnchor.constraint(equalTo: humanInfoStack.bottomAnchor, constant: 24),
