@@ -41,6 +41,9 @@ public class DefaultCacheRepository: CacheRepository {
         static let cacheInfoDict = "cacheInfoDictionary"
     }
     
+    private let fileManagerScheduler = SerialDispatchQueueScheduler(qos: .background)
+    private let downloadScheduler = ConcurrentDispatchQueueScheduler(qos: .background)
+    
     /// 이미지를 메모리에서 캐싱하는 NSCache입니다.
     private let imageMemoryCache: NSCache<NSString, UIImage> = .init()
     
@@ -70,7 +73,49 @@ public class DefaultCacheRepository: CacheRepository {
     
     public func getImage(imageInfo: ImageDownLoadInfo) -> Single<UIImage> {
         
-        Single<UIImage>.create { [weak self] observer in
+        // MARK: 이미지 캐싱정보 확인
+        let findCacheResult = findCache(imageInfo: imageInfo)
+            .subscribe(on: fileManagerScheduler)
+            
+        let cacheFound = findCacheResult.compactMap { $0 }
+        let cacheNotFound = findCacheResult.filter { $0 == nil }
+        
+        // MARK: 이미지 다운로드
+        let imageDownloadResult = cacheNotFound
+            .observe(on: downloadScheduler)
+            .map { [imageInfo] _ -> Data? in
+                try? Data(contentsOf: imageInfo.imageURL)
+            }
+        
+        let downloadSuccess = imageDownloadResult.compactMap { $0 }
+        
+        // MARK: 다운로드된 이미지 캐싱
+        let downloadedImage = downloadSuccess
+            .observe(on: fileManagerScheduler)
+            .compactMap { [imageInfo, weak self] data -> UIImage? in
+                
+                // 이미지 캐싱
+                self?.cacheImage(imageInfo: imageInfo, contents: data)
+                
+                print(Thread.current)
+                
+                return self?.createUIImage(data: data, format: imageInfo.imageFormat)
+            }
+        
+        return Observable
+            .merge(
+                downloadedImage.asObservable(),
+                cacheFound.asObservable()
+            )
+            .asSingle()
+    }
+    
+    
+    private func findCache(imageInfo: ImageDownLoadInfo) -> Single<UIImage?> {
+        
+        Single<UIImage?>.create { [weak self] observer in
+
+            print(Thread.current)
             
             let urlString = imageInfo.imageURL.absoluteString
             let cacheInfoKey = urlString
@@ -104,45 +149,42 @@ public class DefaultCacheRepository: CacheRepository {
                     self?.imageMemoryCache.setObject(image, forKey: memoryKey)
                     
                     observer(.success(image))
-                    
                 } else {
                     
-                    // 디스크정보 없음, 이미지 다운로드 실행
-                    do {
-                        let contents = try Data(contentsOf: imageInfo.imageURL)
-                        
-                        // 디스크에 파일 생성
-                        self?.createImageFile(imageURL: imageInfo.imageURL, contents: contents)
-                        
-                        // UIImage생성
-                        if let image = self?.createUIImage(data: contents, format: imageInfo.imageFormat) {
-                            
-                            // 캐싱정보 지정
-                            let cacheInfo = ImageCacheInfo(
-                                url: imageInfo.imageURL.absoluteString,
-                                format: imageInfo.imageFormat,
-                                date: .now
-                            )
-                            
-                            if var dict = self?.cacheInfoDict {
-                                dict[cacheInfoKey] = cacheInfo
-                                self?.setCacheInfoDict(dict: dict)
-                            }
-                            
-                            // 메모리 캐시에 올리기
-                            self?.imageMemoryCache.setObject(image, forKey: memoryKey)
-                            
-                            observer(.success(image))
-                        }
-                    } catch {
-                        #if DEBUG
-                        print("이미지 다운로드 싪패")
-                        #endif
-                    }
+                    // 캐싱된 이미지 정보 없음
+                    observer(.success(nil))
                 }
             }
             
             return Disposables.create { }
+        }
+    }
+    
+    private func cacheImage(imageInfo: ImageDownLoadInfo, contents: Data) {
+        
+        // 디스크에 파일 생성
+        createImageFile(imageURL: imageInfo.imageURL, contents: contents)
+        
+        let urlString = imageInfo.imageURL.absoluteString
+        let cacheInfoKey = urlString
+        let memoryKey = NSString(string: urlString)
+        
+        // UIImage생성
+        if let image = createUIImage(data: contents, format: imageInfo.imageFormat) {
+            
+            // 캐싱정보 지정
+            let cacheInfo = ImageCacheInfo(
+                url: imageInfo.imageURL.absoluteString,
+                format: imageInfo.imageFormat,
+                date: .now
+            )
+            
+            var dict = cacheInfoDict
+            dict[cacheInfoKey] = cacheInfo
+            setCacheInfoDict(dict: dict)
+            
+            // 메모리 캐시에 올리기
+            imageMemoryCache.setObject(image, forKey: memoryKey)
         }
     }
 }
@@ -195,12 +237,25 @@ extension DefaultCacheRepository {
             return nil
         }
         
-        let imageDirectory = path.appendingPathComponent("Image")
-        try? FileManager.default.createDirectory(at: imageDirectory, withIntermediateDirectories: true)
+        let imageDirectoryPath = path.appendingPathComponent("Image")
+        
+        if !FileManager.default.fileExists(atPath: imageDirectoryPath.path) {
+                
+            do {
+                try FileManager.default.createDirectory(at: imageDirectoryPath, withIntermediateDirectories: true)
+            } catch {
+                
+                #if DEBUG
+                print("이미지 캐싱 디렉토리 생성 실패")
+                #endif
+                
+                return nil
+            }
+        }
         
         let imageFileName = safeFileName(from: url)
         
-        let imageURL = imageDirectory
+        let imageURL = imageDirectoryPath
             .appendingPathComponent(imageFileName)
         return imageURL
     }
