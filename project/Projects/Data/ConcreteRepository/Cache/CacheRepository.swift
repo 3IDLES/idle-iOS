@@ -76,7 +76,9 @@ public class DefaultCacheRepository: CacheRepository {
         // MARK: 이미지 캐싱정보 확인
         let findCacheResult = findCache(imageInfo: imageInfo)
             .subscribe(on: fileManagerScheduler)
-            
+            .asObservable()
+            .share()
+        
         let cacheFound = findCacheResult.compactMap { $0 }
         let cacheNotFound = findCacheResult.filter { $0 == nil }
         
@@ -86,6 +88,7 @@ public class DefaultCacheRepository: CacheRepository {
             .map { [imageInfo] _ -> Data? in
                 try? Data(contentsOf: imageInfo.imageURL)
             }
+            .share()
         
         let downloadSuccess = imageDownloadResult.compactMap { $0 }
         
@@ -96,8 +99,6 @@ public class DefaultCacheRepository: CacheRepository {
                 
                 // 이미지 캐싱
                 self?.cacheImage(imageInfo: imageInfo, contents: data)
-                
-                print(Thread.current)
                 
                 return self?.createUIImage(data: data, format: imageInfo.imageFormat)
             }
@@ -114,8 +115,6 @@ public class DefaultCacheRepository: CacheRepository {
     private func findCache(imageInfo: ImageDownLoadInfo) -> Single<UIImage?> {
         
         Single<UIImage?>.create { [weak self] observer in
-
-            print(Thread.current)
             
             let urlString = imageInfo.imageURL.absoluteString
             let cacheInfoKey = urlString
