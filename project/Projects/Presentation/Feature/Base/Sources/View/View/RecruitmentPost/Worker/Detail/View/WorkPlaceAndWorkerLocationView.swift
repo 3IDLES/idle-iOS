@@ -149,6 +149,14 @@ extension NMFNaverMapView {
         locationRO: WorkPlaceAndWorkerLocationMapRO,
         paddingInsets: UIEdgeInsets
     ) {
+        
+        // 마커 아이콘 사이즈
+        let markerSize: CGSize = .init(width: 33, height: 44)
+        var paddingInsets = paddingInsets
+        paddingInsets.top += markerSize.height
+        paddingInsets.left += markerSize.width/2
+        paddingInsets.right += markerSize.width/2
+        
         // 마커 설정
         let workPlacePos: NMGLatLng = .init(
             lat: locationRO.workPlaceLocation.latitude,
