@@ -35,6 +35,8 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
     
     private var disposables: [Disposable?]?
     
+    let dateFormatter = DateFormatter()
+    
     // View
     let tappableArea: TappableUIView = {
         let view = TappableUIView()
@@ -47,6 +49,7 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
     let applyButton: IdlePrimaryCardButton = {
         let btn = IdlePrimaryCardButton(level: .large)
         btn.label.textString = "지원하기"
+        btn.isUserInteractionEnabled = false
         return btn
     }()
     
@@ -58,6 +61,7 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
     public required init?(coder: NSCoder) { fatalError() }
     
     public override func prepareForReuse() {
+        super.prepareForReuse()
         disposables?.forEach { $0?.dispose() }
         disposables = nil
     }
@@ -103,11 +107,9 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
         
         // 지원 여부
         if let appliedDate = vo.applyDate {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "지원완료 yyyy. MM. dd"
-            let applyButtonLabelString = dateFormatter.string(from: appliedDate)
-            applyButton.label.textString = applyButtonLabelString
-            applyButton.setEnabled(false)
+            disableApplyButton(appliedDate: appliedDate)
+        } else {
+            activateApplyButton()
         }
         
         // 카드 컨텐츠 바인딩
@@ -156,5 +158,17 @@ public class WorkerNativeEmployCardCell: UITableViewCell {
         ]
         
         self.disposables = disposables
+    }
+    
+    private func activateApplyButton() {
+        applyButton.label.textString = "지원하기"
+        applyButton.setEnabled(true)
+    }
+    
+    private func disableApplyButton(appliedDate: Date) {
+        dateFormatter.dateFormat = "지원완료 yyyy. MM. dd"
+        let applyButtonLabelString = dateFormatter.string(from: appliedDate)
+        applyButton.label.textString = applyButtonLabelString
+        applyButton.setEnabled(false)
     }
 }
