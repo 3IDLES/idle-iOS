@@ -11,7 +11,8 @@ import RxCocoa
 import DSKit
 
 public protocol IdleMainPageItemable: Hashable & CaseIterable {
-    var tabItemIcon: UIImage { get }
+    var tabItemIdleIcon: UIImage { get }
+    var tabItemAccentIcon: UIImage { get }
     var tabItemText: String { get }
     var pageOrderNumber: Int { get }
 }
@@ -126,7 +127,8 @@ public extension IdleTabBar {
             let item = IdleTabBarItem(
                 index: page.pageOrderNumber,
                 labelText: page.tabItemText,
-                image: page.tabItemIcon
+                idleImage: page.tabItemIdleIcon,
+                accentImage: page.tabItemAccentIcon
             )
             items[page] = item
             return item

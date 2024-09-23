@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "dock_post_accent.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
