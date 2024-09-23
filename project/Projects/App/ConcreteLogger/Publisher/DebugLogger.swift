@@ -1,5 +1,5 @@
 //
-//  Debug.swift
+//  DebugLogger.swift
 //  ConcreteLogger
 //
 //  Created by choijunios on 9/16/24.
