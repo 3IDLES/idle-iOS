@@ -109,9 +109,15 @@ public class WorkConditionDisplayingView: HStack {
 public extension WorkConditionDisplayingView {
     
     private func applyObject(_ object: WorkTimeAndPayStateObject) {
-        let daysText = object.selectedDays.compactMap { (day, isActive) -> String? in
-            return isActive ? day.korOneLetterText : nil
-        }.joined(separator: ", ")
+        let daysText = object.selectedDays.compactMap { (day, isActive) -> WorkDay? in
+            return isActive ? day : nil
+        }.sorted(by: { lhs, rhs in
+            lhs.rawValue < rhs.rawValue
+        })
+        .map({
+            $0.korOneLetterText
+        })
+        .joined(separator: ", ")
         
         workDaysLabel.textString = daysText
         
