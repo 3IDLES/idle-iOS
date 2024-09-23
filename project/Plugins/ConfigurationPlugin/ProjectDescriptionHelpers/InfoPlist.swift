@@ -11,7 +11,7 @@ public enum IdleInfoPlist {
     
     public static let mainApp: InfoPlist = .extendingDefault(with: [
         
-        "CFBundleDisplayName": "케어밋",
+        "CFBundleDisplayName": "$(BUNDLE_DISPLAY_NAME)",
         
         "CFBundleShortVersionString" : "0.0.4",
         
