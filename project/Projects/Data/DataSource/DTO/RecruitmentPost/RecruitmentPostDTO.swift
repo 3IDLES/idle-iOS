@@ -89,7 +89,7 @@ public struct RecruitmentPostFetchDTO: Codable {
         age: Int,
         weight: Int?,
         careLevel: Int,
-        mentalStatus: String, ㅇ
+        mentalStatus: String,
         disease: String?,
         lifeAssistance: [String]?,
         extraRequirement: String?,
