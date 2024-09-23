@@ -34,6 +34,7 @@ public class IdleLabel: UILabel {
         }
         set {
             currentTypography = newValue
+            currentAttributes = currentTypography.attributes
             updateText()
         }
     }

@@ -134,9 +134,25 @@ public class ApplicantCard: UIView {
     }()
     
     // 버튼들
-    let showProfileButton: IdleSecondaryButton = {
-        let button = IdleSecondaryButton(level: .medium)
-        button.label.textString = "프로필 보기"
+    let showProfileButton: TappableUIView = {
+        let button = TappableUIView()
+        button.backgroundColor = .white
+        button.layer.borderColor = DSColor.gray100.color.cgColor
+        button.layer.borderWidth = 1
+        button.layer.cornerRadius = 6
+        
+        let label = IdleLabel(typography: .Subtitle4)
+        label.textString = "프로필 보기"
+        label.attrTextColor = DSColor.gray300.color
+        
+        button.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+        ])
+        
         return button
     }()
 //    let employButton: IdlePrimaryButton = {
@@ -240,6 +256,9 @@ public class ApplicantCard: UIView {
         }
         
         NSLayoutConstraint.activate([
+            
+            showProfileButton.heightAnchor.constraint(equalToConstant: 38),
+            
             mainStack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
             mainStack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
             mainStack.rightAnchor.constraint(equalTo: self.layoutMarginsGuide.rightAnchor),
