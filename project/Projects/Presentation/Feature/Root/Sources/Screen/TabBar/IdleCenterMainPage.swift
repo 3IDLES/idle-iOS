@@ -35,12 +35,22 @@ public enum IdleCenterMainPage: IdleMainPageItemable {
         }
     }
     
-    public var tabItemIcon: UIImage {
+    public var tabItemIdleIcon: UIImage {
         switch self {
         case .home:
-            return DSIcon.workerPost.image
+            return DSIcon.dockHomeNormal.image
         case .setting:
-            return DSIcon.workerSetting.image
+            return DSIcon.dockSettingNormal.image
+        }
+    }
+    
+    public var tabItemAccentIcon: UIImage {
+        switch self {
+        case .home:
+            return DSIcon.dockHomeAccent.image
+        case .setting:
+            return DSIcon.dockSettingAccent.image
+            
         }
     }
     

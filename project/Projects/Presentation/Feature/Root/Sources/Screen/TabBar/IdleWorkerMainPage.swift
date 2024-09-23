@@ -39,14 +39,25 @@ public enum IdleWorkerMainPage: IdleMainPageItemable {
         }
     }
     
-    public var tabItemIcon: UIImage {
+    public var tabItemIdleIcon: UIImage {
         switch self {
         case .home:
-            return DSIcon.workerHome.image
+            return DSIcon.dockHomeNormal.image
         case .preferredPost:
-            return DSIcon.workerPost.image
+            return DSIcon.dockPostNormal.image
         case .setting:
-            return DSIcon.workerSetting.image
+            return DSIcon.dockSettingNormal.image
+        }
+    }
+    
+    public var tabItemAccentIcon: UIImage {
+        switch self {
+        case .home:
+            return DSIcon.dockHomeAccent.image
+        case .preferredPost:
+            return DSIcon.dockPostAccent.image
+        case .setting:
+            return DSIcon.dockSettingAccent.image
         }
     }
     

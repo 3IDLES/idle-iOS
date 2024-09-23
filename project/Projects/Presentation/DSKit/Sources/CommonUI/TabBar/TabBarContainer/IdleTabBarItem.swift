@@ -22,12 +22,12 @@ public class IdleTabBarItem: TappableUIView {
     }
     
     // idle
-    let idleIconColor: UIColor = DSColor.gray300.color
-    let idleTextColor: UIColor = DSColor.gray300.color
+    let idleIcon: UIImage
+    let accentIcon: UIImage
     
-    // accent
-    let accentIconColor: UIColor = DSColor.gray700.color
+    // text color
     let accentTextColor: UIColor = DSColor.gray700.color
+    let idleTextColor: UIColor = DSColor.gray300.color
     
     // View
     let label: IdleLabel = {
@@ -40,10 +40,11 @@ public class IdleTabBarItem: TappableUIView {
         return view
     }()
     
-    public init(index: Int, labelText: String, image: UIImage) {
+    public init(index: Int, labelText: String, idleImage: UIImage, accentImage: UIImage) {
         self.index = index
         self.label.textString = labelText
-        self.imageView.image = image
+        self.idleIcon = idleImage
+        self.accentIcon = accentImage
         
         super.init()
         
@@ -53,7 +54,7 @@ public class IdleTabBarItem: TappableUIView {
     public required init?(coder: NSCoder) { nil }
     
     private func setAppearance() {
-        imageView.tintColor = idleIconColor
+        imageView.image = idleIcon
         label.attrTextColor = idleTextColor
     }
     
@@ -64,9 +65,6 @@ public class IdleTabBarItem: TappableUIView {
         mainStack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            imageView.widthAnchor.constraint(equalToConstant: 32),
-            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor),
-            
             mainStack.topAnchor.constraint(equalTo: self.topAnchor),
             mainStack.leftAnchor.constraint(equalTo: self.leftAnchor),
             mainStack.rightAnchor.constraint(equalTo: self.rightAnchor),
@@ -86,12 +84,12 @@ public class IdleTabBarItem: TappableUIView {
     }
     
     private func setToIdle() {
-        imageView.tintColor = idleIconColor
+        imageView.image = idleIcon
         label.attrTextColor = idleTextColor
     }
     
     private func setToAccent() {
-        imageView.tintColor = accentIconColor
+        imageView.image = accentIcon
         label.attrTextColor = accentTextColor
     }
 }
