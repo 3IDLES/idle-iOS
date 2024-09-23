@@ -111,7 +111,12 @@ public struct NativeRecruitmentPostDetailDTO: EntityRepresentable {
         )
         
         // MARK: Apply date
-        let applyDate = applyTime != nil ? dateFormatter.date(from: applyTime!) : nil
+        var applyDate: Date?
+        if let applyTime {
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+            applyDate = dateFormatter.date(from: applyTime)
+            print(applyTime)
+        }
         
         return .init(
             isFavorite: isFavorite,
