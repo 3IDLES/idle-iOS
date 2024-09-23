@@ -104,7 +104,7 @@ public class CheckApplicantVC: BaseViewController {
             divider.leftAnchor.constraint(equalTo: contentView.leftAnchor),
             divider.rightAnchor.constraint(equalTo: contentView.rightAnchor),
             
-            applicantTitleLabel.topAnchor.constraint(equalTo: divider.topAnchor, constant: 20),
+            applicantTitleLabel.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 24),
             applicantTitleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
             
             applicantTableView.topAnchor.constraint(equalTo: applicantTitleLabel.bottomAnchor, constant: 20),
