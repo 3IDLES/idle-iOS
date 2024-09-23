@@ -78,7 +78,8 @@ let project = Project(
                 D.ThirdParty.RxMoya,
             ],
             settings: .settings(
-                base: ["ENABLE_TESTABILITY": "YES"]
+                base: ["ENABLE_TESTABILITY": "YES"],
+                configurations: IdleConfiguration.dataConfigurations
             )
         ),
     ],
@@ -88,7 +89,8 @@ let project = Project(
             testableTarget: .target("ConcretesTests"),
             configNames: [
                 IdleConfiguration.debugConfigName,
-                IdleConfiguration.releaseConfigName
+                IdleConfiguration.releaseConfigName,
+                IdleConfiguration.qaConfigName,
             ]
         )
     ].flatMap { $0 }

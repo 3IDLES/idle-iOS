@@ -28,7 +28,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 LoggerAssembly(),
                 DataAssembly(),
                 DomainAssembly(),
-            ])
+            ])    
         
         rootCoordinator = RootCoordinator(
             dependency: .init(

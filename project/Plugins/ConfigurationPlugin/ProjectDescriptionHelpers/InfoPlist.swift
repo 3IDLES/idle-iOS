@@ -9,11 +9,11 @@ import ProjectDescription
 
 public enum IdleInfoPlist {
     
-    public static let appDefault: InfoPlist = .extendingDefault(with: [
+    public static let mainApp: InfoPlist = .extendingDefault(with: [
         
         "CFBundleDisplayName": "케어밋",
         
-        "CFBundleShortVersionString" : "0.0.3",
+        "CFBundleShortVersionString" : "0.0.4",
         
         "NSAppTransportSecurity" : [
             "NSAllowsArbitraryLoads" : true

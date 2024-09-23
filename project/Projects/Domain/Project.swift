@@ -134,21 +134,24 @@ let project = Project(
             testableTarget: .target("ConcreteUseCaseTests"),
             configNames: [
                 IdleConfiguration.debugConfigName,
-                IdleConfiguration.releaseConfigName
+                IdleConfiguration.releaseConfigName,
+                IdleConfiguration.qaConfigName
             ]
         ),
         Scheme.makeSchemes(
             .target("UseCaseInterface"),
             configNames: [
                 IdleConfiguration.debugConfigName,
-                IdleConfiguration.releaseConfigName
+                IdleConfiguration.releaseConfigName,
+                IdleConfiguration.qaConfigName
             ]
         ),
         Scheme.makeSchemes(
             .target("RepositoryInterface"),
             configNames: [
                 IdleConfiguration.debugConfigName,
-                IdleConfiguration.releaseConfigName
+                IdleConfiguration.releaseConfigName,
+                IdleConfiguration.qaConfigName
             ]
         ),
     ].flatMap({ $0 })

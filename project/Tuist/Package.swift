@@ -14,7 +14,8 @@ import PackageDescription
         baseSettings: .settings(
             configurations: [
                 .debug(name: "debug"),
-                .release(name: "release")
+                .release(name: "release"),
+                .release(name: "qa")
             ]
         )
     )
