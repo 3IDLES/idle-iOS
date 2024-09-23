@@ -336,7 +336,12 @@ public class CenterProfileViewController: BaseViewController {
         
         viewModel
             .centerIntroduction?
-            .drive(centerIntroductionLabel.rx.textString)
+            .drive(onNext: { [weak self] introduceText in
+                guard let self else { return }
+                centerIntroductionLabel.textString = introduceText
+                centerIntroductionLabel.isHidden = introduceText.isEmpty
+                centerIntroductionTitleLabel.isHidden = introduceText.isEmpty
+            })
             .disposed(by: disposeBag)
         viewModel
             .centerIntroduction?
@@ -367,6 +372,9 @@ public class CenterProfileViewController: BaseViewController {
                     centerPhoneNumeberField.isHidden = !$0
                     centerPhoneNumeberLabel.isHidden = $0
                     
+                    if $0 {
+                        centerIntroductionTitleLabel.isHidden = false
+                    }
                     centerIntroductionField.isHidden = !$0
                     centerIntroductionLabel.isHidden = $0
                     

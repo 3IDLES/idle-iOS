@@ -152,7 +152,6 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
                 self?.fetchedIntroduction = introduce
                 return introduce
             }
-            .filter { !$0.isEmpty }
             .asDriver(onErrorJustReturn: "")
     
         let centerPhoneNumberDriver = profileRequestSuccess
