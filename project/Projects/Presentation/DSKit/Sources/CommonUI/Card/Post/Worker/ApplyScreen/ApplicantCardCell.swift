@@ -35,12 +35,6 @@ public class ApplicantCardCell: UITableViewCell {
     
     func setAppearance() { }
     
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-
-        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0))
-    }
-    
     func setLayout() {
         
         [
@@ -54,7 +48,7 @@ public class ApplicantCardCell: UITableViewCell {
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
             cardView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
             cardView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
         ])
     }
     
