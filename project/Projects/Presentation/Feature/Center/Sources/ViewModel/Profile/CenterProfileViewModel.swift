@@ -127,6 +127,7 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         
         let profileRequestSuccess = profileRequestResult
             .compactMap { $0.value }
+            .share()
         
         let profileRequestFailure = profileRequestResult
             .compactMap { $0.error }
