@@ -46,7 +46,7 @@ public class DefaultWorkerProfileUseCase: WorkerProfileUseCase {
         
         if let imageInfo {
             updateImageTask = userProfileRepository.uploadImage(
-                .center,
+                .worker,
                 imageInfo: imageInfo
             )
         } else {
