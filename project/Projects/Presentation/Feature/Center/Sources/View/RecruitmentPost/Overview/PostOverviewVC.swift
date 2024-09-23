@@ -101,7 +101,7 @@ public class PostOverviewVC: BaseViewController {
     
     // Overviews
     let workConditionOV = WorkConditionDisplayingView()
-    let customerInfoOV = CustomerInformationDisplayingView()
+    let customerInfoOV = CustomerInformationDisplayingView(userType: .center)
     let applyInfoOverView = ApplicationDetailDisplayingView()
     
     public init() {

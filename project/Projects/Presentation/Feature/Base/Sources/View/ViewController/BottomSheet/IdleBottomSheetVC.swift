@@ -40,6 +40,7 @@ open class IdleBottomSheetVC: BaseViewController {
     }()
     
     let sheetView = UIView()
+    let tapToDismissSpace = UIView()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -84,13 +85,20 @@ open class IdleBottomSheetVC: BaseViewController {
         ])
         
         [
-            sheetView
+            tapToDismissSpace,
+            sheetView,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
+            
+            tapToDismissSpace.topAnchor.constraint(equalTo: view.topAnchor),
+            tapToDismissSpace.leftAnchor.constraint(equalTo: view.leftAnchor),
+            tapToDismissSpace.rightAnchor.constraint(equalTo: view.rightAnchor),
+            tapToDismissSpace.bottomAnchor.constraint(equalTo: sheetView.topAnchor),
+            
             sheetView.rightAnchor.constraint(equalTo: view.rightAnchor),
             sheetView.leftAnchor.constraint(equalTo: view.leftAnchor),
             sheetView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 16)
@@ -109,7 +117,7 @@ open class IdleBottomSheetVC: BaseViewController {
         let tapGesture = UITapGestureRecognizer()
         tapGesture.addTarget(self, action: #selector(tapForDismiss(_:)))
         
-        view.addGestureRecognizer(tapGesture)
+        tapToDismissSpace.addGestureRecognizer(tapGesture)
     }
 }
 

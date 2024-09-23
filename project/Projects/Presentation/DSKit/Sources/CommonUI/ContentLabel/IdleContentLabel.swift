@@ -48,7 +48,7 @@ public class IdleContentTitleLabel: UIStackView {
         [
             titleLabel,
             subTitleLabel,
-            UIView()
+            Spacer()
         ].forEach { label in
             
             self.addArrangedSubview(label)
