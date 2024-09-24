@@ -16,6 +16,10 @@ public class BoardSortigHeaderView: UIView {
         )
         button.label.textString = "정렬 기준"
         button.label.attrTextColor = DSKitAsset.Colors.gray300.color
+        
+        /// ‼️ 미구현 기능
+        button.isHidden = true
+        
         return button
     }()
     

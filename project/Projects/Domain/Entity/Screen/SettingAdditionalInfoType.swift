@@ -20,7 +20,7 @@ public enum SettingAdditionalInfoType {
         case .frequentQuestion:
             urlString = "https://grove-maraca-55d.notion.site/8579186ee8ca4dbb8dc55e3b8b744d11?pvs=4"
         case .contact:
-            urlString = "https://docs.google.com/forms/d/1I1N9xmYuqlpy8K1ga8xOECPZl-1sW33WrKIzXas74Is/viewform?edit_requested=true"
+            urlString = "http://pf.kakao.com/_VPcIn/chat"
         case .termsandPolicies:
             urlString = "https://grove-maraca-55d.notion.site/2e4d597aff1f406e9164cdb6f9195de0?pvs=4"
         case .privacyPolicy:

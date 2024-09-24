@@ -84,12 +84,16 @@ public class PostOverviewVC: BaseViewController {
     
     let screenFoWorkerButton: TextImageButtonType2 = {
         let button = TextImageButtonType2()
-        button.textLabel.textString = "보호사 측 화면으로 보기 "
+        button.textLabel.textString = "보호사 측 화면으로 보기"
         button.textLabel.attrTextColor = DSKitAsset.Colors.gray300.color
         button.imageView.image = DSKitAsset.Icons.chevronRight.image
         button.imageView.tintColor = DSKitAsset.Colors.gray300.color
         button.layoutMargins = .zero
         button.layer.borderWidth = 0.0
+        
+        /// ‼️ 미구현 기능
+        button.isHidden = true
+        
         return button
     }()
     
