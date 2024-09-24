@@ -14,46 +14,58 @@ import RxSwift
 
 class ImageCachingTest: XCTestCase {
     
-    let cacheRepo = DefaultCacheRepository()
-    let disposeBag = DisposeBag()
+    var cacheRepository: DefaultCacheRepository!
+    var disposeBag: DisposeBag!
     
-    func testCaching() {
+    override func setUp() {
+        super.setUp()
+        self.cacheRepository = .init()
+        self.disposeBag = .init()
+    }
+    
+    func test_diskcache_oveflows_50images() {
         
-        let imageInfo = ImageDownLoadInfo(
-            imageURL: URL(string: "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U")!,
-            imageFormat: .jpeg
-        )
+        class ImageFetchedCounter {
+            var count: Int
+            
+            init(count: Int) {
+                self.count = count
+            }
+        }
         
-        let exp = XCTestExpectation(description: "caching")
-        cacheRepo
-            .getImage(imageInfo: imageInfo)
-            .map { image in
-                print("--첫번째 이미지--")
-            }
-            .flatMap { [cacheRepo]_ in
-                cacheRepo
-                    .getImage(imageInfo: imageInfo)
-            }
-            .map { image in
-                print("--메모리 캐싱 체크--")
-            }
-            .map { [cacheRepo]_ in
-                cacheRepo
-                    .checkDiskCache(info: imageInfo)
-            }
-            .subscribe(onSuccess: { image in
+        let counter = ImageFetchedCounter(count: 0)
+        
+        // 이미지 50개를 테스트
+        let observables = (0..<60).map { index in
+            
+            let url = URL(string: "https://dummyimage.com/300x\(300+index)/000/fff")!
+            let imageInfo = ImageDownLoadInfo(
+                imageURL: url,
+                imageFormat: .png
+            )
                 
-                print("--디스크 체크--")
+            return cacheRepository
+                .getImage(imageInfo: imageInfo)
+                .asObservable()
+        }
+        
+        let cacheExpectation = XCTestExpectation(description: "cacheExpectation")
+        
+        Observable
+            .merge(observables)
+            .subscribe(onNext: { [counter] _ in
                 
-                if let image {
-                    exp.fulfill()
-                } else {
-                    XCTFail()
+                counter.count += 1
+                print("이미지 획득 성공 \(counter.count)")
+                
+                if counter.count == 60 {
+                    
+                    cacheExpectation.fulfill()
                 }
-                
             })
             .disposed(by: disposeBag)
+            
         
-        wait(for: [exp], timeout: 5.0)
+        wait(for: [cacheExpectation], timeout: 10.0)
     }
 }
