@@ -33,6 +33,12 @@ class ImageCachingTest: XCTestCase {
             }
         }
         
+        // 디스크 캐싱 내역 삭제
+        guard cacheRepository.clearImageCacheDirectory() else {
+            XCTFail("디스크 캐싱내역 삭제 실패")
+            return
+        }
+        
         let counter = ImageFetchedCounter(count: 0)
         
         // 이미지 50개를 테스트

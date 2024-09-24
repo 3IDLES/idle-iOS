@@ -98,7 +98,7 @@ public class DefaultCacheRepository: CacheRepository {
             .compactMap { [imageInfo, weak self] data -> UIImage? in
                 
                 // 이미지 캐싱
-                self?.cacheImage(imageInfo: imageInfo, contents: data)
+                _ = self?.cacheImage(imageInfo: imageInfo, contents: data)
                 
                 return self?.createUIImage(data: data, format: imageInfo.imageFormat)
             }
@@ -314,6 +314,9 @@ extension DefaultCacheRepository {
             
             // 최대 파일수를 초과한 경우 삭제(LRU), 하위 10개 파일 삭제
             if numOfFiles >= 50 {
+                #if DEBUG
+                print("디스크 파일수가 50개를 초과하였음 삭제실행")
+                #endif
                 
                 var dict = cacheInfoDict
                 let sortedInfo = dict.sorted { (lhs, rhs) in
@@ -323,16 +326,31 @@ extension DefaultCacheRepository {
                 // 이미지 파일 삭제
                 sortedInfo[0..<10].forEach { (key, value) in
                     dict.removeValue(forKey: key)
+                    
                     if let path = createImagePath(url: value.url) {
-                        do {
-                            try FileManager.default.removeItem(at: path)
-                        } catch {
+                        
+                        if FileManager.default.fileExists(atPath: path.path) {
+                            
+                            do {
+                                try FileManager.default.removeItem(at: path)
+                                print("이미지 삭제 성공 \(path)")
+                            } catch {
+                                #if DEBUG
+                                print("\(path) 이미지 삭제 실패 reason: \(error.localizedDescription)")
+                                #endif
+                            }
+                        } else {
                             #if DEBUG
-                            print("\(imageURL) 이미지 삭제 실패")
+                            print("\(path) 파일이 존재하지 않음")
                             #endif
                         }
+                       
                     }
                 }
+                
+                #if DEBUG
+                print("디스크 파일삭제완료")
+                #endif
                 
                 // 이미지 캐싱정보 저장 (10개 삭제)
                 setCacheInfoDict(dict: dict)
@@ -343,7 +361,7 @@ extension DefaultCacheRepository {
         let fileCreationResult = FileManager.default.createFile(atPath: imagePath.path, contents: contents)
         
         #if DEBUG
-        print("디스크에 이미지 생성 \(fileCreationResult ? "성공" : "실패")")
+        print("디스크에 이미지 생성 \(fileCreationResult ? "성공" : "실패") 경로: \(imagePath)")
         #endif
     }
     
@@ -393,5 +411,25 @@ extension DefaultCacheRepository {
         }
 
         return safeFileName
+    }
+    
+    func clearImageCacheDirectory() -> Bool {
+        
+        guard let path = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+            print("\(#function) 이미지 경로 생성 실패")
+            return false
+        }
+        
+        let imageDirectoryPath = path.appendingPathComponent("Image")
+        
+        do {
+            try FileManager.default.removeItem(at: imageDirectoryPath)
+            UserDefaults.standard.removeObject(forKey: Key.cacheInfoDict)
+            print("\(#function) 이미지 캐싱정보 삭제성공")
+            return true
+        } catch {
+            print("\(#function) 파일 삭제 실패")
+            return false
+        }
     }
 }
