@@ -16,9 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: { [weak self] in
-            self?.requestTrackingAuthorization()
-        })
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: { [weak self] in
+//            self?.requestTrackingAuthorization()
+//        })
         
         // FireBase setting
         FirebaseApp.configure()
@@ -40,28 +40,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-    private func requestTrackingAuthorization() {
-        ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
-            switch status {
-            case .authorized:
-                // Tracking authorization dialog was shown
-                // and we are authorized
-                printIfDebug("앱추적권한: Authorized")
-                
-                // 추적을 허용한 사용자 식별자
-                printIfDebug(ASIdentifierManager.shared().advertisingIdentifier)
-            case .denied:
-                // Tracking authorization dialog was
-                // shown and permission is denied
-                printIfDebug("앱추적권한: Denied")
-            case .notDetermined:
-                // Tracking authorization dialog has not been shown
-                printIfDebug("앱추적권한: Not Determined")
-            case .restricted:
-                printIfDebug("앱추적권한: Restricted")
-            @unknown default:
-                printIfDebug("앱추적권한: Unknown")
-            }
-        })
-    }
+//    private func requestTrackingAuthorization() {
+//        ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
+//            switch status {
+//            case .authorized:
+//                // Tracking authorization dialog was shown
+//                // and we are authorized
+//                printIfDebug("앱추적권한: Authorized")
+//                
+//                // 추적을 허용한 사용자 식별자
+//                printIfDebug(ASIdentifierManager.shared().advertisingIdentifier)
+//            case .denied:
+//                // Tracking authorization dialog was
+//                // shown and permission is denied
+//                printIfDebug("앱추적권한: Denied")
+//            case .notDetermined:
+//                // Tracking authorization dialog has not been shown
+//                printIfDebug("앱추적권한: Not Determined")
+//            case .restricted:
+//                printIfDebug("앱추적권한: Restricted")
+//            @unknown default:
+//                printIfDebug("앱추적권한: Unknown")
+//            }
+//        })
+//    }
 }
