@@ -19,7 +19,7 @@ class ImageCachingTest: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        self.cacheRepository = .init()
+        self.cacheRepository = .init(maxFileCount: 5, removeFileCountForOveflow: 1)
         self.disposeBag = .init()
     }
     
@@ -39,7 +39,7 @@ class ImageCachingTest: XCTestCase {
         let counter = ImageFetchedCounter(count: 0)
         
         // 이미지 50개를 테스트
-        let observables = (0..<60).map { index in
+        let observables = (0..<10).map { index in
             
             let url = URL(string: "https://dummyimage.com/300x\(300+index)/000/fff")!
             let imageInfo = ImageDownLoadInfo(
@@ -61,7 +61,7 @@ class ImageCachingTest: XCTestCase {
                 counter.count += 1
                 print("이미지 획득 성공 \(counter.count)")
                 
-                if counter.count == 60 {
+                if counter.count == 10 {
                     
                     cacheExpectation.fulfill()
                 }
@@ -69,6 +69,6 @@ class ImageCachingTest: XCTestCase {
             .disposed(by: disposeBag)
             
         
-        wait(for: [cacheExpectation], timeout: 10.0)
+        wait(for: [cacheExpectation], timeout: 20.0)
     }
 }

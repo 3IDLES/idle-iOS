@@ -62,10 +62,19 @@ public class DefaultCacheRepository: CacheRepository {
         return [:]
     }
     
+    /// 디스크캐시
+    let maxFileCount: Int
+    let removeFileCountForOveflow: Int
+    
     private let jsonDecoder = JSONDecoder()
     private let jsonEncoder = JSONEncoder()
     
-    public init() {
+    public init(maxFileCount: Int = 50, removeFileCountForOveflow: Int = 10) {
+        
+        // 디스크 캐싱 옵션 설정
+        self.maxFileCount = maxFileCount
+        self.removeFileCountForOveflow = removeFileCountForOveflow
+        
         // 이미지 인메모리 캐시 설정
         imageMemoryCache.countLimit = 30
         imageMemoryCache.totalCostLimit = 20
@@ -313,7 +322,7 @@ extension DefaultCacheRepository {
         if let numOfFiles = try? FileManager.default.contentsOfDirectory(atPath: imageDirectoryPath.path).count {
             
             // 최대 파일수를 초과한 경우 삭제(LRU), 하위 10개 파일 삭제
-            if numOfFiles >= 50 {
+            if numOfFiles >= maxFileCount {
                 #if DEBUG
                 print("디스크 파일수가 50개를 초과하였음 삭제실행")
                 #endif
@@ -324,7 +333,7 @@ extension DefaultCacheRepository {
                 }
                 
                 // 이미지 파일 삭제
-                sortedInfo[0..<10].forEach { (key, value) in
+                sortedInfo[0..<removeFileCountForOveflow].forEach { (key, value) in
                     dict.removeValue(forKey: key)
                     
                     if let path = createImagePath(url: value.url) {
