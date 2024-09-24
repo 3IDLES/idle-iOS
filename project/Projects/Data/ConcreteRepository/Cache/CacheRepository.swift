@@ -112,7 +112,7 @@ public class DefaultCacheRepository: CacheRepository {
     }
     
     
-    private func findCache(imageInfo: ImageDownLoadInfo) -> Single<UIImage?> {
+    func findCache(imageInfo: ImageDownLoadInfo) -> Single<UIImage?> {
         
         Single<UIImage?>.create { [weak self] observer in
             
@@ -159,7 +159,7 @@ public class DefaultCacheRepository: CacheRepository {
         }
     }
     
-    private func cacheImage(imageInfo: ImageDownLoadInfo, contents: Data) {
+    func cacheImage(imageInfo: ImageDownLoadInfo, contents: Data) -> Bool {
         
         // 디스크에 파일 생성
         createImageFile(imageURL: imageInfo.imageURL, contents: contents)
@@ -184,7 +184,13 @@ public class DefaultCacheRepository: CacheRepository {
             
             // 메모리 캐시에 올리기
             imageMemoryCache.setObject(image, forKey: memoryKey)
+            
+            // 캐싱 성공
+            return true
         }
+        
+        // 캐싱 실패
+        return false
     }
 }
 
