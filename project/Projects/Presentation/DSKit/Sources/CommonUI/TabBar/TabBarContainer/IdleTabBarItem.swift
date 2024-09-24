@@ -54,6 +54,9 @@ public class IdleTabBarItem: TappableUIView {
     public required init?(coder: NSCoder) { nil }
     
     private func setAppearance() {
+        
+        self.backgroundColor = DSColor.gray0.color
+        
         imageView.image = idleIcon
         label.attrTextColor = idleTextColor
     }
@@ -66,8 +69,8 @@ public class IdleTabBarItem: TappableUIView {
         
         NSLayoutConstraint.activate([
             mainStack.topAnchor.constraint(equalTo: self.topAnchor),
-            mainStack.leftAnchor.constraint(equalTo: self.leftAnchor),
-            mainStack.rightAnchor.constraint(equalTo: self.rightAnchor),
+            mainStack.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 15),
+            mainStack.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -15),
             mainStack.bottomAnchor.constraint(equalTo: self.bottomAnchor),
         ])
     }

@@ -29,9 +29,9 @@ public class IdleTabBarContainer: UIView {
     func setLayout() {
         self.layoutMargins = .init(
             top: 8,
-            left: 71.5,
+            left: 55.5,
             bottom: 8,
-            right: 71.5
+            right: 55.5
         )
         
         let mainStack = HStack(
