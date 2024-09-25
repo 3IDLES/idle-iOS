@@ -84,7 +84,7 @@ extension RcruitmentPostAPI: BaseAPI {
         case .addFavoritePost(let id, _):
             "/\(id)/favorites"
         case .removeFavoritePost(let id):
-            "/\(id)/favorites"
+            "/\(id)/remove-favorites"
         }
     }
     
