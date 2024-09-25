@@ -32,7 +32,6 @@ public class TextFieldWithDegree: UIView {
     }()
     public lazy var textField: IdleTextField = {
         let field = IdleTextField(typography: .Body2)
-        field.textFieldInsets = .zero
         field.textString = initialText
         return field
     }()
@@ -63,22 +62,32 @@ public class TextFieldWithDegree: UIView {
         self.layer.borderColor = DSKitAsset.Colors.gray100.color.cgColor
         self.layer.borderWidth = 1.0
         self.layer.cornerRadius = 6.0
-        self.layoutMargins = .init(top: 10, left: 16, bottom: 10, right: 16)
     }
     
     private func setLayout() {
         
+        let textFieldWrapper = UIView()
+        textFieldWrapper.addSubview(textField)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textFieldWrapper.layoutMargins = .init(top: 10, left: 0, bottom: 10, right: 0)
+        
         let stack = HStack(
             [
-                textField,
-                degreeLabel
+                textFieldWrapper,
+                degreeLabel,
             ],
+            spacing: 6,
             distribution: .fill
         )
-        textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        
+        textFieldWrapper.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        textFieldWrapper.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        
         textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        
         degreeLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         degreeLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        
         
         [
             stack
@@ -88,10 +97,16 @@ public class TextFieldWithDegree: UIView {
         }
         
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
-            stack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
-            stack.trailingAnchor.constraint(equalTo: self.layoutMarginsGuide.trailingAnchor),
-            stack.bottomAnchor.constraint(equalTo: self.layoutMarginsGuide.bottomAnchor),
+            
+            textField.topAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.topAnchor),
+            textField.leftAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.leftAnchor),
+            textField.rightAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.rightAnchor),
+            textField.bottomAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.bottomAnchor),
+            
+            stack.topAnchor.constraint(equalTo: self.topAnchor),
+            stack.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
+            stack.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16),
+            stack.bottomAnchor.constraint(equalTo: self.bottomAnchor),
         ])
         
     }

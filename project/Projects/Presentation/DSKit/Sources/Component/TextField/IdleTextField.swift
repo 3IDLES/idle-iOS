@@ -14,12 +14,6 @@ public class IdleTextField: UITextField {
     
     private var currentTypography: Typography
     private var currentText: String = ""
-    private var currentTextFieldInsets: UIEdgeInsets = .init(
-        top: 10,
-        left: 16,
-        bottom: 10,
-        right: 24
-    )
     public var textString: String {
         get {
             return currentText
@@ -45,6 +39,14 @@ public class IdleTextField: UITextField {
         self.contentVerticalAlignment = .center
         
         addToolbar()
+    }
+    
+    public override var intrinsicContentSize: CGSize {
+        
+        return .init(
+            width: super.intrinsicContentSize.width,
+            height: typography.lineHeight ?? super.intrinsicContentSize.height
+        )
     }
     
     public required init?(coder: NSCoder) { fatalError() }
@@ -89,17 +91,6 @@ public class IdleTextField: UITextField {
         }
     }
     
-    public var textFieldInsets: UIEdgeInsets {
-        
-        get {
-            currentTextFieldInsets
-        }
-        set {
-            currentTextFieldInsets = newValue
-            self.setNeedsLayout()
-        }
-    }
-    
     public var attrPlaceholder: String {
         
         get {
@@ -114,28 +105,5 @@ public class IdleTextField: UITextField {
     }
     private func updateText() {
         self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: currentTypography.attributes))
-    }
-}
-
-
-public extension IdleTextField {
-    
-    // 텍스트 영역의 프레임을 반환
-    override func textRect(forBounds bounds: CGRect) -> CGRect {
-        setInset(bounds: bounds)
-    }
-    
-    // 편집 중일 때 텍스트 영역의 프레임을 반환
-    override func editingRect(forBounds bounds: CGRect) -> CGRect {
-        setInset(bounds: bounds)
-    }
-    
-    // 플레이스홀더 텍스트 영역의 프레임을 반환
-    override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
-        setInset(bounds: bounds)
-    }
-    
-    private func setInset(bounds: CGRect) -> CGRect {
-        bounds.inset(by: currentTextFieldInsets)
     }
 }

@@ -130,8 +130,13 @@ public class IdleOneLineInputField: UIView {
             self.addSubview($0)
         }
         
+        let textFieldWrapper = UIView()
+        textFieldWrapper.addSubview(textField)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textFieldWrapper.layoutMargins = .init(top: 10, left: 16, bottom: 10, right: 24)
+        
         [
-            textField,
+            textFieldWrapper,
             clearButton,
             completeImage,
         ].forEach {
@@ -147,6 +152,11 @@ public class IdleOneLineInputField: UIView {
         completeImage.setContentCompressionResistancePriority(.init(751), for: .horizontal)
         
         NSLayoutConstraint.activate([
+            
+            textField.topAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.topAnchor),
+            textField.leftAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.leftAnchor),
+            textField.rightAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.rightAnchor),
+            textField.bottomAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.bottomAnchor),
         
             stack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
             stack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),
@@ -315,7 +325,7 @@ public extension IdleOneLineInputField {
         timerLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            timerLabel.heightAnchor.constraint(equalTo: textField.heightAnchor),
+            timerLabel.centerYAnchor.constraint(equalTo: textField.centerYAnchor),
         ])
         
         self.timerLabel = timerLabel
