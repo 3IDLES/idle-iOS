@@ -27,6 +27,7 @@ let project = Project(
             infoPlist: IdleInfoPlist.mainApp,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
+            entitlements: .file(path: .relativeToRoot("Entitlements/App/Idle-iOS.entitlements")),
             scripts: [
                 .crashlyticsScript
             ],
@@ -43,6 +44,9 @@ let project = Project(
                 
                 // Logger
                 D.App.ConcreteLogger,
+                
+                // ThirdParty
+                D.ThirdParty.FirebaseMessaging,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.appConfigurations
