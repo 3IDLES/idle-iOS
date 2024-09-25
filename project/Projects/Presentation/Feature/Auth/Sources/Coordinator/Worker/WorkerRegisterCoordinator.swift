@@ -12,8 +12,8 @@ import PresentationCore
 enum WorkerRegisterStage: Int {
     
     case registerFinished=0
-    case info=1
-    case phoneNumber=2
+    case phoneNumber=1
+    case info=2
     case address=3
     case finish=4
     
@@ -21,10 +21,10 @@ enum WorkerRegisterStage: Int {
         switch self {
         case .registerFinished:
             ""
-        case .info:
-            "input|personalInfo"
         case .phoneNumber:
             "input|phoneNumber"
+        case .info:
+            "input|personalInfo"
         case .address:
             "input|address"
         case .finish:
@@ -94,7 +94,7 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
         
         navigationController.pushViewController(vc, animated: true)
         
-        excuteStage(.info, moveTo: .next)
+        excuteStage(.phoneNumber, moveTo: .next)
         
         // MARK: 시작 로깅
         logger.startWorkerRegister()
