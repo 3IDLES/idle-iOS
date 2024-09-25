@@ -133,7 +133,6 @@ public class IdleOneLineInputField: UIView {
         let textFieldWrapper = UIView()
         textFieldWrapper.addSubview(textField)
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textFieldWrapper.layoutMargins = .init(top: 10, left: 16, bottom: 10, right: 24)
         
         [
             textFieldWrapper,
@@ -152,11 +151,10 @@ public class IdleOneLineInputField: UIView {
         completeImage.setContentCompressionResistancePriority(.init(751), for: .horizontal)
         
         NSLayoutConstraint.activate([
-            
-            textField.topAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.topAnchor),
-            textField.leftAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.leftAnchor),
-            textField.rightAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.rightAnchor),
-            textField.bottomAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.bottomAnchor),
+            textFieldWrapper.heightAnchor.constraint(equalToConstant: 44),
+            textField.centerYAnchor.constraint(equalTo: textFieldWrapper.centerYAnchor),
+            textField.leftAnchor.constraint(equalTo: textFieldWrapper.leftAnchor, constant: 16),
+            textField.rightAnchor.constraint(equalTo: textFieldWrapper.rightAnchor, constant: -24),
         
             stack.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor),
             stack.leadingAnchor.constraint(equalTo: self.layoutMarginsGuide.leadingAnchor),

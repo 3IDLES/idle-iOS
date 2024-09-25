@@ -69,7 +69,6 @@ public class TextFieldWithDegree: UIView {
         let textFieldWrapper = UIView()
         textFieldWrapper.addSubview(textField)
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textFieldWrapper.layoutMargins = .init(top: 10, left: 0, bottom: 10, right: 0)
         
         let stack = HStack(
             [
@@ -77,6 +76,7 @@ public class TextFieldWithDegree: UIView {
                 degreeLabel,
             ],
             spacing: 6,
+            alignment: .center,
             distribution: .fill
         )
         
@@ -98,10 +98,10 @@ public class TextFieldWithDegree: UIView {
         
         NSLayoutConstraint.activate([
             
-            textField.topAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.topAnchor),
-            textField.leftAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.leftAnchor),
-            textField.rightAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.rightAnchor),
-            textField.bottomAnchor.constraint(equalTo: textFieldWrapper.layoutMarginsGuide.bottomAnchor),
+            textFieldWrapper.heightAnchor.constraint(equalToConstant: 44),
+            textField.centerYAnchor.constraint(equalTo: textFieldWrapper.centerYAnchor),
+            textField.leftAnchor.constraint(equalTo: textFieldWrapper.leftAnchor),
+            textField.rightAnchor.constraint(equalTo: textFieldWrapper.rightAnchor),
             
             stack.topAnchor.constraint(equalTo: self.topAnchor),
             stack.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),

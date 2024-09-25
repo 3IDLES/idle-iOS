@@ -12,7 +12,7 @@ import PresentationCore
 /// 기본이 되는 텍스트 필드입니다.
 public class IdleTextField: UITextField {
     
-    private var currentTypography: Typography
+    private var currentTypography: Typography!
     private var currentText: String = ""
     public var textString: String {
         get {
@@ -26,11 +26,9 @@ public class IdleTextField: UITextField {
     
     public init(typography: Typography) {
         
-        self.currentTypography = typography
-        
         super.init(frame: .zero)
         
-        self.defaultTextAttributes = typography.attributes
+        self.typography = typography
         
         self.autocorrectionType = .no
         // 첫 글자 자동 대문자화 끄기
@@ -41,13 +39,13 @@ public class IdleTextField: UITextField {
         addToolbar()
     }
     
-    public override var intrinsicContentSize: CGSize {
-        
-        return .init(
-            width: super.intrinsicContentSize.width,
-            height: typography.lineHeight ?? super.intrinsicContentSize.height
-        )
-    }
+//    public override var intrinsicContentSize: CGSize {
+//        
+//        return .init(
+//            width: super.intrinsicContentSize.width,
+//            height: typography.lineHeight ?? super.intrinsicContentSize.height
+//        )
+//    }
     
     public required init?(coder: NSCoder) { fatalError() }
     
@@ -86,7 +84,7 @@ public class IdleTextField: UITextField {
         }
         set {
             currentTypography = newValue
-            defaultTextAttributes = currentTypography.attributes
+            defaultTextAttributes = currentTypography.attributesWithoutLineHeightInset
             self.updateText()
         }
     }
@@ -97,13 +95,13 @@ public class IdleTextField: UITextField {
             attributedPlaceholder?.string ?? ""
         }
         set {
-            attributedPlaceholder = currentTypography.attributes.toString(
+            attributedPlaceholder = currentTypography.attributesWithoutLineHeightInset.toString(
                 newValue,
                 with: DSKitAsset.Colors.gray200.color
             )
         }
     }
     private func updateText() {
-        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: currentTypography.attributes))
+        self.rx.attributedText.onNext(NSAttributedString(string: textString, attributes: currentTypography.attributesWithoutLineHeightInset))
     }
 }
