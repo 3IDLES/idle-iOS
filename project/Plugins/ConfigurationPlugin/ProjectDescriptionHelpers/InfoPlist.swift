@@ -46,9 +46,6 @@ public enum IdleInfoPlist {
         ],
         
         "NMFClientId": "$(NAVER_API_CLIENT_ID)",
-        
-        // 앱추적 허용 메세지
-        "NSUserTrackingUsageDescription": "사용자 맞춤 서비스 제공을 위해 권한을 허용해 주세요. 권한을 허용하지 않을 경우, 앱 사용에 제약이 있을 수 있습니다.",
 
         // 네트워크 사용 메세지
         "NSLocalNetworkUsageDescription": "이 앱은 로컬 네트워크를 통해 서버에 연결하여 데이터를 주고받기 위해 로컬 네트워크 접근 권한이 필요합니다."
