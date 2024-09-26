@@ -161,6 +161,10 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
         
         signOutSuccess
             .subscribe(onNext: { [weak self] _ in
+                
+                // 로그이아웃 성공 -> 원격알림 토큰 제거
+                NotificationCenter.default.post(name: .requestDeleteTokenFromServer, object: nil)
+                
                 self?.coordinator?.popToRoot()
             })
             .disposed(by: disposeBag)
