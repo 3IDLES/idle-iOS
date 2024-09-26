@@ -5,13 +5,16 @@
 //  Created by choijunios on 7/10/24.
 //
 
-import RxSwift
+import Foundation
 import BaseFeature
-import RxCocoa
 import UseCaseInterface
 import RepositoryInterface
 import Entity
 import PresentationCore
+
+
+import RxSwift
+import RxCocoa
 
 public class CenterLoginViewModel: BaseViewModel, ViewModelType {
     
@@ -59,6 +62,9 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
         loginSuccess
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
+                
+                // 원격 알림 토큰 저장요청
+                NotificationCenter.default.post(name: .requestTransportTokenToServer, object: nil)
                 
                 self.coordinator?.authFinished()
             })

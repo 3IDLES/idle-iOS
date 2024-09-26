@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import BaseFeature
 import UseCaseInterface
 import PresentationCore
 
@@ -19,6 +20,42 @@ class FCMService: NSObject {
     override public init() {
         super.init()
         Messaging.messaging().delegate = self
+        
+        
+        // Notification설정
+        subscribeNotification()
+    }
+    
+    func subscribeNotification() {
+        
+        NotificationCenter.default.addObserver(
+            forName: .requestTransportTokenToServer,
+            object: nil,
+            queue: nil) { [weak self] _ in
+                
+                guard let self else { return }
+                
+                if let token = Messaging.messaging().fcmToken {
+                    
+                    notificationUseCase.setNotificationToken(
+                        token: token) { result in
+                            
+                            print("FCMService 토큰 전송 \(result ? "완료" : "실패")")
+                        }
+                }
+            }
+        
+        NotificationCenter.default.addObserver(
+            forName: .requestDeleteTokenFromServer,
+            object: nil,
+            queue: nil) { [weak self] _ in
+                
+                guard let self else { return }
+                
+                notificationUseCase.deleteNotificationToken(completion: { result in
+                    print("FCMService 토큰 삭제 \(result ? "완료" : "실패")")
+                })
+            }
     }
 }
 
