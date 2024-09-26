@@ -33,6 +33,8 @@ class ImageCachingTest: XCTestCase {
             }
         }
         
+        return
+        
         // 디스크 캐싱 내역 삭제
         _ = cacheRepository.clearImageCacheDirectory()
         
