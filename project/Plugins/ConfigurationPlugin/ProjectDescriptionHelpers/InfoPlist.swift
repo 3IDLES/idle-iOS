@@ -40,6 +40,9 @@ public enum IdleInfoPlist {
             "UIInterfaceOrientationPortrait"
         ],
         
+        // 다크모드 금지 설정
+        "UIUserInterfaceStyle" : "Light",
+        
         // iPad 지원하는 화면 모드
         "UISupportedInterfaceOrientations~ipad" : [
             "UIInterfaceOrientationPortrait"
