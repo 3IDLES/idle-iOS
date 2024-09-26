@@ -13,7 +13,7 @@ public enum IdleInfoPlist {
         
         "CFBundleDisplayName": "$(BUNDLE_DISPLAY_NAME)",
         
-        "CFBundleShortVersionString" : "1.0.1",
+        "CFBundleShortVersionString" : "1.0.2",
         
         "NSAppTransportSecurity" : [
             "NSAllowsArbitraryLoads" : true
