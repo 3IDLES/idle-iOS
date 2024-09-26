@@ -6,9 +6,15 @@
 //
 
 import Foundation
+import UseCaseInterface
+import PresentationCore
+
+
 import FirebaseMessaging
 
-class DefaultFCMService: NSObject {
+class FCMService: NSObject {
+    
+    @Injected var notificationUseCase: NotificationUseCase
     
     override public init() {
         super.init()
@@ -16,21 +22,24 @@ class DefaultFCMService: NSObject {
     }
 }
 
-extension DefaultFCMService: MessagingDelegate {
+extension FCMService: MessagingDelegate {
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print("FCM토큰(new): \(String(describing: fcmToken))")
-        
-        let userId = ""
         
         if let fcmToken {
             
+            print("FCM토큰: \(fcmToken)")
+            
+            notificationUseCase.setNotificationToken(token: fcmToken) { isSuccess in
+                
+                print(isSuccess ? "토큰 전송 성공" : "토큰 전송 실패")
+            }
         }
     }
 }
 
 
-extension DefaultFCMService: UNUserNotificationCenterDelegate {
+extension FCMService: UNUserNotificationCenterDelegate {
     
     /// 앱이 포그라운드에 있는 경우, 노티페이케이션이 도착하기만 하면 호출된다.
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {

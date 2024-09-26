@@ -12,7 +12,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
-    var rootCoordinator: RootCoordinator?
+    // RootCoordinator
+    var rootCoordinator: RootCoordinator!
+    
+    // FCMService
+    var fcmService: FCMService!
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -28,8 +32,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 LoggerAssembly(),
                 DataAssembly(),
                 DomainAssembly(),
-            ])    
+            ])
         
+        // FCMService
+        fcmService = FCMService()
+        
+        // RootCoordinator
         rootCoordinator = RootCoordinator(
             dependency: .init(
                 navigationController: rootNavigationController,

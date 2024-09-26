@@ -21,11 +21,6 @@ public struct DataAssembly: Assembly {
             return DefaultLocalStorageService()
         }
         
-        container.register(FCMService.self) { _ in
-            return DefaultFCMService()
-        }
-        .inObjectScope(.container)
-        
         // MARK: 캐싱 레포지토리
         container.register(CacheRepository.self) { _ in
             return DefaultCacheRepository()

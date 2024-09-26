@@ -82,5 +82,9 @@ public struct DomainAssembly: Assembly {
                 userInfoLocalRepository: userInfoLocalRepository
             )
         }
+        
+        container.register(NotificationUseCase.self) { resolver in
+            DefaultNotificationUseCase()
+        }
     }
 }
