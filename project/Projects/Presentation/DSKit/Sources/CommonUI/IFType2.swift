@@ -21,11 +21,11 @@ public class IFType2: UIStackView {
     public var eventPublisher: Observable<String> { self.idleTextField.eventPublisher }
     
     // View
-    public private(set) lazy var titleLabel: ResizableUILabel = {
-        let label = ResizableUILabel()
-        label.text = self.titleLabelText
-        label.font = DSKitFontFamily.Pretendard.bold.font(size: 14)
-        label.textColor = DSKitAsset.Colors.gray500.color
+    public private(set) lazy var titleLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Subtitle4)
+        label.textString = self.titleLabelText
+        label.attrTextColor = DSKitAsset.Colors.gray500.color
+        label.textAlignment = .left
         return label
     }()
     
@@ -66,7 +66,7 @@ public class IFType2: UIStackView {
     
     func setStack() {
         
-        self.alignment = .leading
+        self.alignment = .fill
         self.axis = .vertical
         self.spacing = 6.0
     }
@@ -79,11 +79,6 @@ public class IFType2: UIStackView {
         ].forEach {
             self.addArrangedSubview($0)
         }
-        
-        NSLayoutConstraint.activate([
-            idleTextField.leftAnchor.constraint(equalTo: self.leftAnchor),
-            idleTextField.rightAnchor.constraint(equalTo: self.rightAnchor),
-        ])
     }
 
     public override func resignFirstResponder() -> Bool {

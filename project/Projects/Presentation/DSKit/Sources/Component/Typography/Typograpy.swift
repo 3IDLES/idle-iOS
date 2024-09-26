@@ -68,6 +68,14 @@ public enum Typography {
         }
     }
     
+    public var attributesWithoutLineHeightInset: Attrubutes {
+        var attrs = attributes
+        (attrs[.paragraphStyle] as? NSMutableParagraphStyle)?.minimumLineHeight = 0
+        (attrs[.paragraphStyle] as? NSMutableParagraphStyle)?.maximumLineHeight = 0
+        attrs[.baselineOffset] = 0
+        return attrs
+    }
+    
     public var attributes: Attrubutes {
         
         switch self {
