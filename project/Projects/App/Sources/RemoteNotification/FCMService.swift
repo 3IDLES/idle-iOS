@@ -7,9 +7,8 @@
 
 import Foundation
 import FirebaseMessaging
-import DataSource
 
-class DefaultFCMService: NSObject, FCMService {
+class DefaultFCMService: NSObject {
     
     override public init() {
         super.init()
@@ -26,7 +25,6 @@ extension DefaultFCMService: MessagingDelegate {
         
         if let fcmToken {
             
-            sendTokenToServer(identifier: userId, fcmToken: fcmToken)
         }
     }
 }
