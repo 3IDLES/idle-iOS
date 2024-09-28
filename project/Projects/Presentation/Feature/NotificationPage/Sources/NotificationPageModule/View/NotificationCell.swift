@@ -15,14 +15,14 @@ import RxSwift
 
 protocol NotificationCellViewModel {
     
-    var id: String { get }
     var cellInfo: NotificationCellInfo { get }
     
     // Input
     var cellClicked: PublishSubject<Void> { get }
     
     // Output
-    var isRead: Driver<Bool> { get }
+    var isRead: Driver<Bool>? { get }
+    var profileImage: Driver<UIImage>? { get }
 }
 
 class NotificationCell: UITableViewCell {
@@ -30,7 +30,7 @@ class NotificationCell: UITableViewCell {
     static let identifier: String = .init(describing: NotificationCell.self)
     
     var viewModel: NotificationCellViewModel?
-    var disposables: [Disposable] = []
+    var disposables: [Disposable?] = []
     
     let profileImageView: UIImageView = {
         let view = UIImageView()
@@ -45,13 +45,13 @@ class NotificationCell: UITableViewCell {
         return label
     }()
     
-    let contentLabel: IdleLabel = {
+    let titleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle3)
         label.textAlignment = .left
         return label
     }()
     
-    let postInfoLabel: IdleLabel = {
+    let subTitleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.attrTextColor = DSColor.gray300.color
         label.textAlignment = .left
@@ -73,9 +73,9 @@ class NotificationCell: UITableViewCell {
         let labelStack = VStack([
             timeLabel,
             Spacer(height: 2),
-            contentLabel,
+            titleLabel,
             Spacer(height: 1),
-            postInfoLabel
+            subTitleLabel
         ], alignment: .fill)
         
         let mainStack = HStack([
@@ -119,6 +119,11 @@ class NotificationCell: UITableViewCell {
         super.prepareForReuse()
         
         self.viewModel = nil
+        
+        disposables.forEach { dis in
+            dis?.dispose()
+        }
+        disposables = []
     }
     
     @objc
@@ -130,15 +135,32 @@ class NotificationCell: UITableViewCell {
         
         self.viewModel = viewModel
         
+        // Render
+        let cellInfo = viewModel.cellInfo
         
+        timeLabel.textString = cellInfo.timeText
+        titleLabel.textString = cellInfo.titleText
+        subTitleLabel.textString = cellInfo.subTitleText
+        
+        // Reactive
         disposables = [
             // Input
             tap.bind(to: viewModel.cellClicked),
             
             // Output
-            viewModel.isRead.drive(onNext: { [weak self] isRead in
-                self?.setState(isRead: isRead)
-            })
+            viewModel
+                .isRead?
+                .drive(onNext: { [weak self] isRead in
+                    self?.setState(isRead: isRead)
+                }),
+            
+            viewModel
+                .profileImage?
+                .drive(onNext: { [weak self] image in
+                    UIView.animate(withDuration: 0.15) {
+                        self?.profileImageView.image = image
+                    }
+                })
         ]
     }
     
