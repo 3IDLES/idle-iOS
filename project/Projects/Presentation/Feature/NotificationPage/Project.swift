@@ -2,7 +2,7 @@
 //  Project.swift
 //  ProjectDescriptionHelpers
 //
-//  Created by choijunios on 2024/07/25
+//  Created by choijunios on 2024/09/28
 //
 
 import ProjectDescription
@@ -11,7 +11,7 @@ import ConfigurationPlugin
 import DependencyPlugin
 
 let project = Project(
-    name: "Root",
+    name: "NotificationPage",
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
@@ -19,7 +19,7 @@ let project = Project(
         
         /// FeatureConcrete
         .target(
-            name: "RootFeature",
+            name: "NotificationPageFeature",
             destinations: DeploymentSettings.platforms,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -27,12 +27,8 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-
-                // Presentation
-                D.Presentation.AuthFeature,
-                D.Presentation.WorkerFeature,
-                D.Presentation.CenterFeature,
-                D.Presentation.NotificationPageFeature,
+                
+                D.Presentation.BaseFeature,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -41,7 +37,7 @@ let project = Project(
         
         /// FeatureConcrete ExampleApp
         .target(
-            name: "Root_ExampleApp",
+            name: "NotificationPage_ExampleApp",
             destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -50,7 +46,7 @@ let project = Project(
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
-                .target(name: "RootFeature"),
+                .target(name: "NotificationPageFeature"),
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -59,14 +55,14 @@ let project = Project(
     ],
     schemes: [
         Scheme.makeSchemes(
-            .target("RootFeature"),
+            .target("NotificationPageFeature"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
             ]
         ),
         Scheme.makeSchemes(
-            .target("Root_ExampleApp"),
+            .target("NotificationPage_ExampleApp"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
