@@ -56,4 +56,22 @@ class NotificationCellViewModel: NotificationCellViewModelable {
             })
             .disposed(by: disposeBag)
     }
+    
+    func getTimeText() -> String {
+        
+        let diff = Date.now.timeIntervalSince(cellInfo.notificationDate)
+        
+        switch diff {
+        case 0..<60:
+            return "방금 전"
+        case 0..<3600:
+            // 1시간 이전
+            return "\(Int(diff/60))분 전"
+        case 0..<86400:
+            // 1일내
+            return "\(Int(diff/3600))시간 전"
+        default:
+            return "\(Int(diff/86400))일 전"
+        }
+    }
 }
