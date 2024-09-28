@@ -8,7 +8,7 @@
 import UIKit
 import Domain
 import PresentationCore
-import ConcreteRepository
+import Repository
 
 
 import RxSwift

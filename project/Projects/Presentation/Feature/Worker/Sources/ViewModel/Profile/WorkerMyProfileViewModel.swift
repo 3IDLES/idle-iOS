@@ -10,7 +10,7 @@ import PresentationCore
 import DSKit
 import Domain
 import BaseFeature
-import ConcreteRepository
+import Repository
 
 
 import RxSwift

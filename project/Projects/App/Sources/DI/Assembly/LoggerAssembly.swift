@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ConcreteLogger
 import RootFeature
 import AuthFeature
 import CenterFeature

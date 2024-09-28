@@ -19,39 +19,20 @@ let project = Project(
         
         /// RepositoryConcrete
         .target(
-            name: "ConcreteRepository",
+            name: "Repository",
             destinations: DeploymentSettings.platforms,
-            product: .staticLibrary,
+            product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["ConcreteRepository/**"],
+            sources: ["Repository/**"],
             dependencies: [
                 D.Domain,
                 D.Data.DataSource,
                 
-                // ThirdParty
-                D.ThirdParty.RxSwift,
-                D.ThirdParty.FirebaseRemoteConfig,
                 D.ThirdParty.SDWebImageWebPCoder,
             ],
             settings: .settings(
-                base: ["ENABLE_TESTABILITY": "YES"]
-            )
-        ),
-        
-        /// ConcreteTests
-        .target(
-            name: "ConcretesTests",
-            destinations: DeploymentSettings.platforms,
-            product: .unitTests,
-            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["ConcretesTests/**"],
-            dependencies: [
-                D.Data.ConcreteRepository,
-                D.Data.DataSource,
-            ],
-            settings: .settings(
+                base: ["ENABLE_TESTABILITY": "YES"],
                 configurations: IdleConfiguration.dataConfigurations
             )
         ),
@@ -60,7 +41,7 @@ let project = Project(
         .target(
             name: "DataSource",
             destinations: DeploymentSettings.platforms,
-            product: .staticLibrary,
+            product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: [
@@ -82,11 +63,27 @@ let project = Project(
                 configurations: IdleConfiguration.dataConfigurations
             )
         ),
+        
+        /// ConcreteTests
+        .target(
+            name: "DataTests",
+            destinations: DeploymentSettings.platforms,
+            product: .unitTests,
+            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
+            deploymentTargets: DeploymentSettings.deployment_version,
+            sources: ["DataTests/**"],
+            dependencies: [
+                D.Data.Repository,
+            ],
+            settings: .settings(
+                configurations: IdleConfiguration.dataConfigurations
+            )
+        ),
     ],
     schemes: [
         Scheme.makeTestableSchemes(
-            .target("ConcreteRepository"),
-            testableTarget: .target("ConcretesTests"),
+            .target("Repository"),
+            testableTarget: .target("DataTests"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName,

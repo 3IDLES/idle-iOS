@@ -26,32 +26,19 @@ public class InitialScreenVM: BaseViewModel {
     let viewDidLoad: PublishRelay<Void> = .init()
     let viewWillAppear: PublishRelay<Void> = .init()
     
-    let authUseCase: AuthUseCase
-    let workerProfileUseCase: WorkerProfileUseCase
-    let centerProfileUseCase: CenterProfileUseCase
-    let userInfoLocalRepository: UserInfoLocalRepository
-    let remoteConfigRepository: RemoteConfigRepository
+    @Injected var authUseCase: AuthUseCase
+    @Injected var workerProfileUseCase: WorkerProfileUseCase
+    @Injected var centerProfileUseCase: CenterProfileUseCase
+    @Injected var userInfoLocalRepository: UserInfoLocalRepository
     
     // network monitoring
     private let networkMonitor: NWPathMonitor = .init()
     private let networkMonitoringQueue = DispatchQueue.global(qos: .background)
     private let networtIsAvailablePublisher: PublishSubject<Bool> = .init()
     
-    public init(
-            coordinator: RootCoorinatable?,
-            authUseCase: AuthUseCase,
-            workerProfileUseCase: WorkerProfileUseCase,
-            centerProfileUseCase: CenterProfileUseCase,
-            userInfoLocalRepository: UserInfoLocalRepository,
-            remoteConfigRepository: RemoteConfigRepository
-        )
-    {
+    public init(coordinator: RootCoorinatable?) {
+        
         self.coordinator = coordinator
-        self.authUseCase = authUseCase
-        self.workerProfileUseCase = workerProfileUseCase
-        self.centerProfileUseCase = centerProfileUseCase
-        self.userInfoLocalRepository = userInfoLocalRepository
-        self.remoteConfigRepository = remoteConfigRepository
         
         super.init()
         
@@ -96,17 +83,17 @@ public class InitialScreenVM: BaseViewModel {
         // MARK: 강제업데이트 확인
         // 네트워크 확인 -> 강제업데이트 확인
         let needsForceUpdate = networkConnected
-            .flatMap { [remoteConfigRepository] _ in
-                remoteConfigRepository.fetchRemoteConfig()
+            .flatMap { _ in
+                RemoteConfigService.shared.fetchRemoteConfig()
             }
             .compactMap { $0.value }
-            .map { [remoteConfigRepository] isConfigFetched in
+            .map { isConfigFetched in
                 
                 if !isConfigFetched {
                     Crashlytics.crashlytics().log("Remote Config fetch실패")
                 }
                 
-                guard let config = remoteConfigRepository.getForceUpdateInfo() else {
+                guard let config = RemoteConfigService.shared.getForceUpdateInfo() else {
                     // ‼️ Config로딩 불가시 크래쉬
                     Crashlytics.crashlytics().log("Remote Config획득 실패")
                     fatalError("Remote Config fetching에러")

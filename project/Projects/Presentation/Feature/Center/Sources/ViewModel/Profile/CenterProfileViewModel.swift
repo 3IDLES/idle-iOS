@@ -7,7 +7,7 @@
 
 import UIKit
 import PresentationCore
-import ConcreteRepository
+import Repository
 import BaseFeature
 import Domain
 

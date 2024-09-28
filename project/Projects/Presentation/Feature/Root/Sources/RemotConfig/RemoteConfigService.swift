@@ -1,27 +1,27 @@
 //
-//  DefaultRemoteConfigRepository.swift
-//  ConcreteRepository
+//  asd.swift
+//  RootFeature
 //
-//  Created by choijunios on 9/13/24.
+//  Created by choijunios on 9/29/24.
 //
 
 import Foundation
+import FirebaseRemoteConfig
+import RxSwift
 import Domain
 
-
-import RxSwift
-import FirebaseRemoteConfig
-
-public class DefaultRemoteConfigRepository: RemoteConfigRepository {
+public class RemoteConfigService {
+    
+    static let shared: RemoteConfigService = .init()
     
     private let remoteConfig = RemoteConfig.remoteConfig()
     private let settings = RemoteConfigSettings()
     
-    public init() {
+    private init() {
         remoteConfig.configSettings = settings
     }
     
-    public func fetchRemoteConfig() -> RxSwift.Single<Result<Bool, Error>> {
+    public func fetchRemoteConfig() -> Single<Result<Bool, Error>> {
         
         Single.create { [weak self] single in
             

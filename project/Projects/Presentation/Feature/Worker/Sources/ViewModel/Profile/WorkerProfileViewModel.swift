@@ -9,7 +9,7 @@ import UIKit
 import PresentationCore
 import DSKit
 import Domain
-import ConcreteRepository
+import Repository
 
 
 import RxSwift

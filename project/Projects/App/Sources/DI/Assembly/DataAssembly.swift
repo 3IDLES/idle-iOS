@@ -7,7 +7,7 @@
 
 import Foundation
 import Domain
-import ConcreteRepository
+import Repository
 import DataSource
 
 
@@ -53,11 +53,6 @@ public struct DataAssembly: Assembly {
         // MARK: 구인공고 레포지토리
         container.register(RecruitmentPostRepository.self) { _ in
             return DefaultRecruitmentPostRepository()
-        }
-        
-        // MARK: RemoteConfig
-        container.register(RemoteConfigRepository.self) { _ in
-            return DefaultRemoteConfigRepository()
         }
     }
 }

@@ -30,7 +30,8 @@ let project = Project(
                 D.ThirdParty.RxSwift,
             ],
             settings: .settings(
-                base: ["ENABLE_TESTABILITY": "YES"]
+                base: ["ENABLE_TESTABILITY": "YES"],
+                configurations: IdleConfiguration.domainConfigurations
             )
         ),
         

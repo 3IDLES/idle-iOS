@@ -28,7 +28,6 @@ let proejct = Project(
                 D.Domain,
                 
                 // ThirdParty
-                D.ThirdParty.RxSwift,
                 D.ThirdParty.RxCocoa,
                 D.ThirdParty.Swinject,
             ],

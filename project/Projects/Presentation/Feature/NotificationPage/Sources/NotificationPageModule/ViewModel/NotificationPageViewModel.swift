@@ -8,7 +8,7 @@
 import Foundation
 import BaseFeature
 import Domain
-import ConcreteRepository
+import Repository
 import PresentationCore
 
 import RxSwift

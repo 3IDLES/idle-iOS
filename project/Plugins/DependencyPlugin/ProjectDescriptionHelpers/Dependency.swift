@@ -12,14 +12,10 @@ public typealias D = ModuleDependency
 
 public enum ModuleDependency {
     
-    public enum App {
-        public static let ConcreteLogger: TargetDependency = .project(target: "ConcreteLogger", path: .relativeToRoot("Projects/App"))
-    }
-    
     public static let Domain: TargetDependency = .project(target: "Domain", path: .relativeToRoot("Projects/Domain"))
     
     public enum Data {
-        public static let ConcreteRepository: TargetDependency = .project(target: "ConcreteRepository", path: .relativeToRoot("Projects/Data"))
+        public static let Repository: TargetDependency = .project(target: "Repository", path: .relativeToRoot("Projects/Data"))
         public static let DataSource: TargetDependency = .project(target: "DataSource", path: .relativeToRoot("Projects/Data"))
     }
     
