@@ -83,8 +83,8 @@ public struct DomainAssembly: Assembly {
             )
         }
         
-        container.register(NotificationUseCase.self) { resolver in
-            DefaultNotificationUseCase()
+        container.register(NotificationTokenManage.self) { resolver in
+            DefaultNotificationTokenManage()
         }
     }
 }

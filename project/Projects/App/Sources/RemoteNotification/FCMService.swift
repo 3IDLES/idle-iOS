@@ -15,7 +15,7 @@ import FirebaseMessaging
 
 class FCMService: NSObject {
     
-    @Injected var notificationUseCase: NotificationUseCase
+    @Injected var notificationTokenManageUseCase: NotificationTokenManage
     
     override public init() {
         super.init()
@@ -37,7 +37,7 @@ class FCMService: NSObject {
                 
                 if let token = Messaging.messaging().fcmToken {
                     
-                    notificationUseCase.setNotificationToken(
+                    notificationTokenManageUseCase.setNotificationToken(
                         token: token) { result in
                             
                             print("FCMService 토큰 전송 \(result ? "완료" : "실패")")
@@ -52,7 +52,7 @@ class FCMService: NSObject {
                 
                 guard let self else { return }
                 
-                notificationUseCase.deleteNotificationToken(completion: { result in
+                notificationTokenManageUseCase.deleteNotificationToken(completion: { result in
                     print("FCMService 토큰 삭제 \(result ? "완료" : "실패")")
                 })
             }
@@ -67,7 +67,7 @@ extension FCMService: MessagingDelegate {
             
             print("FCM토큰: \(fcmToken)")
             
-            notificationUseCase.setNotificationToken(token: fcmToken) { isSuccess in
+            notificationTokenManageUseCase.setNotificationToken(token: fcmToken) { isSuccess in
                 
                 print(isSuccess ? "토큰 전송 성공" : "토큰 전송 실패")
             }
