@@ -9,7 +9,6 @@ import UIKit
 import NotificationPageFeature
 import PresentationCore
 import UseCaseInterface
-import ConcreteUseCase
 import ConcreteRepository
 import Entity
 
