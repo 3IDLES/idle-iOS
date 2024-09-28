@@ -126,7 +126,10 @@ public struct NativeRecruitmentPostForWorkerDTO: EntityRepresentable {
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
         let deadlineDate = self.applyDeadline != nil ? dateFormatter.date(from: self.applyDeadline!) : nil
-        let applyDate = self.applyTime != nil ? dateFormatter.date(from: self.applyDeadline!) : nil
+        
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+                
+        let applyDate = self.applyTime != nil ? dateFormatter.date(from: self.applyTime!) : nil
         
         let iso8601Formatter = ISO8601DateFormatter()
         var createdDate: Date?

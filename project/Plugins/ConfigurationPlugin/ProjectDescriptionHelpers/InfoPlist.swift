@@ -13,7 +13,7 @@ public enum IdleInfoPlist {
         
         "CFBundleDisplayName": "$(BUNDLE_DISPLAY_NAME)",
         
-        "CFBundleShortVersionString" : "1.0.1",
+        "CFBundleShortVersionString" : "1.0.2",
         
         "NSAppTransportSecurity" : [
             "NSAllowsArbitraryLoads" : true
@@ -39,6 +39,9 @@ public enum IdleInfoPlist {
         "UISupportedInterfaceOrientations" : [
             "UIInterfaceOrientationPortrait"
         ],
+        
+        // 다크모드 금지 설정
+        "UIUserInterfaceStyle" : "Light",
         
         // iPad 지원하는 화면 모드
         "UISupportedInterfaceOrientations~ipad" : [

@@ -115,7 +115,6 @@ public struct NativeRecruitmentPostDetailDTO: EntityRepresentable {
         if let applyTime {
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
             applyDate = dateFormatter.date(from: applyTime)
-            print(applyTime)
         }
         
         return .init(
