@@ -86,9 +86,5 @@ public struct DomainAssembly: Assembly {
         container.register(NotificationUseCase.self) { resolver in
             DefaultNotificationUseCase()
         }
-        
-        container.register(NotificationPageUseCase.self) { resolver in
-            TestNotificationPageUseCase()
-        }
     }
 }
