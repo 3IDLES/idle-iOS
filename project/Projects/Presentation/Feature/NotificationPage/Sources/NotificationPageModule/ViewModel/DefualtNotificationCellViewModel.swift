@@ -13,7 +13,7 @@ import RxCocoa
 import PresentationCore
 import ConcreteRepository
 
-class DefualtNotificationCellViewModel: NotificationCellViewModel {
+class NotificationCellViewModel: NotificationCellViewModelable {
     
     @Injected var cacheRepository: CacheRepository
     

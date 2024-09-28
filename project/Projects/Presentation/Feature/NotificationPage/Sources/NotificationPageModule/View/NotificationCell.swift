@@ -13,7 +13,7 @@ import RxCocoa
 import RxSwift
 
 
-protocol NotificationCellViewModel {
+protocol NotificationCellViewModelable {
     
     var cellInfo: NotificationCellInfo { get }
     
@@ -29,7 +29,7 @@ class NotificationCell: UITableViewCell {
     
     static let identifier: String = .init(describing: NotificationCell.self)
     
-    var viewModel: NotificationCellViewModel?
+    var viewModel: NotificationCellViewModelable?
     var disposables: [Disposable?] = []
     
     let profileImageView: UIImageView = {
@@ -131,7 +131,7 @@ class NotificationCell: UITableViewCell {
         tap.onNext(())
     }
     
-    func bind(viewModel: NotificationCellViewModel) {
+    func bind(viewModel: NotificationCellViewModelable) {
         
         self.viewModel = viewModel
         
