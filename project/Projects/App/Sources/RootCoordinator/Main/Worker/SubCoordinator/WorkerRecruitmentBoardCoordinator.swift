@@ -9,9 +9,8 @@ import UIKit
 import WorkerFeature
 import BaseFeature
 import CenterFeature
-import Entity
 import PresentationCore
-import UseCaseInterface
+import Domain
 
 class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
     

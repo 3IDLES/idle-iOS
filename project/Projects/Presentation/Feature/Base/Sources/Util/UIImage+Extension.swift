@@ -6,7 +6,9 @@
 //
 
 import UIKit
-import Entity
+import Domain
+
+
 import SDWebImageWebPCoder
 
 public extension UIImage {

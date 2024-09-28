@@ -8,11 +8,12 @@
 import UIKit
 import PresentationCore
 import BaseFeature
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
-import Entity
 
 public protocol DeregisterReasonVMable: BaseViewModel {
     var userType: UserType { get }

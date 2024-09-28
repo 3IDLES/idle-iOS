@@ -5,11 +5,10 @@
 //  Created by choijunios on 9/21/24.
 //
 
-import Foundation
-import Entity
 import UIKit
 import UniformTypeIdentifiers
-import RepositoryInterface
+import Domain
+
 
 import SDWebImageWebPCoder
 import RxSwift

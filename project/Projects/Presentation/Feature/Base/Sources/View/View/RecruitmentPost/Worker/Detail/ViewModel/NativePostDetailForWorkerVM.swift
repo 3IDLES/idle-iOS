@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import Domain
+import DSKit
+import PresentationCore
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import PresentationCore
-import UseCaseInterface
-import DSKit
+
 
 public protocol NativePostDetailForWorkerViewModelable: BaseViewModel {
     
@@ -45,7 +47,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     private let centerProfileUseCase: CenterProfileUseCase
     
     // Ouput
-    public var postForWorkerBundle: RxCocoa.Driver<Entity.RecruitmentPostForWorkerBundle>?
+    public var postForWorkerBundle: RxCocoa.Driver<RecruitmentPostForWorkerBundle>?
     public var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
     public var idleAlertVM: Driver<any IdleAlertViewModelable>?
     public var starButtonRequestResult: Driver<Bool>?
@@ -290,7 +292,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             .disposed(by: disposeBag)
     }
         
-    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: Entity.RecruitmentPostType) -> RxSwift.Single<Bool> {
+    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: RecruitmentPostType) -> RxSwift.Single<Bool> {
         
         return Single<Bool>.create { [weak self] observer in
             

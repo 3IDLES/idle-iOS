@@ -25,7 +25,7 @@ let proejct = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**",],
             dependencies: [
-                D.Domain.Entity,
+                D.Domain,
                 D.Presentation.PresentationCore,
                 
                 // ThirdParty

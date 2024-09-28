@@ -7,10 +7,12 @@
 
 import UIKit
 import PresentationCore
+import DSKit
+import Domain
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 
 /// 공고등록에 사용됩니다.
 public protocol AddressInputViewContentVMable {

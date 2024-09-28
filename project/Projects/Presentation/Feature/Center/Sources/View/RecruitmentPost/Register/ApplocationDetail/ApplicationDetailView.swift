@@ -9,10 +9,12 @@
 import UIKit
 import BaseFeature
 import PresentationCore
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 
 public class ApplicationDetailView: UIView, RegisterRecruitmentPostViews {
     

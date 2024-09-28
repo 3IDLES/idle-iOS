@@ -7,9 +7,8 @@
 
 import UIKit
 import CenterFeature
-import Entity
 import PresentationCore
-import UseCaseInterface
+import Domain
 
 class CenterProfileRegisterCoordinator: CenterProfileRegisterCoordinatable {
     

@@ -8,10 +8,12 @@
 import UIKit
 import PresentationCore
 import BaseFeature
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 
 // MARK: 센터주소 (도로명, 지번주소 + 상세주소)
 class AddressView: UIView {

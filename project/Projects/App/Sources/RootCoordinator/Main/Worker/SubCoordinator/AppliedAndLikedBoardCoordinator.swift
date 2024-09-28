@@ -7,11 +7,10 @@
 
 import UIKit
 import WorkerFeature
-import Entity
 import BaseFeature
 import CenterFeature
 import PresentationCore
-import UseCaseInterface
+import Domain
 
 class AppliedAndLikedBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
     

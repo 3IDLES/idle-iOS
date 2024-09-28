@@ -6,12 +6,13 @@
 //
 
 import Foundation
+import Domain
+import PresentationCore
+import BaseFeature
+
+
 import RxSwift
 import RxCocoa
-import Entity
-import PresentationCore
-import UseCaseInterface
-import BaseFeature
 
 public class EditPostVM: BaseViewModel, EditPostViewModelable {
     
@@ -24,7 +25,7 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
     public weak var editPostCoordinator: EditPostCoordinator?
     public var editViewExitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var saveButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var requestSaveFailure: RxCocoa.Driver<Entity.DefaultAlertContentVO>?
+    public var requestSaveFailure: RxCocoa.Driver<DefaultAlertContentVO>?
     
     // MARK: State
     var state_workTimeAndPay: WorkTimeAndPayStateObject = .init()
@@ -81,7 +82,7 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
     
     // MARK: Application detail
     public var experiencePreferenceType: PublishRelay<ExperiencePreferenceType> = .init()
-    public var applyType: PublishRelay<(Entity.ApplyType, Bool)> = .init()
+    public var applyType: PublishRelay<(ApplyType, Bool)> = .init()
     public var applyDeadlineType: PublishRelay<ApplyDeadlineType> = .init()
     public var deadlineDate: BehaviorRelay<Date?> = .init(value: nil)
     

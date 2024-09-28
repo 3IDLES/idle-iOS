@@ -7,8 +7,7 @@
 
 import Foundation
 import BaseFeature
-import UseCaseInterface
-import Entity
+import Domain
 
 
 import RxCocoa

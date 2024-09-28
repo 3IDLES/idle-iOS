@@ -6,12 +6,15 @@
 //
 
 import UIKit
-import Entity
+import Domain
 import DSKit
-import RxSwift
-import RxCocoa
 import PresentationCore
 import BaseFeature
+
+
+import RxSwift
+import RxCocoa
+
 
 public protocol SetIdInputable {
     var editingId: BehaviorRelay<String> { get set }

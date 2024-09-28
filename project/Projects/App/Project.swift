@@ -37,7 +37,7 @@ let project = Project(
                 D.Presentation.RootFeature,
                 
                 // Domain
-                D.Domain.ConcreteUseCase,
+                D.Domain,
                 
                 // Data
                 D.Data.ConcreteRepository,
@@ -66,7 +66,7 @@ let project = Project(
             dependencies: [
                 
                 D.Presentation.RootFeature,
-                D.Domain.LoggerInterface,
+                D.Domain,
                 
                 // ThirdParty
                 D.ThirdParty.Amplitude,

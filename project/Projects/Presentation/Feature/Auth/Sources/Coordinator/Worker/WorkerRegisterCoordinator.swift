@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import UseCaseInterface
+import Domain
 import PresentationCore
 
 enum WorkerRegisterStage: Int {

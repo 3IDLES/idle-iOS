@@ -7,11 +7,14 @@
 
 import UIKit
 import PresentationCore
+import Domain
+import BaseFeature
+import DSKit
+
+
 import RxSwift
 import RxCocoa
-import DSKit
-import Entity
-import BaseFeature
+
 
 public class CenterProfileViewController: BaseViewController {
     

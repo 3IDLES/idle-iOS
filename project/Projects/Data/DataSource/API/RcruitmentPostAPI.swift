@@ -5,10 +5,12 @@
 //  Created by choijunios on 8/8/24.
 //
 
-import Moya
 import Foundation
+import Domain
+
+
+import Moya
 import Alamofire
-import Entity
 
 public enum RcruitmentPostAPI {
     

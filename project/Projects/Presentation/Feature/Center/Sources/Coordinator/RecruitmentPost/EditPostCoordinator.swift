@@ -8,8 +8,7 @@
 import UIKit
 import PresentationCore
 import BaseFeature
-import UseCaseInterface
-import Entity
+import Domain
 import DSKit
 
 public class EditPostCoordinator: ChildCoordinator {

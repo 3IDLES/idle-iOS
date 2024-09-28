@@ -7,11 +7,14 @@
 
 import UIKit
 import PresentationCore
-import RxCocoa
-import RxSwift
-import Entity
+import Domain
 import DSKit
 import BaseFeature
+
+
+import RxCocoa
+import RxSwift
+
 
 public class CenterAuthVC: BaseViewController {
     

@@ -6,9 +6,12 @@
 //
 
 import UIKit
+import Domain
+
+
 import RxSwift
 import RxCocoa
-import Entity
+
 
 public enum PageProcessAction {
     case next

@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import Entity
+import Domain
+
 
 public protocol CenterProfileRegisterCoordinatable: ParentCoordinator {
     

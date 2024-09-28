@@ -6,8 +6,10 @@
 //
 
 import UIKit
-import Entity
+import Domain
 import DSKit
+
+
 import RxSwift
 
 open class BaseViewController: UIViewController {

@@ -6,9 +6,8 @@
 //
 
 import UIKit
-import Entity
+import Domain
 import PresentationCore
-import UseCaseInterface
 
 public class CenterProfileRegisterOverviewCO: ChildCoordinator {
     

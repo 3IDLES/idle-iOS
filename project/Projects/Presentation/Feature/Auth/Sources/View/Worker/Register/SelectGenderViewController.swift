@@ -6,12 +6,14 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 import DSKit
-import Entity
+import Domain
 import PresentationCore
 import BaseFeature
+
+
+import RxSwift
+import RxCocoa
 
 protocol SelectGenderInputable {
     var selectingGender: BehaviorRelay<Gender> { get }

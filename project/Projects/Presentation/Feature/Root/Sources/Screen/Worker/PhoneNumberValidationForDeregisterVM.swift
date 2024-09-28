@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import Domain
+import AuthFeature
+import BaseFeature
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import AuthFeature
-import UseCaseInterface
-import BaseFeature
+
 
 public protocol PhoneNumberValidationForDeregisterVMable: BaseViewModel, AuthPhoneNumberInputable & AuthPhoneNumberOutputable {
     

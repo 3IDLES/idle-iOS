@@ -6,10 +6,11 @@
 //
 
 import Foundation
-import RxSwift
-import Entity
-import RepositoryInterface
 import DataSource
+import Domain
+
+
+import RxSwift
 
 /// 저장된 데이터의 키값을 나타냅니다.
 enum UserInfoStorageKey: String, Hashable, CaseIterable {
@@ -39,7 +40,7 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
         self.localStorageService = localStorageService
     }
     
-    public func getUserType() -> Entity.UserType? {
+    public func getUserType() -> UserType? {
         let rawValue: String? = localStorageService.fetchData(key: K.userType.rawValue)
         if let rawValue {
             return UserType(rawValue: rawValue)
@@ -47,14 +48,14 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
         return nil
     }
     
-    public func updateUserType(_ type: Entity.UserType) {
+    public func updateUserType(_ type: UserType) {
         localStorageService.saveData(
             key: K.userType.rawValue,
             value: type.rawValue
         )
     }
     
-    public func getCurrentWorkerData() -> Entity.WorkerProfileVO? {
+    public func getCurrentWorkerData() -> WorkerProfileVO? {
         if let data: Data = localStorageService.fetchData(key: K.currentWorker.rawValue) {
             
             if let decoded = try? jsonDecoder.decode(WorkerProfileVO.self, from: data) {
@@ -65,12 +66,12 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
         return nil
     }
     
-    public func updateCurrentWorkerData(vo: Entity.WorkerProfileVO) {
+    public func updateCurrentWorkerData(vo: WorkerProfileVO) {
         let encoded = try! encoder.encode(vo)
         localStorageService.saveData(key: K.currentWorker.rawValue, value: encoded)
     }
     
-    public func getCurrentCenterData() -> Entity.CenterProfileVO? {
+    public func getCurrentCenterData() -> CenterProfileVO? {
         if let data: Data = localStorageService.fetchData(key: K.currentCenter.rawValue) {
             
             if let decoded = try? jsonDecoder.decode(CenterProfileVO.self, from: data) {
@@ -81,7 +82,7 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
         return nil
     }
     
-    public func updateCurrentCenterData(vo: Entity.CenterProfileVO) {
+    public func updateCurrentCenterData(vo: CenterProfileVO) {
         let encoded = try! encoder.encode(vo)
         localStorageService.saveData(key: K.currentCenter.rawValue, value: encoded)
     }

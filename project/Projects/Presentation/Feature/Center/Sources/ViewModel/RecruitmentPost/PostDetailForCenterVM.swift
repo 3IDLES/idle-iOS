@@ -6,13 +6,15 @@
 //
 
 import Foundation
-import RxSwift
-import RxCocoa
-import Entity
 import PresentationCore
-import UseCaseInterface
+import Domain
 import BaseFeature
 import DSKit
+
+
+import RxSwift
+import RxCocoa
+
 
 public protocol PostDetailViewModelable:
     AnyObject,

@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import Entity
+import Domain
+
 
 public protocol WorkerRecruitmentBoardCoordinatable: ParentCoordinator {
     /// 요양보호사가 볼 수 있는 공고 상세정보를 표시합니다.

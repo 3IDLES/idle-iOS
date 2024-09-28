@@ -6,11 +6,12 @@
 //
 
 import UIKit
+import PresentationCore
+import Domain
+
+
 import RxSwift
 import RxCocoa
-import PresentationCore
-import UseCaseInterface
-import Entity
 
 extension AuthInOutStreamManager {
     

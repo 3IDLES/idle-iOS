@@ -6,10 +6,11 @@
 //
 
 import Foundation
-import RxSwift
-import RepositoryInterface
+import Domain
 import DataSource
-import Entity
+
+
+import RxSwift
 
 public class DefaultAuthRepository: AuthRepository {
     

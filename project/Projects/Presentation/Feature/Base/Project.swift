@@ -32,8 +32,7 @@ let project = Project(
                 D.Presentation.DSKit,
 
                 // Domain
-                D.Domain.UseCaseInterface,
-                D.Domain.RepositoryInterface,
+                D.Domain,
                 
                 // Data
                 D.Data.ConcreteRepository,

@@ -5,13 +5,14 @@
 //  Created by choijunios on 8/7/24.
 //
 
-import Foundation
 import UIKit
 import PresentationCore
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 
 public protocol WorkConditionDisplayingVMable {
     

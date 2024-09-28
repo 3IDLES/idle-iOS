@@ -7,9 +7,7 @@
 
 import Foundation
 import BaseFeature
-import UseCaseInterface
-import RepositoryInterface
-import Entity
+import Domain
 import PresentationCore
 
 

@@ -6,12 +6,13 @@
 //
 
 import UIKit
+import PresentationCore
+import BaseFeature
+import Domain
+
+
 import RxSwift
 import RxCocoa
-import PresentationCore
-import UseCaseInterface
-import Entity
-import BaseFeature
 
 public class CenterRegisterViewModel: BaseViewModel, ViewModelType {
     

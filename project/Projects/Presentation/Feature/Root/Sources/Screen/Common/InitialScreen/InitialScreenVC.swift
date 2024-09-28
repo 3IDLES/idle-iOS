@@ -8,7 +8,7 @@
 import UIKit
 import BaseFeature
 import PresentationCore
-import Entity
+import Domain
 import DSKit
 
 import RxCocoa

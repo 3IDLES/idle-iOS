@@ -8,12 +8,13 @@
 import UIKit
 import BaseFeature
 import PresentationCore
+import Domain
+import DSKit
+import UserNotifications
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
-import UseCaseInterface
-import UserNotifications
 
 public protocol WorkerSettingVMable: BaseViewModel {
     

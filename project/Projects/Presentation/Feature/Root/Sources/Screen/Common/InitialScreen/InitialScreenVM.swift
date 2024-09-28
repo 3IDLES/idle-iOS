@@ -9,10 +9,8 @@ import UIKit
 import Network
 
 import PresentationCore
-import UseCaseInterface
-import RepositoryInterface
+import Domain
 import BaseFeature
-import Entity
 import DSKit
 
 import RxSwift

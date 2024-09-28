@@ -6,11 +6,13 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
-import Entity
+import Domain
 import PresentationCore
 import DSKit
+
+
+import RxSwift
+import RxCocoa
 
 open class IdleBottomSheetVC: BaseViewController {
     

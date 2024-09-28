@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import Domain
+
+
 import SDWebImageWebPCoder
-import Entity
 
 public extension ImageUploadInfo {
     

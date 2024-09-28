@@ -7,7 +7,7 @@
 
 import UIKit
 import PresentationCore
-import Entity
+import Domain
 import DSKit
 
 import RxCocoa

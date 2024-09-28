@@ -8,14 +8,16 @@
 import UIKit
 import BaseFeature
 import PresentationCore
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 
 public protocol ClosedPostViewModelable: BaseViewModel {
     
-    var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>? { get }
+    var closedPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>? { get }
     var requestClosedPost: PublishRelay<Void> { get }
     
     func createClosedPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable

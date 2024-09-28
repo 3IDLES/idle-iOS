@@ -6,12 +6,14 @@
 //
 
 import UIKit
-import Entity
+import Domain
 import DSKit
-import RxSwift
-import RxCocoa
 import PresentationCore
 import BaseFeature
+
+
+import RxSwift
+import RxCocoa
 
 public protocol AuthBusinessOwnerInputable {
     var editingBusinessNumber: BehaviorRelay<String> { get set }

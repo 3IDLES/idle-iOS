@@ -8,8 +8,7 @@
 import UIKit
 import PresentationCore
 import RootFeature
-import UseCaseInterface
-import RepositoryInterface
+import Domain
 
 class RootCoordinator {
     

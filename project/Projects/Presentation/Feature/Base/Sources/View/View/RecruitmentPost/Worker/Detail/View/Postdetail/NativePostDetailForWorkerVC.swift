@@ -7,10 +7,12 @@
 
 import UIKit
 import PresentationCore
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 
 /// 센토도 요양보호사가 보는 공고화면을 볼 수 있기 때문에 해당뷰를 BaseFeature에 구현하였습니다.
 public class NativePostDetailForWorkerVC: BaseViewController {

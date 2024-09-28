@@ -1,16 +1,16 @@
 //
-//  asd.swift
+//  DefaultRemoteConfigRepository.swift
 //  ConcreteRepository
 //
 //  Created by choijunios on 9/13/24.
 //
 
 import Foundation
-import RepositoryInterface
+import Domain
+
 
 import RxSwift
 import FirebaseRemoteConfig
-import Entity
 
 public class DefaultRemoteConfigRepository: RemoteConfigRepository {
     

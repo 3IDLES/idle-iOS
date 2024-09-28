@@ -6,10 +6,11 @@
 //
 
 import Foundation
-import RxSwift
-import Entity
-import RepositoryInterface
+import Domain
 import DataSource
+
+
+import RxSwift
 
 public class DefaultUserProfileRepository: UserProfileRepository {
 
@@ -77,7 +78,7 @@ public class DefaultUserProfileRepository: UserProfileRepository {
     }
     
     /// 요양보호사 프로필 정보를 가져옵니다.
-    public func getWorkerProfile(mode: Entity.ProfileMode) -> RxSwift.Single<Entity.WorkerProfileVO> {
+    public func getWorkerProfile(mode: ProfileMode) -> RxSwift.Single<WorkerProfileVO> {
         var api: UserInformationAPI!
         
         switch mode {

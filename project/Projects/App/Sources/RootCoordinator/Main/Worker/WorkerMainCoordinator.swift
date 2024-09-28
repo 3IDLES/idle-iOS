@@ -9,7 +9,7 @@ import UIKit
 import DSKit
 import PresentationCore
 import RootFeature
-import UseCaseInterface
+import Domain
 
 class WorkerMainCoordinator: ParentCoordinator {
     

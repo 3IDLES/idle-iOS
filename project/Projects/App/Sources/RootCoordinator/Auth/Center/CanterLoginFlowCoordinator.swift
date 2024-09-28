@@ -8,7 +8,7 @@
 import UIKit
 import PresentationCore
 import AuthFeature
-import UseCaseInterface
+import Domain
 
 class CanterLoginFlowCoordinator: CanterLoginFlowable {
     

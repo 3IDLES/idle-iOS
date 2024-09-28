@@ -8,8 +8,7 @@
 import Foundation
 import AuthFeature
 import PresentationCore
-import UseCaseInterface
-import RepositoryInterface
+import Domain
 import BaseFeature
 
 extension AuthCoordinator: AuthCoordinatable {

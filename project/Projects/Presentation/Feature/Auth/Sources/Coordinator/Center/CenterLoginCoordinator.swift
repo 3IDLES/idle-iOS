@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import UseCaseInterface
+import Domain
 import PresentationCore
 
 public class CenterLoginCoordinator: ChildCoordinator {

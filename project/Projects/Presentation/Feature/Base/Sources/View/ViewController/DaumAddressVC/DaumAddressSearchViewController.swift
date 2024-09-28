@@ -6,12 +6,14 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 import DSKit
-import Entity
+import Domain
 import WebKit
 import PresentationCore
+
+
+import RxSwift
+import RxCocoa
 
 public enum AddressDataKey: String, CaseIterable {
     case address="address"

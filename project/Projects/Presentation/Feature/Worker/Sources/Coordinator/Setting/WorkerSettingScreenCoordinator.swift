@@ -7,8 +7,7 @@
 
 import UIKit
 import PresentationCore
-import UseCaseInterface
-import Entity
+import Domain
 
 public class WorkerSettingScreenCoordinator: ChildCoordinator {
     

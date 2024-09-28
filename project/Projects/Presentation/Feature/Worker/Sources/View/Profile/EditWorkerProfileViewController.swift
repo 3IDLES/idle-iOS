@@ -7,11 +7,12 @@
 
 import UIKit
 import PresentationCore
+import Domain
+import DSKit
+import BaseFeature
+
 import RxSwift
 import RxCocoa
-import DSKit
-import Entity
-import BaseFeature
 
 public class EditWorkerProfileViewController: BaseViewController {
     

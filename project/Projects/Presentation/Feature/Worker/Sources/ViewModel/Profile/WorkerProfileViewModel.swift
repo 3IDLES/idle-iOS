@@ -8,8 +8,7 @@
 import UIKit
 import PresentationCore
 import DSKit
-import Entity
-import UseCaseInterface
+import Domain
 import ConcreteRepository
 
 
@@ -40,7 +39,7 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
     
     // Output
     var uploadSuccess: Driver<Void>?
-    public var alert: Driver<Entity.DefaultAlertContentVO>?
+    public var alert: Driver<DefaultAlertContentVO>?
     
     public var profileRenderObject: Driver<WorkerProfileRenderObject>?
     private let rederingState: BehaviorRelay<WorkerProfileRenderObject> = .init(value: .createRO(isMyProfile: true, vo: .mock))

@@ -7,10 +7,9 @@
 
 import UIKit
 import PresentationCore
-import UseCaseInterface
 import BaseFeature
 import DSKit
-import Entity
+import Domain
 
 import RxSwift
 import RxCocoa

@@ -7,8 +7,8 @@
 
 import UIKit
 import PresentationCore
-import UseCaseInterface
-import Entity
+import Domain
+
 
 class PhoneNumberValidationForDeregisterCoordinator: ChildCoordinator {
     

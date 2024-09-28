@@ -6,10 +6,10 @@
 //
 
 import Foundation
-import LoggerInterface
+import PresentationCore
 import AuthFeature
 import CenterFeature
-import Entity
+import Domain
 
 public protocol OverallLogger:
     CenterRegisterLogger, 

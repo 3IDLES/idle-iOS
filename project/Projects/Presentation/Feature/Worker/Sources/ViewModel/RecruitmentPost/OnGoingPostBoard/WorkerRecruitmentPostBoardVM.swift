@@ -8,11 +8,12 @@
 import UIKit
 import BaseFeature
 import PresentationCore
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
-import UseCaseInterface
 
 public typealias BoardRefreshResult = (isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])
 
@@ -304,7 +305,7 @@ extension WorkerPagablePostBoardVMable {
         coordinator?.showPostDetail(postType: postType, postId: id)
     }
     
-    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: Entity.RecruitmentPostType) -> RxSwift.Single<Bool> {
+    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: RecruitmentPostType) -> RxSwift.Single<Bool> {
         
         return Single<Bool>.create { [weak self] observer in
             

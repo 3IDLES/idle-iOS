@@ -5,12 +5,13 @@
 //  Created by choijunios on 7/17/24.
 //
 
-import RxSwift
-import RxCocoa
-import UseCaseInterface
-import Entity
+import Domain
 import PresentationCore
 import BaseFeature
+
+
+import RxSwift
+import RxCocoa
 
 public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
     
@@ -142,7 +143,7 @@ public extension CenterSetNewPasswordViewModel {
         public var changePasswordButtonClicked: PublishRelay<Void> = .init()
         
         // Alert
-        public var alert: PublishSubject<Entity.DefaultAlertContentVO> = .init()
+        public var alert: PublishSubject<DefaultAlertContentVO> = .init()
     }
     
     class Output {

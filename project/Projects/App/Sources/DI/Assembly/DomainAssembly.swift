@@ -6,12 +6,8 @@
 //
 
 import Foundation
-import UseCaseInterface
-import ConcreteUseCase
-import RepositoryInterface
-import LoggerInterface
 import ConcreteLogger
-
+import Domain
 
 import Swinject
 

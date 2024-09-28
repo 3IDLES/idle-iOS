@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import LoggerInterface
-import Entity
+import PresentationCore
+import Domain
 
 public class DebugLogger: LoggerMessagePublisher {
     

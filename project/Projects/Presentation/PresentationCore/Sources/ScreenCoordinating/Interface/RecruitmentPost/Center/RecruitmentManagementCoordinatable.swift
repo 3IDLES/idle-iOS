@@ -5,7 +5,8 @@
 //  Created by choijunios on 8/13/24.
 //
 
-import Entity
+import Domain
+
 
 public protocol RecruitmentManagementCoordinatable: ParentCoordinator {
     

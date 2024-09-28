@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Entity
+import Domain
 
 public struct RecruitmentPostForCenterListDTO: Decodable {
     public let jobPostings: [RecruitmentPostForCenterDTO]

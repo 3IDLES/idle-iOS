@@ -9,7 +9,7 @@ import Foundation
 import AuthFeature
 import CenterFeature
 import PresentationCore
-import UseCaseInterface
+import Domain
 
 extension RootCoordinator: RootCoorinatable {
     

@@ -6,9 +6,7 @@
 //
 
 import UIKit
-import UseCaseInterface
 import PresentationCore
-import LoggerInterface
 
 enum CenterRegisterStage: Int {
     

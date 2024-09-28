@@ -6,12 +6,10 @@
 //
 
 import UIKit
-import Entity
 import PresentationCore
-import UseCaseInterface
-import RepositoryInterface
 import ConcreteRepository
 import BaseFeature
+import Domain
 
 
 import RxSwift

@@ -6,12 +6,13 @@
 //
 
 import UIKit
+import Domain
+import PresentationCore
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import PresentationCore
-import UseCaseInterface
-import DSKit
 
 public protocol WorknetPostDetailForWorkerViewModelable: BaseViewModel {
     
@@ -36,7 +37,7 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
     private let workerProfileUseCase: WorkerProfileUseCase
     
     // Ouput
-    public var postDetail: RxCocoa.Driver<Entity.WorknetRecruitmentPostDetailVO>?
+    public var postDetail: RxCocoa.Driver<WorknetRecruitmentPostDetailVO>?
     public var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
     public var starButtonRequestResult: Driver<Bool>?
     
@@ -166,7 +167,7 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
             .disposed(by: disposeBag)
     }
         
-    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: Entity.RecruitmentPostType) -> RxSwift.Single<Bool> {
+    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: RecruitmentPostType) -> RxSwift.Single<Bool> {
         
         return Single<Bool>.create { [weak self] observer in
             

@@ -19,16 +19,13 @@ let project = Project(
         
         /// UseCaseConcrete type
         .target(
-            name: "ConcreteUseCase",
+            name: "Domain",
             destinations: DeploymentSettings.platforms,
-            product: .staticLibrary,
+            product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["ConcreteUseCase/**"],
+            sources: ["Sources/**"],
             dependencies: [
-                D.Domain.UseCaseInterface,
-                D.Domain.RepositoryInterface,
-                
                 // ThirdParty
                 D.ThirdParty.RxSwift,
             ],
@@ -39,115 +36,26 @@ let project = Project(
         
         /// Concrete type Test
         .target(
-            name: "ConcreteUseCaseTests",
+            name: "DomainTests",
             destinations: DeploymentSettings.platforms,
             product: .unitTests,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["ConcreteUseCaseTests/**"],
+            sources: ["DomainTests/**"],
             dependencies: [
-                D.Domain.ConcreteUseCase,
-                D.Domain.RepositoryInterface,
-                
+
                 // for test
-                D.Data.ConcreteRepository,
-                D.Data.DataSource
+                D.Domain,
             ],
             settings: .settings(
-                configurations: IdleConfiguration.domainConfigurations
-            )
-        ),
-        
-        /// Domain interface
-        .target(
-            name: "UseCaseInterface",
-            destinations: DeploymentSettings.platforms,
-            product: .framework,
-            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["UseCaseInterface/**"],
-            dependencies: [
-                D.Domain.Entity,
-                
-                // ThirdParty
-                D.ThirdParty.RxSwift,
-            ],
-            settings: .settings(
-                configurations: IdleConfiguration.domainConfigurations
-            )
-        ),
-        
-        /// Repository interface
-        .target(
-            name: "RepositoryInterface",
-            destinations: DeploymentSettings.platforms,
-            product: .framework,
-            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["RepositoryInterface/**"],
-            dependencies: [
-                D.Domain.Entity,
-                
-                // ThirdParty
-                D.ThirdParty.RxSwift,
-            ],
-            settings: .settings(
-                base: ["ENABLE_TESTABILITY": "YES"],
-                configurations: IdleConfiguration.domainConfigurations
-            )
-        ),
-        
-        /// Entity
-        .target(
-            name: "Entity",
-            destinations: DeploymentSettings.platforms,
-            product: .framework,
-            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["Entity/**"],
-            settings: .settings(
-                base: ["ENABLE_TESTABILITY": "YES"],
-                configurations: IdleConfiguration.domainConfigurations
-            )
-        ),
-        
-        /// Logger interface
-        .target(
-            name: "LoggerInterface",
-            destinations: DeploymentSettings.platforms,
-            product: .framework,
-            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["LoggerInterface/source/**"],
-            dependencies: [
-                D.Domain.Entity,
-            ],
-            settings: .settings(
-                base: ["ENABLE_TESTABILITY": "YES"],
                 configurations: IdleConfiguration.domainConfigurations
             )
         ),
     ],
     schemes: [
         Scheme.makeTestableSchemes(
-            .target("ConcreteUseCase"),
-            testableTarget: .target("ConcreteUseCaseTests"),
-            configNames: [
-                IdleConfiguration.debugConfigName,
-                IdleConfiguration.releaseConfigName,
-                IdleConfiguration.qaConfigName
-            ]
-        ),
-        Scheme.makeSchemes(
-            .target("UseCaseInterface"),
-            configNames: [
-                IdleConfiguration.debugConfigName,
-                IdleConfiguration.releaseConfigName,
-                IdleConfiguration.qaConfigName
-            ]
-        ),
-        Scheme.makeSchemes(
-            .target("RepositoryInterface"),
+            .target("Domain"),
+            testableTarget: .target("DomainTests"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName,

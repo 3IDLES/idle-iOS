@@ -6,8 +6,8 @@
 //
 
 import UIKit
+import Domain
 import PresentationCore
-import UseCaseInterface
 import BaseFeature
 import DSKit
 

@@ -8,10 +8,12 @@
 import UIKit
 import BaseFeature
 import PresentationCore
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 
 enum RegisterCenterInfoPage: Int, CaseIterable {
     case nameAndPhoneNumber = 0

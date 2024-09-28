@@ -7,8 +7,7 @@
 
 import Foundation
 import BaseFeature
-import Entity
-import UseCaseInterface
+import Domain
 import PresentationCore
 
 import RxSwift

@@ -6,10 +6,9 @@
 //
 
 import UIKit
-import Entity
 import DSKit
 import PresentationCore
-import UseCaseInterface
+import Domain
 import BaseFeature
 import ConcreteRepository
 

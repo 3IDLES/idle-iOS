@@ -26,7 +26,7 @@ let project = Project(
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["ConcreteRepository/**"],
             dependencies: [
-                D.Domain.RepositoryInterface,
+                D.Domain,
                 D.Data.DataSource,
                 
                 // ThirdParty
@@ -68,7 +68,7 @@ let project = Project(
                 SecretSource.networkDataSource,
             ],
             dependencies: [
-                D.Domain.Entity,
+                D.Domain,
                 
                 // ThirdParty
                 D.ThirdParty.Alamofire,

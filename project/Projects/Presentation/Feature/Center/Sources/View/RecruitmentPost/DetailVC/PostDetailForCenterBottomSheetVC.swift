@@ -8,10 +8,12 @@
 import UIKit
 import PresentationCore
 import BaseFeature
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 
 // MARK: 진행중인 공고
 class OngoingPostOptionVC: IdleBottomSheetVC {

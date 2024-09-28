@@ -5,12 +5,15 @@
 //  Created by choijunios on 8/8/24.
 //
 
-import RepositoryInterface
-import RxSwift
-import Entity
-import DataSource
 import Foundation
+import Domain
+import DataSource
+
+
 import Moya
+import RxSwift
+
+
 
 public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     
@@ -35,7 +38,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             .mapToVoid()
     }
 
-    public func getPostDetailForCenter(id: String) -> RxSwift.Single<Entity.RegisterRecruitmentPostBundle> {
+    public func getPostDetailForCenter(id: String) -> RxSwift.Single<RegisterRecruitmentPostBundle> {
         
         recruitmentPostService.request(api: .postDetail(id: id, userType: .center), with: .withToken)
             .map(RecruitmentPostFetchDTO.self)
@@ -54,13 +57,13 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         ).map { _ in () }
     }
     
-    public func getOngoingPosts() -> RxSwift.Single<[Entity.RecruitmentPostInfoForCenterVO]> {
+    public func getOngoingPosts() -> RxSwift.Single<[RecruitmentPostInfoForCenterVO]> {
         return recruitmentPostService.request(api: .getOnGoingPosts, with: .withToken)
             .map(RecruitmentPostForCenterListDTO.self)
             .map({ $0.jobPostings.map { $0.toVO() } })
     }
     
-    public func getClosedPosts() -> RxSwift.Single<[Entity.RecruitmentPostInfoForCenterVO]> {
+    public func getClosedPosts() -> RxSwift.Single<[RecruitmentPostInfoForCenterVO]> {
         return recruitmentPostService.request(api: .getClosedPosts, with: .withToken)
             .map(RecruitmentPostForCenterListDTO.self)
             .map({ $0.jobPostings.map { $0.toVO() } })
@@ -74,7 +77,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             }
     }
     
-    public func getPostApplicantScreenData(id: String) -> RxSwift.Single<Entity.PostApplicantScreenVO> {
+    public func getPostApplicantScreenData(id: String) -> RxSwift.Single<PostApplicantScreenVO> {
         recruitmentPostService.request(api: .getApplicantList(id: id), with: .withToken)
             .map(PostApplicantScreenDTO.self)
             .map { dto in
@@ -93,7 +96,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     }
     
     // MARK: Worker
-    public func getNativePostDetailForWorker(id: String) -> RxSwift.Single<Entity.RecruitmentPostForWorkerBundle> {
+    public func getNativePostDetailForWorker(id: String) -> RxSwift.Single<RecruitmentPostForWorkerBundle> {
         recruitmentPostService.request(
             api: .postDetail(id: id, userType: .worker),
             with: .withToken
@@ -101,7 +104,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         .mapToEntity(NativeRecruitmentPostDetailDTO.self)
     }
     
-    public func getWorknetPostDetailForWorker(id: String) -> RxSwift.Single<Entity.WorknetRecruitmentPostDetailVO> {
+    public func getWorknetPostDetailForWorker(id: String) -> RxSwift.Single<WorknetRecruitmentPostDetailVO> {
         crawlingPostService
             .request(api: .getDetail(postId: id), with: .withToken)
             .mapToEntity(WorknetRecruitmentPostDetailDTO.self)

@@ -16,13 +16,7 @@ public enum ModuleDependency {
         public static let ConcreteLogger: TargetDependency = .project(target: "ConcreteLogger", path: .relativeToRoot("Projects/App"))
     }
     
-    public enum Domain {
-        public static let ConcreteUseCase: TargetDependency = .project(target: "ConcreteUseCase", path: .relativeToRoot("Projects/Domain"))
-        public static let UseCaseInterface: TargetDependency = .project(target: "UseCaseInterface", path: .relativeToRoot("Projects/Domain"))
-        public static let RepositoryInterface: TargetDependency = .project(target: "RepositoryInterface", path: .relativeToRoot("Projects/Domain"))
-        public static let Entity: TargetDependency = .project(target: "Entity", path: .relativeToRoot("Projects/Domain"))
-        public static let LoggerInterface: TargetDependency = .project(target: "LoggerInterface", path: .relativeToRoot("Projects/Domain"))
-    }
+    public static let Domain: TargetDependency = .project(target: "Domain", path: .relativeToRoot("Projects/Domain"))
     
     public enum Data {
         public static let ConcreteRepository: TargetDependency = .project(target: "ConcreteRepository", path: .relativeToRoot("Projects/Data"))

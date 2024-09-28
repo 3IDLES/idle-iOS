@@ -10,7 +10,7 @@ import DSKit
 import PresentationCore
 import CenterFeature
 import RootFeature
-import UseCaseInterface
+import Domain
 
 class CenterMainCoordinator: CenterMainCoordinatable {
     

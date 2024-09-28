@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import RepositoryInterface
+import Domain
 import ConcreteRepository
 import DataSource
 

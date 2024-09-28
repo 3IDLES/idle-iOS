@@ -7,11 +7,13 @@
 
 import UIKit
 import DSKit
-import RxSwift
-import RxCocoa
 import PresentationCore
 import BaseFeature
-import Entity
+import Domain
+
+
+import RxSwift
+import RxCocoa
 
 class SelectAuthTypeViewController: BaseViewController {
     

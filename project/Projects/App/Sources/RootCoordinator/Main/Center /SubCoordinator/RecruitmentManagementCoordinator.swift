@@ -9,8 +9,7 @@ import UIKit
 import RootFeature
 import CenterFeature
 import PresentationCore
-import UseCaseInterface
-import Entity
+import Domain
 
 
 public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatable {

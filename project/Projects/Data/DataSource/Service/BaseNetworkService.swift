@@ -6,7 +6,9 @@
 //
 
 import Foundation
-import Entity
+import Domain
+
+
 import RxSwift
 import Alamofire
 import Moya

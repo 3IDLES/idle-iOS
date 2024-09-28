@@ -8,8 +8,7 @@
 import UIKit
 import PresentationCore
 import DSKit
-import Entity
-import UseCaseInterface
+import Domain
 import BaseFeature
 import ConcreteRepository
 
@@ -57,7 +56,7 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     
     // Output
     public var uploadSuccess: Driver<Void>?
-    public var alert: Driver<Entity.DefaultAlertContentVO>?
+    public var alert: Driver<DefaultAlertContentVO>?
     
     public var profileRenderObject: Driver<WorkerProfileRenderObject>?
     public var displayingImage: Driver<UIImage?>?

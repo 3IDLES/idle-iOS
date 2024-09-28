@@ -9,11 +9,12 @@ import Foundation
 import UIKit
 import BaseFeature
 import PresentationCore
-import UseCaseInterface
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 
 public protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelable & ClosedPostViewModelable {
 }
@@ -29,8 +30,8 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
     public var requestClosedPost: PublishRelay<Void> = .init()
     public var registerPostButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
-    public var ongoingPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
-    public var closedPostInfo: RxCocoa.Driver<[Entity.RecruitmentPostInfoForCenterVO]>?
+    public var ongoingPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
+    public var closedPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
     public var showRemovePostAlert: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
     public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
@@ -161,7 +162,7 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
         .disposed(by: disposeBag)
     }
     
-    public func createOngoingPostCellVM(postInfo: Entity.RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
+    public func createOngoingPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
         CenterEmployCardVM(
             postInfo: postInfo,
             postState: .onGoing,
@@ -170,7 +171,7 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
         )
     }
     
-    public func createClosedPostCellVM(postInfo: Entity.RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
+    public func createClosedPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
         CenterEmployCardVM(
             postInfo: postInfo,
             postState: .closed,

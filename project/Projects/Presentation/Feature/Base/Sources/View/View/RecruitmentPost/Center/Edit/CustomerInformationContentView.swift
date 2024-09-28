@@ -7,10 +7,13 @@
 
 import UIKit
 import PresentationCore
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
+
 
 public protocol CustomerInformationContentVMable {
     var name: PublishRelay<String> { get }

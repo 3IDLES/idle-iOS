@@ -7,9 +7,11 @@
 
 
 import UIKit
+import Domain
+
+
 import RxSwift
 import RxCocoa
-import Entity
 
 public class ApplicantCardCell: UITableViewCell {
     

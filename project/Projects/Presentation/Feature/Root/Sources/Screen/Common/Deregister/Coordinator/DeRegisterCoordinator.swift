@@ -6,10 +6,9 @@
 //
 
 import UIKit
-import Entity
 import PresentationCore
 import CenterFeature
-import UseCaseInterface
+import Domain
 
 public class DeRegisterCoordinator: DeregisterCoordinatable {
     

@@ -7,10 +7,12 @@
 
 import UIKit
 import PresentationCore
+import Domain
+import DSKit
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import DSKit
 import NMapsMap
 
 public class WorkPlaceAndWorkerLocationFullVC: BaseViewController {

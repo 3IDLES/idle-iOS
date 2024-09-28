@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import Domain
+import DSKit
+
+
 import RxSwift
 import RxCocoa
-import Entity
-import DSKit
 
 open class BaseViewModel {
     

@@ -9,7 +9,7 @@ import UIKit
 import CenterFeature
 import RootFeature
 import PresentationCore
-import UseCaseInterface
+import Domain
 
 class CenterSettingCoordinator: CenterSettingCoordinatable {
     

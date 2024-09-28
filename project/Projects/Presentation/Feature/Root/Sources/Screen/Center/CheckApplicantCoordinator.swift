@@ -7,10 +7,9 @@
 
 import UIKit
 import PresentationCore
-import UseCaseInterface
 import CenterFeature
 import WorkerFeature
-import Entity
+import Domain
 import BaseFeature
 
 public class CheckApplicantCoordinator: CheckApplicantCoordinatable {

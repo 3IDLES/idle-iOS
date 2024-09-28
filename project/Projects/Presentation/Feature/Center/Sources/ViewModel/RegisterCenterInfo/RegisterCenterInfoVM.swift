@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import Domain
+import PresentationCore
+import BaseFeature
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import PresentationCore
-import UseCaseInterface
-import BaseFeature
+
 
 public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelable {
     

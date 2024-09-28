@@ -8,8 +8,7 @@
 import UIKit
 import BaseFeature
 import PresentationCore
-import UseCaseInterface
-import Entity
+import Domain
 import DSKit
 
 public class PostDetailForCenterCoordinator: ChildCoordinator {

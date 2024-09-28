@@ -9,7 +9,7 @@ import UIKit
 import WorkerFeature
 import RootFeature
 import PresentationCore
-import UseCaseInterface
+import Domain
 
 class WorkerSettingCoordinaator: WorkerSettingScreenCoordinatable {
     
