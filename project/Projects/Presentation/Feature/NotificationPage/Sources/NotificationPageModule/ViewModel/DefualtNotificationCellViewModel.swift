@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import Entity
+import PresentationCore
+import ConcreteRepository
 
 
 import RxSwift
 import RxCocoa
-import PresentationCore
-import ConcreteRepository
+
 
 class NotificationCellViewModel: NotificationCellViewModelable {
     
