@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import NotificationPageFeature
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -17,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = ViewController()
+        window?.rootViewController = NotificationPageVC()
         window?.makeKeyAndVisible()
     }
 }
