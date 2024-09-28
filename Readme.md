@@ -15,12 +15,72 @@
 
 구인자가 공고작성시 구직자가 필요로하는 노인 정보를 의무적으로 기입하도록 유도함으로써 이 문제를 해결하려고 합니다.
 
-![Simulator Screen Recording - iPhone 15 Pro - 2024-08-31 at 02 34 14](https://github.com/user-attachments/assets/3ac7a7eb-7f2b-4d09-9552-81ee21ff596c)
+### 센터관리자 기능
+<table>
+<tr>
+<td><b>센터관리자 공고등록</b></td>
+<td><b>센터관리자 지원자 확인</b></td>
+<td><b>센터관리자 센터 프로필 관리</b></td>
+</tr>
+
+<tr>
+    
+<td>
+<img src="https://github.com/user-attachments/assets/68158206-fcf5-4a77-bc1d-13e8452171aa" width=300/>    
+</td>
+
+<td>
+<img src="https://github.com/user-attachments/assets/35ee5387-b4fe-4e66-ab88-fa46c7d875f3" width=300/>    
+</td>
 
 
-요양보호사는 센터가 작성한 공고를 확인하고 공고에 지원할 수 있습니다.
+<td>
+<img src="https://github.com/user-attachments/assets/81649325-b1ac-46d9-8ac4-b81b413eb2a8" width=300/>    
+</td>
 
-![Simulator Screen Recording - iPhone 15 Pro - 2024-08-31 at 02 41 55](https://github.com/user-attachments/assets/08baebe9-79cc-41b0-9f01-61e9b547af91)
+</tr>
+    
+<tr>
+<td><b>센터관리자 공고 마감/삭제</b></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td>
+<img src="https://github.com/user-attachments/assets/247ea098-afc7-47ea-9707-ed0ddc856909" width=300/>    
+</td>
+<td></td>
+<td></td>
+</tr> 
+
+</table>
+
+### 요양보호사 기능
+<table>
+<tr>
+<td><b>요양보호사 공고 확인</b></td>
+<td><b>요양보호사 공고 지원</b></td>
+<td><b>요양보호사 프로필 수정</b></td>
+</tr>
+
+<tr>
+
+<td>
+<img src="https://github.com/user-attachments/assets/ae1013be-31a2-4910-9bfa-2bfac05f89a9" width=300/>    
+</td>
+
+<td>
+<img src="https://github.com/user-attachments/assets/25dd1ce1-4159-437a-860d-2dc5796d20aa" width=300/>    
+</td>
+
+<td>
+<img src="https://github.com/user-attachments/assets/2252d158-82ef-43c3-ae80-0067556d7d50" width=300/>    
+</td>
+
+</tr>
+</table>
+
 
 ## 기술소개
 
@@ -32,9 +92,7 @@
         
 - Tuist를 사용한 이유
     - 타겟의 Mash-O타입에따라 임베딩 방식이 달라져 일일히 설정하기 번거로웠습니다.
-        
-        새로운 모듈을 생성하는 경우 의존하는 모듈들의 Mash-O타입을 일일히 확인해야 하는 것이 번거로웠습니다.
-        
+    - 새로운 모듈을 생성하는 경우 의존하는 모듈들의 Mash-O타입을 일일히 확인해야 하는 것이 번거로웠습니다.
     - `tuist graph` 명령어를 사용하여 전체적인 모듈의존구조를 파악하기 쉬웠습니다. 의존구조를 가시적으로 파악한 후 Tuist가 제공하는 전이 의존기능을 통해 특정 모듈 하나만 의존해도 해당 모듈이 의존하는 다른 모듈들을 전이 의존할 수 있어 빠른 모듈세팅이 가능했습니다.
 
 ### 클린아키텍처
@@ -43,14 +101,12 @@
     - 의존성 주입을 통해 앱 내 모든 모듈과 파일에 일관된 비즈니스 로직을 제공했습니다. 이를 통해 특정 비즈니스 로직을 조작하거나 테스트 객체를 만들어 앱 테스트를 용이하게 할 수 있었습니다.
     - 하나의 기능을 수행하는 데 필요한 책임을 계층화하여 세분화함으로써, 계층별로 테스트를 쉽게 진행할 수 있도록 했습니다.
 
-### MVVM+RxSwift
+### MVVM 아키텍처
 
 - 사용한 이유
-    - 비즈니스로직과 UI를 분리하여 UI 재사용성을 높이기 위해서 사용했습니다.
-    - UI는 bind함수의 매개변수로 ViewModel을 전달받아 바인딩 관계를 맻습니다.
-        
-        RxSwift를 사용하여 옵저버와 옵저버블의 구독관계로 구현하였습니다.
-
+  - 비지니스 로직과 UI역할 분리하기 위해서입니다.
+  - 다수의 화면에서 ViewModel이 포함한 데이터 처리로직을 공유하기 위해서 입니다.
+      
 ## 모듈 의존성그래프
 
 ![Example Image](./project/graph.png)
