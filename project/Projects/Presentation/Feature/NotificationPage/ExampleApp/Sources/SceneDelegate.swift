@@ -7,6 +7,14 @@
 
 import UIKit
 import NotificationPageFeature
+import PresentationCore
+import UseCaseInterface
+import ConcreteUseCase
+import ConcreteRepository
+import Entity
+
+import Swinject
+import RxSwift
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -18,7 +26,63 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = NotificationPageVC()
+        
+        DependencyInjector.shared.assemble([
+            TestAssembly()
+        ])
+        
+        let viewModel = NotificationPageViewModel()
+        
+        window?.rootViewController = NotificationPageVC(viewModel: viewModel)
         window?.makeKeyAndVisible()
+    }
+}
+
+public class TestAssembly: Assembly {
+    
+    public func assemble(container: Swinject.Container) {
+        
+        container.register(CacheRepository.self) { _ in
+            DefaultCacheRepository()
+        }
+        
+        container.register(NotificationPageUseCase.self) { _ in
+            TestNotificationPageUseCase()
+        }
+    }
+}
+
+public class TestNotificationPageUseCase: NotificationPageUseCase {
+    
+    public init() { }
+    
+    public func getNotificationList() -> Single<Result<[NotificationCellInfo], DomainError>> {
+        
+        let task = Single<[NotificationCellInfo]>.create { observer in
+            
+            var mockData: [NotificationCellInfo] = []
+            
+            // 오늘
+            mockData.append(
+                contentsOf: (0..<5).map { _ in NotificationCellInfo.create(minute: -30) }
+            )
+            
+            // 4일전
+            mockData.append(
+                contentsOf: (0..<5).map { _ in NotificationCellInfo.create(createdDay: -4) }
+            )
+            
+            // 15일전
+            mockData.append(
+                contentsOf: (0..<5).map { _ in NotificationCellInfo.create(createdDay: -15) }
+            )
+            
+            observer(.success(mockData))
+            
+            
+            return Disposables.create { }
+        }
+        
+        return convert(task: task)
     }
 }

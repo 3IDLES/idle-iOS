@@ -13,7 +13,7 @@ import RxCocoa
 import RxSwift
 
 
-protocol NotificationCellViewModelable {
+public protocol NotificationCellViewModelable {
     
     var cellInfo: NotificationCellInfo { get }
     
@@ -23,6 +23,8 @@ protocol NotificationCellViewModelable {
     // Output
     var isRead: Driver<Bool>? { get }
     var profileImage: Driver<UIImage>? { get }
+    
+    func getTimeText() -> String
 }
 
 class NotificationCell: UITableViewCell {
@@ -35,6 +37,7 @@ class NotificationCell: UITableViewCell {
     let profileImageView: UIImageView = {
         let view = UIImageView()
         view.layer.cornerRadius = 24
+        view.clipsToBounds = true
         return view
     }()
     
@@ -87,7 +90,7 @@ class NotificationCell: UITableViewCell {
             mainStack
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.addSubview(mainStack)
+            contentView.addSubview(mainStack)
         }
         
         contentView.layoutMargins = .init(
@@ -138,7 +141,7 @@ class NotificationCell: UITableViewCell {
         // Render
         let cellInfo = viewModel.cellInfo
         
-        timeLabel.textString = cellInfo.timeText
+        timeLabel.textString = viewModel.getTimeText()
         titleLabel.textString = cellInfo.titleText
         subTitleLabel.textString = cellInfo.subTitleText
         

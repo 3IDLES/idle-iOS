@@ -27,9 +27,17 @@ public struct NotificationCellInfo {
         self.imageInfo = imageInfo
     }
     
-    public static func create(createdDay: Int) -> NotificationCellInfo {
+    public static func create(createdDay: Int? = nil, minute: Int? = nil) -> NotificationCellInfo {
         
-        let date = Calendar.current.date(byAdding: .day, value: createdDay, to: .now)!
+        var date = Date.now
+        
+        if let createdDay {
+            date = Calendar.current.date(byAdding: .day, value: createdDay, to: date)!
+        }
+        
+        if let minute {
+            date = Calendar.current.date(byAdding: .minute, value: minute, to: date)!
+        }
         
         return .init(
             id: UUID().uuidString,
