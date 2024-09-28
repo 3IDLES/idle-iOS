@@ -17,6 +17,8 @@ import RxCocoa
 
 public class NotificationPageVC: BaseViewController {
     
+    typealias Cell = NotificationCell
+    
     enum SectionInfo: Int, CaseIterable {
         case today
         case week
@@ -56,14 +58,22 @@ public class NotificationPageVC: BaseViewController {
     public required init?(coder: NSCoder) { fatalError() }
     
     private func setUpTableView() {
+        
+        // MARK: DataSource
         tableViewDataSource = .init(tableView: tableView, cellProvider: { tableView, indexPath, itemIdentifier in
+            
+            
+            
             return nil
         })
         tableView.dataSource = tableViewDataSource
         tableView.delegate = self
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 93
-        tableView.sectionHeaderTopPadding = 0
+        tableView.sectionHeaderTopPadding = 10
+        
+        // MARK: Cell
+        tableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
     }
     
     public override func viewDidLoad() {
@@ -102,11 +112,10 @@ public class NotificationPageVC: BaseViewController {
         ])
     }
     
-    private func setObservable() {
-        
-    }
+    private func setObservable() { }
 }
 
+// MARK: Header
 extension NotificationPageVC: UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -115,7 +124,7 @@ extension NotificationPageVC: UITableViewDelegate {
     }
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        62
+        52
     }
     
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -126,42 +135,10 @@ extension NotificationPageVC: UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         switch section {
-        case 2:
+        case tableView.numberOfSections-1:
             return 0
         default:
             return 8
         }
-    }
-}
-
-class NotificationSectionHeader: UIView {
-    
-    let titleLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Subtitle2)
-        return label
-    }()
-    
-    init(titleText: String) {
-        self.titleLabel.textString = titleText
-        super.init(frame: .zero)
-        
-        setUpUI()
-    }
-    required init?(coder: NSCoder) { nil }
-    
-    private func setUpUI() {
-        
-        [
-            titleLabel
-        ].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            self.addSubview($0)
-        }
-        
-        NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 24),
-            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-            titleLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -8),
-        ])
     }
 }
