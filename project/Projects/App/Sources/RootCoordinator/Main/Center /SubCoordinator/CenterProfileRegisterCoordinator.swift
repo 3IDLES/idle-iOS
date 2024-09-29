@@ -50,7 +50,7 @@ extension CenterProfileRegisterCoordinator {
     }
 
     func showPreviewScreen(stateObject: CenterProfileRegisterState) {
-        let coordinator = CenterProfileRegisterOverviewCO(
+        let coordinator = CenterProfileRegisterOverviewCoordinator(
             navigationController: navigationController,
             stateObject: stateObject
         )
