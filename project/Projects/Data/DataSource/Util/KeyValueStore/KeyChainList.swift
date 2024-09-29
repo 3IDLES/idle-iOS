@@ -48,14 +48,8 @@ extension KeyChainList: KeyValueStore {
     
     func get(key: String) -> String? {
         if let value = try? keyChain.get(key) {
-            #if DEBUG
-            print("get value from KeyChain: \(key)")
-            #endif
             return value
         } else if let value = UserDefaults.standard.string(forKey: key) {
-            #if DEBUG
-            print("get value from UserDefaults: \(key)")
-            #endif
             return value
         }
         return nil
