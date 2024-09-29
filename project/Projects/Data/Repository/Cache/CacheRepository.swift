@@ -8,6 +8,7 @@
 import UIKit
 import UniformTypeIdentifiers
 import Domain
+import Core
 
 
 import SDWebImageWebPCoder
@@ -40,8 +41,8 @@ public class DefaultCacheRepository: CacheRepository {
         static let cacheInfoDict = "cacheInfoDictionary"
     }
     
-    private let fileManagerScheduler = SerialDispatchQueueScheduler(qos: .background)
-    private let downloadScheduler = ConcurrentDispatchQueueScheduler(qos: .background)
+    private let fileManagerScheduler = SerialDispatchQueueScheduler(qos: .userInitiated)
+    private let concurrentScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     /// 이미지를 메모리에서 캐싱하는 NSCache입니다.
     private let imageMemoryCache: NSCache<NSString, UIImage> = .init()
@@ -81,6 +82,8 @@ public class DefaultCacheRepository: CacheRepository {
     
     public func getImage(imageInfo: ImageDownLoadInfo) -> Single<UIImage> {
         
+        let startTime: Date = .now
+        
         // MARK: 이미지 캐싱정보 확인
         let findCacheResult = findCache(imageInfo: imageInfo)
             .subscribe(on: fileManagerScheduler)
@@ -92,7 +95,7 @@ public class DefaultCacheRepository: CacheRepository {
         
         // MARK: 이미지 다운로드
         let imageDownloadResult = cacheNotFound
-            .observe(on: downloadScheduler)
+            .observe(on: concurrentScheduler)
             .map { [imageInfo] _ -> Data? in
                 try? Data(contentsOf: imageInfo.imageURL)
             }
@@ -103,12 +106,18 @@ public class DefaultCacheRepository: CacheRepository {
         // MARK: 다운로드된 이미지 캐싱
         let downloadedImage = downloadSuccess
             .observe(on: fileManagerScheduler)
-            .compactMap { [imageInfo, weak self] data -> UIImage? in
+            .map { [imageInfo, weak self] data in
+                // 디스크에 이미지 캐싱
+                self?.cacheImageFileToDisk(imageURL: imageInfo.imageURL, contents: data)
                 
-                // 이미지 캐싱
-                _ = self?.cacheImage(imageInfo: imageInfo, contents: data)
-                
-                return self?.createUIImage(data: data, format: imageInfo.imageFormat)
+                return data
+            }
+            .observe(on: concurrentScheduler)
+            .compactMap { [imageInfo, weak self] data in
+                self?.cacheImageToMemory(
+                    imageInfo: imageInfo,
+                    contents: data
+                )
             }
         
         return Observable
@@ -116,6 +125,11 @@ public class DefaultCacheRepository: CacheRepository {
                 downloadedImage.asObservable(),
                 cacheFound.asObservable()
             )
+            .map({ [startTime] image in
+                let diff = Date.now.timeIntervalSince(startTime)
+                printIfDebug("이미지 획득 종료, 소요시간(초): \(diff)")
+                return image
+            })
             .asSingle()
     }
     
@@ -167,11 +181,8 @@ public class DefaultCacheRepository: CacheRepository {
         }
     }
     
-    func cacheImage(imageInfo: ImageDownLoadInfo, contents: Data) -> Bool {
-        
-        // 디스크에 파일 생성
-        createImageFile(imageURL: imageInfo.imageURL, contents: contents)
-        
+    func cacheImageToMemory(imageInfo: ImageDownLoadInfo, contents: Data) -> UIImage? {
+    
         let urlString = imageInfo.imageURL.absoluteString
         let cacheInfoKey = urlString
         let memoryKey = NSString(string: urlString)
@@ -194,11 +205,11 @@ public class DefaultCacheRepository: CacheRepository {
             imageMemoryCache.setObject(image, forKey: memoryKey)
             
             // 캐싱 성공
-            return true
+            return image
         }
         
         // 캐싱 실패
-        return false
+        return nil
     }
 }
 
@@ -284,33 +295,27 @@ extension DefaultCacheRepository {
             
             // 이미지 파일이 존재
             
-            #if DEBUG
-            print("\(info.imageURL) : 디스크에 파일이 존재함")
-            #endif
+            printIfDebug("\(info.imageURL) : 디스크에 파일이 존재함")
             
             if let data = FileManager.default.contents(atPath: imagePath.path) {
                 
                 return createUIImage(data: data, format: info.imageFormat)
             }
             
-            #if DEBUG
-            print("\(info.imageURL) : 파일이 존재하지만 데이터를 불러오지 못함")
-            #endif
+            printIfDebug("\(info.imageURL) : 파일이 존재하지만 데이터를 불러오지 못함")
             
             return nil
             
         } else {
             
             // 파일이 존재하지 않는 경우
-            #if DEBUG
-            print("디스크에 파일이 존재하지 않음")
-            #endif
+            printIfDebug("디스크에 파일이 존재하지 않음")
             
             return nil
         }
     }
     
-    func createImageFile(imageURL: URL, contents: Data) {
+    func cacheImageFileToDisk(imageURL: URL, contents: Data) {
         
         guard let imagePath = createImagePath(url: imageURL.absoluteString) else {
             return
