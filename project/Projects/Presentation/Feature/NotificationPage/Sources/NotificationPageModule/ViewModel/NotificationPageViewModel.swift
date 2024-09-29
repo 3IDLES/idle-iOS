@@ -10,6 +10,7 @@ import BaseFeature
 import Domain
 import Repository
 import PresentationCore
+import Core
 
 import RxSwift
 import RxCocoa

@@ -7,6 +7,7 @@
 
 import UIKit
 import PresentationCore
+import Core
 
 enum CenterRegisterStage: Int {
     

@@ -26,8 +26,8 @@ let project = Project(
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Sources/**"],
             dependencies: [
-                // ThirdParty
-                D.ThirdParty.RxSwift,
+                
+                D.Core
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"],

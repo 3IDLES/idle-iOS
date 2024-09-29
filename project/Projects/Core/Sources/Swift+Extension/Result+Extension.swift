@@ -1,8 +1,8 @@
 //
 //  Result+Extension.swift
-//  PresentationCore
+//  Core
 //
-//  Created by choijunios on 7/14/24.
+//  Created by choijunios on 9/29/24.
 //
 
 import Foundation

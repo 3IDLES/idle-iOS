@@ -10,6 +10,7 @@ import Domain
 import PresentationCore
 import BaseFeature
 import DSKit
+import Core
 
 enum SetNewPasswordStage: Int {
     

@@ -10,6 +10,7 @@ import PresentationCore
 import BaseFeature
 import Domain
 import DSKit
+import Core
 
 public class EditPostCoordinator: ChildCoordinator {
     

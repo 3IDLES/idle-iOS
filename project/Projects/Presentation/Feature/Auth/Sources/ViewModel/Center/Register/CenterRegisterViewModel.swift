@@ -9,7 +9,7 @@ import UIKit
 import PresentationCore
 import BaseFeature
 import Domain
-
+import Core
 
 import RxSwift
 import RxCocoa

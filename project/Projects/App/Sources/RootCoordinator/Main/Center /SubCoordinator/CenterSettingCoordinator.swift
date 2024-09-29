@@ -10,6 +10,7 @@ import CenterFeature
 import RootFeature
 import PresentationCore
 import Domain
+import Core
 
 class CenterSettingCoordinator: CenterSettingCoordinatable {
     

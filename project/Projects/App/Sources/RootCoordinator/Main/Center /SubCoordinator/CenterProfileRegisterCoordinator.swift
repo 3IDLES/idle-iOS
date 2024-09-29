@@ -9,6 +9,7 @@ import UIKit
 import CenterFeature
 import PresentationCore
 import Domain
+import Core
 
 class CenterProfileRegisterCoordinator: CenterProfileRegisterCoordinatable {
     

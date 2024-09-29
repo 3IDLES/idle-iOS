@@ -9,6 +9,7 @@ import UIKit
 import PresentationCore
 import Domain
 import BaseFeature
+import Core
 
 
 public class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable {

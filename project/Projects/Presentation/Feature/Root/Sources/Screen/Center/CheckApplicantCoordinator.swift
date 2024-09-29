@@ -11,6 +11,7 @@ import CenterFeature
 import WorkerFeature
 import Domain
 import BaseFeature
+import Core
 
 public class CheckApplicantCoordinator: CheckApplicantCoordinatable {
     

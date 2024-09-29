@@ -11,6 +11,7 @@ import PresentationCore
 import CenterFeature
 import RootFeature
 import Domain
+import Core
 
 class CenterMainCoordinator: CenterMainCoordinatable {
     

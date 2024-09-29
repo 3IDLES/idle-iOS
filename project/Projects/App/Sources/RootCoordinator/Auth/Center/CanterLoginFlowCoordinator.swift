@@ -9,6 +9,7 @@ import UIKit
 import PresentationCore
 import AuthFeature
 import Domain
+import Core
 
 class CanterLoginFlowCoordinator: CanterLoginFlowable {
     

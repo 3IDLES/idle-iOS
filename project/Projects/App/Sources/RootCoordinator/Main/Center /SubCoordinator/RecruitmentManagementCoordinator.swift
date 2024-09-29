@@ -10,6 +10,7 @@ import RootFeature
 import CenterFeature
 import PresentationCore
 import Domain
+import Core
 
 
 public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatable {

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Core
 
 // MARK: Coordinator
 public protocol Coordinator: AnyObject {

@@ -8,6 +8,7 @@
 import UIKit
 import PresentationCore
 import AuthFeature
+import Core
 
 class AuthCoordinator: ParentCoordinator {
     

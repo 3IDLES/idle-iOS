@@ -8,7 +8,7 @@
 import UIKit
 import PresentationCore
 import Domain
-
+import Core
 
 import RxSwift
 import RxCocoa

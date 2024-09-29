@@ -10,6 +10,7 @@ import BaseFeature
 import PresentationCore
 import Domain
 import DSKit
+import Core
 
 public class PostDetailForCenterCoordinator: ChildCoordinator {
     

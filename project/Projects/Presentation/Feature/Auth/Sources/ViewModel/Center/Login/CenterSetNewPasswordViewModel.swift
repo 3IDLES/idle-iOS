@@ -8,7 +8,7 @@
 import Domain
 import PresentationCore
 import BaseFeature
-
+import Core
 
 import RxSwift
 import RxCocoa

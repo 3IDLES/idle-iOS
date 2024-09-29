@@ -1,8 +1,8 @@
 //
 //  Project.swift
-//  FeatureManifests
+//  Idle-iOSManifests
 //
-//  Created by 최준영 on 6/21/24.
+//  Created by 최준영 on 9/29/24.
 //
 
 import ProjectDescription
@@ -10,29 +10,31 @@ import ProjectDescriptionHelpers
 import ConfigurationPlugin
 import DependencyPlugin
 
-let proejct = Project(
-    name: "PresentationCore",
+let project = Project(
+    name: "Core",
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
     targets: [
+        
+        /// UseCaseConcrete type
         .target(
-            name: "PresentationCore",
+            name: "Core",
             destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Sources/**"],
             dependencies: [
-                
-                D.Domain,
-                
                 // ThirdParty
-                D.ThirdParty.RxCocoa,
+                D.ThirdParty.RxSwift,
+                D.ThirdParty.Swinject,
             ],
             settings: .settings(
-                configurations: IdleConfiguration.presentationConfigurations
+                base: ["ENABLE_TESTABILITY": "YES"],
+                configurations: IdleConfiguration.domainConfigurations
             )
-        )
+        ),
+
     ]
 )

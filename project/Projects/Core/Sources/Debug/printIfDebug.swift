@@ -1,6 +1,6 @@
 //
 //  DebugLog.swift
-//  PresentationCore
+//  Core
 //
 //  Created by choijunios on 7/1/24.
 //

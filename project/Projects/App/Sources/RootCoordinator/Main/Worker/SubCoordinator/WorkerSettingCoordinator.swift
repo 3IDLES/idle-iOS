@@ -10,6 +10,7 @@ import WorkerFeature
 import RootFeature
 import PresentationCore
 import Domain
+import Core
 
 class WorkerSettingCoordinaator: WorkerSettingScreenCoordinatable {
     

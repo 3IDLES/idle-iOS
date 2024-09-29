@@ -10,6 +10,7 @@ import DSKit
 import PresentationCore
 import RootFeature
 import Domain
+import Core
 
 class WorkerMainCoordinator: ParentCoordinator {
     

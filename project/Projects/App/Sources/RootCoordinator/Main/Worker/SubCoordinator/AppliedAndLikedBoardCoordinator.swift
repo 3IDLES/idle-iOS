@@ -11,6 +11,7 @@ import BaseFeature
 import CenterFeature
 import PresentationCore
 import Domain
+import Core
 
 class AppliedAndLikedBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
     

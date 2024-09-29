@@ -8,6 +8,7 @@
 import UIKit
 import PresentationCore
 import Domain
+import Core
 
 public class PasswordForDeregisterCoordinator: ChildCoordinator {
     

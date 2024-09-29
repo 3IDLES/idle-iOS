@@ -8,6 +8,7 @@
 import UIKit
 import Domain
 import PresentationCore
+import Core
 
 enum WorkerRegisterStage: Int {
     

@@ -9,6 +9,7 @@ import Foundation
 import BaseFeature
 import PresentationCore
 import Domain
+import Core
 
 import FirebaseMessaging
 

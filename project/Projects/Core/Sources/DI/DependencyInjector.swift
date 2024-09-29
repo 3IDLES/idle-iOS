@@ -1,6 +1,6 @@
 //
 //  DependencyInjector.swift
-//  PresentationCore
+//  Core
 //
 //  Created by 최준영 on 6/22/24.
 //

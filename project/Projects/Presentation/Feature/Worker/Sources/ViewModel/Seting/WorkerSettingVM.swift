@@ -11,6 +11,7 @@ import PresentationCore
 import Domain
 import DSKit
 import UserNotifications
+import Core
 
 
 import RxCocoa
