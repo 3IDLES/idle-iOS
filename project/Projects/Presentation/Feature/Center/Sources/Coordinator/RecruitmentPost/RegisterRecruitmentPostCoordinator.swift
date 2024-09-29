@@ -16,16 +16,6 @@ public class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordina
     
     @Injected var logger: PostRegisterLogger
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let recruitmentPostUseCase: RecruitmentPostUseCase
-        
-        public init(navigationController: UINavigationController, recruitmentPostUseCase: RecruitmentPostUseCase) {
-            self.navigationController = navigationController
-            self.recruitmentPostUseCase = recruitmentPostUseCase
-        }
-    }
-    
     public var childCoordinators: [Coordinator] = []
     
     public var parent: ParentCoordinator?
@@ -35,12 +25,9 @@ public class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordina
     var viewControllerRef: UIViewController?
     var registerRecruitmentPostVM: RegisterRecruitmentPostViewModelable!
     
-    public init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.registerRecruitmentPostVM = RegisterRecruitmentPostVM(
-            registerRecruitmentPostCoordinator: self,
-            recruitmentPostUseCase: dependency.recruitmentPostUseCase
-        )
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+        self.registerRecruitmentPostVM = RegisterRecruitmentPostVM(coordinator: self)
     }
     
     public func start() {
@@ -48,10 +35,10 @@ public class RegisterRecruitmentPostCoordinator: RegisterRecruitmentPostCoordina
         vc.bind(viewModel: registerRecruitmentPostVM)
         
         let coordinator = CoordinatorWrapper(
-            parent: self,
             nav: navigationController,
             vc: vc
         )
+        addChildCoordinator(coordinator)
         coordinator.start()
         
         // MARK: 로깅
@@ -63,24 +50,18 @@ public extension RegisterRecruitmentPostCoordinator {
     
     func showEditPostScreen() {
         let coordinator = EditPostCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                viewModel: registerRecruitmentPostVM
-            )
+            viewModel: registerRecruitmentPostVM,
+            navigationController: navigationController
         )
-        coordinator.parent = self
         addChildCoordinator(coordinator)
         coordinator.start()
     }
     
     func showOverViewScreen() {
         let coordinator = PostOverviewCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                viewModel: registerRecruitmentPostVM
-            )
+            viewModel: registerRecruitmentPostVM,
+            navigationController: navigationController
         )
-        coordinator.parent = self
         addChildCoordinator(coordinator)
         coordinator.start()
     }
@@ -89,7 +70,6 @@ public extension RegisterRecruitmentPostCoordinator {
         let coordinator = RegisterCompleteCoordinator(
             navigationController: navigationController
         )
-        coordinator.parent = self
         addChildCoordinator(coordinator)
         coordinator.start()
         

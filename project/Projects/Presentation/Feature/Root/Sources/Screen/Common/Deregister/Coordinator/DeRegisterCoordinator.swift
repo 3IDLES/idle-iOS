@@ -12,20 +12,6 @@ import Domain
 
 public class DeRegisterCoordinator: DeregisterCoordinatable {
     
-    public struct Dependency {
-        let userType: UserType
-        let settingUseCase: SettingScreenUseCase
-        let inputValidationUseCase: AuthInputValidationUseCase
-        let navigationController: UINavigationController
-        
-        public init(userType: UserType, settingUseCase: SettingScreenUseCase, inputValidationUseCase: AuthInputValidationUseCase, navigationController: UINavigationController) {
-            self.userType = userType
-            self.settingUseCase = settingUseCase
-            self.inputValidationUseCase = inputValidationUseCase
-            self.navigationController = navigationController
-        }
-    }
-
     public var childCoordinators: [any Coordinator] = []
     
     public var navigationController: UINavigationController
@@ -34,14 +20,10 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     
     var viewControllerRef: UIViewController?
     let userType: UserType
-    let settingUseCase: SettingScreenUseCase
-    let inputValidationUseCase: AuthInputValidationUseCase
     
-    public init(dependency: Dependency) {
-        self.userType = dependency.userType
-        self.settingUseCase = dependency.settingUseCase
-        self.inputValidationUseCase = dependency.inputValidationUseCase
-        self.navigationController = dependency.navigationController
+    public init(userType: UserType, navigationController: UINavigationController) {
+        self.userType = userType
+        self.navigationController = navigationController
     }
     
     public func start() {
@@ -50,11 +32,8 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     
     public func showSelectReasonScreen() {
         let coordinator: SelectReasonCoordinator = .init(
-            dependency: .init(
-                userType: userType,
-                settingUseCase: settingUseCase,
-                navigationController: navigationController
-            )
+            userType: userType,
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self
@@ -64,11 +43,8 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     public func showFinalPasswordScreen(reasons: [String]) {
     
         let coordinator = PasswordForDeregisterCoordinator(
-            dependency: .init(
-                settingUseCase: settingUseCase,
-                reasons: reasons,
-                navigationController: navigationController
-            )
+            reasons: reasons,
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self
@@ -77,12 +53,8 @@ public class DeRegisterCoordinator: DeregisterCoordinatable {
     
     public func showFinalPhoneAuthScreen(reasons: [String]) {
         let coordinator = PhoneNumberValidationForDeregisterCoordinator(
-            dependency: .init(
-                settingUseCase: settingUseCase,
-                inputValidationUseCase: inputValidationUseCase,
-                reasons: reasons,
-                navigationController: navigationController
-            )
+            reasons: reasons,
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self

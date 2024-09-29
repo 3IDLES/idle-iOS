@@ -15,7 +15,10 @@ public class SelectAuthTypeCoordinator: ChildCoordinator {
     
     public weak var viewControllerRef: UIViewController?
     
-    public var parent: AuthCoordinatable?
+    public weak var parent: ParentCoordinator?
+    var authCoordinator: AuthCoordinatable? {
+        parent as? AuthCoordinatable
+    }
     
     public init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -42,12 +45,12 @@ public class SelectAuthTypeCoordinator: ChildCoordinator {
 extension SelectAuthTypeCoordinator {
     
     func startCenterLoginFlow() {
-        parent?.startCenterLoginFlow()
+        authCoordinator?.startCenterLoginFlow()
     }
     func registerAsCenter() {
-        parent?.registerAsCenter()
+        authCoordinator?.registerAsCenter()
     }
     func registerAsWorker() {
-        parent?.registerAsWorker()
+        authCoordinator?.registerAsWorker()
     }
 }

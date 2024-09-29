@@ -12,27 +12,17 @@ import Core
 
 public class CenterSettingScreenCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let settingUseCase: SettingScreenUseCase
-        
-        public init(navigationController: UINavigationController, settingUseCase: SettingScreenUseCase) {
-            self.navigationController = navigationController
-            self.settingUseCase = settingUseCase
-        }
+    public weak var viewControllerRef: UIViewController?
+    public weak var parent: ParentCoordinator?
+    
+    var centerSettingCoordinator: CenterSettingCoordinatable? {
+        parent as? CenterSettingCoordinatable
     }
     
-    public weak var viewControllerRef: UIViewController?
-    public weak var parent: CenterSettingCoordinatable?
-    
     public let navigationController: UINavigationController
-    let settingUseCase: SettingScreenUseCase
     
-    public init(
-        dependency: Dependency
-    ) {
-        self.navigationController = dependency.navigationController
-        self.settingUseCase = dependency.settingUseCase
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -41,10 +31,7 @@ public class CenterSettingScreenCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = CenterSettingVC()
-        let vm = CenterSettingVM(
-            coordinator: self,
-            settingUseCase: settingUseCase
-        )
+        let vm = CenterSettingVM(coordinator: self)
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: false)
@@ -62,11 +49,11 @@ public class CenterSettingScreenCoordinator: ChildCoordinator {
     }
     
     public func startRemoveCenterAccountFlow() {
-        parent?.startRemoveCenterAccountFlow()
+        centerSettingCoordinator?.startRemoveCenterAccountFlow()
     }
     
     public func showMyCenterProfile() {
-        parent?.showMyCenterProfile()
+        centerSettingCoordinator?.showMyCenterProfile()
     }
 }
 

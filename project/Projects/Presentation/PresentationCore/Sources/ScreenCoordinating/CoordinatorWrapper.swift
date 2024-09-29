@@ -18,17 +18,13 @@ public class CoordinatorWrapper: ChildCoordinator {
     let animated: Bool
     
     public init(
-        parent: ParentCoordinator,
         nav: UINavigationController,
         vc: UIViewController,
         animated: Bool = true
     ) {
-        self.parent = parent
         self.navigationController = nav
         self.viewControllerRef = vc
         self.animated = animated
-        
-        parent.addChildCoordinator(self)
     }
     
     public func start() {

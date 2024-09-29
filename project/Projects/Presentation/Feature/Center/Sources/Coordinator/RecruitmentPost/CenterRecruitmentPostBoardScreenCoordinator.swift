@@ -12,25 +12,17 @@ import Core
 
 public class CenterRecruitmentPostBoardScreenCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let recruitmentPostUseCase: RecruitmentPostUseCase
-        
-        public init(navigationController: UINavigationController, recruitmentPostUseCase: RecruitmentPostUseCase) {
-            self.navigationController = navigationController
-            self.recruitmentPostUseCase = recruitmentPostUseCase
-        }
+    public weak var viewControllerRef: UIViewController?
+    public weak var parent: ParentCoordinator?
+    
+    var recruitmentManagementCoordinatable: RecruitmentManagementCoordinatable? {
+        parent as? RecruitmentManagementCoordinatable
     }
     
-    public weak var viewControllerRef: UIViewController?
-    public weak var parent: RecruitmentManagementCoordinatable?
-    
     public let navigationController: UINavigationController
-    let recruitmentPostUseCase: RecruitmentPostUseCase
     
-    public init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -39,10 +31,7 @@ public class CenterRecruitmentPostBoardScreenCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = CenterRecruitmentPostBoardVC()
-        let vm = CenterRecruitmentPostBoardVM(
-            coordinator: self,
-            recruitmentPostUseCase: recruitmentPostUseCase
-        )
+        let vm = CenterRecruitmentPostBoardVM(coordinator: self)
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: false)
@@ -54,20 +43,20 @@ public class CenterRecruitmentPostBoardScreenCoordinator: ChildCoordinator {
     }
     
     public func showCheckingApplicantScreen(postId: String) {
-        parent?.showCheckingApplicantScreen(postId: postId)
+        recruitmentManagementCoordinatable?.showCheckingApplicantScreen(postId: postId)
     }
     
     public func showPostDetailScreenForCenter(postId: String, postState: PostState) {
         
-        parent?.showPostDetailScreenForCenter(postId: postId, postState: postState)
+        recruitmentManagementCoordinatable?.showPostDetailScreenForCenter(postId: postId, postState: postState)
     }
     
     public func showEditScreen(postId: String) {
-        parent?.showEditScreen(postId: postId)
+        recruitmentManagementCoordinatable?.showEditScreen(postId: postId)
     }
     
     public func showRegisterPostScreen() {
-        parent?.showRegisterPostScrean()
+        recruitmentManagementCoordinatable?.showRegisterPostScrean()
     }
 }
 

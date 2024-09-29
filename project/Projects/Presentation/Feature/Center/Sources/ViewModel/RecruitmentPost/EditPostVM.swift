@@ -9,6 +9,7 @@ import Foundation
 import Domain
 import PresentationCore
 import BaseFeature
+import Core
 
 
 import RxSwift
@@ -16,9 +17,10 @@ import RxCocoa
 
 public class EditPostVM: BaseViewModel, EditPostViewModelable {
     
+    @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
+    
     // Init
     let id: String
-    let recruitmentPostUseCase: RecruitmentPostUseCase
     
     // MARK: Edit Screen
     public var editPostViewWillAppear: RxRelay.PublishRelay<Void> = .init()
@@ -106,12 +108,9 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
         return dict
     }()
     
-    public init(
-        id: String,
-        recruitmentPostUseCase: RecruitmentPostUseCase
-    ) {
+    public init(id: String) {
+        
         self.id = id
-        self.recruitmentPostUseCase = recruitmentPostUseCase
         
         super.init()
         

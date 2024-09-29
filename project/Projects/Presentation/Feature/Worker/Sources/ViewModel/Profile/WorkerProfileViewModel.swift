@@ -25,13 +25,11 @@ public protocol OtherWorkerProfileViewModelable: WorkerProfileViewModelable {
 public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
     
     @Injected var cacheRepository: CacheRepository
-    
-    public weak var coordinator: WorkerProfileCoordinator?
-    
-    let workerProfileUseCase: WorkerProfileUseCase
+    @Injected var workerProfileUseCase: WorkerProfileUseCase
     
     // Init
     let workerId: String
+    public weak var coordinator: WorkerProfileCoordinator?
     
     // Input(Rendering)
     public var viewWillAppear: PublishRelay<Void> = .init()
@@ -58,12 +56,10 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
     
     public init(
         coordinator: WorkerProfileCoordinator?,
-        workerProfileUseCase: WorkerProfileUseCase,
         workerId: String
     ) {
         
         self.coordinator = coordinator
-        self.workerProfileUseCase = workerProfileUseCase
         self.workerId = workerId
         
         // Input(Rendering)

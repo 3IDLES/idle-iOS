@@ -40,9 +40,10 @@ public protocol CenterSettingVMable: BaseViewModel {
 
 public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
     
+    @Injected var settingUseCase: SettingScreenUseCase
+    
     // Init
     weak var coordinator: CenterSettingScreenCoordinator?
-    let settingUseCase: SettingScreenUseCase
     
     public var viewWillAppear: PublishRelay<Void> = .init()
     public var myCenterProfileButtonClicked: PublishRelay<Void> = .init()
@@ -57,13 +58,8 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
     public var centerInfo: RxCocoa.Driver<(name: String, location: String)>?
     public var showSettingAlert: Driver<Void>?
     
-    public init(
-        coordinator: CenterSettingScreenCoordinator?,
-        settingUseCase: SettingScreenUseCase
-        )
-    {
+    public init(coordinator: CenterSettingScreenCoordinator?) {
         self.coordinator = coordinator
-        self.settingUseCase = settingUseCase
         
         super.init()
         
@@ -116,7 +112,7 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
         
         // MARK: 센터카드 정보 알아내기
         centerInfo = viewWillAppear
-            .map { centerProfileVO in
+            .map { [settingUseCase] centerProfileVO in
                 let vo = settingUseCase.getCenterProfile()
                 return (vo.centerName, vo.roadNameAddress)
             }

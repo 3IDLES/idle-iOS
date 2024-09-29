@@ -37,16 +37,11 @@ enum WorkerRegisterStage: Int {
 public class WorkerRegisterCoordinator: ChildCoordinator {
     
     @Injected var logger: WorkerRegisterLogger
-
-    public struct Dependency {
-        let navigationController: UINavigationController
-        
-        public init(navigationController: UINavigationController) {
-            self.navigationController = navigationController
-        }
-    }
     
-    public var parent: AuthCoordinatable?
+    public weak var parent: ParentCoordinator?
+    var authCoordinator: AuthCoordinatable? {
+        parent as? AuthCoordinatable
+    }
     
     public let navigationController: UINavigationController
     public weak var viewControllerRef: UIViewController?
@@ -57,8 +52,8 @@ public class WorkerRegisterCoordinator: ChildCoordinator {
     var stageViewControllers: [UIViewController] = []
     private var currentStage: WorkerRegisterStage!
     
-    public init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -171,7 +166,7 @@ extension WorkerRegisterCoordinator {
             completeButtonText: "시작하기") { [weak self] in
                 self?.authFinished()
             }
-        parent?.showCompleteScreen(ro: renderObject)
+        authCoordinator?.showCompleteScreen(ro: renderObject)
         
         // MARK: 완료 로깅
         logger.startWorkerRegister()
@@ -179,7 +174,7 @@ extension WorkerRegisterCoordinator {
     
     func authFinished() {
         stageViewControllers = []
-        parent?.authFinished()
+        authCoordinator?.authFinished()
     }
     
     func registerFinished() {

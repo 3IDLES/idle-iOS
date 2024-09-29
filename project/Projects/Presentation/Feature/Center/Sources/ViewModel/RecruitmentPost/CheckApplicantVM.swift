@@ -32,10 +32,11 @@ public protocol CheckApplicantViewModelable: BaseViewModel {
 
 public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
     
+    @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
+    
     // Init
     let postId: String
     weak var coorindator: CheckApplicantCoordinatable?
-    let recruitmentPostUseCase: RecruitmentPostUseCase
     
     public var exitButtonClicked: PublishRelay<Void> = .init()
     public var requestpostApplicantVO: PublishRelay<Void> = .init()
@@ -44,9 +45,9 @@ public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
     public var postApplicantVO: Driver<[PostApplicantVO]>?
     public var postCardVO: Driver<CenterEmployCardVO>?
     
-    public init(postId: String, coorindator: CheckApplicantCoordinatable?, recruitmentPostUseCase: RecruitmentPostUseCase) {
+    public init(postId: String, coorindator: CheckApplicantCoordinatable?) {
+        
         self.postId = postId
-        self.recruitmentPostUseCase = recruitmentPostUseCase
         self.coorindator = coorindator
         
         super.init()

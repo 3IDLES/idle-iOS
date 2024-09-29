@@ -12,21 +12,14 @@ import Core
 
 class AuthCoordinator: ParentCoordinator {
     
-    struct Dependency {
-        let navigationController: UINavigationController
-        let injector: Injector
-    }
-    
     var childCoordinators: [Coordinator] = []
     
     var parent: ParentCoordinator?
     
     let navigationController: UINavigationController
-    let injector: Injector
     
-    init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.injector = dependency.injector
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -35,10 +28,7 @@ class AuthCoordinator: ParentCoordinator {
     
     public func start() {
         
-        let coordinator = SelectAuthTypeCoordinator(
-            navigationController: navigationController
-        )
-        coordinator.parent = self
+        let coordinator = SelectAuthTypeCoordinator(navigationController: navigationController)
         addChildCoordinator(coordinator)
         coordinator.start()
     }

@@ -11,6 +11,8 @@ import Core
 
 class CenterAuthCoordinator: ParentCoordinator {
     
+    weak var parent: ParentCoordinator?
+    
     struct Dependency {
         let navigationController: UINavigationController
         let injector: Injector

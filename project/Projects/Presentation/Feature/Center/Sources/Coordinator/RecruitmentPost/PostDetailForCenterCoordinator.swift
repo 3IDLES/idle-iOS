@@ -13,36 +13,26 @@ import DSKit
 import Core
 
 public class PostDetailForCenterCoordinator: ChildCoordinator {
-    
-    public struct Dependency {
-        let postId: String
-        let postState: PostState
-        let navigationController: UINavigationController
-        let recruitmentPostUseCase: RecruitmentPostUseCase
-        
-        public init(postId: String, postState: PostState, navigationController: UINavigationController, recruitmentPostUseCase: RecruitmentPostUseCase) {
-            self.postId = postId
-            self.postState = postState
-            self.navigationController = navigationController
-            self.recruitmentPostUseCase = recruitmentPostUseCase
-        }
-    }
-    
+
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: RecruitmentManagementCoordinatable?
+    public weak var parent: ParentCoordinator?
+    
+    var recruitmentManagementCoordinator: RecruitmentManagementCoordinatable? {
+        parent as? RecruitmentManagementCoordinatable
+    }
     
     public let navigationController: UINavigationController
     let postId: String
     let postState: PostState
-    let recruitmentPostUseCase: RecruitmentPostUseCase
     
     public init(
-        dependency: Dependency
+        postId: String,
+        postState: PostState,
+        navigationController: UINavigationController
     ) {
-        self.navigationController = dependency.navigationController
-        self.postId = dependency.postId
-        self.postState = dependency.postState
-        self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
+        self.postId = postId
+        self.postState = postState
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -54,8 +44,7 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
         let vm = PostDetailForCenterVM(
             postId: postId,
             postState: postState,
-            coordinator: self,
-            recruitmentPostUseCase: recruitmentPostUseCase
+            coordinator: self
         )
         viewControllerRef = vc
         vc.bind(viewModel: vm)
@@ -86,9 +75,9 @@ public class PostDetailForCenterCoordinator: ChildCoordinator {
 extension PostDetailForCenterCoordinator {
     
     func showPostEditScreen(postId: String) {
-        parent?.showEditScreen(postId: postId)
+        recruitmentManagementCoordinator?.showEditScreen(postId: postId)
     }
     func showCheckApplicantScreen(postId: String) {
-        parent?.showCheckingApplicantScreen(postId: postId)
+        recruitmentManagementCoordinator?.showCheckingApplicantScreen(postId: postId)
     }
 }

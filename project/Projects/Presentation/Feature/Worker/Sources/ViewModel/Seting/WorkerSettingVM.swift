@@ -41,8 +41,8 @@ public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
     
     // Init
     weak var coordinator: WorkerSettingScreenCoordinator?
-    let settingUseCase: SettingScreenUseCase
-    let centerProfileUseCase: CenterProfileUseCase
+    @Injected var settingUseCase: SettingScreenUseCase
+    @Injected var centerProfileUseCase: CenterProfileUseCase
     
     // Input
     public let viewWillAppear: PublishRelay<Void> = .init()
@@ -58,15 +58,8 @@ public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
     public var pushNotificationApproveState: Driver<Bool>?
     public var showSettingAlert: Driver<Void>?
     
-    public init(
-        coordinator: WorkerSettingScreenCoordinator?,
-        settingUseCase: SettingScreenUseCase,
-        centerProfileUseCase: CenterProfileUseCase
-        )
-    {
+    public init(coordinator: WorkerSettingScreenCoordinator?) {
         self.coordinator = coordinator
-        self.settingUseCase = settingUseCase
-        self.centerProfileUseCase = centerProfileUseCase
         
         super.init()
         

@@ -36,10 +36,11 @@ public protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
 public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     
     @Injected var cacheRepository: CacheRepository
+    @Injected var workerProfileUseCase: WorkerProfileUseCase
     
     public weak var coordinator: WorkerProfileCoordinator?
     
-    let workerProfileUseCase: WorkerProfileUseCase
+    
     
     // Input(Editing)
     public var requestUpload: PublishRelay<Void> = .init()
@@ -73,13 +74,9 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     
     let disposbag: DisposeBag = .init()
     
-    public init(
-        coordinator: WorkerProfileCoordinator?,
-        workerProfileUseCase: WorkerProfileUseCase
-    ) {
+    public init(coordinator: WorkerProfileCoordinator?) {
         
         self.coordinator = coordinator
-        self.workerProfileUseCase = workerProfileUseCase
         
         // Input(Rendering)
         let fetchedProfileVOResult = viewWillAppear

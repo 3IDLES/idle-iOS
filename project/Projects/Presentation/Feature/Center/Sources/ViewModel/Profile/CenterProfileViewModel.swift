@@ -53,8 +53,8 @@ public protocol CenterProfileOutputable {
 public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
     @Injected var cacheRepository: CacheRepository
-     
-    let profileUseCase: CenterProfileUseCase
+    @Injected var profileUseCase: CenterProfileUseCase
+    
     weak var coordinator: CenterProfileCoordinator?
     
     public let profileMode: ProfileMode
@@ -102,15 +102,10 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         )
     }
     
-    public init(
-        mode: ProfileMode,
-        coordinator: CenterProfileCoordinator,
-        useCase: CenterProfileUseCase) 
-    {
+    public init(mode: ProfileMode, coordinator: CenterProfileCoordinator) {
         
         self.profileMode = mode
         self.coordinator = coordinator
-        self.profileUseCase = useCase
         
         let navigationBarTitle = (mode == .myProfile ? "내 센터 정보" : "센터 정보")
         self.navigationBarTitle = navigationBarTitle
@@ -204,7 +199,7 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             .map({ [unowned self] _ in
                 checkModification()
             })
-            .flatMap { [useCase, editingPhoneNumber] (inputs) in
+            .flatMap { [profileUseCase, editingPhoneNumber] (inputs) in
                 
                 let (phoneNumber, introduction, imageInfo) = inputs
                 
@@ -214,7 +209,7 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
                 if let _ = imageInfo { printIfDebug("✅ 센터 이미지 변경되었음") }
                 
                 // 전화번호는 무조건 포함시켜야 함으로 아래와 같이 포함합니다.
-                return useCase.updateProfile(
+                return profileUseCase.updateProfile(
                     phoneNumber: phoneNumber ?? editingPhoneNumber.value,
                     introduction: introduction,
                     imageInfo: imageInfo

@@ -12,25 +12,16 @@ import Core
 
 public class CenterCertificateCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let centerCertificateUseCase: CenterCertificateUseCase
-        
-        public init(navigationController: UINavigationController, centerCertificateUseCase: CenterCertificateUseCase) {
-            self.navigationController = navigationController
-            self.centerCertificateUseCase = centerCertificateUseCase
-        }
+    public weak var viewControllerRef: UIViewController?
+    public weak var parent: ParentCoordinator?
+    var rootCoordinator: RootCoorinatable? {
+        parent as? RootCoorinatable
     }
     
-    public weak var viewControllerRef: UIViewController?
-    public weak var parent: RootCoorinatable?
-    
     public let navigationController: UINavigationController
-    let centerCertificateUseCase: CenterCertificateUseCase
-    
-    public init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.centerCertificateUseCase = dependency.centerCertificateUseCase
+
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -39,21 +30,18 @@ public class CenterCertificateCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = CenterCertificateIntroductionVC()
-        let vm = CenterCertificateIntroVM(
-            centerCertificateUseCase: centerCertificateUseCase,
-            coordinator: self
-        )
+        let vm = CenterCertificateIntroVM(coordinator: self)
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
     }
     
     func showProfileRegisterScreen() {
-        parent?.makeCenterProfile()
+        rootCoordinator?.makeCenterProfile()
     }
     
     public func coordinatorDidFinish() {
-        parent?.removeChildCoordinator(self)
+        rootCoordinator?.removeChildCoordinator(self)
         popViewController()
     }
 }

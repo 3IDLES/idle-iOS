@@ -16,16 +16,17 @@ import RxCocoa
 
 public class CenterLoginViewModel: BaseViewModel, ViewModelType {
     
+    // Injection
+    @Injected var authUseCase: AuthUseCase
+    
     // Init
     weak var coordinator: CenterLoginCoordinator?
-    let authUseCase: AuthUseCase
     
     public var input: Input = .init()
     public var output: Output = .init()
     
-    public init(coordinator: CenterLoginCoordinator?, authUseCase: AuthUseCase) {
+    public init(coordinator: CenterLoginCoordinator?) {
         self.coordinator = coordinator
-        self.authUseCase = authUseCase
         
         super.init()
         

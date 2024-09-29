@@ -23,9 +23,10 @@ public protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelabl
 
 public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostBoardViewModelable {
     
+    @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
+    
     // Init
     weak var coordinator: CenterRecruitmentPostBoardScreenCoordinator?
-    let recruitmentPostUseCase: RecruitmentPostUseCase
 
     public var requestOngoingPost: PublishRelay<Void> = .init()
     public var requestClosedPost: PublishRelay<Void> = .init()
@@ -35,9 +36,9 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
     public var closedPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
     public var showRemovePostAlert: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
-    public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
+    public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?) {
+        
         self.coordinator = coordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
         
         super.init()
         

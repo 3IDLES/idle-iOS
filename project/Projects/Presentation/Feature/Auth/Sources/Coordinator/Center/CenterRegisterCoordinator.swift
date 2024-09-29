@@ -40,15 +40,11 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
     @Injected var logger: CenterRegisterLogger
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        
-        public init(navigationController: UINavigationController) {
-            self.navigationController = navigationController
-        }
-    }
+    public weak var parent: ParentCoordinator?
     
-    public var parent: AuthCoordinatable?
+    var authCoordinatable: AuthCoordinatable? {
+        parent as? AuthCoordinatable
+    }
     
     public weak var viewControllerRef: UIViewController?
     
@@ -60,10 +56,8 @@ public class CenterRegisterCoordinator: ChildCoordinator {
     
     private var currentStage: CenterRegisterStage!
     
-    public init(
-        dependency: Dependency
-    ) {
-        self.navigationController = dependency.navigationController
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
         
         let vm = CenterRegisterViewModel(coordinator: self)
         
@@ -171,13 +165,13 @@ extension CenterRegisterCoordinator {
     
     func authFinished() {
         stageViewControllers = []
-        parent?.authFinished()
+        authCoordinatable?.authFinished()
     }
     
     func registerFinished() {
         stageViewControllers = []
         popViewController()
-        parent?.removeChildCoordinator(self)
+        authCoordinatable?.removeChildCoordinator(self)
     }
     
     func showCompleteScreen() {
@@ -187,7 +181,7 @@ extension CenterRegisterCoordinator {
             completeButtonText: "시작하기") { [weak self] in
                 self?.authFinished()
             }
-        parent?.showCompleteScreen(ro: renderObject)
+        authCoordinatable?.showCompleteScreen(ro: renderObject)
         
         // MARK: 종료 로깅
         logger.logCenterRegisterDuration()

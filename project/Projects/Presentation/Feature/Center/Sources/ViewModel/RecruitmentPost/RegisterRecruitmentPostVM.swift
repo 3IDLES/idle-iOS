@@ -9,6 +9,7 @@ import Foundation
 import Domain
 import PresentationCore
 import BaseFeature
+import Core
 
 
 import RxSwift
@@ -41,7 +42,7 @@ public enum RegisterRecruitmentPostInputSection: CaseIterable {
 public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostViewModelable {
     
     //Init
-    let recruitmentPostUseCase: RecruitmentPostUseCase
+    @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
     public weak var coordinator: (any PresentationCore.RegisterRecruitmentPostCoordinatable)?
     
     // MARK: Edit Screen
@@ -139,12 +140,8 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         return dict
     }()
     
-    public init(
-        registerRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable,
-        recruitmentPostUseCase: RecruitmentPostUseCase
-    ) {
-        self.coordinator = registerRecruitmentPostCoordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
+    public init(coordinator: RegisterRecruitmentPostCoordinatable) {
+        self.coordinator = coordinator
         
         super.init()
         

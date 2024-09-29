@@ -9,6 +9,7 @@ import UIKit
 import Domain
 import DSKit
 import PresentationCore
+import Core
 
 
 import RxCocoa
@@ -41,10 +42,10 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
     public weak var coordinator: PostDetailForWorkerCoodinator?
     
     // Init
-    private let postId: String
-    private let recruitmentPostUseCase: RecruitmentPostUseCase
-    private let workerProfileUseCase: WorkerProfileUseCase
-    private let centerProfileUseCase: CenterProfileUseCase
+    private let postInfo: RecruitmentPostInfo
+    @Injected private var recruitmentPostUseCase: RecruitmentPostUseCase
+    @Injected private var workerProfileUseCase: WorkerProfileUseCase
+    @Injected private var centerProfileUseCase: CenterProfileUseCase
     
     // Ouput
     public var postForWorkerBundle: RxCocoa.Driver<RecruitmentPostForWorkerBundle>?
@@ -63,26 +64,17 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
 
     private var centerInfoForCSCache: CenterInfoForCS?
     
-    public init(
-            postId: String,
-            coordinator: PostDetailForWorkerCoodinator?,
-            recruitmentPostUseCase: RecruitmentPostUseCase,
-            workerProfileUseCase: WorkerProfileUseCase,
-            centerProfileUseCase: CenterProfileUseCase
-        )
-    {
-        self.postId = postId
+    public init(postInfo: RecruitmentPostInfo, coordinator: PostDetailForWorkerCoodinator?) {
+        
+        self.postInfo = postInfo
         self.coordinator = coordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
-        self.workerProfileUseCase = workerProfileUseCase
-        self.centerProfileUseCase = centerProfileUseCase
         
         super.init()
         
         let getPostDetailResult = viewWillAppear
             .flatMap { [recruitmentPostUseCase] _ in
                 recruitmentPostUseCase
-                    .getNativePostDetailForWorker(id: postId)
+                    .getNativePostDetailForWorker(id: postInfo.id)
             }
             .share()
         
@@ -205,7 +197,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                 
                 // 리스트화면에서는 앱내 지원만 지원합니다.
                 recruitmentPostUseCase
-                    .applyToPost(postId: postId, method: .app)
+                    .applyToPost(postId: postInfo.id, method: .app)
             })
             .share()
         
@@ -259,7 +251,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             .flatMap { [weak self] isFavoriteRequest in
                 self?.setPostFavoriteState(
                     isFavoriteRequest: isFavoriteRequest,
-                    postId: postId,
+                    postId: postInfo.id,
                     postType: .native
                 ) ?? .never()
             }

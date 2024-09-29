@@ -13,19 +13,14 @@ import Core
 
 class RootCoordinator {
     
-    struct Dependency {
-        let navigationController: UINavigationController
-        let injector: Injector
-    }
-    
     var childCoordinators: [Coordinator] = []
     
     let navigationController: UINavigationController
-    let injector: Injector
     
-    init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.injector = dependency.injector
+    var parent: ParentCoordinator?
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     func start() {

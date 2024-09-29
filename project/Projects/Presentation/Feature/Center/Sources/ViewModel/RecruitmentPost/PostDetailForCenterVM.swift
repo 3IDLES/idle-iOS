@@ -57,11 +57,12 @@ public protocol PostDetailViewModelable:
 
 public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
     
+    @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
+    
     // Init
     let postId: String
     let postState: PostState
     weak var coordinator: PostDetailForCenterCoordinator?
-    let recruitmentPostUseCase: RecruitmentPostUseCase
     
     // MARK: DetailVC Interaction
     public var applicantCount: Int?
@@ -106,19 +107,19 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
     }()
     
     // MARK: ETC
-    public let applicantCountText: Driver<String>?
+    public var applicantCountText: Driver<String>?
     
     init(
             postId: String,
             postState: PostState,
-            coordinator: PostDetailForCenterCoordinator?,
-            recruitmentPostUseCase: RecruitmentPostUseCase
+            coordinator: PostDetailForCenterCoordinator?
         )
     {
         self.postId = postId
         self.postState = postState
         self.coordinator = coordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
+        
+        super.init()
         
         casting_workTimeAndPay = fetched_workTimeAndPay.asDriver()
         casting_customerRequirement = fetched_customerRequirement.asDriver()
@@ -144,8 +145,6 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
                 }.asObservable()
             )
             .asDriver(onErrorDriveWith: .never())
-        
-        super.init()
         
         // MARK: Detail View
         let fetchPostDetailResult = viewWillAppear

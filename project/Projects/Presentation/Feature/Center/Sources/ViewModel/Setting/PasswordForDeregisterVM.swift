@@ -8,6 +8,7 @@
 import Foundation
 import BaseFeature
 import Domain
+import Core
 
 
 import RxCocoa
@@ -15,21 +16,19 @@ import RxSwift
 
 public class PasswordForDeregisterVM: BaseViewModel {
 
+    @Injected var settingUseCase: SettingScreenUseCase
+    
     public weak var coordinator: PasswordForDeregisterCoordinator?
     
     public let deregisterButtonClicked: PublishRelay<String> = .init()
     public let backButtonClicked: PublishRelay<Void> = .init()
     public let cancelButtonClicked: PublishRelay<Void> = .init()
     
-    let settingUseCase: SettingScreenUseCase
-    
     public init(
         deregisterReasons: [String],
-        coordinator: PasswordForDeregisterCoordinator,
-        settingUseCase: SettingScreenUseCase
+        coordinator: PasswordForDeregisterCoordinator
     ) {
         self.coordinator = coordinator
-        self.settingUseCase = settingUseCase
         
         super.init()
         

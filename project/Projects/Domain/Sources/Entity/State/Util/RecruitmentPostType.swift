@@ -20,3 +20,13 @@ public enum RecruitmentPostType: String, Codable {
         }
     }
 }
+
+public struct RecruitmentPostInfo {
+    public let type: RecruitmentPostType
+    public let id: String
+    
+    public init(type: RecruitmentPostType, id: String) {
+        self.type = type
+        self.id = id
+    }
+}

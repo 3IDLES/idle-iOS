@@ -13,16 +13,14 @@ import Core
 public class RegisterCenterInfoCoordinator: ChildCoordinator {
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: CenterProfileRegisterCoordinatable?
+    public weak var parent: ParentCoordinator?
+    var centerProfileRegisterCoordinator: CenterProfileRegisterCoordinatable? {
+        parent as? CenterProfileRegisterCoordinatable
+    }
     
     public let navigationController: UINavigationController
-    let profileUseCase: CenterProfileUseCase
     
-    public init(
-        profileUseCase: CenterProfileUseCase,
-        navigationController: UINavigationController
-    ) {
-        self.profileUseCase = profileUseCase
+    public init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
     
@@ -49,10 +47,10 @@ public class RegisterCenterInfoCoordinator: ChildCoordinator {
 extension RegisterCenterInfoCoordinator {
     
     func showPreviewScreen(stateObject: CenterProfileRegisterState) {
-        parent?.showPreviewScreen(stateObject: stateObject)
+        centerProfileRegisterCoordinator?.showPreviewScreen(stateObject: stateObject)
     }
     
     func registerFinished() {
-        parent?.registerFinished()
+        centerProfileRegisterCoordinator?.registerFinished()
     }
 }

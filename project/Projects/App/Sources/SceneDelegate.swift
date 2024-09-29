@@ -39,12 +39,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         fcmService = FCMService()
         
         // RootCoordinator
-        rootCoordinator = RootCoordinator(
-            dependency: .init(
-                navigationController: rootNavigationController,
-                injector: injector
-            )
-        )
+        rootCoordinator = RootCoordinator(navigationController: rootNavigationController)
         
         rootCoordinator?.start()
         

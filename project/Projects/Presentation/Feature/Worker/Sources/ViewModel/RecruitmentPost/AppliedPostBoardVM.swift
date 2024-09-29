@@ -10,6 +10,7 @@ import BaseFeature
 import PresentationCore
 import Domain
 import DSKit
+import Core
 
 
 import RxCocoa
@@ -17,6 +18,11 @@ import RxSwift
 
 
 public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
+    
+    @Injected public var recruitmentPostUseCase: RecruitmentPostUseCase
+    
+    // Init
+    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
     
     // Input
     public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
@@ -26,19 +32,14 @@ public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
     // Output
     public var postBoardData: RxCocoa.Driver<BoardRefreshResult>?
     
-    // Init
-    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    public let recruitmentPostUseCase: RecruitmentPostUseCase
-    
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
     var nextPagingRequest: PostPagingRequestForWorker?
     /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
     private let currentPostVO: BehaviorRelay<[RecruitmentPostForWorkerRepresentable]> = .init(value: [])
     
-    public init(coordinator: WorkerRecruitmentBoardCoordinatable, recruitmentPostUseCase: RecruitmentPostUseCase) {
+    public init(coordinator: WorkerRecruitmentBoardCoordinatable) {
         self.coordinator = coordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
         self.nextPagingRequest = .initial
         
         super.init()

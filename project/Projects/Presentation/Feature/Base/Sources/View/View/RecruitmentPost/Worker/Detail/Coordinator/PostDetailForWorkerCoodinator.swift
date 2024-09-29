@@ -12,54 +12,20 @@ import Core
 
 public class PostDetailForWorkerCoodinator: ChildCoordinator {
     
-    public struct Dependency {
-        let postType: RecruitmentPostType
-        let postId: String
-        weak var parent: WorkerRecruitmentBoardCoordinatable?
-        let navigationController: UINavigationController
-        let recruitmentPostUseCase: RecruitmentPostUseCase
-        let workerProfileUseCase: WorkerProfileUseCase
-        let centerProfileUseCase: CenterProfileUseCase
-        
-        public init(
-            postType: RecruitmentPostType,
-            postId: String,
-            parent: WorkerRecruitmentBoardCoordinatable? = nil,
-            navigationController: UINavigationController,
-            recruitmentPostUseCase: RecruitmentPostUseCase,
-            workerProfileUseCase: WorkerProfileUseCase,
-            centerProfileUseCase: CenterProfileUseCase
-        ) {
-            self.postType = postType
-            self.postId = postId
-            self.parent = parent
-            self.navigationController = navigationController
-            self.recruitmentPostUseCase = recruitmentPostUseCase
-            self.workerProfileUseCase = workerProfileUseCase
-            self.centerProfileUseCase = centerProfileUseCase
-        }
-    }
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: WorkerRecruitmentBoardCoordinatable?
+    public weak var parent: ParentCoordinator?
     
-    let postType: RecruitmentPostType
-    let postId: String
+    var workerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinatable? {
+        parent as? WorkerRecruitmentBoardCoordinatable
+    }
+    
+    let postInfo: RecruitmentPostInfo
     public let navigationController: UINavigationController
-    let recruitmentPostUseCase: RecruitmentPostUseCase
-    let workerProfileUseCase: WorkerProfileUseCase
-    let centerProfileUseCase: CenterProfileUseCase
     
-    public init(
-        dependency: Dependency
-    ) {
-        self.postType = dependency.postType
-        self.postId = dependency.postId
-        self.parent = dependency.parent
-        self.navigationController = dependency.navigationController
-        self.recruitmentPostUseCase = dependency.recruitmentPostUseCase
-        self.workerProfileUseCase = dependency.workerProfileUseCase
-        self.centerProfileUseCase = dependency.centerProfileUseCase
+    public init(postInfo: RecruitmentPostInfo, navigationController: UINavigationController) {
+        self.postInfo = postInfo
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -70,25 +36,22 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
         
         var vc: UIViewController!
         
-        switch postType {
+        switch postInfo.type {
+            
         case .native:
             let nativeDetailVC = NativePostDetailForWorkerVC()
             let vm = NativePostDetailForWorkerVM(
-                postId: postId,
-                coordinator: self,
-                recruitmentPostUseCase: recruitmentPostUseCase, 
-                workerProfileUseCase: workerProfileUseCase,
-                centerProfileUseCase: centerProfileUseCase
+                postInfo: postInfo,
+                coordinator: self
             )
             nativeDetailVC.bind(viewModel: vm)
             vc = nativeDetailVC
+            
         case .workNet:
             let worknetDetailVC = WorknetPostDetailForWorkerVC()
             let vm = WorknetPostDetailForWorkerVM(
-                postId: postId,
-                coordinator: self,
-                recruitmentPostUseCase: recruitmentPostUseCase,
-                workerProfileUseCase: workerProfileUseCase
+                postInfo: postInfo,
+                coordinator: self
             )
             worknetDetailVC.bind(viewModel: vm)
             vc = worknetDetailVC
@@ -107,6 +70,6 @@ public class PostDetailForWorkerCoodinator: ChildCoordinator {
 extension PostDetailForWorkerCoodinator {
     
     func showCenterProfileScreen(centerId: String) {
-        parent?.showCenterProfile(centerId: centerId)
+        workerRecruitmentBoardCoordinator?.showCenterProfile(centerId: centerId)
     }
 }

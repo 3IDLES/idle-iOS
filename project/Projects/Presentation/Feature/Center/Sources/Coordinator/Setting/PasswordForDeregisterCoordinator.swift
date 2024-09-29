@@ -12,31 +12,21 @@ import Core
 
 public class PasswordForDeregisterCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let settingUseCase: SettingScreenUseCase
-        let reasons: [String]
-        let navigationController: UINavigationController
-        
-        public init(settingUseCase: SettingScreenUseCase, reasons: [String], navigationController: UINavigationController) {
-            self.settingUseCase = settingUseCase
-            self.reasons = reasons
-            self.navigationController = navigationController
-        }
+    public weak var viewControllerRef: UIViewController?
+    public weak var parent: ParentCoordinator?
+    var deregisterCoordinator: DeregisterCoordinatable? {
+        parent as? DeregisterCoordinatable
     }
     
-    public weak var viewControllerRef: UIViewController?
-    public weak var parent: DeregisterCoordinatable?
-    
     public let navigationController: UINavigationController
-    let settingUseCase: SettingScreenUseCase
     let reasons: [String]
     
     public init(
-        dependency: Dependency
+        reasons: [String],
+        navigationController: UINavigationController
     ) {
-        self.settingUseCase = dependency.settingUseCase
-        self.reasons = dependency.reasons
-        self.navigationController = dependency.navigationController
+        self.reasons = reasons
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -47,8 +37,7 @@ public class PasswordForDeregisterCoordinator: ChildCoordinator {
         let vc = PasswordForDeregisterVC()
         let vm = PasswordForDeregisterVM(
             deregisterReasons: reasons,
-            coordinator: self,
-            settingUseCase: settingUseCase
+            coordinator: self
         )
         vc.bind(viewModel: vm)
         viewControllerRef = vc
@@ -61,11 +50,11 @@ public class PasswordForDeregisterCoordinator: ChildCoordinator {
     }
     
     public func popToRoot() {
-        parent?.popToRoot()
+        deregisterCoordinator?.popToRoot()
     }
     
     public func cancelDeregister() {
-        parent?.cancelDeregister()
+        deregisterCoordinator?.cancelDeregister()
     }
 }
 

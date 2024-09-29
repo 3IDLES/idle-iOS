@@ -9,15 +9,18 @@ import Foundation
 import BaseFeature
 import Domain
 import PresentationCore
+import Core
+
 
 import RxSwift
 import RxCocoa
 
 class RegisterProfileOverviewVM: BaseViewModel {
     
+    @Injected var profileUseCase: CenterProfileUseCase
+    
     // Init
     weak var coordinator: CenterProfileRegisterOverviewCO?
-    let profileUseCase: CenterProfileUseCase
     
     // input
     let backButtonClicked: PublishSubject<Void> = .init()
@@ -29,12 +32,10 @@ class RegisterProfileOverviewVM: BaseViewModel {
     
     init(
         coordinator: CenterProfileRegisterOverviewCO,
-        stateObject: CenterProfileRegisterState,
-        profileUseCase: CenterProfileUseCase
+        stateObject: CenterProfileRegisterState
     ) {
         self.coordinator = coordinator
         self.renderObject = stateObject
-        self.profileUseCase = profileUseCase
         
         super.init()
         

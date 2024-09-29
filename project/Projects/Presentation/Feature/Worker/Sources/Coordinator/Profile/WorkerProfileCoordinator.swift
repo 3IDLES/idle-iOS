@@ -12,31 +12,16 @@ import Core
 
 public class WorkerProfileCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        public let profileMode: ProfileMode
-        public let navigationController: UINavigationController
-        public let workerProfileUseCase: WorkerProfileUseCase
-        
-        public init(profileMode: ProfileMode, navigationController: UINavigationController, workerProfileUseCase: WorkerProfileUseCase) {
-            self.profileMode = profileMode
-            self.navigationController = navigationController
-            self.workerProfileUseCase = workerProfileUseCase
-        }
-    }
-    
     public weak var viewControllerRef: UIViewController?
     public weak var parent: ParentCoordinator?
     
-    public let navigationController: UINavigationController
     let profileMode: ProfileMode
-    let workerProfileUseCase: WorkerProfileUseCase
+    public let navigationController: UINavigationController
     
-    public init(
-        dependency: Dependency
-    ) {
-        self.navigationController = dependency.navigationController
-        self.profileMode = dependency.profileMode
-        self.workerProfileUseCase = dependency.workerProfileUseCase
+    public init(profileMode: ProfileMode, navigationController: UINavigationController) {
+        
+        self.profileMode = profileMode
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -48,17 +33,10 @@ public class WorkerProfileCoordinator: ChildCoordinator {
         
         switch profileMode {
         case .myProfile:
-            let vm = WorkerMyProfileViewModel(
-                coordinator: self,
-                workerProfileUseCase: workerProfileUseCase
-            )
+            let vm = WorkerMyProfileViewModel(coordinator: self)
             vc.bind(vm)
         case .otherProfile(let id):
-            let vm = WorkerProfileViewModel(
-                coordinator: self,
-                workerProfileUseCase: workerProfileUseCase,
-                workerId: id
-            )
+            let vm = WorkerProfileViewModel(coordinator: self, workerId: id)
             vc.bind(vm)
         }
         viewControllerRef = vc

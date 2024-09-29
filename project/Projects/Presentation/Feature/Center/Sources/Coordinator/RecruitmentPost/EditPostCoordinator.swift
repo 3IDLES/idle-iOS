@@ -14,16 +14,6 @@ import Core
 
 public class EditPostCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let viewModel: EditPostViewModelable
-        
-        public init(navigationController: UINavigationController, viewModel: EditPostViewModelable) {
-            self.navigationController = navigationController
-            self.viewModel = viewModel
-        }
-    }
-    
     public weak var viewControllerRef: UIViewController?
     public weak var parent: ParentCoordinator?
     
@@ -31,10 +21,11 @@ public class EditPostCoordinator: ChildCoordinator {
     public let viewModel: EditPostViewModelable
     
     public init(
-        dependency: Dependency
+        viewModel: EditPostViewModelable,
+        navigationController: UINavigationController
     ) {
-        self.navigationController = dependency.navigationController
-        self.viewModel = dependency.viewModel
+        self.viewModel = viewModel
+        self.navigationController = navigationController
         viewModel.editPostCoordinator = self
     }
     

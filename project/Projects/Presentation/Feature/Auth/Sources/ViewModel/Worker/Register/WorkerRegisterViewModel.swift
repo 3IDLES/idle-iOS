@@ -17,10 +17,11 @@ import RxCocoa
 
 public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
     
-    // Init
-    weak var coordinator: WorkerRegisterCoordinator?
     @Injected var inputValidationUseCase: AuthInputValidationUseCase
     @Injected var authUseCase: AuthUseCase
+    
+    // Init
+    weak var coordinator: WorkerRegisterCoordinator?
     
     public var input: Input = .init()
     public var output: Output = .init()

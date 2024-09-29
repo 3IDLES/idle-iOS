@@ -14,7 +14,10 @@ import Core
 public class RegisterRecruitmentCoordinator: ChildCoordinator {
     
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: RegisterRecruitmentPostCoordinatable?
+    public weak var parent: ParentCoordinator?
+    var registerRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable? {
+        parent as? RegisterRecruitmentPostCoordinatable
+    }
     
     public let navigationController: UINavigationController
     
@@ -47,10 +50,10 @@ public class RegisterRecruitmentCoordinator: ChildCoordinator {
 extension RegisterRecruitmentCoordinator {
     
     func showOverViewScreen() {
-        parent?.showOverViewScreen()
+        registerRecruitmentPostCoordinator?.showOverViewScreen()
     }
     
     func registerFinished() {
-        parent?.registerFinished()
+        registerRecruitmentPostCoordinator?.registerFinished()
     }
 }

@@ -104,9 +104,4 @@ class WorkerRegisterViewController: BaseViewController {
             })
             .disposed(by: disposeBag)
     }
-    
-    func cleanUp() {
-        
-        coordinator?.stageViewControllers = []
-    }
 }

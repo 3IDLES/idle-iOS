@@ -9,6 +9,7 @@ import UIKit
 import Domain
 import PresentationCore
 import DSKit
+import Core
 
 
 import RxCocoa
@@ -29,12 +30,13 @@ public protocol WorknetPostDetailForWorkerViewModelable: BaseViewModel {
 
 public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWorkerViewModelable {
     
+    @Injected private var recruitmentPostUseCase: RecruitmentPostUseCase
+    @Injected private var workerProfileUseCase: WorkerProfileUseCase
+    
     public weak var coordinator: PostDetailForWorkerCoodinator?
     
     // Init
-    private let postId: String
-    private let recruitmentPostUseCase: RecruitmentPostUseCase
-    private let workerProfileUseCase: WorkerProfileUseCase
+    private let postInfo: RecruitmentPostInfo
     
     // Ouput
     public var postDetail: RxCocoa.Driver<WorknetRecruitmentPostDetailVO>?
@@ -47,24 +49,16 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
     public var starButtonClicked: RxRelay.PublishRelay<Bool> = .init()
 
     
-    public init(
-            postId: String,
-            coordinator: PostDetailForWorkerCoodinator?,
-            recruitmentPostUseCase: RecruitmentPostUseCase,
-            workerProfileUseCase: WorkerProfileUseCase
-        )
-    {
-        self.postId = postId
+    public init(postInfo: RecruitmentPostInfo, coordinator: PostDetailForWorkerCoodinator?) {
+        self.postInfo = postInfo
         self.coordinator = coordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
-        self.workerProfileUseCase = workerProfileUseCase
         
         super.init()
         
         let getPostDetailResult = requestRefresh
             .flatMap { [recruitmentPostUseCase] _ in
                 recruitmentPostUseCase
-                    .getWorknetPostDetailForWorker(id: postId)
+                    .getWorknetPostDetailForWorker(id: postInfo.id)
             }
             .share()
         
@@ -150,7 +144,7 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
             .flatMap { [weak self] isFavoriteRequest in
                 self?.setPostFavoriteState(
                     isFavoriteRequest: isFavoriteRequest,
-                    postId: postId,
+                    postId: postInfo.id,
                     postType: .native
                 ) ?? .never()
             }

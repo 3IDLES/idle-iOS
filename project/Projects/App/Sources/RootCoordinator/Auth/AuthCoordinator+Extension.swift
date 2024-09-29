@@ -15,19 +15,13 @@ extension AuthCoordinator: AuthCoordinatable {
     
     public func registerAsWorker() {
         
-        let coordinator = WorkerRegisterCoordinator(
-            dependency: .init(navigationController: navigationController)
-        )
-        coordinator.parent = self
+        let coordinator = WorkerRegisterCoordinator(navigationController: navigationController)
         addChildCoordinator(coordinator)
         coordinator.start()
     }
     
     public func registerAsCenter() {
-        let coordinator = CenterRegisterCoordinator(
-            dependency: .init(navigationController: navigationController)
-        )
-        coordinator.parent = self
+        let coordinator = CenterRegisterCoordinator(navigationController: navigationController)
         addChildCoordinator(coordinator)
         coordinator.start()
     }
@@ -37,30 +31,22 @@ extension AuthCoordinator: AuthCoordinatable {
         vc.applyRO(ro)
         
         let coordinator = CoordinatorWrapper(
-            parent: self,
             nav: navigationController,
             vc: vc
         )
+        addChildCoordinator(coordinator)
         coordinator.start()
     }
     
     public func startCenterLoginFlow() {
         
-        let coordinator = CanterLoginFlowCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                injector: injector
-            )
-        )
+        let coordinator = CanterLoginFlowCoordinator(navigationController: navigationController)
         addChildCoordinator(coordinator)
-        coordinator.parent = self
         coordinator.start()
     }
 
     public func authFinished() {
-        
         clearChildren()
-        
         parent?.removeChildCoordinator(self)
     }
 }

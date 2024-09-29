@@ -10,12 +10,17 @@ import BaseFeature
 import PresentationCore
 import Domain
 import DSKit
+import Core
 
 
 import RxCocoa
 import RxSwift
 
 public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
+    
+    // Init
+    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
+    @Injected public var recruitmentPostUseCase: RecruitmentPostUseCase
     
     // Input
     public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
@@ -26,13 +31,8 @@ public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
     public var postBoardData: RxCocoa.Driver<BoardRefreshResult>?
     public var idleAlertVM: RxCocoa.Driver<IdleAlertViewModelable>?
     
-    // Init
-    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    public let recruitmentPostUseCase: RecruitmentPostUseCase
-    
-    public init(coordinator: WorkerRecruitmentBoardCoordinatable, recruitmentPostUseCase: RecruitmentPostUseCase) {
+    public init(coordinator: WorkerRecruitmentBoardCoordinatable) {
         self.coordinator = coordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
         
         super.init()
         

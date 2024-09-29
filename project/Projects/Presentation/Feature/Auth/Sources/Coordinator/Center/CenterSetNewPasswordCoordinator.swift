@@ -22,36 +22,22 @@ enum SetNewPasswordStage: Int {
 
 public class CenterSetNewPasswordCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let authUseCase: AuthUseCase
-        let inputValidationUseCase: AuthInputValidationUseCase
-        public init(navigationController: UINavigationController, authUseCase: AuthUseCase, inputValidationUseCase: AuthInputValidationUseCase) {
-            self.navigationController = navigationController
-            self.authUseCase = authUseCase
-            self.inputValidationUseCase = inputValidationUseCase
-        }
-    }
-    
     public weak var viewControllerRef: UIViewController?
     public var navigationController: UINavigationController
     
     var stageViewControllers: [UIViewController] = []
     weak var pageViewController: UIPageViewController?
     
-    public var parent: CanterLoginFlowable?
+    public weak var parent: ParentCoordinator?
     
-    let authUseCase: AuthUseCase
-    let inputValidationUseCase: AuthInputValidationUseCase
+    var canterLoginFlowCoordinator: CanterLoginFlowable? {
+        parent as? CanterLoginFlowable
+    }
     
     var currentStage: SetNewPasswordStage!
     
-    public init(
-        dependency: Dependency
-    ) {
-        self.navigationController = dependency.navigationController
-        self.authUseCase = dependency.authUseCase
-        self.inputValidationUseCase = dependency.inputValidationUseCase
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     deinit { printIfDebug("deinit \(Self.self)") }

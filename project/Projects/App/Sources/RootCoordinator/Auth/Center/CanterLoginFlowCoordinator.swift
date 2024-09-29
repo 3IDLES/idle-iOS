@@ -13,21 +13,17 @@ import Core
 
 class CanterLoginFlowCoordinator: CanterLoginFlowable {
     
-    struct Dependency {
-        let navigationController: UINavigationController
-        let injector: Injector
-    }
-    
     var childCoordinators: [Coordinator] = []
     
-    var parent: AuthCoordinatable?
+    weak var parent: ParentCoordinator?
+    var authCoordinator: AuthCoordinatable? {
+        parent as? AuthCoordinatable
+    }
     
     let navigationController: UINavigationController
-    let injector: Injector
     
-    init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.injector = dependency.injector
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     deinit { printIfDebug("deinit \(Self.self)") }
@@ -40,12 +36,7 @@ class CanterLoginFlowCoordinator: CanterLoginFlowable {
 extension CanterLoginFlowCoordinator: CanterLoginCoordinatable {
     
     func login() {
-        let coordinator = CenterLoginCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                authUseCase: injector.resolve(AuthUseCase.self)
-            )
-        )
+        let coordinator = CenterLoginCoordinator(navigationController: navigationController)
         coordinator.parent = self
         addChildCoordinator(coordinator)
         coordinator.start()
@@ -53,13 +44,7 @@ extension CanterLoginFlowCoordinator: CanterLoginCoordinatable {
     
     func setNewPassword() {
         
-        let coordinator = CenterSetNewPasswordCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                authUseCase: injector.resolve(AuthUseCase.self),
-                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self)
-            )
-        )
+        let coordinator = CenterSetNewPasswordCoordinator(navigationController: navigationController)
         coordinator.parent = self
         addChildCoordinator(coordinator)
         
@@ -68,6 +53,6 @@ extension CanterLoginFlowCoordinator: CanterLoginCoordinatable {
     
     func authFinished() {
         
-        parent?.authFinished()
+        authCoordinator?.authFinished()
     }
 }

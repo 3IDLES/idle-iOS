@@ -11,11 +11,10 @@ import Core
 // MARK: Coordinator
 public protocol Coordinator: AnyObject {
     
+    var parent: ParentCoordinator? { get set }
     var navigationController: UINavigationController { get }
     
     func start()
-    func next()
-    func prev()
     func popViewController(animated: Bool)
 }
 
@@ -24,9 +23,6 @@ public extension Coordinator {
     func popViewController(animated: Bool = true) {
         navigationController.popViewController(animated: animated)
     }
-    
-    func next() { }
-    func prev() { }
 }
 
 // MARK: ParentCoordinator
@@ -44,6 +40,7 @@ public extension ParentCoordinator {
     
     func addChildCoordinator(_ coordinator: Coordinator) {
         childCoordinators.append(coordinator)
+        coordinator.parent = self
     }
     
     func removeChildCoordinator(_ coordinator: Coordinator) {

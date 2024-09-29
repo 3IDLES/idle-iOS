@@ -12,31 +12,16 @@ import Core
 
 public class WorkerSettingScreenCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let settingUseCase: SettingScreenUseCase
-        let centerProfileUseCase: CenterProfileUseCase
-        
-        public init(navigationController: UINavigationController, settingUseCase: SettingScreenUseCase, centerProfileUseCase: CenterProfileUseCase) {
-            self.navigationController = navigationController
-            self.settingUseCase = settingUseCase
-            self.centerProfileUseCase = centerProfileUseCase
-        }
+    public weak var viewControllerRef: UIViewController?
+    public weak var parent: ParentCoordinator?
+    var workerSettingScreenCoordinator: WorkerSettingScreenCoordinatable? {
+        parent as? WorkerSettingScreenCoordinatable
     }
     
-    public weak var viewControllerRef: UIViewController?
-    public weak var parent: WorkerSettingScreenCoordinatable?
-    
     public let navigationController: UINavigationController
-    let settingUseCase: SettingScreenUseCase
-    let centerProfileUseCase: CenterProfileUseCase
     
-    public init(
-        dependency: Dependency
-    ) {
-        self.navigationController = dependency.navigationController
-        self.settingUseCase = dependency.settingUseCase
-        self.centerProfileUseCase = dependency.centerProfileUseCase
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -46,11 +31,7 @@ public class WorkerSettingScreenCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = WorkerSettingVC()
-        let vm = WorkerSettingVM(
-            coordinator: self,
-            settingUseCase: settingUseCase,
-            centerProfileUseCase: centerProfileUseCase
-        )
+        let vm = WorkerSettingVM(coordinator: self)
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: false)
@@ -68,10 +49,10 @@ public class WorkerSettingScreenCoordinator: ChildCoordinator {
     }
     
     func startRemoveWorkerAccountFlow() {
-        parent?.startRemoveWorkerAccountFlow()
+        workerSettingScreenCoordinator?.startRemoveWorkerAccountFlow()
     }
     
     func showMyProfileScreen() {
-        parent?.showMyProfileScreen()
+        workerSettingScreenCoordinator?.showMyProfileScreen()
     }
 }

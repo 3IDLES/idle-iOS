@@ -12,26 +12,19 @@ import Core
 
 public class PostOverviewCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let viewModel: PostOverviewViewModelable
-        
-        public init(navigationController: UINavigationController, viewModel: PostOverviewViewModelable) {
-            self.navigationController = navigationController
-            self.viewModel = viewModel
-        }
-    }
-    
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: RegisterRecruitmentPostCoordinatable?
+    public weak var parent: ParentCoordinator?
+    var registerRecruitmentPostCoordinator: RegisterRecruitmentPostCoordinatable? {
+        parent as? RegisterRecruitmentPostCoordinatable
+    }
     
     public let navigationController: UINavigationController
     
     public let viewModel: PostOverviewViewModelable
     
-    public init(dependency: Dependency) {
-        self.viewModel = dependency.viewModel
-        self.navigationController = dependency.navigationController
+    public init(viewModel: PostOverviewViewModelable, navigationController: UINavigationController) {
+        self.viewModel = viewModel
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -54,6 +47,6 @@ public class PostOverviewCoordinator: ChildCoordinator {
 
 extension PostOverviewCoordinator {
     func showCompleteScreen() {
-        parent?.showRegisterCompleteScreen()
+        registerRecruitmentPostCoordinator?.showRegisterCompleteScreen()
     }
 }

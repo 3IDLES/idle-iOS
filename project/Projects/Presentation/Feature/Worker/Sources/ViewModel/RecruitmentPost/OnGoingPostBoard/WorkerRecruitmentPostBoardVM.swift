@@ -56,6 +56,12 @@ public protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable
 
 public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostBoardVMable {
     
+    @Injected public var recruitmentPostUseCase: RecruitmentPostUseCase
+    @Injected var workerProfileUseCase: WorkerProfileUseCase
+    
+    // Init
+    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
+    
     // Output
     public var postBoardData: Driver<(isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])>?
     public var workerLocationTitleText: Driver<String>?
@@ -69,12 +75,6 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
     public var requestNextPage: PublishRelay<Void> = .init()
     public var applyButtonClicked: PublishRelay<(postId: String, postTitle: String)> = .init()
     
-    
-    // Init
-    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    public let recruitmentPostUseCase: RecruitmentPostUseCase
-    public let workerProfileUseCase: WorkerProfileUseCase
-    
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
     var nextPagingRequest: PostPagingRequestForWorker? = .initial
@@ -84,15 +84,8 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
     // Observable
     let dispostBag = DisposeBag()
     
-    public init(
-        coordinator: WorkerRecruitmentBoardCoordinatable,
-        recruitmentPostUseCase: RecruitmentPostUseCase,
-        workerProfileUseCase: WorkerProfileUseCase
-        )
-    {
+    public init(coordinator: WorkerRecruitmentBoardCoordinatable) {
         self.coordinator = coordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
-        self.workerProfileUseCase = workerProfileUseCase
         
         super.init()
         
@@ -303,7 +296,10 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
 extension WorkerPagablePostBoardVMable {
     
     public func showPostDetail(postType: RecruitmentPostType, id: String) {
-        coordinator?.showPostDetail(postType: postType, postId: id)
+        coordinator?.showPostDetail(postInfo: .init(
+            type: postType,
+            id: id
+        ))
     }
     
     public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: RecruitmentPostType) -> RxSwift.Single<Bool> {

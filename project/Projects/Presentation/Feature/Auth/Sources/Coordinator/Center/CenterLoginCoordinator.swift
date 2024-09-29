@@ -12,36 +12,24 @@ import Core
 
 public class CenterLoginCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let authUseCase: AuthUseCase
-        
-        public init(navigationController: UINavigationController, authUseCase: AuthUseCase) {
-            self.navigationController = navigationController
-            self.authUseCase = authUseCase
-        }
-    }
-    
     public weak var viewControllerRef: UIViewController?
 
     public var navigationController: UINavigationController
-    let authUseCase: AuthUseCase
     
-    public var parent: CanterLoginFlowable?
+    public weak var parent: ParentCoordinator?
+    var canterLoginFlowaCoordinator: CanterLoginFlowable? {
+        parent as? CanterLoginFlowable
+    }
     
-    public init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.authUseCase = dependency.authUseCase
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     deinit { printIfDebug("deinit \(Self.self)") }
     
     public func start() {
         
-        let vm = CenterLoginViewModel(
-            coordinator: self,
-            authUseCase: authUseCase
-        )
+        let vm = CenterLoginViewModel(coordinator: self)
         let vc = CenterLoginViewController(viewModel: vm)
         
         viewControllerRef = vc
@@ -57,11 +45,11 @@ public class CenterLoginCoordinator: ChildCoordinator {
 extension CenterLoginCoordinator {
     
     func showSetNewPasswordScreen() {
-        parent?.setNewPassword()
+        canterLoginFlowaCoordinator?.setNewPassword()
     }
     
     /// Auth가 종료된 경우
     func authFinished() {
-        parent?.authFinished()
+        canterLoginFlowaCoordinator?.authFinished()
     }
 }

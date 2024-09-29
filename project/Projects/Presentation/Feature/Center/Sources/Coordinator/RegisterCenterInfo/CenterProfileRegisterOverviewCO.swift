@@ -11,30 +11,19 @@ import PresentationCore
 import Core
 
 public class CenterProfileRegisterOverviewCO: ChildCoordinator {
-    
-    public struct Dependency {
-        let navigationController: UINavigationController
-        let stateObject: CenterProfileRegisterState
-        let profileUseCase: CenterProfileUseCase
-        
-        public init(navigationController: UINavigationController, stateObject: CenterProfileRegisterState, profileUseCase: CenterProfileUseCase) {
-            self.navigationController = navigationController
-            self.stateObject = stateObject
-            self.profileUseCase = profileUseCase
-        }
-    }
-    
+
     public weak var viewControllerRef: UIViewController?
-    public weak var parent: CenterProfileRegisterCoordinatable?
+    public weak var parent: ParentCoordinator?
+    var centerProfileRegisterCoordinator: CenterProfileRegisterCoordinatable? {
+        parent as? CenterProfileRegisterCoordinatable
+    }
     
     public let navigationController: UINavigationController
     let stateObject: CenterProfileRegisterState
-    let profileUseCase: CenterProfileUseCase
     
-    public init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.stateObject = dependency.stateObject
-        self.profileUseCase = dependency.profileUseCase
+    public init(navigationController: UINavigationController, stateObject: CenterProfileRegisterState) {
+        self.navigationController = navigationController
+        self.stateObject = stateObject
     }
     
     deinit {
@@ -45,8 +34,7 @@ public class CenterProfileRegisterOverviewCO: ChildCoordinator {
         let vc = CenterProfileRegisterOverviewVC()
         let vm = RegisterProfileOverviewVM(
             coordinator: self,
-            stateObject: stateObject,
-            profileUseCase: profileUseCase
+            stateObject: stateObject
         )
         vc.bind(viewModel: vm)
         
@@ -60,6 +48,6 @@ public class CenterProfileRegisterOverviewCO: ChildCoordinator {
     }
     
     func showCompleteScreen() {
-        parent?.showCompleteScreen()
+        centerProfileRegisterCoordinator?.showCompleteScreen()
     }
 }

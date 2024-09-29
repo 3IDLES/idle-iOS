@@ -10,14 +10,16 @@ import PresentationCore
 import BaseFeature
 import DSKit
 import Domain
+import Core
 
 import RxSwift
 import RxCocoa
 
 public class CenterCertificateIntroVM: BaseViewModel {
     
+    @Injected var centerCertificateUseCase: CenterCertificateUseCase
+    
     // Init
-    let centerCertificateUseCase: CenterCertificateUseCase
     weak var coordinator: CenterCertificateCoordinator?
     
     // input
@@ -32,11 +34,7 @@ public class CenterCertificateIntroVM: BaseViewModel {
     // internal
     private let signOutButtonComfirmed: PublishSubject<Void> = .init()
     
-    public init(
-        centerCertificateUseCase: CenterCertificateUseCase,
-        coordinator: CenterCertificateCoordinator
-    ) {
-        self.centerCertificateUseCase = centerCertificateUseCase
+    public init(coordinator: CenterCertificateCoordinator) {
         self.coordinator = coordinator
         super.init()
         

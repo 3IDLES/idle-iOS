@@ -14,21 +14,14 @@ import Core
 
 class WorkerMainCoordinator: ParentCoordinator {
     
-    struct Dependency {
-        let navigationController: UINavigationController
-        let injector: Injector
-    }
-    
     var childCoordinators: [Coordinator] = []
     
     var parent: ParentCoordinator?
     
     var navigationController: UINavigationController
-    let injector: Injector
     
-    init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.injector = dependency.injector
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     func start() {
@@ -72,29 +65,11 @@ class WorkerMainCoordinator: ParentCoordinator {
         
         switch page {
         case .home:
-            coordinator = WorkerRecruitmentBoardCoordinator(
-                depedency: .init(
-                    parent: self,
-                    injector: injector,
-                    navigationController: navigationController
-                )
-            )
+            coordinator = WorkerRecruitmentBoardCoordinator(navigationController: navigationController)
         case .preferredPost:
-            coordinator = AppliedAndLikedBoardCoordinator(
-                depedency: .init(
-                    parent: self,
-                    injector: injector,
-                    navigationController: navigationController
-                )
-            )
+            coordinator = AppliedAndLikedBoardCoordinator(navigationController: navigationController)
         case .setting:
-            coordinator = WorkerSettingCoordinaator(
-                dependency: .init(
-                    parent: self,
-                    injector: injector,
-                    navigationController: navigationController
-                )
-            )
+            coordinator = WorkerSettingCoordinaator(navigationController: navigationController)
         }
         
         addChildCoordinator(coordinator)
