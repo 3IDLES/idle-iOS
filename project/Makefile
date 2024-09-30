@@ -1,10 +1,18 @@
-# Module creation
+
+# Test
 
 test:
 	TUIST_ROOT_DIR=${PWD} tuist test
 
+# Project generation
+
 generate:
 	TUIST_ROOT_DIR=${PWD} tuist generate
+
+genModule:
+	TUIST_ROOT_DIR=${PWD} tuist generate ${name}
+
+# Module generation
 
 USER_NAME = $(shell python3 Scaffold/Scripts/author_name.py)
 CURRENT_DATE = $(shell pipenv run python Scaffold/Scripts/current_date.py)
