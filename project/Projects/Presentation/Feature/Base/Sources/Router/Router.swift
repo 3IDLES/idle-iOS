@@ -37,24 +37,24 @@ public protocol RouterProtocol {
     
     
     // MARK: Set root module
-    /// 컨트롤러의 루트 VC를 변경
-    func setRootModule(module: Module, animated: Bool)
-    
+    /// RootController의 루트 Module을 변경
+    func changeRootModuleTo(module: Module, animated: Bool)
     
     
     // MARK: change window
     /// 키 윈도우의 rootController를 변경, 페인드 인/아웃 애니메이션 적용됨
-    func replaceRootModule(module: Module, animated: Bool, completion: RoutingCompletion?)
+    func replaceRootModuleTo(module: Module, animated: Bool, completion: RoutingCompletion?)
     
-    /// 루트윈도우를 설정
-    func setKeyWindow(module: Module)
+    
+    /// RootController를 생성및 KeyWindow의 루트로 지정
+    func setRootModuleTo(module: Module)
 }
 
 public final class Router: NSObject, RouterProtocol {
     
     weak var rootController: UINavigationController?
     
-    var completion: [UnsafePointer<Module>: RoutingCompletion] = [:]
+    var completion: [UnsafeRawPointer: RoutingCompletion] = [:]
     
     var transition: UIViewControllerAnimatedTransitioning?
     
@@ -63,11 +63,9 @@ public final class Router: NSObject, RouterProtocol {
         rootController?.topViewController
     }
     
-    public init(rootController: UINavigationController? = nil) {
-        self.rootController = rootController
-    }
+    public override init() { }
     
-    public func present(_ module: Module, animated: Bool, modalPresentationSytle: UIModalPresentationStyle, completion: RoutingCompletion?) {
+    public func present(_ module: Module, animated: Bool, modalPresentationSytle: UIModalPresentationStyle, completion: RoutingCompletion? = nil) {
         
         rootController?.modalPresentationStyle = modalPresentationSytle
         rootController?.present(
@@ -77,7 +75,7 @@ public final class Router: NSObject, RouterProtocol {
         )
     }
     
-    public func dismissModule(animated: Bool, completion: (() -> Void)?) {
+    public func dismissModule(animated: Bool, completion: (() -> Void)? = nil) {
         
         rootController?.dismiss(
             animated: animated,
@@ -85,12 +83,14 @@ public final class Router: NSObject, RouterProtocol {
         )
     }
     
-    public func push(module: Module, animated: Bool, popCompletion: (() -> Void)?) {
+    public func push(module: Module, animated: Bool, popCompletion: (() -> Void)? = nil) {
         
         guard (module is UINavigationController) == false else {
             // 디버그 모드시 런타임에러발생시킴
             return assertionFailure("\(#function) 네비게이션 컨트롤러 삽입 불가")
         }
+        
+        completion[module.getRawPointer] = popCompletion
         
         rootController?.pushViewController(
             module,
@@ -100,15 +100,19 @@ public final class Router: NSObject, RouterProtocol {
     
     public func popModule(animated: Bool) {
         
-        rootController?
-            .popViewController(animated: animated)
+        if let module = rootController?.popViewController(animated: animated) {
+            
+            let pointer = module.getRawPointer
+            completion[pointer]?()
+            completion.removeValue(forKey: pointer)
+        }
     }
     
     public func popTo(module: Module, animated: Bool) {
-        
+    
         guard let controllers = rootController?.viewControllers else { return }
         
-        for controller in rootController!.viewControllers {
+        for controller in controllers {
             
             if controller === module {
                 
@@ -117,12 +121,12 @@ public final class Router: NSObject, RouterProtocol {
         }
     }
     
-    public func setRootModule(module: Module, animated: Bool) {
+    public func changeRootModuleTo(module: Module, animated: Bool) {
         
         rootController?.setViewControllers([module], animated: animated)
     }
     
-    public func replaceRootModule(module: Module, animated: Bool, completion: (() -> Void)?) {
+    public func replaceRootModuleTo(module: Module, animated: Bool, completion: (() -> Void)? = nil) {
         
         guard let keyWindow = UIWindow.keyWindow else { return }
         
@@ -132,7 +136,7 @@ public final class Router: NSObject, RouterProtocol {
         
         if !animated {
             // 애니메이션이 없는 경우
-            setKeyWindow(module: module)
+            setRootModuleTo(module: module)
             completion?()
             
             return
@@ -153,7 +157,7 @@ public final class Router: NSObject, RouterProtocol {
         }
     }
     
-    public func setKeyWindow(module: Module) {
+    public func setRootModuleTo(module: Module) {
         guard let keyWindow = UIWindow.keyWindow else { return }
         let navigationController = UINavigationController(rootViewController: module)
         
@@ -175,5 +179,12 @@ extension UIWindow {
             return keyWindow
         }
         return nil
+    }
+}
+
+extension UIViewController {
+    
+    var getRawPointer: UnsafeMutableRawPointer {
+        Unmanaged.passUnretained(self).toOpaque()
     }
 }
