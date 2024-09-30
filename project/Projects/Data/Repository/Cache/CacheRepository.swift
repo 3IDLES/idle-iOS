@@ -252,6 +252,7 @@ extension DefaultCacheRepository {
 extension DefaultCacheRepository {
     
     /// image경로를 획득합니다.
+    @discardableResult
     func createImagePath(url: String) -> URL? {
         
         guard let path = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
@@ -285,6 +286,7 @@ extension DefaultCacheRepository {
     }
     
     /// 디스크 캐시를 확인합니다.
+    @discardableResult
     func checkDiskCache(info: ImageDownLoadInfo) -> UIImage? {
         
         guard let imagePath = createImagePath(url: info.imageURL.absoluteString) else {
@@ -378,6 +380,7 @@ extension DefaultCacheRepository {
         #endif
     }
     
+    @discardableResult
     func createUIImage(data: Data, format: ImageFormat) -> UIImage? {
         var image: UIImage?
         if format == .webp {
@@ -426,6 +429,7 @@ extension DefaultCacheRepository {
         return safeFileName
     }
     
+    @discardableResult
     func clearImageCacheDirectory() -> Bool {
         
         guard let path = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {

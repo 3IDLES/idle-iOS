@@ -7,8 +7,8 @@
 
 import Foundation
 import XCTest
-@testable import ConcreteRepository
-import Entity
+@testable import Repository
+@testable import Domain
 
 import RxSwift
 
@@ -33,10 +33,10 @@ class ImageCachingTest: XCTestCase {
             }
         }
         
-        return
+        return;
         
         // 디스크 캐싱 내역 삭제
-        _ = cacheRepository.clearImageCacheDirectory()
+        cacheRepository.clearImageCacheDirectory()
         
         let counter = ImageFetchedCounter(count: 0)
         

@@ -1,14 +1,18 @@
 //
-//  Tests.swift
-//  Concrete
+//  InputValidationTest.swift
+//  DataTests
 //
-//  Created by 최준영 on 6/20/24.
+//  Created by choijunios on 9/30/24.
 //
 
 import XCTest
-@testable import ConcreteUseCase
-@testable import ConcreteRepository
-@testable import DataSource
+import Foundation
+@testable import Repository
+@testable import Domain
+
+
+import RxSwift
+
 
 /// 사용자의 입력을 판단하는 UseCase를 테스트 합니다.
 final class InputValidationTests: XCTestCase {

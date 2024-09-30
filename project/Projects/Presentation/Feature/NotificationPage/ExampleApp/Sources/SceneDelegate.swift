@@ -9,7 +9,8 @@ import UIKit
 import NotificationPageFeature
 import PresentationCore
 import Domain
-import ConcreteRepository
+import Repository
+import Core
 
 
 import Swinject

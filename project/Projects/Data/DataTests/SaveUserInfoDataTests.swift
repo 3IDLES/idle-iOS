@@ -7,7 +7,7 @@
 
 import Foundation
 import XCTest
-@testable import ConcreteRepository
+@testable import Repository
 @testable import DataSource
 
 class SaveUserInfoDataTests: XCTestCase {
