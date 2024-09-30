@@ -25,12 +25,10 @@ let proejct = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**",],
             dependencies: [
-                D.Domain.Entity,
+                
                 D.Presentation.PresentationCore,
                 
                 // ThirdParty
-                D.ThirdParty.RxSwift,
-                D.ThirdParty.RxCocoa,
                 D.ThirdParty.FSCalendar,
             ],
             settings: .settings(

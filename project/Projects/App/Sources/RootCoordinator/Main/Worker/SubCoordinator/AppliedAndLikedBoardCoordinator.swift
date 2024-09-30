@@ -7,25 +7,13 @@
 
 import UIKit
 import WorkerFeature
-import Entity
 import BaseFeature
 import CenterFeature
 import PresentationCore
-import UseCaseInterface
+import Domain
+import Core
 
 class AppliedAndLikedBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
-    
-    struct Dependency {
-        let parent: WorkerMainCoordinator
-        let injector: Injector
-        let navigationController: UINavigationController
-        
-        init(parent: WorkerMainCoordinator, injector: Injector, navigationController: UINavigationController) {
-            self.parent = parent
-            self.injector = injector
-            self.navigationController = navigationController
-        }
-    }
     
     var childCoordinators: [any PresentationCore.Coordinator] = []
     
@@ -33,24 +21,15 @@ class AppliedAndLikedBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
     
     var navigationController: UINavigationController
     weak var parent: ParentCoordinator?
-    let injector: Injector
     
-    public init(depedency: Dependency) {
-        self.parent = depedency.parent
-        self.navigationController = depedency.navigationController
-        self.injector = depedency.injector
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     public func start() {
         let vc = StarredAndAppliedVC()
-        let appliedVM = AppliedPostBoardVM(
-            coordinator: self,
-            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
-        )
-        let starredVM = StarredPostBoardVM(
-            coordinator: self,
-            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
-        )
+        let appliedVM = AppliedPostBoardVM(coordinator: self)
+        let starredVM = StarredPostBoardVM(coordinator: self)
         vc.bind(
             appliedPostVM: appliedVM,
             starredPostVM: starredVM
@@ -66,28 +45,19 @@ class AppliedAndLikedBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
 }
 
 extension AppliedAndLikedBoardCoordinator {
-    public func showPostDetail(postType: RecruitmentPostType, postId: String) {
-        let coodinator = PostDetailForWorkerCoodinator(
-            dependency: .init(
-                postType: postType,
-                postId: postId,
-                parent: self,
-                navigationController: navigationController,
-                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self),
-                workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self),
-                centerProfileUseCase: injector.resolve(CenterProfileUseCase.self)
-            )
+    public func showPostDetail(postInfo: RecruitmentPostInfo) {
+        let coordinator = PostDetailForWorkerCoodinator(
+            postInfo: postInfo,
+            navigationController: navigationController
         )
-        addChildCoordinator(coodinator)
-        coodinator.start()
+        addChildCoordinator(coordinator)
+        coordinator.parent = self
+        coordinator.start()
     }
     public func showCenterProfile(centerId: String) {
         let coordinator = CenterProfileCoordinator(
-            dependency: .init(
-                mode: .otherProfile(id: centerId),
-                profileUseCase: injector.resolve(CenterProfileUseCase.self),
-                navigationController: navigationController
-            )
+            mode: .otherProfile(id: centerId),
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self

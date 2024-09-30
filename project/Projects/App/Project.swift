@@ -35,46 +35,8 @@ let project = Project(
                 
                 // Presentation
                 D.Presentation.RootFeature,
-                
-                // Domain
-                D.Domain.ConcreteUseCase,
-                
-                // Data
-                D.Data.ConcreteRepository,
-                
-                // Logger
-                D.App.ConcreteLogger,
-                
-                // ThirdParty
-                D.ThirdParty.FirebaseMessaging,
             ],
             settings: .settings(
-                configurations: IdleConfiguration.appConfigurations
-            )
-        ),
-        
-        .target(
-            name: "ConcreteLogger",
-            destinations: DeploymentSettings.platforms,
-            product: .staticLibrary,
-            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER).concretelogger",
-            deploymentTargets: DeploymentSettings.deployment_version,
-            sources: [
-                "ConcreteLogger/**",
-                SecretSource.amplitudeConfig,
-            ],
-            dependencies: [
-                
-                D.Presentation.RootFeature,
-                D.Domain.LoggerInterface,
-                
-                // ThirdParty
-                D.ThirdParty.Amplitude,
-            ],
-            settings: .settings(
-                base: [
-                    "ENABLE_TESTABILITY": "YES",
-                ],
                 configurations: IdleConfiguration.appConfigurations
             )
         ),

@@ -9,37 +9,26 @@ import UIKit
 import CenterFeature
 import RootFeature
 import PresentationCore
-import UseCaseInterface
+import Domain
+import Core
 
 class CenterSettingCoordinator: CenterSettingCoordinatable {
     
-    struct Dependency {
-        let parent: CenterMainCoordinatable
-        let injector: Injector
-        let navigationController: UINavigationController
-    }
-    
     var childCoordinators: [any PresentationCore.Coordinator] = []
     
-    weak var parent: CenterMainCoordinatable?
+    weak var parent: ParentCoordinator?
     
     weak var viewControllerRef: UIViewController?
     
     var navigationController: UINavigationController
-    let injector: Injector
     
-    init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.injector = dependency.injector
-        self.parent = dependency.parent
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     func start() {
         let coordinator = CenterSettingScreenCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                settingUseCase: injector.resolve(SettingScreenUseCase.self)
-            )
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self
@@ -48,12 +37,8 @@ class CenterSettingCoordinator: CenterSettingCoordinatable {
     
     func startRemoveCenterAccountFlow() {
         let coordinator = DeRegisterCoordinator(
-            dependency: .init(
-                userType: .center,
-                settingUseCase: injector.resolve(SettingScreenUseCase.self),
-                inputValidationUseCase: injector.resolve(AuthInputValidationUseCase.self),
-                navigationController: navigationController
-            )
+            userType: .center,
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self
@@ -62,11 +47,8 @@ class CenterSettingCoordinator: CenterSettingCoordinatable {
     
     func showMyCenterProfile() {
         let coordinator = CenterProfileCoordinator(
-            dependency: .init(
-                mode: .myProfile,
-                profileUseCase: injector.resolve(CenterProfileUseCase.self),
-                navigationController: navigationController
-            )
+            mode: .myProfile,
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self

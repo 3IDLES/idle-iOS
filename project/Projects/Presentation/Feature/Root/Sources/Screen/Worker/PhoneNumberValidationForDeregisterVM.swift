@@ -6,12 +6,15 @@
 //
 
 import Foundation
+import Domain
+import AuthFeature
+import BaseFeature
+import Core
+
+
 import RxCocoa
 import RxSwift
-import Entity
-import AuthFeature
-import UseCaseInterface
-import BaseFeature
+
 
 public protocol PhoneNumberValidationForDeregisterVMable: BaseViewModel, AuthPhoneNumberInputable & AuthPhoneNumberOutputable {
     
@@ -22,12 +25,13 @@ public protocol PhoneNumberValidationForDeregisterVMable: BaseViewModel, AuthPho
 
 class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidationForDeregisterVMable {
     
+    @Injected var inputValidationUseCase: AuthInputValidationUseCase
+    @Injected var settingUseCase: SettingScreenUseCase
+    
     var loginSuccess: RxCocoa.Driver<Void>?
     
     // Init
     weak var coordinator: PhoneNumberValidationForDeregisterCoordinator?
-    let inputValidationUseCase: AuthInputValidationUseCase
-    let settingUseCase: SettingScreenUseCase
     
     // Input
     var editingPhoneNumber: RxRelay.BehaviorRelay<String> = .init(value: "")
@@ -45,16 +49,8 @@ class PhoneNumberValidationForDeregisterVM: BaseViewModel, PhoneNumberValidation
     var authNumberValidation: RxCocoa.Driver<Bool>?
     var loginValidation: RxCocoa.Driver<Void>?
     
-    init(
-            coordinator: PhoneNumberValidationForDeregisterCoordinator?,
-            deregisterReasons: [String],
-            inputValidationUseCase: AuthInputValidationUseCase,
-            settingUseCase: SettingScreenUseCase
-        )
-    {
+    init(coordinator: PhoneNumberValidationForDeregisterCoordinator?, deregisterReasons: [String]) {
         self.coordinator = coordinator
-        self.inputValidationUseCase = inputValidationUseCase
-        self.settingUseCase = settingUseCase
         
         super.init()
         

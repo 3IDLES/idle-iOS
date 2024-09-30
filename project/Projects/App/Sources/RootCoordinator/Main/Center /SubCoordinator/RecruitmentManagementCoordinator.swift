@@ -9,47 +9,26 @@ import UIKit
 import RootFeature
 import CenterFeature
 import PresentationCore
-import UseCaseInterface
-import Entity
+import Domain
+import Core
 
 
 public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatable {
-    
-    public struct Dependency {
-        let parent: CenterMainCoordinatable
-        let injector: Injector
-        let navigationController: UINavigationController
-        
-        init(parent: CenterMainCoordinatable, injector: Injector, navigationController: UINavigationController) {
-            self.parent = parent
-            self.injector = injector
-            self.navigationController = navigationController
-        }
-    }
     
     public var childCoordinators: [any PresentationCore.Coordinator] = []
     
     public weak var viewControllerRef: UIViewController?
     
-    public weak var parent: CenterMainCoordinatable?
-    let injector: Injector
+    public weak var parent: ParentCoordinator?
+    
     public var navigationController: UINavigationController
     
-    public init(
-        dependency: Dependency
-    ) {
-        self.parent = dependency.parent
-        self.injector = dependency.injector
-        self.navigationController = dependency.navigationController
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     public func start() {
-        let coordinator = CenterRecruitmentPostBoardScreenCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
-            )
-        )
+        let coordinator = CenterRecruitmentPostBoardScreenCoordinator(navigationController: navigationController)
         addChildCoordinator(coordinator)
         coordinator.parent = self
         coordinator.start()
@@ -65,61 +44,40 @@ public extension RecruitmentManagementCoordinator {
 
     func showCheckingApplicantScreen(postId: String) {
         let coordinator = CheckApplicantCoordinator(
-            dependency: .init(
-                postId: postId,
-                navigationController: navigationController,
-                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self),
-                workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
-            )
+            postId: postId,
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
-        coordinator.parent = self
         coordinator.start()
     }
     
     func showPostDetailScreenForCenter(postId: String, postState: PostState) {
         
         let coordinator = PostDetailForCenterCoordinator(
-            dependency: .init(
-                postId: postId,
-                postState: postState,
-                navigationController: navigationController,
-                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
-            )
+            postId: postId,
+            postState: postState,
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
-        coordinator.parent = self
         coordinator.start()
     }
     
     func showEditScreen(postId: String) {
         
-        let vm = EditPostVM(
-            id: postId,
-            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
-        )
+        let vm = EditPostVM(id: postId)
         let coordinator = EditPostCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                viewModel: vm
-            )
+            viewModel: vm,
+            navigationController: navigationController
         )
         vm.editPostCoordinator = coordinator
         addChildCoordinator(coordinator)
-        coordinator.parent = self
         coordinator.start()
     }
     
     func showRegisterPostScrean() {
         
-        let coordinator = RegisterRecruitmentPostCoordinator(
-            dependency: .init(
-                navigationController: navigationController,
-                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self)
-            )
-        )
+        let coordinator = RegisterRecruitmentPostCoordinator(navigationController: navigationController)
         addChildCoordinator(coordinator)
-        coordinator.parent = self
         coordinator.start()
     }
 }

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Entity
+import Domain
 
 public protocol EntityRepresentable: Codable {
     associatedtype Entity

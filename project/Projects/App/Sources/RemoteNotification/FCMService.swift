@@ -7,9 +7,9 @@
 
 import Foundation
 import BaseFeature
-import UseCaseInterface
 import PresentationCore
-
+import Domain
+import Core
 
 import FirebaseMessaging
 

@@ -7,34 +7,23 @@
 
 import UIKit
 import PresentationCore
-import UseCaseInterface
-import Entity
+import Domain
+import Core
 
 public class SelectReasonCoordinator: ChildCoordinator {
     
-    public struct Dependency {
-        let userType: UserType
-        let settingUseCase: SettingScreenUseCase
-        let navigationController: UINavigationController
-        
-        public init(userType: UserType, settingUseCase: SettingScreenUseCase, navigationController: UINavigationController) {
-            self.userType = userType
-            self.settingUseCase = settingUseCase
-            self.navigationController = navigationController
-        }
-    }
-    
     public weak var viewControllerRef: UIViewController?
     public var navigationController: UINavigationController
-    public weak var parent: DeregisterCoordinatable?
+    public weak var parent: ParentCoordinator?
+    var deregisterCoordinator: DeregisterCoordinatable? {
+        parent as? DeregisterCoordinatable
+    }
     
     let userType: UserType
-    let settingUseCase: SettingScreenUseCase
     
-    public init(dependency: Dependency) {
-        self.userType = dependency.userType
-        self.settingUseCase = dependency.settingUseCase
-        self.navigationController = dependency.navigationController
+    public init(userType: UserType, navigationController: UINavigationController) {
+        self.userType = userType
+        self.navigationController = navigationController
     }
     
     deinit {
@@ -62,11 +51,11 @@ public class SelectReasonCoordinator: ChildCoordinator {
     }
     
     public func showPasswordAuthScreen(reasons: [String]) {
-        parent?.showFinalPasswordScreen(reasons: reasons)
+        deregisterCoordinator?.showFinalPasswordScreen(reasons: reasons)
     }
     
     public func showPhoneNumberAuthScreen(reasons: [String]) {
-        parent?.showFinalPhoneAuthScreen(reasons: reasons)
+        deregisterCoordinator?.showFinalPhoneAuthScreen(reasons: reasons)
     }
 }
 

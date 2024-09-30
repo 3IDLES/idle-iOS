@@ -7,8 +7,11 @@
 
 import UIKit
 import PresentationCore
+import Core
 
 class CenterAuthCoordinator: ParentCoordinator {
+    
+    weak var parent: ParentCoordinator?
     
     struct Dependency {
         let navigationController: UINavigationController

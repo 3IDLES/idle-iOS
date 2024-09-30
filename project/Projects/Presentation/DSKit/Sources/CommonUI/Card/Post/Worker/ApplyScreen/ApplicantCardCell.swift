@@ -7,9 +7,11 @@
 
 
 import UIKit
+import Domain
+
+
 import RxSwift
 import RxCocoa
-import Entity
 
 public class ApplicantCardCell: UITableViewCell {
     
@@ -70,7 +72,7 @@ public class ApplicantCardCell: UITableViewCell {
                     
                     guard let self else { return }
                    
-                    UIView.transition(with: contentView, duration: 0.1) {
+                    UIView.transition(with: contentView, duration: 0.1, options: .transitionCrossDissolve) {
                         self.cardView.workerProfileImage.image = image
                     }
                 }),

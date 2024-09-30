@@ -21,30 +21,21 @@ let project = Project(
         .target(
             name: "BaseFeature",
             destinations: DeploymentSettings.platforms,
-            product: .staticFramework,
+            product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                // Presentation
-                D.Presentation.PresentationCore,
-                D.Presentation.DSKit,
-
-                // Domain
-                D.Domain.UseCaseInterface,
-                D.Domain.RepositoryInterface,
                 
                 // Data
-                D.Data.ConcreteRepository,
+                D.Data.Repository,
+                
+                // Presentation
+                D.Presentation.DSKit,
 
                 // ThirdParty
-                D.ThirdParty.RxSwift,
-                D.ThirdParty.RxCocoa,
                 D.ThirdParty.NaverMapSDKForSPM,
-                D.ThirdParty.FirebaseCrashlytics,
-                D.ThirdParty.FirebaseAnalytics,
-                D.ThirdParty.SDWebImageWebPCoder,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

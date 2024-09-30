@@ -1,0 +1,135 @@
+//
+//  CenterSetNewPasswordCoordinator.swift
+//  AuthFeature
+//
+//  Created by choijunios on 7/17/24.
+//
+
+import UIKit
+import Domain
+import PresentationCore
+import BaseFeature
+import DSKit
+import Core
+
+enum SetNewPasswordStage: Int {
+    
+    case findPasswordFinished=0
+    case phoneNumber=1
+    case password=2
+    case finish=3
+}
+
+public class CenterSetNewPasswordCoordinator: ChildCoordinator {
+    
+    public weak var viewControllerRef: UIViewController?
+    public var navigationController: UINavigationController
+    
+    var stageViewControllers: [UIViewController] = []
+    weak var pageViewController: UIPageViewController?
+    
+    public weak var parent: ParentCoordinator?
+    
+    var canterLoginFlowCoordinator: CanterLoginFlowable? {
+        parent as? CanterLoginFlowable
+    }
+    
+    var currentStage: SetNewPasswordStage!
+    
+    public init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+    }
+    
+    deinit { printIfDebug("deinit \(Self.self)") }
+    
+    public func start() {
+        
+        let vm = CenterSetNewPasswordViewModel(coordinator: self)
+        
+        // stageViewControllerss에 자기자신과 ViewModel할당
+        
+        self.stageViewControllers = [
+            ValidatePhoneNumberViewController(viewModel: vm),
+            ValidateNewPasswordViewController(viewModel: vm)
+        ]
+        
+        let pageViewController = UIPageViewController(
+            transitionStyle: .scroll,
+            navigationOrientation: .horizontal,
+            options: nil
+        )
+        
+        self.pageViewController = pageViewController
+        
+        let vc = CenterSetNewPasswordController(
+            pageViewController: pageViewController,
+            pageCount: stageViewControllers.count
+        )
+        vc.bind(viewModel: vm)
+        vc.coordinator = self
+        
+        navigationController.pushViewController(vc, animated: true)
+        excuteStage(.phoneNumber, moveTo: .next)
+    }
+    
+    public func coordinatorDidFinish() {
+        
+        stageViewControllers = []
+        popViewController()
+        parent?.removeChildCoordinator(self)
+    }
+    
+    public func coordinatorDidFinishWithSnackBar(ro: IdleSnackBarRO) {
+        let belowIndex = navigationController.children.count-2
+        
+        if belowIndex >= 0 {
+            let belowVC = navigationController.children[belowIndex]
+            
+            if let baseVC = belowVC as? BaseViewController {
+                
+                baseVC.viewModel?.addSnackBar(ro: ro)
+            }
+        }
+        
+        coordinatorDidFinish()
+    }
+}
+
+extension CenterSetNewPasswordCoordinator {
+    
+    /// 패스워드 변경화면 표시
+    enum MoveTo {
+        case next, prev
+    }
+    
+    public func next() {
+        if let nextStage = SetNewPasswordStage(rawValue: currentStage.rawValue+1) {
+            excuteStage(nextStage, moveTo: .next)
+        }
+    }
+    
+    public func prev() {
+        if let prevStage = SetNewPasswordStage(rawValue: currentStage.rawValue-1) {
+            excuteStage(prevStage, moveTo: .prev)
+        }
+    }
+    
+    private func excuteStage(_ stage: SetNewPasswordStage, moveTo: MoveTo) {
+        currentStage = stage
+        switch stage {
+        case .findPasswordFinished, .finish:
+            coordinatorDidFinish()
+        default:
+            let vc = stageViewControllers[stage.rawValue-1]
+            showStage(viewController: vc, moveTo: moveTo)
+        }
+    }
+    
+    func showStage(viewController: UIViewController, moveTo: MoveTo) {
+        pageViewController?.setViewControllers(
+            [viewController],
+            direction: moveTo == .next ? .forward : .reverse,
+            animated: true
+        )
+    }
+}

@@ -24,7 +24,10 @@ let project = Project(
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["Sources/**"],
+            sources: [
+                "Sources/**",
+                SecretSource.amplitudeConfig,
+            ],
             resources: ["Resources/**"],
             dependencies: [
 
@@ -33,6 +36,13 @@ let project = Project(
                 D.Presentation.WorkerFeature,
                 D.Presentation.CenterFeature,
                 D.Presentation.NotificationPageFeature,
+                
+                // ThirParty
+                D.ThirdParty.Amplitude,
+                D.ThirdParty.FirebaseRemoteConfig,
+                D.ThirdParty.FirebaseCrashlytics,
+                D.ThirdParty.FirebaseAnalytics,
+                D.ThirdParty.FirebaseMessaging,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

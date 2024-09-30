@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Entity
+import Domain
 import DSKit
 
 import RxCocoa

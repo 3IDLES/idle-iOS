@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import Domain
+
+
 import Moya
 import Alamofire
-import Entity
 
 public enum ApplyAPI {
     case applys(jobPostingId: String, applyMethodType: String)

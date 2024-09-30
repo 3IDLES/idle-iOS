@@ -9,23 +9,11 @@ import UIKit
 import WorkerFeature
 import BaseFeature
 import CenterFeature
-import Entity
 import PresentationCore
-import UseCaseInterface
+import Domain
+import Core
 
 class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
-    
-    struct Dependency {
-        let parent: WorkerMainCoordinator
-        let injector: Injector
-        let navigationController: UINavigationController
-        
-        init(parent: WorkerMainCoordinator, injector: Injector, navigationController: UINavigationController) {
-            self.parent = parent
-            self.injector = injector
-            self.navigationController = navigationController
-        }
-    }
     
     var childCoordinators: [any PresentationCore.Coordinator] = []
     
@@ -33,21 +21,14 @@ class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
     
     var navigationController: UINavigationController
     weak var parent: ParentCoordinator?
-    let injector: Injector
     
-    init(depedency: Dependency) {
-        self.navigationController = depedency.navigationController
-        self.parent = depedency.parent
-        self.injector = depedency.injector
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     func start() {
         let vc = WorkerRecruitmentPostBoardVC()
-        let vm = WorkerRecruitmentPostBoardVM(
-            coordinator: self,
-            recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self),
-            workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
-        )
+        let vm = WorkerRecruitmentPostBoardVM(coordinator: self)
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: false)
@@ -55,28 +36,19 @@ class WorkerRecruitmentBoardCoordinator: WorkerRecruitmentBoardCoordinatable {
 }
 
 extension WorkerRecruitmentBoardCoordinator {
-    public func showPostDetail(postType: RecruitmentPostType, postId: String) {
+    public func showPostDetail(postInfo: RecruitmentPostInfo) {
         let coodinator = PostDetailForWorkerCoodinator(
-            dependency: .init(
-                postType: postType,
-                postId: postId,
-                parent: self,
-                navigationController: navigationController,
-                recruitmentPostUseCase: injector.resolve(RecruitmentPostUseCase.self),
-                workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self),
-                centerProfileUseCase: injector.resolve(CenterProfileUseCase.self)
-            )
+            postInfo: postInfo,
+            navigationController: navigationController
         )
+        coodinator.parent = self
         addChildCoordinator(coodinator)
         coodinator.start()
     }
     public func showCenterProfile(centerId: String) {
         let coordinator = CenterProfileCoordinator(
-            dependency: .init(
-                mode: .otherProfile(id: centerId),
-                profileUseCase: injector.resolve(CenterProfileUseCase.self),
-                navigationController: navigationController
-            )
+            mode: .otherProfile(id: centerId),
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self
@@ -85,11 +57,8 @@ extension WorkerRecruitmentBoardCoordinator {
     
     public func showWorkerProfile() {
         let coordinator = WorkerProfileCoordinator(
-            dependency: .init(
-                profileMode: .myProfile,
-                navigationController: navigationController,
-                workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self)
-            )
+            profileMode: .myProfile,
+            navigationController: navigationController
         )
         addChildCoordinator(coordinator)
         coordinator.parent = self

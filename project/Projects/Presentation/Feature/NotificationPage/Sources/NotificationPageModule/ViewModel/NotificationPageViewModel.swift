@@ -7,10 +7,10 @@
 
 import Foundation
 import BaseFeature
-import Entity
-import UseCaseInterface
-import ConcreteRepository
+import Domain
+import Repository
 import PresentationCore
+import Core
 
 import RxSwift
 import RxCocoa

@@ -24,10 +24,11 @@ let proejct = Project(
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Sources/**"],
             dependencies: [
+                
+                D.Domain,
+                
                 // ThirdParty
-                D.ThirdParty.RxSwift,
                 D.ThirdParty.RxCocoa,
-                D.ThirdParty.Swinject,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

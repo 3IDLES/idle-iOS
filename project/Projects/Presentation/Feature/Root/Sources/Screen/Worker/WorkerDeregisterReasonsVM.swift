@@ -5,17 +5,19 @@
 //  Created by choijunios on 8/25/24.
 //
 
-import Entity
+import BaseFeature
+import Domain
+
+
 import RxSwift
 import RxCocoa
-import BaseFeature
 
 public class WorkerDeregisterReasonsVM: BaseViewModel, DeregisterReasonVMable {
     
     public weak var coordinator: SelectReasonCoordinator?
     public var exitButonClicked: RxRelay.PublishRelay<Void> = .init()
     public var acceptDeregisterButonClicked: PublishRelay<[String]> = .init()
-    public var userType: Entity.UserType = .worker
+    public var userType: UserType = .worker
     
     public init(coordinator: SelectReasonCoordinator) {
         self.coordinator = coordinator

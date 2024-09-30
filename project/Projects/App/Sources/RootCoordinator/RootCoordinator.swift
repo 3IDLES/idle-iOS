@@ -8,24 +8,19 @@
 import UIKit
 import PresentationCore
 import RootFeature
-import UseCaseInterface
-import RepositoryInterface
+import Domain
+import Core
 
 class RootCoordinator {
-    
-    struct Dependency {
-        let navigationController: UINavigationController
-        let injector: Injector
-    }
     
     var childCoordinators: [Coordinator] = []
     
     let navigationController: UINavigationController
-    let injector: Injector
     
-    init(dependency: Dependency) {
-        self.navigationController = dependency.navigationController
-        self.injector = dependency.injector
+    var parent: ParentCoordinator?
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     func start() {
@@ -33,14 +28,7 @@ class RootCoordinator {
         
         // Root VC
         let vc = InitialScreenVC()
-        let vm = InitialScreenVM(
-            coordinator: self, 
-            authUseCase: injector.resolve(AuthUseCase.self),
-            workerProfileUseCase: injector.resolve(WorkerProfileUseCase.self),
-            centerProfileUseCase: injector.resolve(CenterProfileUseCase.self),
-            userInfoLocalRepository: injector.resolve(UserInfoLocalRepository.self),
-            remoteConfigRepository: injector.resolve(RemoteConfigRepository.self)
-        )
+        let vm = InitialScreenVM(coordinator: self)
         
         vc.bind(viewModel: vm)
         

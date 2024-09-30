@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import Domain
+
+
 import RxSwift
 import RxCocoa
-import Entity
 
 // MARK: Render object
 public class WorkerNativeEmployCardRO {

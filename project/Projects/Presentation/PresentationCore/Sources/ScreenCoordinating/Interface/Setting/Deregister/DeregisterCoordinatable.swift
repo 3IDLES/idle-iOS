@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Entity
+
 
 public protocol DeregisterCoordinatable: ParentCoordinator {
     

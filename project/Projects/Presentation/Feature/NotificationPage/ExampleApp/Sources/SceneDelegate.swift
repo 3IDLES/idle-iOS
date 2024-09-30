@@ -8,9 +8,10 @@
 import UIKit
 import NotificationPageFeature
 import PresentationCore
-import UseCaseInterface
-import ConcreteRepository
-import Entity
+import Domain
+import Repository
+import Core
+
 
 import Swinject
 import RxSwift
