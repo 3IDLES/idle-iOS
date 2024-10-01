@@ -1,6 +1,6 @@
 //
 //  InitialScreenVM.swift
-//  RootFeature
+//  SplashFeature
 //
 //  Created by choijunios on 8/25/24.
 //
@@ -17,6 +17,7 @@ import Core
 import RxSwift
 import RxCocoa
 import FirebaseCrashlytics
+import FirebaseRemoteConfig
 
 
 public class InitialScreenVM: BaseViewModel {

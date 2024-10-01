@@ -1,6 +1,6 @@
 //
 //  InitialScreenVC.swift
-//  RootFeature
+//  SplashFeature
 //
 //  Created by choijunios on 8/25/24.
 //

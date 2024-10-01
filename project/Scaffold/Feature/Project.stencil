@@ -20,7 +20,7 @@ let project = Project(
         /// FeatureConcrete
         .target(
             name: "{{ projectName }}Feature",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
@@ -28,16 +28,7 @@ let project = Project(
             resources: ["Resources/**"],
             dependencies: [
                 // Presentation
-                D.Presentation.PresentationCore,
-                D.Presentation.DSKit,
-
-                // Domain
-                D.Domain.UseCaseInterface,
-                D.Domain.RepositoryInterface,
-
-                // ThirdParty
-                D.ThirdParty.RxSwift,
-                D.ThirdParty.RxCocoa,
+                D.Presentation.BaseFeature,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -47,7 +38,7 @@ let project = Project(
         /// FeatureConcrete ExampleApp
         .target(
             name: "{{ projectName }}_ExampleApp",
-            destinations: DeploymentSettings.platform,
+            destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
