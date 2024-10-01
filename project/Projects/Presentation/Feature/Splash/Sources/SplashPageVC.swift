@@ -1,5 +1,5 @@
 //
-//  InitialScreenVC.swift
+//  SplashPageVC.swift
 //  SplashFeature
 //
 //  Created by choijunios on 8/25/24.
@@ -14,14 +14,19 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-public class InitialScreenVC: BaseViewController {
+public class SplashPageVC: BaseViewController {
     
     // Init
     
     // View
     
-    public init() {
+    public init(viewModel: SplashPageVM) {
         super.init(nibName: nil, bundle: nil)
+        
+        self.rx.viewDidLoad
+            .map({ _ in })
+            .bind(to: viewModel.viewDidLoad)
+            .disposed(by: disposeBag)
     }
     
     public required init?(coder: NSCoder) { fatalError() }
@@ -40,15 +45,5 @@ public class InitialScreenVC: BaseViewController {
     private func setLayout() { }
     
     private func setObservable() { }
-    
-    public func bind(viewModel: InitialScreenVM) {
-        
-        super.bind(viewModel: viewModel)
-        
-        self.rx.viewDidAppear
-            .map({ _ in })
-            .bind(to: viewModel.viewWillAppear)
-            .disposed(by: disposeBag)
-    }
 }
 
