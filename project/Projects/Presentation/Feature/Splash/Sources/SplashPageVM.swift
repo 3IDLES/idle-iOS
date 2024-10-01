@@ -1,5 +1,5 @@
 //
-//  InitialScreenVM.swift
+//  SplashPageVM.swift
 //  SplashFeature
 //
 //  Created by choijunios on 8/25/24.
@@ -20,18 +20,18 @@ import FirebaseCrashlytics
 import FirebaseRemoteConfig
 
 
-public class InitialScreenVM: BaseViewModel {
+public class SplashPageVM: BaseViewModel {
+    
+    // DI
+    @Injected var authUseCase: AuthUseCase
+    @Injected var workerProfileUseCase: WorkerProfileUseCase
+    @Injected var centerProfileUseCase: CenterProfileUseCase
+    @Injected var userInfoLocalRepository: UserInfoLocalRepository
     
     weak var coordinator: RootCoorinatable?
     
     // Input
     let viewDidLoad: PublishRelay<Void> = .init()
-    let viewWillAppear: PublishRelay<Void> = .init()
-    
-    @Injected var authUseCase: AuthUseCase
-    @Injected var workerProfileUseCase: WorkerProfileUseCase
-    @Injected var centerProfileUseCase: CenterProfileUseCase
-    @Injected var userInfoLocalRepository: UserInfoLocalRepository
     
     // network monitoring
     private let networkMonitor: NWPathMonitor = .init()
