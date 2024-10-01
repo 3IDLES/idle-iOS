@@ -1,6 +1,6 @@
 //
-//  asd.swift
-//  RootFeature
+//  RemoteConfigService.swift
+//  SplashFeature
 //
 //  Created by choijunios on 9/29/24.
 //

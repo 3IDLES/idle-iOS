@@ -2,7 +2,7 @@
 //  Project.swift
 //  ProjectDescriptionHelpers
 //
-//  Created by choijunios on 2024/07/25
+//  Created by choijunios on 2024/10/01
 //
 
 import ProjectDescription
@@ -11,7 +11,7 @@ import ConfigurationPlugin
 import DependencyPlugin
 
 let project = Project(
-    name: "Root",
+    name: "Splash",
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
@@ -19,28 +19,20 @@ let project = Project(
         
         /// FeatureConcrete
         .target(
-            name: "RootFeature",
+            name: "SplashFeature",
             destinations: DeploymentSettings.platforms,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: [
-                "Sources/**",
-                SecretSource.amplitudeConfig,
-            ],
+            sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-
                 // Presentation
-                D.Presentation.SplashFeature,
-                D.Presentation.AuthFeature,
-                D.Presentation.WorkerFeature,
-                D.Presentation.CenterFeature,
-                D.Presentation.NotificationPageFeature,
+                D.Presentation.BaseFeature,
                 
-                // ThirParty
-                D.ThirdParty.Amplitude,
-                D.ThirdParty.FirebaseMessaging,
+                // ThirdParty
+                D.ThirdParty.FirebaseRemoteConfig,
+                D.ThirdParty.FirebaseCrashlytics,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -49,7 +41,7 @@ let project = Project(
         
         /// FeatureConcrete ExampleApp
         .target(
-            name: "Root_ExampleApp",
+            name: "Splash_ExampleApp",
             destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -58,7 +50,7 @@ let project = Project(
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
-                .target(name: "RootFeature"),
+                .target(name: "SplashFeature"),
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -67,14 +59,14 @@ let project = Project(
     ],
     schemes: [
         Scheme.makeSchemes(
-            .target("RootFeature"),
+            .target("SplashFeature"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
             ]
         ),
         Scheme.makeSchemes(
-            .target("Root_ExampleApp"),
+            .target("Splash_ExampleApp"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
