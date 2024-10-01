@@ -6,35 +6,50 @@
 //
 
 import Foundation
+import BaseFeature
+import Core
 
 
-public protocol Coordinator2: AnyObject {
+public class AppCoordinator: BaseCoordinator {
     
-    /// Coordinator를 시작한다.
-    func start()
+    let router: Router
+    
+    public init(router: Router) {
+        self.router = router
+    }
+    
 }
 
-
-/// 자식 코디네이터를 가질 수 있는 코디네이터
-public class BaseCoordinator: Coordinator2 {
+extension AppCoordinator {
     
-    var children: [Coordinator2] = []
-    
-    
-    public init(children: [Coordinator2] = []) {
-        self.children = children
+    /// SplashFlow를 시작합니다.
+    func runSplashFlow() {
+        
     }
     
-    open func start() { }
     
-    public func addChild(_ coordinator: Coordinator2) {
+    /// AuthFlow를 시작합니다.
+    func runAuthFlow() {
         
-        children.append(coordinator)
     }
     
-    public func removeChild(_ coordinator: Coordinator2) {
+    
+    /// CenterCetrificateFlow를 시작합니다.
+    func runCenterCertificateFlow() {
         
-        children.removeAll { $0 === coordinator}
+        
+    }
+    
+    
+    /// CenterMainFlow를 시작합니다.
+    func runCenterMainFlow() {
+            
+    }
+    
+    
+    /// WorkerMainFlow를 시작합니다.
+    func runWorkerMainFlow() {
+        
+        
     }
 }
-
