@@ -64,9 +64,8 @@ public class SplashCoordinator: BaseCoordinator {
          
         let module = SplashPageVC()
         
-        router.push(
-            module: module,
-            animated: false
+        router.setRootModuleTo(
+            module: module
         )
         
         checkNetworkFlow()
@@ -90,7 +89,7 @@ public class SplashCoordinator: BaseCoordinator {
     
     /// 딥링크 단계를 수행합니다.
     /// 필수 인증 단계를 통과하지 못하면 false를 반환합니다.
-    func startWithDeepLink(successCompletion: @escaping (UserType) -> ()) {
+    public func startWithDeepLink(successCompletion: @escaping (UserType) -> ()) {
         
         let module = SplashPageVC()
         
@@ -212,7 +211,7 @@ private extension SplashCoordinator {
                 
                 printIfDebug("앱 버전: \(appVersion) 최소앱버전: \(minAppVersion)")
                 
-                return minAppVersion > appVersion
+                return minAppVersion <= appVersion
             }
             .share()
         
@@ -230,7 +229,7 @@ private extension SplashCoordinator {
                         name: "앱 종료",
                         action: { exit(0) })
                     )
-                    .setAcceptAction(.init(
+                    .setCancelAction(.init(
                         name: "앱 업데이트",
                         action: {
                             let url = "itms-apps://itunes.apple.com/app/6670529341";
@@ -276,10 +275,17 @@ private extension SplashCoordinator {
             })
             .disposed(by: disposeBag)
         
-        
-        let workerUser = userFound.filter({ $0 == .worker })
-        let centerUser = userFound.filter({ $0 == .center })
-           
+        userFound
+            .unretained(self)
+            .subscribe(onNext: { (object, userType) in
+                switch userType {
+                case .center:
+                    object.checkCenterFlow()
+                case .worker:
+                    object.checkWorkerFlow()
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     func checkWorkerFlow() {

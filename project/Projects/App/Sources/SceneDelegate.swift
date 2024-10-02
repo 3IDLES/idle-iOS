@@ -8,13 +8,20 @@
 import UIKit
 import PresentationCore
 import Core
+import RootFeature
+import BaseFeature
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
     // RootCoordinator
-    var rootCoordinator: RootCoordinator!
+    let router: Router = .init()
+    
+    lazy var appCoordinator: AppCoordinator = {
+        let coodinator = AppCoordinator(router: router)
+        return coodinator
+    }()
     
     // FCMService
     var fcmService: FCMService!
@@ -24,8 +31,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
         
         window = UIWindow(windowScene: windowScene)
+        window?.makeKeyAndVisible()
         
-        let rootNavigationController = UINavigationController()
         let injector = DependencyInjector.shared
         
         injector
@@ -37,13 +44,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // FCMService
         fcmService = FCMService()
-        
-        // RootCoordinator
-        rootCoordinator = RootCoordinator(navigationController: rootNavigationController)
-        
-        rootCoordinator?.start()
-        
-        window?.rootViewController = rootNavigationController
-        window?.makeKeyAndVisible()
+    
+        // Start AppCoodinator
+        appCoordinator.start()
     }
 }

@@ -35,14 +35,14 @@ public extension ObservableType where Element == Bool {
     func onSuccess() -> Observable<Void> {
         
         self
-            .filter { !$0 }
+            .filter { $0 }
             .mapToVoid()
     }
     
     func onSuccess<T>(transform: @escaping () throws -> T) -> Observable<T> {
         
         self
-            .filter { !$0 }
+            .filter { $0 }
             .mapToVoid()
             .map(transform)
             .asObservable()
@@ -51,7 +51,7 @@ public extension ObservableType where Element == Bool {
     func onSuccess(onNext: @escaping () -> Void) -> Disposable {
         
         self
-            .filter { !$0 }
+            .filter { $0 }
             .mapToVoid()
             .subscribe(onNext: onNext)
     }
@@ -59,14 +59,14 @@ public extension ObservableType where Element == Bool {
     func onFailure() -> Observable<Void> {
         
         self
-            .filter { $0 }
+            .filter { !$0 }
             .mapToVoid()
     }
     
     func onFailure<T>(transform: @escaping () throws -> T) -> Observable<T> {
         
         self
-            .filter { $0 }
+            .filter { !$0 }
             .mapToVoid()
             .map(transform)
             .asObservable()
@@ -75,7 +75,7 @@ public extension ObservableType where Element == Bool {
     func onFailure(onNext: @escaping () -> Void) -> Disposable {
         
         self
-            .filter { $0 }
+            .filter { !$0 }
             .mapToVoid()
             .subscribe(onNext: onNext)
     }

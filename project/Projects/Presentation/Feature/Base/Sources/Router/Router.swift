@@ -73,7 +73,9 @@ public final class Router: NSObject, RouterProtocol {
         rootController?.topViewController
     }
     
-    public override init() { }
+    public override init() {
+        super.init()
+    }
     
     public func present(_ module: Module, animated: Bool, modalPresentationSytle: UIModalPresentationStyle, completion: RoutingCompletion? = nil) {
         

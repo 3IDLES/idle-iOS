@@ -67,7 +67,7 @@ public class IdleAlertObject {
         let name: String
         let action: (() -> ())?
         
-        public init(name: String, action: (() -> Void)?) {
+        public init(name: String, action: (() -> Void)? = nil) {
             self.name = name
             self.action = action
         }
