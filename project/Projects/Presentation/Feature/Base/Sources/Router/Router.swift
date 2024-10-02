@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 public protocol RouterProtocol {
     
@@ -48,6 +49,10 @@ public protocol RouterProtocol {
     
     /// RootController를 생성및 KeyWindow의 루트로 지정
     func setRootModuleTo(module: Module)
+    
+    
+    /// Default alert를 표출
+    func showDefaultAlert(alertVO: DefaultAlertContentVO)
 }
 
 public final class Router: NSObject, RouterProtocol {
@@ -164,6 +169,27 @@ public final class Router: NSObject, RouterProtocol {
         keyWindow.rootViewController = navigationController
         
         self.rootController = navigationController
+    }
+    
+    public func presentDefaultAlertController(alertVO: DefaultAlertContentVO) {
+        
+        let alertController = UIAlertController(
+            title: alertVO.title,
+            message: alertVO.message,
+            preferredStyle: .alert
+        )
+        let closeAction = UIAlertAction(title: alertVO.dismissButtonLabelText, style: .default) { _ in
+            
+            // on dismiss
+            alertVO.onDismiss?()
+        }
+        alertController.addAction(closeAction)
+        
+        self.present(
+            alertController,
+            animated: true,
+            modalPresentationSytle: .automatic
+        )
     }
 }
 
