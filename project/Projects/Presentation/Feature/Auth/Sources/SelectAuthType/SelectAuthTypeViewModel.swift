@@ -11,36 +11,37 @@ import RxCocoa
 import BaseFeature
 
 class SelectAuthTypeViewModel: BaseViewModel {
-    
-    weak var coordinator: SelectAuthTypeCoordinator?
-    
+
     let loginAsCenterButtonClicked: PublishRelay<Void> = .init()
     let registerAsCenterButtonClicked: PublishRelay<Void> = .init()
     let registerAsWorkerButtonClicked: PublishRelay<Void> = .init()
     
-    init(coordinator: SelectAuthTypeCoordinator?) {
-        self.coordinator = coordinator
+    var presentLoginPage: (() -> ())!
+    var presentCenterRegisterPage: (() -> ())!
+    var presentWorkerRegisterPage: (() -> ())!
+    
+    override init() {
         
         super.init()
         
         loginAsCenterButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                self.coordinator?.startCenterLoginFlow()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentLoginPage()
             })
             .disposed(by: disposeBag)
         
         registerAsCenterButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                self.coordinator?.registerAsCenter()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentCenterRegisterPage()
             })
             .disposed(by: disposeBag)
         
         registerAsWorkerButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                self.coordinator?.registerAsWorker()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentWorkerRegisterPage()
             })
             .disposed(by: disposeBag)
     }
