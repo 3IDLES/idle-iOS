@@ -107,6 +107,20 @@ private extension SplashCoordinator {
             .onFailure {
                 
                 // 재시도 Alert
+                let alertVO = DefaultAlertContentVO(
+                    title: "인터넷 연결이 불안정해요",
+                    message: "Wi-Fi 또는 셀룰러 데이터 연결을 확인한 후 다시 시도해 주세요.",
+                    dismissButtonLabelText: "다시 시도하기") { [weak self] in
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now()+1) { [weak self] in
+                            guard let self else { return }
+                            
+                            if self.networkMonitor.currentPath.status == .unsatisfied {
+                                
+                                self.networtIsAvailablePublisher.onNext(false)
+                            }
+                        }
+                    }
             }
             .disposed(by: disposeBag)
             
