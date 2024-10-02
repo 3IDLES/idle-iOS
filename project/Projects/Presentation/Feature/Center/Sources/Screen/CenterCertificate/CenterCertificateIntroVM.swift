@@ -40,17 +40,18 @@ public class CenterCertificateIntroVM: BaseViewModel {
         
         // MARK: 로그아웃
         logoutButtonClicked
-            .subscribe(onNext: { [weak self] in
+            .subscribe(onNext: {
+                [weak self] in
                 guard let self else { return }
                 let object = IdleAlertObject()
                     .setTitle("로그아웃하시겠어요?")
-                    .setAcceptButtonLabelText("로그아웃")
-                    .setCancelButtonLabelText("취소하기")
-                
-                object
-                    .acceptButtonClicked
-                    .bind(to: signOutButtonComfirmed)
-                    .disposed(by: disposeBag)
+                    .setAcceptAction(.init(
+                        name: "로그아웃",
+                        action: { [signOutButtonComfirmed] in
+                            signOutButtonComfirmed.onNext(())
+                        }
+                    ))
+                    .setCancelAction(.init(name: "취소하기"))
                 
                 alertObject.onNext(object)
             })

@@ -25,14 +25,6 @@ class RootCoordinator {
     
     func start() {
         navigationController.setNavigationBarHidden(true, animated: false)
-        
-        // Root VC
-        let vc = InitialScreenVC()
-        let vm = InitialScreenVM(coordinator: self)
-        
-        vc.bind(viewModel: vm)
-        
-        navigationController.pushViewController(vc, animated: false)
     }
     
     func popViewController() {
