@@ -5,9 +5,10 @@
 //  Created by choijunios on 10/1/24.
 //
 
-import Foundation
+import UIKit
 import Network
 import BaseFeature
+import DSKit
 import Domain
 import Core
 
@@ -199,35 +200,31 @@ public extension SplashCoordinator {
                 let object = IdleAlertObject()
                     .setTitle("최신 버전의 앱이 있어요")
                     .setDescription("유저분들의 의견을 반영해 앱을 더 발전시켰어요.\n보다 좋은 서비스를 만나기 위해, 업데이트해주세요.")
-                    .setAcceptButtonLabelText("앱 종료")
-                    .setCancelButtonLabelText("앱 업데이트")
+                    .setAcceptAction(.init(
+                        name: "앱 종료",
+                        action: { exit(0) })
+                    )
+                    .setAcceptAction(.init(
+                        name: "앱 업데이트",
+                        action: {
+                            let url = "itms-apps://itunes.apple.com/app/6670529341";
+                            if let url = URL(string: url), UIApplication.shared.canOpenURL(url) {
+                                UIApplication.shared.open(url, options: [:])
+                            }
+                        })
+                    )
                 
-                object
-                    .cancelButtonClicked
-                    .subscribe(onNext: {
-                        let url = "itms-apps://itunes.apple.com/app/6670529341";
-                        if let url = URL(string: url), UIApplication.shared.canOpenURL(url) {
-                            UIApplication.shared.open(url, options: [:])
-                        }
-                    })
-                    .disposed(by: disposeBag)
-                
-                object
-                    .acceptButtonClicked
-                    .subscribe(onNext: {
-                        // 어플리케이션 종료
-                        exit(0)
-                    })
-                    .disposed(by: disposeBag)
-                
-                alertObject.onNext(object)
+                router.presentIdleAlertController(
+                    type: .red,
+                    object: object
+                )
             }
             .disposed(by: disposeBag)
         
         // 강제업데이트 필요하지 않음
         passForceUpdate
             .onSuccess()
-            .bind(to: checkForceUpdatePassed)
+            .bind(to: forceUpdateCheckingPassed)
             .disposed(by: disposeBag)
     }
 }
