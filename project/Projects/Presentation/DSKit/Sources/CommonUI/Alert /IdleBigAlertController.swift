@@ -63,13 +63,20 @@ public class DefaultIdleAlertVM: IdleAlertViewModelable {
 
 public class IdleAlertObject {
     
+    public struct Action {
+        let name: String
+        let action: (() -> ())?
+        
+        public init(name: String, action: (() -> Void)?) {
+            self.name = name
+            self.action = action
+        }
+    }
+    
     public private(set) var title: String = ""
     public private(set) var description: String = ""
-    public private(set) var acceptButtonLabelText: String = ""
-    public private(set) var cancelButtonLabelText: String = ""
-    
-    public var acceptButtonClicked: PublishRelay<Void> = .init()
-    public var cancelButtonClicked: PublishRelay<Void> = .init()
+    public private(set) var acceptAction: Action = .init(name: "", action: nil)
+    public private(set) var cancelAction: Action = .init(name: "", action: nil)
     
     public init() { }
     
@@ -83,13 +90,13 @@ public class IdleAlertObject {
         return self
     }
     
-    public func setAcceptButtonLabelText(_ text: String) -> Self {
-        self.acceptButtonLabelText = text
+    public func setAcceptAction(_ action: Action) -> Self {
+        self.acceptAction = action
         return self
     }
     
-    public func setCancelButtonLabelText(_ text: String) -> Self {
-        self.cancelButtonLabelText = text
+    public func setCancelAction(_ action: Action) -> Self {
+        self.cancelAction = action
         return self
     }
 }
@@ -237,8 +244,8 @@ public class IdleBigAlertController: UIViewController {
         descriptionLabel.textString = object.description
         descriptionLabel.textAlignment = .center
         
-        acceptButton.label.textString = object.acceptButtonLabelText
-        cancelButton.label.textString = object.cancelButtonLabelText
+        acceptButton.label.textString = object.acceptAction.name
+        cancelButton.label.textString = object.cancelAction.name
         
         
         Observable.merge(
@@ -255,11 +262,17 @@ public class IdleBigAlertController: UIViewController {
         .disposed(by: disposeBag)
         
         acceptButton.rx.tap
-            .bind(to: object.acceptButtonClicked)
+            .subscribe(onNext: { [object] _ in
+                
+                object.acceptAction.action?()
+            })
             .disposed(by: disposeBag)
             
         cancelButton.rx.tap
-            .bind(to: object.cancelButtonClicked)
+            .subscribe(onNext: { [object] _ in
+                
+                object.cancelAction.action?()
+            })
             .disposed(by: disposeBag)
     }
     

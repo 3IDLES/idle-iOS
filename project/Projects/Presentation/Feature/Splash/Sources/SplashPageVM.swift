@@ -144,7 +144,7 @@ class SplashPageVM: BaseViewModel {
                 object
                     .acceptButtonClicked
                     .subscribe(onNext: {
-                        // 어플리케이션 종ㄹ
+                        // 어플리케이션 종료
                         exit(0)
                     })
                     .disposed(by: disposeBag)

@@ -9,9 +9,12 @@ import Foundation
 import Network
 import BaseFeature
 import Domain
+import Core
 
 
 import RxSwift
+import FirebaseCrashlytics
+import FirebaseRemoteConfig
 
 public enum SplashCoordinatorDestination {
     case authPage
@@ -27,14 +30,14 @@ public class SplashCoordinator: BaseCoordinator {
     public var startFlow: ((SplashCoordinatorDestination) -> ())?
     
     // #1. 네트워크 연결상태 확인
-    private let cehckNetworkPassed: PublishSubject<Void> = .init()
+    private let networkCheckingPassed: PublishSubject<Void> = .init()
     
     private let networkMonitor: NWPathMonitor = .init()
     private let networkMonitoringQueue = DispatchQueue.global(qos: .background)
     private let networkConnectionState: PublishSubject<Bool> = .init()
     
     // #2. 강제 업데이트 확인
-    let checkForceUpdatePassed: PublishSubject<Bool> = .init()
+    let forceUpdateCheckingPassed: PublishSubject<Void> = .init()
     
     // #3. 유저 인증정보 확인
     /// - 요양보호사 토큰이 유효한가?
@@ -99,31 +102,38 @@ private extension SplashCoordinator {
         networkConnectionState
             .onSuccess()
             .take(1)
-            .bind(to: cehckNetworkPassed)
+            .bind(to: networkCheckingPassed)
             .disposed(by: disposeBag)
         
         // 네트워크가 연결되지 않음
         networkConnectionState
-            .onFailure {
+            .onFailure { [router] in
                 
-                // 재시도 Alert
-                let alertVO = DefaultAlertContentVO(
-                    title: "인터넷 연결이 불안정해요",
-                    message: "Wi-Fi 또는 셀룰러 데이터 연결을 확인한 후 다시 시도해 주세요.",
-                    dismissButtonLabelText: "다시 시도하기") { [weak self] in
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now()+1) { [weak self] in
-                            guard let self else { return }
+                let alertObject = DefaultAlertObject()
+                
+                alertObject
+                    .setTitle("인터넷 연결이 불안정해요")
+                    .setDescription("Wi-Fi 또는 셀룰러 데이터 연결을 확인한 후 다시 시도해 주세요.")
+                    .addAction(.init(
+                        titleName: "다시 시도하기") {
                             
-                            if self.networkMonitor.currentPath.status == .unsatisfied {
+                            DispatchQueue.main.asyncAfter(deadline: .now()+1) { [weak self] in
+                                guard let self else { return }
                                 
-                                self.networtIsAvailablePublisher.onNext(false)
+                                let status = self.networkMonitor.currentPath.status
+                                
+                                self.networkConnectionState
+                                    .onNext(status == .requiresConnection ||
+                                            status == .satisfied
+                                    )
                             }
                         }
-                    }
+                    )
+                
+                router
+                    .presentDefaultAlertController(object: alertObject)
             }
             .disposed(by: disposeBag)
-            
     }
     
     func startNeworkMonitoring() {
@@ -143,3 +153,81 @@ private extension SplashCoordinator {
     }
 }
 
+// MARK: 강제업데이트 유무 확인하기
+public extension SplashCoordinator {
+    
+    func checkForceUpdateFlow() {
+        
+        let passForceUpdate = networkCheckingPassed
+            .flatMap({ _ in
+                RemoteConfigService.shared.fetchRemoteConfig()
+            })
+            .compactMap { $0.value }
+            .map { isConfigFetched in
+                
+                if !isConfigFetched {
+                    Crashlytics.crashlytics().log("Remote Config fetch실패")
+                }
+                
+                guard let config = RemoteConfigService.shared.getForceUpdateInfo() else {
+                    // ‼️ Config로딩 불가시 크래쉬
+                    Crashlytics.crashlytics().log("Remote Config획득 실패")
+                    fatalError("Remote Config fetching에러")
+                }
+                
+                return config
+            }
+            .map { info in
+                
+                let minAppVersion = info.minVersion
+                
+                let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
+                
+                printIfDebug("앱 버전: \(appVersion) 최소앱버전: \(minAppVersion)")
+                
+                return minAppVersion > appVersion
+            }
+            .share()
+        
+        // 강제업데이트 필요
+        passForceUpdate
+            .onFailure { [weak self] in
+                
+                guard let self else { return }
+                
+                // 네트워크 연결되지 않음
+                let object = IdleAlertObject()
+                    .setTitle("최신 버전의 앱이 있어요")
+                    .setDescription("유저분들의 의견을 반영해 앱을 더 발전시켰어요.\n보다 좋은 서비스를 만나기 위해, 업데이트해주세요.")
+                    .setAcceptButtonLabelText("앱 종료")
+                    .setCancelButtonLabelText("앱 업데이트")
+                
+                object
+                    .cancelButtonClicked
+                    .subscribe(onNext: {
+                        let url = "itms-apps://itunes.apple.com/app/6670529341";
+                        if let url = URL(string: url), UIApplication.shared.canOpenURL(url) {
+                            UIApplication.shared.open(url, options: [:])
+                        }
+                    })
+                    .disposed(by: disposeBag)
+                
+                object
+                    .acceptButtonClicked
+                    .subscribe(onNext: {
+                        // 어플리케이션 종료
+                        exit(0)
+                    })
+                    .disposed(by: disposeBag)
+                
+                alertObject.onNext(object)
+            }
+            .disposed(by: disposeBag)
+        
+        // 강제업데이트 필요하지 않음
+        passForceUpdate
+            .onSuccess()
+            .bind(to: checkForceUpdatePassed)
+            .disposed(by: disposeBag)
+    }
+}
