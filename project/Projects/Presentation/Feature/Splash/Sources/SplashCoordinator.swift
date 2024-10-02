@@ -26,9 +26,15 @@ public enum SplashCoordinatorDestination {
 
 public class SplashCoordinator: BaseCoordinator {
     
+    // DI
+    @Injected var authUseCase: AuthUseCase
+    @Injected var workerProfileUseCase: WorkerProfileUseCase
+    @Injected var centerProfileUseCase: CenterProfileUseCase
+    @Injected var userInfoLocalRepository: UserInfoLocalRepository
+    
     let router: Router
     
-    public var startFlow: ((SplashCoordinatorDestination) -> ())?
+    public var startFlow: ((SplashCoordinatorDestination) -> ())!
     
     // #1. 네트워크 연결상태 확인
     private let networkCheckingPassed: PublishSubject<Void> = .init()
@@ -45,7 +51,7 @@ public class SplashCoordinator: BaseCoordinator {
     /// - 센터토큰이 유효한가?
     /// - 센터 인증정보가 있는가?
     /// - 센터 프로필 정보가 있는가?
-    let checkUserAuthStatePasssed: PublishSubject<Bool> = .init()
+    let userAuthStateCheckingPasssed: PublishSubject<UserType> = .init()
     
     
     let disposeBag = DisposeBag()
@@ -86,11 +92,12 @@ public class SplashCoordinator: BaseCoordinator {
         )
     }
     
-    func startWithDeepLink() {
+    /// 딥링크 단계를 수행합니다.
+    /// 필수 인증 단계를 통과하지 못하면 false를 반환합니다.
+    func startWithDeepLink(completion: @escaping (Bool) -> ()) {
         
         
     }
-    
     
 }
 
@@ -155,7 +162,7 @@ private extension SplashCoordinator {
 }
 
 // MARK: 강제업데이트 유무 확인하기
-public extension SplashCoordinator {
+private extension SplashCoordinator {
     
     func checkForceUpdateFlow() {
         
@@ -228,3 +235,77 @@ public extension SplashCoordinator {
             .disposed(by: disposeBag)
     }
 }
+
+// MARK: 로컬에 저장된 유저가 있는지 확인
+private extension SplashCoordinator {
+    
+    func checkLocalUser() {
+        
+        let seekLocalUser = forceUpdateCheckingPassed
+            .map { [userInfoLocalRepository] _ in
+                
+                return userInfoLocalRepository.getUserType()
+            }
+        
+        let userFound = seekLocalUser.compactMap({ $0 })
+        let userNotFound = seekLocalUser.filter({ $0 == nil })
+        
+        userNotFound
+            .mapToVoid()
+            .subscribe(onNext: { [weak self] in
+                self?.startFlow(.authPage)
+            })
+            .disposed(by: disposeBag)
+        
+        
+        let workerUser = userFound.filter({ $0 == .worker })
+        let centerUser = userFound.filter({ $0 == .center })
+           
+    }
+    
+    func checkWorkerFlow() {
+        
+        let profileFetchResult = workerProfileUseCase
+            .getFreshProfile(mode: .myProfile)
+            .asObservable()
+            .share()
+        
+        let profileFetchSuccess = profileFetchResult.compactMap { $0.value }
+        let profileFetchFailure = profileFetchResult.compactMap { $0.error }
+        
+        profileFetchSuccess
+            .unretained(self)
+            .map { (object, profileVO) -> UserType in
+                
+                // 불로온 정보 로컬에 저장
+                object.userInfoLocalRepository.updateCurrentWorkerData(vo: profileVO)
+                
+                return .worker
+            }
+            .bind(to: userAuthStateCheckingPasssed)
+            .disposed(by: disposeBag)
+            
+        profileFetchFailure
+            .unretained(self)
+            .subscribe(onNext: { (object, error) in
+                
+                switch error {
+                case .tokenExpiredException:
+                    // 토큰이 만료된 경우
+                    object.startFlow(.authPage)
+                default:
+                    // 토큰과 무관한 에러상황
+                    let alertVO = DefaultAlertObject()
+                    alertVO
+                        .setTitle("초기화면 오류")
+                        .setDescription(error.message)
+                        .addAction(.init(
+                            titleName: "앱 종료",
+                            action: { exit(1) }
+                        ))
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
