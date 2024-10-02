@@ -20,7 +20,6 @@ open class BaseCoordinator: Coordinator2 {
     
     var children: [Coordinator2] = []
     
-    
     public init(children: [Coordinator2] = []) {
         self.children = children
     }
