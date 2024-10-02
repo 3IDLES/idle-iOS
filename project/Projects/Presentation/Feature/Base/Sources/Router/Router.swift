@@ -8,6 +8,7 @@
 import UIKit
 import Domain
 import DSKit
+import PresentationCore
 
 public protocol RouterProtocol {
     
@@ -203,6 +204,10 @@ public final class Router: NSObject, RouterProtocol {
             modalPresentationSytle: .automatic
         )
     }
+}
+
+// MARK: Alert
+extension Router {
     
     public func presentIdleAlertController(type: IdleBigAlertController.ButtonType, object: DSKit.IdleAlertObject) {
         
@@ -210,6 +215,17 @@ public final class Router: NSObject, RouterProtocol {
         alertVC.bindObject(object)
         alertVC.modalPresentationStyle = .custom
         self.present(alertVC, animated: true, modalPresentationSytle: .custom)
+    }
+}
+
+extension Router {
+    
+    public func presentAnonymousCompletePage(_ object: AnonymousCompleteVCRenderObject) {
+        
+        let completeViewController = AnonymousCompleteVC()
+        completeViewController.applyRO(object)
+        
+        self.push(module: completeViewController, animated: true)
     }
 }
 
