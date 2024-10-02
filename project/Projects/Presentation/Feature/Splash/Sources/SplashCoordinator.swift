@@ -62,49 +62,68 @@ public class SplashCoordinator: BaseCoordinator {
     
     public override func start() {
          
-        let viewModel = SplashPageVM()
-        
-        viewModel.startAuthFlow = { [weak self] in
-            self?.startFlow?(.authPage)
-        }
-        
-        viewModel.startCenterMainFlow = { [weak self] in
-            self?.startFlow?(.mainPage(userType: .center))
-        }
-        
-        viewModel.startWorkerMainFlow = { [weak self] in
-            self?.startFlow?(.mainPage(userType: .worker))
-        }
-        
-        viewModel.startCenterCertificateFlow = { [weak self] in
-            self?.startFlow?(.centerCertificatePage)
-        }
-        
-        viewModel.startMakingCenterProfileFlow = { [weak self] in
-            self?.startFlow?(.centerMakeProfilePage)
-        }
-        
-        let viewController = SplashPageVC(viewModel: viewModel)
+        let module = SplashPageVC()
         
         router.push(
-            module: viewController,
+            module: module,
             animated: false
         )
+        
+        checkNetworkFlow()
+        checkForceUpdateFlow()
+        checkUserFlow()
+        startNeworkMonitoring()
+        
+        Observable
+            .zip(
+                networkCheckingPassed,
+                forceUpdateCheckingPassed,
+                userAuthStateCheckingPasssed
+            )
+            .unretained(self)
+            .subscribe(onNext: { (object, arg1) in
+                let (_, _, userType) = arg1
+                object.startFlow(.mainPage(userType: userType))
+            })
+            .disposed(by: disposeBag)
     }
     
     /// 딥링크 단계를 수행합니다.
     /// 필수 인증 단계를 통과하지 못하면 false를 반환합니다.
-    func startWithDeepLink(completion: @escaping (Bool) -> ()) {
+    func startWithDeepLink(successCompletion: @escaping (UserType) -> ()) {
         
+        let module = SplashPageVC()
         
+        router.push(
+            module: module,
+            animated: false
+        )
+        
+        checkNetworkFlow()
+        checkForceUpdateFlow()
+        checkUserFlow()
+        startNeworkMonitoring()
+        
+        Observable
+            .zip(
+                networkCheckingPassed,
+                forceUpdateCheckingPassed,
+                userAuthStateCheckingPasssed
+            )
+            .unretained(self)
+            .subscribe(onNext: { (object, arg1) in
+                let (_, _, userType) = arg1
+                
+                successCompletion(userType)
+            })
+            .disposed(by: disposeBag)
     }
-    
 }
 
 // MARK: 네트워크 확인
 private extension SplashCoordinator {
     
-    func networkCheckingFlow() {
+    func checkNetworkFlow() {
         
         // 네트워가 연결된 상태
         networkConnectionState
@@ -239,7 +258,7 @@ private extension SplashCoordinator {
 // MARK: 로컬에 저장된 유저가 있는지 확인
 private extension SplashCoordinator {
     
-    func checkLocalUser() {
+    func checkUserFlow() {
         
         let seekLocalUser = forceUpdateCheckingPassed
             .map { [userInfoLocalRepository] _ in

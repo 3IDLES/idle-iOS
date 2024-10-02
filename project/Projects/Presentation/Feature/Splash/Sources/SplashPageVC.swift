@@ -20,13 +20,8 @@ public class SplashPageVC: BaseViewController {
     
     // View
     
-    public init(viewModel: SplashPageVM) {
+    public init() {
         super.init(nibName: nil, bundle: nil)
-        
-        self.rx.viewDidLoad
-            .map({ _ in })
-            .bind(to: viewModel.viewDidLoad)
-            .disposed(by: disposeBag)
     }
     
     public required init?(coder: NSCoder) { fatalError() }
