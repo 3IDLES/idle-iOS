@@ -173,6 +173,7 @@ public final class Router: NSObject, RouterProtocol {
     public func setRootModuleTo(module: Module) {
         guard let keyWindow = UIWindow.keyWindow else { return }
         let navigationController = UINavigationController(rootViewController: module)
+        navigationController.setNavigationBarHidden(true, animated: false)
         
         keyWindow.rootViewController = navigationController
         
