@@ -2,11 +2,12 @@
 //  AppCoordinator.swift
 //  RootFeature
 //
-//  Created by choijunios on 10/1/24.
+//  Created by choijunios on 10/2/24.
 //
 
 import Foundation
 import BaseFeature
+import SplashFeature
 import Core
 
 
@@ -24,6 +25,8 @@ extension AppCoordinator {
     
     /// SplashFlow를 시작합니다.
     func runSplashFlow() {
+        
+        let coordinator = SplashCoordinator(router: router)
         
     }
     

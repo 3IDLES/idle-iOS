@@ -16,7 +16,7 @@ public protocol Coordinator2: AnyObject {
 
 
 /// 자식 코디네이터를 가질 수 있는 코디네이터
-public class BaseCoordinator: Coordinator2 {
+open class BaseCoordinator: Coordinator2 {
     
     var children: [Coordinator2] = []
     
