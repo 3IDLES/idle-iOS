@@ -1,5 +1,5 @@
 //
-//  CenterRegisterViewModel.swift
+//  CenterAccountRegisterViewModel.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/6/24.
@@ -14,14 +14,15 @@ import Core
 import RxSwift
 import RxCocoa
 
-public class CenterRegisterViewModel: BaseViewModel, ViewModelType {
+public class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
     
-    // Init
-    weak var coordinator: CenterRegisterCoordinator?
-    
-    // UseCase
+    // Injected
     @Injected var inputValidationUseCase: AuthInputValidationUseCase
     @Injected var authUseCase: AuthUseCase
+    
+    var presentNextPage: (() -> ())!
+    var presentPrevPage: (() -> ())!
+    var presentCompleteScreen: (() -> ())!
     
     // Input은 모든 ViewController에서 공유한다. (다만, 각가의 ViewController의 Input프로토콜에 의해 제한된다.)
     public let input = Input()
@@ -29,9 +30,7 @@ public class CenterRegisterViewModel: BaseViewModel, ViewModelType {
     
     internal let stateObject = CenterRegisterState()
     
-    public init(coordinator: CenterRegisterCoordinator) {
-        
-        self.coordinator = coordinator
+    public override init() {
         
         super.init()
         
@@ -82,17 +81,17 @@ public class CenterRegisterViewModel: BaseViewModel, ViewModelType {
         // MARK: 화면 페이지네이션
         input
             .nextButtonClicked
-            .subscribe(onNext: { [weak self] in
-                guard let self else { return }
-                self.coordinator?.next()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentNextPage()
             })
             .disposed(by: disposeBag)
         
         input
             .prevButtonClicked
-            .subscribe(onNext: { [weak self] in
-                guard let self else { return }
-                self.coordinator?.prev()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentPrevPage()
             })
             .disposed(by: disposeBag)
     }
@@ -103,7 +102,7 @@ public class CenterRegisterViewModel: BaseViewModel, ViewModelType {
 }
 
 // MARK: ViewModel input output
-extension CenterRegisterViewModel {
+extension CenterAccountRegisterViewModel {
     
     public class Input {
         
@@ -164,7 +163,7 @@ extension CenterRegisterViewModel {
     }
 }
 
-extension CenterRegisterViewModel {
+extension CenterAccountRegisterViewModel {
     
     func registerInOut() {
         // MARK: 최종 회원가입 버튼
@@ -194,8 +193,9 @@ extension CenterRegisterViewModel {
         let loginFailure = loginResult.compactMap { $0.error }
         
         loginSuccess
-            .subscribe(onNext: { [weak self] in
-                self?.coordinator?.showCompleteScreen()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentCompleteScreen()
             })
             .disposed(by: disposeBag)
         
@@ -217,7 +217,7 @@ extension CenterRegisterViewModel {
     }
 }
 
-extension CenterRegisterViewModel {
+extension CenterAccountRegisterViewModel {
     
     func validateBusinessNumberInOut() {
         // MARK: 사업자 번호 입력
@@ -238,7 +238,7 @@ extension CenterRegisterViewModel {
                 
                 let businessNumber = input.editingBusinessNumber.value
                 let formatted = AuthInOutStreamManager.formatBusinessNumber(businessNumber: businessNumber)
-                printIfDebug("[CenterRegisterViewModel] 사업자 번호 인증 요청: \(formatted)")
+                printIfDebug("[CenterAccountRegisterViewModel] 사업자 번호 인증 요청: \(formatted)")
                 return inputValidationUseCase
                     .requestBusinessNumberAuthentication(businessNumber: formatted)
             }
@@ -290,23 +290,23 @@ extension CenterRegisterViewModel {
 // MARK: Input Validation
 
 // CTAButton
-extension CenterRegisterViewModel.Input: PageProcessInputable { }
+extension CenterAccountRegisterViewModel.Input: PageProcessInputable { }
 
 // Enter name
-extension CenterRegisterViewModel.Input: EnterNameInputable { }
-extension CenterRegisterViewModel.Output: EnterNameOutputable { }
+extension CenterAccountRegisterViewModel.Input: EnterNameInputable { }
+extension CenterAccountRegisterViewModel.Output: EnterNameOutputable { }
 
 // Auth phoneNumber
-extension CenterRegisterViewModel.Input: AuthPhoneNumberInputable { }
-extension CenterRegisterViewModel.Output: AuthPhoneNumberOutputable { }
+extension CenterAccountRegisterViewModel.Input: AuthPhoneNumberInputable { }
+extension CenterAccountRegisterViewModel.Output: AuthPhoneNumberOutputable { }
 
 // Auth Business owner
-extension CenterRegisterViewModel.Input: AuthBusinessOwnerInputable { }
-extension CenterRegisterViewModel.Output: AuthBusinessOwnerOutputable { }
+extension CenterAccountRegisterViewModel.Input: AuthBusinessOwnerInputable { }
+extension CenterAccountRegisterViewModel.Output: AuthBusinessOwnerOutputable { }
 
 // Id & Password
-extension CenterRegisterViewModel.Input: SetIdInputable { }
-extension CenterRegisterViewModel.Input: SetPasswordInputable { }
-extension CenterRegisterViewModel.Output: SetIdOutputable { }
-extension CenterRegisterViewModel.Output: SetPasswordOutputable { }
+extension CenterAccountRegisterViewModel.Input: SetIdInputable { }
+extension CenterAccountRegisterViewModel.Input: SetPasswordInputable { }
+extension CenterAccountRegisterViewModel.Output: SetIdOutputable { }
+extension CenterAccountRegisterViewModel.Output: SetPasswordOutputable { }
 

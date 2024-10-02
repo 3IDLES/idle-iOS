@@ -14,9 +14,9 @@ import BaseFeature
 import RxCocoa
 import RxSwift
 
-class CenterRegisterViewController: DisposableViewController {
+class CenterAccountRegisterViewController: DisposableViewController {
     
-    var coordinator: CenterRegisterCoordinator?
+    var exitPage: (() -> ())!
     
     var pageViewController: UIPageViewController
     
@@ -100,8 +100,9 @@ class CenterRegisterViewController: DisposableViewController {
     func setObservable() {
         navigationBar
             .eventPublisher
-            .subscribe { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe { (obj, _) in
+                obj.exitPage()
             }
             .disposed(by: disposeBag)
         

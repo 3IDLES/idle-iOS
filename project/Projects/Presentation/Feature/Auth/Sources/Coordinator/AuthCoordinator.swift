@@ -10,11 +10,9 @@ import BaseFeature
 
 public enum AuthCoordinatorDestination {
     
-    case selectAuthTypePage
     case workerRegisterPage
     case centerRegisterPage
     case loginPage
-    case setNewPasswordPage
 }
 
 public class AuthCoordinator: BaseCoordinator {
