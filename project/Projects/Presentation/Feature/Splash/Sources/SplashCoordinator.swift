@@ -307,5 +307,100 @@ private extension SplashCoordinator {
             })
             .disposed(by: disposeBag)
     }
+    
+    func checkCenterFlow() {
+        
+        let centerJoinStatusResult = authUseCase
+            .checkCenterJoinStatus()
+            .asObservable()
+            .share()
+        
+        let centerJoinStatusSuccess = centerJoinStatusResult.compactMap { $0.value }
+        let centerJoinStatusFailure = centerJoinStatusResult.compactMap { $0.error }
+        
+        centerJoinStatusFailure
+            .unretained(self)
+            .subscribe(onNext: { (object, error) in
+                
+                switch error {
+                case .tokenExpiredException, .tokenNotFound:
+                    // 토큰이 만료된 경우
+                    object.startFlow(.authPage)
+                default:
+                    // 토큰과 무관한 에러상황
+                    let alertVO = DefaultAlertObject()
+                    alertVO
+                        .setTitle("초기화면 오류")
+                        .setDescription(error.message)
+                        .addAction(.init(
+                            titleName: "앱 종료",
+                            action: { exit(1) }
+                        ))
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        let checkProfileRegisterResult = centerJoinStatusSuccess
+            .unretained(self)
+            .compactMap { (object, info) -> CenterJoinStatusInfoVO? in
+                
+                switch info.centerManagerAccountStatus {
+                case .approved:
+                    return info
+                case .pending, .new:
+                    
+                    // 센터인증화면으로 이동
+                    object.startFlow(.authPage)
+                    
+                    return nil
+                }
+            }
+            .flatMap { [centerProfileUseCase] _ in
+                centerProfileUseCase
+                    .getProfile(mode: .myProfile)
+            }
+            .share()
+        
+        let profileExists = checkProfileRegisterResult.compactMap { $0.value }
+        let profileDoentExistOrError = checkProfileRegisterResult.compactMap { $0.error }
+        
+        profileDoentExistOrError
+            .unretained(self)
+            .subscribe(onNext: { (object, error) in
+                
+                switch error {
+                case .centerNotFoundException:
+                    
+                    // 센터가 없는 경우 -> 프로필이 등록되지 않음
+                    // 프로필 등록화면으로 이동
+                    object.startFlow(.centerMakeProfilePage)
+                    
+                default:
+                    // 토큰과 무관한 에러상황
+                    let alertVO = DefaultAlertObject()
+                    alertVO
+                        .setTitle("초기화면 오류")
+                        .setDescription(error.message)
+                        .addAction(.init(
+                            titleName: "앱 종료",
+                            action: { exit(1) }
+                        ))
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        // 프로필이 존재함으로 메인화면으로 이동
+        profileExists
+            .unretained(self)
+            .map { (object, profileVO) -> UserType in
+                
+                // 불로온 정보를 로컬에 저장
+                object.userInfoLocalRepository.updateCurrentCenterData(vo: profileVO)
+                
+                return .center
+            }
+            .bind(to: userAuthStateCheckingPasssed)
+            .disposed(by: disposeBag)
+    }
 }
 
