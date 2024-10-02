@@ -37,8 +37,7 @@ public protocol SetPasswordOutputable {
 class SetIdPasswordViewController<T: ViewModelType>: BaseViewController
 where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
       T.Output: SetIdOutputable & SetPasswordOutputable, T: BaseViewModel {
-    
-    var coordinator: CenterRegisterCoordinator?
+
     
     // View
     private let processTitleLabel: IdleLabel = {

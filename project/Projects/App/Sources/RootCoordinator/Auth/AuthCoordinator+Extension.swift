@@ -21,9 +21,7 @@ extension AuthCoordinator: AuthCoordinatable {
     }
     
     public func registerAsCenter() {
-        let coordinator = CenterRegisterCoordinator(navigationController: navigationController)
-        addChildCoordinator(coordinator)
-        coordinator.start()
+        
     }
     
     public func showCompleteScreen(ro: AnonymousCompleteVCRenderObject) {

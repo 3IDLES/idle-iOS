@@ -8,6 +8,7 @@
 import Foundation
 import BaseFeature
 import SplashFeature
+import AuthFeature
 import Core
 
 
@@ -39,9 +40,16 @@ extension AppCoordinator {
             
             switch destination {
             case .authPage:
-                runCenterMainFlow()
+                runAuthFlow()
             case .mainPage(let userType):
-                runWorkerMainFlow()
+                
+                switch userType {
+                case .center:
+                    runCenterMainPageFlow()
+                case .worker:
+                    runWorkerMainPageFlow()
+                }
+                
             case .centerCertificatePage:
                 runCenterCertificateFlow()
             case .centerMakeProfilePage:
@@ -49,16 +57,36 @@ extension AppCoordinator {
             }
         }
         
+        addChild(coordinator)
         coordinator.start()
-        
         
         return coordinator
     }
     
     
     /// AuthFlow를 시작합니다.
-    func runAuthFlow() {
-        printIfDebug("Auth")
+    @discardableResult
+    func runAuthFlow() -> AuthCoordinator {
+        let coordinator = AuthCoordinator(router: router)
+        
+        coordinator.startFlow = { [weak self] destination in
+            
+            guard let self else { return }
+            
+            switch destination {
+            case .centerRegisterPage:
+                centerAccountRegisterFlow()
+            case .workerRegisterPage:
+                return
+            case .loginPage:
+                return
+            }
+        }
+        
+        addChild(coordinator)
+        coordinator.start()
+        
+        return coordinator
     }
     
     
@@ -69,13 +97,13 @@ extension AppCoordinator {
     
     
     /// CenterMainFlow를 시작합니다.
-    func runCenterMainFlow() {
+    func runCenterMainPageFlow() {
         printIfDebug("CenterMain")
     }
     
     
     /// WorkerMainFlow를 시작합니다.
-    func runWorkerMainFlow() {
+    func runWorkerMainPageFlow() {
         printIfDebug("WorkerMain")
     }
     
@@ -83,5 +111,29 @@ extension AppCoordinator {
     /// CenterMakeProfileFlow를 시작합니다.
     func runCenterMakeProfileFlow() {
         printIfDebug("Center make profile")
+    }
+}
+
+// MARK: AuthFlow
+extension AppCoordinator {
+    
+    @discardableResult
+    func centerAccountRegisterFlow() -> CenterAccountRegisterCoordinator {
+        
+        let coordinator = CenterAccountRegisterCoordinator(router: router)
+        coordinator.startFlow = { [weak self] destination in
+            
+            guard let self else { return }
+            
+            switch destination {
+            case .centerMainPage:
+                runCenterMainPageFlow()
+            }
+        }
+        
+        addChild(coordinator)
+        coordinator.start()
+        
+        return coordinator
     }
 }

@@ -28,9 +28,7 @@ class AuthCoordinator: ParentCoordinator {
     
     public func start() {
         
-        let coordinator = SelectAuthTypeCoordinator(navigationController: navigationController)
-        addChildCoordinator(coordinator)
-        coordinator.start()
+        
     }
     
     public func popViewController() {
