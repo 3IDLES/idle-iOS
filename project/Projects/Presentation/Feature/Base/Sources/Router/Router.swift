@@ -7,6 +7,7 @@
 
 import UIKit
 import Domain
+import DSKit
 
 public protocol RouterProtocol {
     
@@ -52,7 +53,11 @@ public protocol RouterProtocol {
     
     
     /// Default alert를 표출
-    func showDefaultAlert(object: DefaultAlertObject)
+    func presentDefaultAlertController(object: DefaultAlertObject)
+    
+    
+    /// Default alert를 표출
+    func presentIdleAlertController(type: IdleBigAlertController.ButtonType, object: IdleAlertObject)
 }
 
 public final class Router: NSObject, RouterProtocol {
@@ -195,6 +200,14 @@ public final class Router: NSObject, RouterProtocol {
             animated: true,
             modalPresentationSytle: .automatic
         )
+    }
+    
+    public func presentIdleAlertController(type: IdleBigAlertController.ButtonType, object: DSKit.IdleAlertObject) {
+        
+        let alertVC = IdleBigAlertController(type: type)
+        alertVC.bindObject(object)
+        alertVC.modalPresentationStyle = .custom
+        self.present(alertVC, animated: true, modalPresentationSytle: .custom)
     }
 }
 
