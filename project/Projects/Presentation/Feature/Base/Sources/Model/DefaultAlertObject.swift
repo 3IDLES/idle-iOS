@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct DefaultAlertObject {
+public final class DefaultAlertObject {
     
     public struct Action {
         let titleName: String
@@ -25,17 +25,20 @@ public struct DefaultAlertObject {
     
     public init() { }
     
-    public mutating func setTitle(_ text: String) -> Self {
+    @discardableResult
+    public func setTitle(_ text: String) -> Self {
         self.title = text
         return self
     }
     
-    public mutating func setDescription(_ text: String) -> Self {
+    @discardableResult
+    public func setDescription(_ text: String) -> Self {
         self.description = text
         return self
     }
     
-    public mutating func addAction(_ action: Action) -> Self {
+    @discardableResult
+    public func addAction(_ action: Action) -> Self {
         actions.append(action)
         return self
     }

@@ -52,7 +52,7 @@ public protocol RouterProtocol {
     
     
     /// Default alert를 표출
-    func showDefaultAlert(alertVO: DefaultAlertContentVO)
+    func showDefaultAlert(object: DefaultAlertObject)
 }
 
 public final class Router: NSObject, RouterProtocol {
@@ -171,19 +171,24 @@ public final class Router: NSObject, RouterProtocol {
         self.rootController = navigationController
     }
     
-    public func presentDefaultAlertController(alertVO: DefaultAlertContentVO) {
+    public func presentDefaultAlertController(object: DefaultAlertObject) {
         
         let alertController = UIAlertController(
-            title: alertVO.title,
-            message: alertVO.message,
+            title: object.title,
+            message: object.description,
             preferredStyle: .alert
         )
-        let closeAction = UIAlertAction(title: alertVO.dismissButtonLabelText, style: .default) { _ in
+        
+        for action in object.actions {
             
-            // on dismiss
-            alertVO.onDismiss?()
+            let alertAction = UIAlertAction(title: action.titleName, style: .default) { _ in
+                
+                // on dismiss
+                action.action?()
+            }
+            
+            alertController.addAction(alertAction)
         }
-        alertController.addAction(closeAction)
         
         self.present(
             alertController,
