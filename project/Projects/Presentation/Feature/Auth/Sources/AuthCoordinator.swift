@@ -27,24 +27,26 @@ public class AuthCoordinator: BaseCoordinator {
     
     public override func start() {
         
-        let vm = SelectAuthTypeViewModel()
+        let viewModel = SelectAuthTypeViewModel()
         
-        vm.presentLoginPage = { [weak self] in
+        viewModel.presentLoginPage = { [weak self] in
             self?.startFlow(.loginPage)
         }
         
-        vm.presentCenterRegisterPage = { [weak self] in
+        viewModel.presentCenterRegisterPage = { [weak self] in
             self?.startFlow(.centerRegisterPage)
         }
         
-        vm.presentWorkerRegisterPage = { [weak self] in
+        viewModel.presentWorkerRegisterPage = { [weak self] in
             self?.startFlow(.workerRegisterPage)
         }
         
-        let vc = SelectAuthTypeViewController()
-        vc.bind(viewModel: vm)
+        let viewController = SelectAuthTypeViewController()
+        viewController.bind(viewModel: viewModel)
         
-        router.push(
-            module: vc, animated: true)
+        router.replaceRootModuleTo(
+            module: viewController,
+            animated: true
+        )
     }
 }

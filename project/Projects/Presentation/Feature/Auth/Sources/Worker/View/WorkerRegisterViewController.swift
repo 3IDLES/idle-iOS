@@ -14,7 +14,7 @@ import BaseFeature
 
 class WorkerRegisterViewController: BaseViewController {
     
-    var coordinator: WorkerRegisterCoordinator?
+    var exitPage: (() -> ())!
     
     var pageViewController: UIPageViewController
     
@@ -90,8 +90,9 @@ class WorkerRegisterViewController: BaseViewController {
     func setObservable() {
         navigationBar
             .backButton.rx.tap
-            .subscribe { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe { (obj, _) in
+                obj.exitPage()
             }
             .disposed(by: disposeBag)
         

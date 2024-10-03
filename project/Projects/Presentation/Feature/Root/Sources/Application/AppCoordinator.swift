@@ -77,7 +77,7 @@ extension AppCoordinator {
             case .centerRegisterPage:
                 centerAccountRegisterFlow()
             case .workerRegisterPage:
-                return
+                workerAccountRegisterFlow()
             case .loginPage:
                 return
             }
@@ -117,6 +117,7 @@ extension AppCoordinator {
 // MARK: AuthFlow
 extension AppCoordinator {
     
+    /// 센터관리자 계정가입을 시작합니다.
     @discardableResult
     func centerAccountRegisterFlow() -> CenterAccountRegisterCoordinator {
         
@@ -128,6 +129,25 @@ extension AppCoordinator {
             switch destination {
             case .centerMainPage:
                 runCenterMainPageFlow()
+            }
+        }
+        
+        addChild(coordinator)
+        coordinator.start()
+        
+        return coordinator
+    }
+    
+    /// 요양보호사 계정가입을 시작합니다.
+    @discardableResult
+    func workerAccountRegisterFlow() -> WorkerAccountRegisterCoordinator {
+        
+        let coordinator = WorkerAccountRegisterCoordinator(router: router)
+        coordinator.startFlow = { [weak self] destination in
+            
+            switch destination {
+            case .workerMainPage:
+                self?.runWorkerMainPageFlow()
             }
         }
         

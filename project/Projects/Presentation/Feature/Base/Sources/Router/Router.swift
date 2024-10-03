@@ -144,6 +144,7 @@ public final class Router: NSObject, RouterProtocol {
         guard let keyWindow = UIWindow.keyWindow else { return }
         
         let navigationController = UINavigationController(rootViewController: module)
+        navigationController.setNavigationBarHidden(true, animated: false)
         
         self.rootController = navigationController
         
