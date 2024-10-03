@@ -1,6 +1,6 @@
 //
 //  RegisterCenterInfoVC.swift
-//  AuthFeature
+//  CenterFeature
 //
 //  Created by choijunios on 7/26/24.
 //
@@ -10,6 +10,7 @@ import BaseFeature
 import PresentationCore
 import Domain
 import DSKit
+import BaseFeature
 
 
 import RxCocoa

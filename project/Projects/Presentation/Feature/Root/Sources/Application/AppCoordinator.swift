@@ -101,6 +101,14 @@ extension AppCoordinator {
     @discardableResult
     func runCenterMainPageFlow() -> CenterMainPageCoordinator {
         let coordinator = CenterMainPageCoordinator(router: router)
+        coordinator.startFlow = { [weak self] destination in
+            
+            switch destination {
+            case .workerProfilePage(let workerId):
+                self?.workerProfileFlow(id: workerId)
+            }
+        }
+        
         addChild(coordinator)
         coordinator.start()
         return coordinator
@@ -182,11 +190,17 @@ extension AppCoordinator {
     
 }
 
-// MARK: Center Main Page
+
+// MARK: User profile
 extension AppCoordinator {
     
-    func centerPostBoardFlow() {
-        
-        
+   @discardableResult
+    func workerProfileFlow(id: String) {
+        printIfDebug("worker profile")
     }
+    
+    @discardableResult
+     func centerProfileFlow() {
+         printIfDebug("center profile")
+     }
 }
