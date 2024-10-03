@@ -79,7 +79,7 @@ extension AppCoordinator {
             case .workerRegisterPage:
                 workerAccountRegisterFlow()
             case .loginPage:
-                return
+                centerLoginFlow()
             }
         }
         
@@ -156,4 +156,23 @@ extension AppCoordinator {
         
         return coordinator
     }
+    
+    /// 센터관리자 회원가입을 시작합니다.
+    @discardableResult
+    func centerLoginFlow() -> CenterLogInCoordinator {
+        
+        let coordinator = CenterLogInCoordinator(router: router)
+        coordinator.startFlow = { [weak self] destination in
+            switch destination {
+            case .centerMainPage:
+                self?.runCenterMainPageFlow()
+            }
+        }
+        
+        addChild(coordinator)
+        coordinator.start()
+        
+        return coordinator
+    }
+    
 }

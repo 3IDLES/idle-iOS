@@ -133,7 +133,7 @@ where
     
     private func setAutoLayout() {
         
-        view.layoutMargins = .init(top: 28, left: 20, bottom: 0, right: 20)
+        view.layoutMargins = .init(top: 50, left: 20, bottom: 0, right: 20)
         
         [
             processTitle,

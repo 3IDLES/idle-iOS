@@ -13,13 +13,14 @@ import PresentationCore
 import BaseFeature
 
 class CenterSetNewPasswordController: BaseViewController {
+
+    // Navigation
+    var exitPage: (() -> ())!
     
     // Init
     var pageViewController: UIPageViewController
     
     let pageCount: Int
-    
-    var coordinator: CenterSetNewPasswordCoordinator?
     
     public init(pageViewController: UIPageViewController, pageCount: Int) {
         self.pageViewController = pageViewController
@@ -65,10 +66,10 @@ class CenterSetNewPasswordController: BaseViewController {
             navigationBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             navigationBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             
-            pageViewController.view.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 64),
+            pageViewController.view.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             pageViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             pageViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            pageViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            pageViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -14),
         ])
     }
     
@@ -76,13 +77,10 @@ class CenterSetNewPasswordController: BaseViewController {
         
         navigationBar
             .backButton.rx.tap
-            .subscribe { [weak self] _ in
-                self?.coordinator?.prev()
+            .unretained(self)
+            .subscribe { (obj, _) in
+                obj.exitPage()
             }
             .disposed(by: disposeBag)
-    }
-    
-    func cleanUp() {
-        
     }
 }

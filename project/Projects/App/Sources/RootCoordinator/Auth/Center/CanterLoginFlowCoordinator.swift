@@ -36,19 +36,12 @@ class CanterLoginFlowCoordinator: CanterLoginFlowable {
 extension CanterLoginFlowCoordinator: CanterLoginCoordinatable {
     
     func login() {
-        let coordinator = CenterLoginCoordinator(navigationController: navigationController)
-        coordinator.parent = self
-        addChildCoordinator(coordinator)
-        coordinator.start()
+        
     }
     
     func setNewPassword() {
         
-        let coordinator = CenterSetNewPasswordCoordinator(navigationController: navigationController)
-        coordinator.parent = self
-        addChildCoordinator(coordinator)
-        
-        coordinator.start()
+    
     }
     
     func authFinished() {
