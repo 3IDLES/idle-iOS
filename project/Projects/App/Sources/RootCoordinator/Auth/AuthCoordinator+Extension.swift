@@ -15,9 +15,6 @@ extension AuthCoordinator: AuthCoordinatable {
     
     public func registerAsWorker() {
         
-        let coordinator = WorkerRegisterCoordinator(navigationController: navigationController)
-        addChildCoordinator(coordinator)
-        coordinator.start()
     }
     
     public func registerAsCenter() {
