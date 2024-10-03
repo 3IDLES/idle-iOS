@@ -80,7 +80,7 @@ public final class Router: NSObject, RouterProtocol {
     
     public func present(_ module: Module, animated: Bool, modalPresentationSytle: UIModalPresentationStyle, completion: RoutingCompletion? = nil) {
         
-        rootController?.modalPresentationStyle = modalPresentationSytle
+        module.modalPresentationStyle = modalPresentationSytle
         rootController?.present(
             module,
             animated: animated,
@@ -114,6 +114,16 @@ public final class Router: NSObject, RouterProtocol {
     public func popModule(animated: Bool) {
         
         if let module = rootController?.popViewController(animated: animated) {
+            
+            if let transitionInterval = rootController?.transitionCoordinator?.transitionDuration {
+                DispatchQueue.main.asyncAfter(deadline: .now()+transitionInterval) { [weak self] in
+                    
+                    let pointer = module.getRawPointer
+                    self?.completion[pointer]?()
+                    self?.completion.removeValue(forKey: pointer)
+                }
+                return
+            }
             
             let pointer = module.getRawPointer
             completion[pointer]?()
@@ -180,8 +190,13 @@ public final class Router: NSObject, RouterProtocol {
         
         self.rootController = navigationController
     }
+}
+
+// MARK: Alert
+public extension Router {
     
-    public func presentDefaultAlertController(object: DefaultAlertObject) {
+    /// 네이티브 AlertViewController를 표시합니다.
+    func presentDefaultAlertController(object: DefaultAlertObject) {
         
         let alertController = UIAlertController(
             title: object.title,
@@ -206,12 +221,9 @@ public final class Router: NSObject, RouterProtocol {
             modalPresentationSytle: .automatic
         )
     }
-}
-
-// MARK: Alert
-extension Router {
     
-    public func presentIdleAlertController(type: IdleBigAlertController.ButtonType, object: DSKit.IdleAlertObject) {
+    /// IdleAlet를 표시합니다.
+    func presentIdleAlertController(type: IdleBigAlertController.ButtonType, object: DSKit.IdleAlertObject) {
         
         let alertVC = IdleBigAlertController(type: type)
         alertVC.bindObject(object)
@@ -220,9 +232,22 @@ extension Router {
     }
 }
 
-extension Router {
+// MARK: Snack bar
+public extension Router {
     
-    public func presentAnonymousCompletePage(_ object: AnonymousCompleteVCRenderObject) {
+    func presentSnackBar(bottomPadding: CGFloat, object: IdleSnackBarRO) {
+        let snackBarController = IdleSnackBarController(
+            bottomPaddingFromSafeArea: bottomPadding,
+            object: object
+        )
+        self.present(snackBarController, animated: false, modalPresentationSytle: .overFullScreen)
+    }
+}
+
+// MARK: Anonymous complete screen
+public extension Router {
+    
+    func presentAnonymousCompletePage(_ object: AnonymousCompleteVCRenderObject) {
         
         let completeViewController = AnonymousCompleteVC()
         completeViewController.applyRO(object)

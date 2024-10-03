@@ -150,7 +150,7 @@ extension BaseViewController {
         snackBar.applyRO(ro)
         
         // 스낵바를 하단에 감춘다
-        snackBar.transform = .init(translationX: 0, y: snackBarHeight+horizontalPadding)
+        snackBar.transform = .init(translationX: 0, y: snackBarHeight+bottomPadding)
         snackBar.alpha = 0.25
         
         // 뷰계층에 추가
