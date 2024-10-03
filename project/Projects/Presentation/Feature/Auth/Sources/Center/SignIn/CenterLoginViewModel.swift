@@ -19,29 +19,30 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
     // Injection
     @Injected var authUseCase: AuthUseCase
     
-    // Init
-    weak var coordinator: CenterLoginCoordinator?
+    // Navigation
+    var exitPage: (() -> ())!
+    var presentSetupNewPasswordPage: (() -> ())!
+    var presentCenterMainPage: (() -> ())!
     
     public var input: Input = .init()
     public var output: Output = .init()
     
-    public init(coordinator: CenterLoginCoordinator?) {
-        self.coordinator = coordinator
+    public override init() {
         
         super.init()
         
         // MARK: input
         input.backButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                self.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage()
             })
             .disposed(by: disposeBag)
         
         input.setNewPasswordButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                self.coordinator?.showSetNewPasswordScreen()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentSetupNewPasswordPage()
             })
             .disposed(by: disposeBag)
         
@@ -59,13 +60,14 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
         
         
         loginSuccess
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
                 
                 // 원격 알림 토큰 저장요청
                 NotificationCenter.default.post(name: .requestTransportTokenToServer, object: nil)
                 
-                self.coordinator?.authFinished()
+                // 센터 메인화면으로 이동
+                obj.presentCenterMainPage()
             })
             .disposed(by: disposeBag)
         

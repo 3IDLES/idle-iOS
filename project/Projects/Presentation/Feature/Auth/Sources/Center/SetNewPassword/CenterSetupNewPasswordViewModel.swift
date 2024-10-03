@@ -1,5 +1,5 @@
 //
-//  CenterSetNewPasswordViewModel.swift
+//  CenterSetupNewPasswordViewModel.swift
 //  AuthFeature
 //
 //  Created by choijunios on 7/17/24.
@@ -13,22 +13,25 @@ import Core
 import RxSwift
 import RxCocoa
 
-public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
+class CenterSetupNewPasswordViewModel: BaseViewModel, ViewModelType {
     
-    // Init
+    // Injected
     @Injected var authUseCase: AuthUseCase
     @Injected var inputValidationUseCase: AuthInputValidationUseCase
-    weak var coordinator: CenterSetNewPasswordCoordinator?
     
-    public var input: Input = .init()
-    public var output: Output = .init()
+    // Navigation
+    var presentNextPage: (() -> ())!
+    var presentPrevPage: (() -> ())!
+    var presentCompleteAndDismiss: (() -> ())!
+    
+    var input: Input = .init()
+    var output: Output = .init()
     
     // State
     private var validPassword: String?
     private var authenticatedPhoneNumebr: String?
     
-    public init(coordinator: CenterSetNewPasswordCoordinator) {
-        self.coordinator = coordinator
+    override init() {
         
         super.init()
         
@@ -68,26 +71,14 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
             .share()
         
         changePasswordResult
-            .subscribe(onNext: {
-                [weak self] result in
-                
-                guard let self else { return }
+            .unretained(self)
+            .subscribe(onNext: { (obj, result) in
                 
                 switch result {
                 case .success:
-                    self.coordinator?
-                        .coordinatorDidFinishWithSnackBar(
-                            ro: .init(
-                                titleText: "비밀번호 변경 성공"
-                            )
-                        )
+                    obj.presentCompleteAndDismiss()
                 case .failure(let error):
-                    self.alert.onNext(
-                        .init(
-                            title: "비밀번호 변경 실패",
-                            message: error.message
-                        )
-                    )
+                    self.alert.onNext(.init(title: "비밀번호 변경 실패", message: error.message))
                 }
             })
             .disposed(by: disposeBag)
@@ -101,27 +92,23 @@ public class CenterSetNewPasswordViewModel: BaseViewModel, ViewModelType {
         // MARK: 화면 페이지네이션
         input
             .nextButtonClicked
-            .subscribe(onNext: { [weak self] in
-                guard let self else { return }
-                self.coordinator?.next()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentNextPage()
             })
             .disposed(by: disposeBag)
         
         input
             .prevButtonClicked
-            .subscribe(onNext: { [weak self] in
-                guard let self else { return }
-                self.coordinator?.prev()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentPrevPage()
             })
             .disposed(by: disposeBag)
     }
-    
-    deinit {
-        printIfDebug("deinit \(Self.self)")
-    }
 }
 
-public extension CenterSetNewPasswordViewModel {
+extension CenterSetupNewPasswordViewModel {
     
     class Input {
         
@@ -162,11 +149,11 @@ public extension CenterSetNewPasswordViewModel {
 }
 
 // Auth phoneNumber
-extension CenterSetNewPasswordViewModel.Input: AuthPhoneNumberInputable { }
-extension CenterSetNewPasswordViewModel.Output: AuthPhoneNumberOutputable { }
+extension CenterSetupNewPasswordViewModel.Input: AuthPhoneNumberInputable { }
+extension CenterSetupNewPasswordViewModel.Output: AuthPhoneNumberOutputable { }
 
-extension CenterSetNewPasswordViewModel.Input: SetPasswordInputable { }
-extension CenterSetNewPasswordViewModel.Output: SetPasswordOutputable { }
+extension CenterSetupNewPasswordViewModel.Input: SetPasswordInputable { }
+extension CenterSetupNewPasswordViewModel.Output: SetPasswordOutputable { }
 
-extension CenterSetNewPasswordViewModel.Input: ChangePasswordSuccessInputable { }
-extension CenterSetNewPasswordViewModel.Input: PageProcessInputable { }
+extension CenterSetupNewPasswordViewModel.Input: ChangePasswordSuccessInputable { }
+extension CenterSetupNewPasswordViewModel.Input: PageProcessInputable { }

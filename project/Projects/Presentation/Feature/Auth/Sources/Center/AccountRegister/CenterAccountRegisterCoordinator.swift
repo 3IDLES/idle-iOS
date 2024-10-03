@@ -112,8 +112,8 @@ public class CenterAccountRegisterCoordinator: Coordinator2 {
         )
         
         // 회원가입화면 벗어남
-        viewController.exitPage = { [router] in
-            router.popModule(animated: true)
+        viewController.exitPage = { [weak self] in
+            self?.router.popModule(animated: true)
         }
         
         router.push(module: viewController, animated: true)

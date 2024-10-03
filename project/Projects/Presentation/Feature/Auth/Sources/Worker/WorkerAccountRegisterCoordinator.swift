@@ -103,9 +103,9 @@ public class WorkerAccountRegisterCoordinator: Coordinator2 {
             pageViewController: pageViewController
         )
         
-        viewController.exitPage = { [router] in
+        viewController.exitPage = { [weak self] in
             
-            router.popModule(animated: true)
+            self?.router.popModule(animated: true)
         }
         
         router.push(module: viewController, animated: true)

@@ -107,7 +107,7 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
     
     private func setAppearance() {
         
-        view.layoutMargins = .init(top: 32, left: 20, bottom: 0, right: 20)
+        view.layoutMargins = .init(top: 50, left: 20, bottom: 0, right: 20)
     }
     
     private func setAutoLayout() {
@@ -128,7 +128,7 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
         
         NSLayoutConstraint.activate([
                 
-            processTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            processTitle.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
             processTitle.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             processTitle.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
