@@ -12,11 +12,11 @@ import Core
 
 enum WorkerRegisterStage: Int {
     
-    case registerFinished=0
-    case phoneNumber=1
-    case info=2
-    case address=3
-    case finish=4
+    case registerFinished
+    case phoneNumber
+    case info
+    case address
+    case finish
     
     var screenName: String {
         switch self {
