@@ -17,28 +17,28 @@ import Core
 import RxCocoa
 import RxSwift
 
-public protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelable & ClosedPostViewModelable {
+protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelable & ClosedPostViewModelable {
 }
 
 
-public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostBoardViewModelable {
+class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModelable {
     
+    // Injected
     @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
     
-    // Init
-    weak var coordinator: CenterRecruitmentPostBoardScreenCoordinator?
+    // Navigation
+    var presentRegisterPostPage: (() -> ())?
+    var createPostCellViewModel: ((RecruitmentPostInfoForCenterVO, PostState) -> CenterEmployCardViewModelable)!
 
-    public var requestOngoingPost: PublishRelay<Void> = .init()
-    public var requestClosedPost: PublishRelay<Void> = .init()
-    public var registerPostButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    var requestOngoingPost: PublishRelay<Void> = .init()
+    var requestClosedPost: PublishRelay<Void> = .init()
+    var registerPostButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
-    public var ongoingPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
-    public var closedPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
-    public var showRemovePostAlert: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
+    var ongoingPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
+    var closedPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
+    var showRemovePostAlert: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
-    public init(coordinator: CenterRecruitmentPostBoardScreenCoordinator?) {
-        
-        self.coordinator = coordinator
+    public override init() {
         
         super.init()
         
@@ -141,8 +141,9 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
         
         // 공고등록버튼
         registerPostButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.showRegisterPostScreen()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentRegisterPostPage?()
             })
             .disposed(by: disposeBag)
         
@@ -163,34 +164,21 @@ public class CenterRecruitmentPostBoardVM: BaseViewModel, CenterRecruitmentPostB
         })
         .disposed(by: disposeBag)
     }
-    
-    public func createOngoingPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
-        CenterEmployCardVM(
-            postInfo: postInfo,
-            postState: .onGoing,
-            coordinator: coordinator,
-            recruitmentPostUseCase: recruitmentPostUseCase
-        )
-    }
-    
-    public func createClosedPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> any DSKit.CenterEmployCardViewModelable {
-        CenterEmployCardVM(
-            postInfo: postInfo,
-            postState: .closed,
-            coordinator: coordinator,
-            recruitmentPostUseCase: recruitmentPostUseCase
-        )
-    }
 }
 
 // MARK: 카드 뷰에 사용될 ViewModel
 class CenterEmployCardVM: CenterEmployCardViewModelable {
     
+    @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
+    
+    // Navigation
+    var presentPostDetailPage: ((String, PostState) -> ())?
+    var presentPostApplicantPage: ((String) -> ())?
+    var presentPostEditPage: ((String) -> ())?
+    
     // Init
     let postInfo: RecruitmentPostInfoForCenterVO
     let postState: PostState
-    let recruitmentPostUseCase: RecruitmentPostUseCase
-    weak var coordinator: CenterRecruitmentPostBoardScreenCoordinator?
     
     // Output
     let renderObject: CenterEmployCardRO
@@ -204,11 +192,9 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
     
     let disposeBag = DisposeBag()
     
-    init(postInfo: RecruitmentPostInfoForCenterVO, postState: PostState, coordinator: CenterRecruitmentPostBoardScreenCoordinator?, recruitmentPostUseCase: RecruitmentPostUseCase) {
+    init(postInfo: RecruitmentPostInfoForCenterVO, postState: PostState) {
         self.postInfo = postInfo
         self.postState = postState
-        self.coordinator = coordinator
-        self.recruitmentPostUseCase = recruitmentPostUseCase
         
         // MARK: RenderObject
         self.renderObject = CenterEmployCardRO.create(vo: postInfo)
@@ -234,11 +220,10 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
         
         // MARK: 버튼 처리
         cardClicked
-            .subscribe(onNext: {
-                [weak self] _ in
-                guard let self else { return }
-                
-                self.coordinator?.showPostDetailScreenForCenter(postId: postInfo.id, postState: postState)
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                let info = obj.postInfo
+                obj.presentPostDetailPage?(info.id, postState)
             })
             .disposed(by: disposeBag)
         
@@ -247,19 +232,19 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
         // 이전 공고인 경우 버튼 바인딩 하지 않음
         
         checkApplicantBtnClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                self.coordinator?.showCheckingApplicantScreen(postId: postInfo.id)
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                let info = obj.postInfo
+                obj.presentPostApplicantPage?(info.id)
             })
             .disposed(by: disposeBag)
         
         
         editPostBtnClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                
-                self.coordinator?.showEditScreen(postId: postInfo.id)
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                let info = obj.postInfo
+                obj.presentPostEditPage?(info.id)
             })
             .disposed(by: disposeBag)
         

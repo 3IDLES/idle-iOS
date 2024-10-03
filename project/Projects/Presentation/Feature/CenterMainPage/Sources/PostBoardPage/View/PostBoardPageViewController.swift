@@ -16,7 +16,7 @@ import RxCocoa
 import RxSwift
 
 
-public class CenterRecruitmentPostBoardVC: BaseViewController {
+class PostBoardPageViewController: BaseViewController {
     enum TabBarState: Int, CaseIterable {
         case onGoingPost = 0
         case closedPost = 1
@@ -60,13 +60,13 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
         initialItem: .init(id: currentState)
     )!
     
-    public init() {
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         setAppearance()
         setLayout()
         setObservable()
@@ -157,7 +157,7 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
         ])
     }
     
-    public func bind(viewModel: CenterRecruitmentPostBoardViewModelable) {
+    func bind(viewModel: CenterRecruitmentPostBoardViewModelable) {
         
         super.bind(viewModel: viewModel)
     
@@ -169,5 +169,5 @@ public class CenterRecruitmentPostBoardVC: BaseViewController {
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
     
-    CenterRecruitmentPostBoardVC()
+    PostBoardPageViewController()
 }

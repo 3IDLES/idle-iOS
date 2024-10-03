@@ -1,5 +1,5 @@
 //
-//  ClosedPostVC.swift
+//  OnGoingPostVC.swift
 //  CenterFeature
 //
 //  Created by choijunios on 8/13/24.
@@ -15,21 +15,28 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-public protocol ClosedPostViewModelable: BaseViewModel {
+public protocol OnGoingPostViewModelable: BaseViewModel {
     
-    var closedPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>? { get }
-    var requestClosedPost: PublishRelay<Void> { get }
+    var ongoingPostInfo: Driver<[RecruitmentPostInfoForCenterVO]>? { get }
+    var showRemovePostAlert: Driver<IdleAlertViewModelable>? { get }
     
-    func createClosedPostCellVM(postInfo: RecruitmentPostInfoForCenterVO) -> CenterEmployCardViewModelable
+    var requestOngoingPost: PublishRelay<Void> { get }
+    var registerPostButtonClicked: PublishRelay<Void> { get }
+    var createPostCellViewModel: ((RecruitmentPostInfoForCenterVO, PostState) -> CenterEmployCardViewModelable)! { get }
 }
 
-public class ClosedPostVC: BaseViewController {
+public class OnGoingPostVC: BaseViewController {
     
     typealias Cell = CenterEmployCardCell
     
     // View
     let postTableView: UITableView = .init()
     let tableHeader = BoardSortigHeaderView()
+    
+    let registerPostButton: IdleFloatingButton = {
+        let button = IdleFloatingButton(labelText: "공고 등록")
+        return button
+    }()
     
     // DataSource
     private var postData: [RecruitmentPostInfoForCenterVO] = []
@@ -70,8 +77,10 @@ public class ClosedPostVC: BaseViewController {
     }
     
     private func setLayout() {
+        
         [
-            postTableView
+            postTableView,
+            registerPostButton
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -82,6 +91,9 @@ public class ClosedPostVC: BaseViewController {
             postTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
             postTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
             postTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            registerPostButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
+            registerPostButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
         ])
     }
     
@@ -89,32 +101,48 @@ public class ClosedPostVC: BaseViewController {
         
     }
     
-    public func bind(viewModel: ClosedPostViewModelable) {
+    public func bind(viewModel: OnGoingPostViewModelable) {
         
         // 다수의 화면이 하나의 ViewModel을 공유하는 특수한 경우
         self.viewModel = viewModel
         
         // Output
         viewModel
-            .closedPostInfo?
+            .ongoingPostInfo?
             .drive(onNext: { [weak self] postInfo in
                 guard let self else { return }
                 
                 self.postData = postInfo
                 
                 postTableView.reloadData()
+                DispatchQueue.main.async { [weak self] in
+                    self?.postTableView.setContentOffset(.zero, animated: false)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .showRemovePostAlert?
+            .drive(onNext: { [weak self] vm in
+                self?.showIdleModal(viewModel: vm)
             })
             .disposed(by: disposeBag)
         
         // Input
         rx.viewWillAppear
             .map { _ in }
-            .bind(to: viewModel.requestClosedPost)
+            .bind(to: viewModel.requestOngoingPost)
             .disposed(by: disposeBag)
+        
+        registerPostButton
+            .rx.tap
+            .bind(to: viewModel.registerPostButtonClicked)
+            .disposed(by: disposeBag)
+            
     }
 }
 
-extension ClosedPostVC: UITableViewDataSource, UITableViewDelegate {
+extension OnGoingPostVC: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         postData.count
@@ -127,11 +155,26 @@ extension ClosedPostVC: UITableViewDataSource, UITableViewDelegate {
         
         let data = postData[indexPath.item]
         
-        if let viewModel = self.viewModel as? ClosedPostViewModelable {
-            let vm = viewModel.createClosedPostCellVM(postInfo: data)
-            cell.bind(viewModel: vm)
+        if let viewModel = self.viewModel as? OnGoingPostViewModelable {
+            let cellViewModel = viewModel.createPostCellViewModel(data, .onGoing)
+            cell.bind(viewModel: cellViewModel)
         }
         
         return cell
+    }
+    
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if registerPostButton.alpha != 0 {
+            UIView.animate(withDuration: 0.1) {
+                self.registerPostButton.alpha = 0.5
+            }
+        }
+    }
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if registerPostButton.alpha != 1 {
+            UIView.animate(withDuration: 0.1) {
+                self.registerPostButton.alpha = 1
+            }
+        }
     }
 }

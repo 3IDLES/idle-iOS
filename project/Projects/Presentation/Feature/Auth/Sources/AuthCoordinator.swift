@@ -15,7 +15,7 @@ public enum AuthCoordinatorDestination {
     case loginPage
 }
 
-public class AuthCoordinator: BaseCoordinator {
+public class AuthCoordinator: Coordinator2 {
     
     let router: Router
     
@@ -25,7 +25,7 @@ public class AuthCoordinator: BaseCoordinator {
     
     public var startFlow: ((AuthCoordinatorDestination) -> ())!
     
-    public override func start() {
+    public func start() {
         
         let viewModel = SelectAuthTypeViewModel()
         

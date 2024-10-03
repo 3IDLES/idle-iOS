@@ -1,52 +1,55 @@
 //
-//  IdleCenterMainPage.swift
-//  RootFeature
+//  CenterMainPageTab.swift
+//  CenterMainPageFeature
 //
-//  Created by choijunios on 8/19/24.
+//  Created by choijunios on 10/3/24.
 //
 
 import UIKit
+import BaseFeature
 import DSKit
 
-public enum IdleCenterMainPage: IdleMainPageItemable {
+enum CenterMainPageTab {
+    case postBoard
+    case setting
+}
+
+extension CenterMainPageTab: TabBarItem {
     
-    public enum State {
+    enum State {
         case idle
         case accent
     }
     
-    case home
-    case setting
-    
-    public init?(index: Int) {
+    init?(index: Int) {
         switch index {
-        case 0: self = .home
+        case 0: self = .postBoard
         case 1: self = .setting
         default: return nil
         }
     }
         
-    public var pageOrderNumber: Int {
+    var pageOrderNumber: Int {
         switch self {
-        case .home:
+        case .postBoard:
             return 0
         case .setting:
             return 1
         }
     }
     
-    public var tabItemIdleIcon: UIImage {
+    var tabItemIdleIcon: UIImage {
         switch self {
-        case .home:
+        case .postBoard:
             return DSIcon.dockHomeNormal.image
         case .setting:
             return DSIcon.dockSettingNormal.image
         }
     }
     
-    public var tabItemAccentIcon: UIImage {
+    var tabItemAccentIcon: UIImage {
         switch self {
-        case .home:
+        case .postBoard:
             return DSIcon.dockHomeAccent.image
         case .setting:
             return DSIcon.dockSettingAccent.image
@@ -54,9 +57,9 @@ public enum IdleCenterMainPage: IdleMainPageItemable {
         }
     }
     
-    public var tabItemText: String {
+    var tabItemText: String {
         switch self {
-        case .home:
+        case .postBoard:
             "공고"
         case .setting:
             "설정"
