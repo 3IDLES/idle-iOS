@@ -17,19 +17,21 @@ import RxCocoa
 
 public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
     
+    // Injected
     @Injected var inputValidationUseCase: AuthInputValidationUseCase
     @Injected var authUseCase: AuthUseCase
     
-    // Init
-    weak var coordinator: WorkerRegisterCoordinator?
+    // Navigation closure
+    var presentNextPage: (() -> ())!
+    var presentPrevPage: (() -> ())!
+    var presentCompletePage: (() -> ())!
     
     public var input: Input = .init()
     public var output: Output = .init()
     
     private let stateObject = WorkerRegisterState()
     
-    public init(coordinator: WorkerRegisterCoordinator) {
-        self.coordinator = coordinator
+    public override init() {
         super.init()
         
         setInput()
@@ -40,17 +42,17 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
         // MARK: 화면 페이지네이션
         input
             .nextButtonClicked
-            .subscribe(onNext: { [weak self] in
-                guard let self else { return }
-                self.coordinator?.next()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentNextPage()
             })
             .disposed(by: disposeBag)
         
         input
             .prevButtonClicked
-            .subscribe(onNext: { [weak self] in
-                guard let self else { return }
-                self.coordinator?.prev()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentPrevPage()
             })
             .disposed(by: disposeBag)
         
@@ -102,8 +104,11 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
         // 로그인 완료화면으로 이동
         output
             .loginSuccess?
-            .drive(onNext: { [weak self] _ in
-                self?.coordinator?.showCompleteScreen()
+            .asObservable()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                
+                obj.presentCompletePage()
             })
             .disposed(by: disposeBag)
         
@@ -124,10 +129,12 @@ public class WorkerRegisterViewModel: BaseViewModel, ViewModelType {
             })
             .share()
         
-        registerValidation.compactMap { $0.value }
-            .subscribe (onNext: { [weak self] _ in
-                guard let self else { return }
-                self.coordinator?.showCompleteScreen()
+        registerValidation
+            .compactMap { $0.value }
+            .unretained(self)
+            .subscribe (onNext: { (obj, _) in
+                
+                obj.presentCompletePage()
             })
             .disposed(by: disposeBag)
         
