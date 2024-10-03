@@ -10,6 +10,7 @@ import RootFeature
 import AuthFeature
 import CenterFeature
 import PresentationCore
+import CenterMainPageFeature
 
 import Swinject
 

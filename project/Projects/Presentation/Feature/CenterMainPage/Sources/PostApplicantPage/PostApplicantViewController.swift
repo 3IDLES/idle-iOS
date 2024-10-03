@@ -15,7 +15,7 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-class MyTableView: UITableView {
+class ContentBaseSizeTableView: UITableView {
     
     override var intrinsicContentSize: CGSize {
 
@@ -29,7 +29,7 @@ class MyTableView: UITableView {
     }
 }
 
-public class CheckApplicantVC: BaseViewController {
+class PostApplicantViewController: BaseViewController {
     
     typealias Cell = ApplicantCardCell
     
@@ -51,20 +51,20 @@ public class CheckApplicantVC: BaseViewController {
         return label
     }()
     
-    let applicantTableView: MyTableView = {
-        let tableView = MyTableView()
+    let applicantTableView: ContentBaseSizeTableView = {
+        let tableView = ContentBaseSizeTableView()
         return tableView
     }()
     
     let postApplicantVO: BehaviorRelay<[PostApplicantVO]> = .init(value: [])
     
-    public init() {
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         setAppearance()
         setLayout()
@@ -171,7 +171,7 @@ public class CheckApplicantVC: BaseViewController {
     
     private func setObservable() {  }
     
-    public func bind(viewModel: CheckApplicantViewModelable) {
+    func bind(viewModel: PostApplicantViewModelable) {
         
         super.bind(viewModel: viewModel)
         
@@ -207,19 +207,22 @@ public class CheckApplicantVC: BaseViewController {
     }
 }
 
-extension CheckApplicantVC: UITableViewDataSource, UITableViewDelegate {
+extension PostApplicantViewController: UITableViewDataSource, UITableViewDelegate {
     
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         postApplicantVO.value.count
     }
     
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
         
-        if let viewModel = self.viewModel as? CheckApplicantViewModelable {
-            let vm = viewModel.createApplicantCardVM(vo: postApplicantVO.value[indexPath.row])
-            cell.bind(viewModel: vm)
-            cell.selectionStyle = .none
+        if let viewModel = self.viewModel as? PostApplicantViewModelable {
+            let cellVO = postApplicantVO.value[indexPath.row]
+            
+            if let cellViewModel = viewModel.createCellViewModel?(cellVO) {
+                cell.bind(viewModel: cellViewModel)
+                cell.selectionStyle = .none
+            }
         }
         
         return cell

@@ -40,41 +40,41 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
 public extension RecruitmentManagementCoordinator {
 
     func showCheckingApplicantScreen(postId: String) {
-        let coordinator = CheckApplicantCoordinator(
-            postId: postId,
-            navigationController: navigationController
-        )
-        addChildCoordinator(coordinator)
-        coordinator.start()
+//        let coordinator = CheckApplicantCoordinator(
+//            postId: postId,
+//            navigationController: navigationController
+//        )
+//        addChildCoordinator(coordinator)
+//        coordinator.start()
     }
     
     func showPostDetailScreenForCenter(postId: String, postState: PostState) {
         
-        let coordinator = PostDetailForCenterCoordinator(
-            postId: postId,
-            postState: postState,
-            navigationController: navigationController
-        )
-        addChildCoordinator(coordinator)
-        coordinator.start()
+//        let coordinator = PostDetailForCenterCoordinator(
+//            postId: postId,
+//            postState: postState,
+//            navigationController: navigationController
+//        )
+//        addChildCoordinator(coordinator)
+//        coordinator.start()
     }
     
     func showEditScreen(postId: String) {
         
-        let vm = EditPostVM(id: postId)
-        let coordinator = EditPostCoordinator(
-            viewModel: vm,
-            navigationController: navigationController
-        )
-        vm.editPostCoordinator = coordinator
-        addChildCoordinator(coordinator)
-        coordinator.start()
+//        let vm = EditPostVM(id: postId)
+//        let coordinator = EditPostCoordinator(
+//            viewModel: vm,
+//            navigationController: navigationController
+//        )
+//        vm.editPostCoordinator = coordinator
+//        addChildCoordinator(coordinator)
+//        coordinator.start()
     }
     
     func showRegisterPostScrean() {
         
-        let coordinator = RegisterRecruitmentPostCoordinator(navigationController: navigationController)
-        addChildCoordinator(coordinator)
-        coordinator.start()
+//        let coordinator = RegisterRecruitmentPostCoordinator(navigationController: navigationController)
+//        addChildCoordinator(coordinator)
+//        coordinator.start()
     }
 }

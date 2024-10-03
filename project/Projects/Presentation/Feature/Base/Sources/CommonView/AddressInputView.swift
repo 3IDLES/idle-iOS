@@ -1,13 +1,12 @@
 //
 //  AddressInputView.swift
-//  CenterFeature
+//  BaseFeature
 //
 //  Created by choijunios on 7/29/24.
 //
 
 import UIKit
 import PresentationCore
-import BaseFeature
 import Domain
 import DSKit
 
@@ -16,34 +15,34 @@ import RxCocoa
 import RxSwift
 
 // MARK: 센터주소 (도로명, 지번주소 + 상세주소)
-class AddressView: UIView {
+public class AddressView: UIView {
     
     // init
     
     // View
-    private let processTitle: IdleLabel = {
+    public let processTitle: IdleLabel = {
         let label = IdleLabel(typography: .Heading2)
         label.textString = "센터 주소 정보를 입력해주세요."
         label.textAlignment = .left
         return label
     }()
 
-    let contentView: AddressContentView
+    public let contentView: AddressContentView
     
     // 하단 버튼
-    private let buttonContainer: PrevOrNextContainer = {
+    public let buttonContainer: PrevOrNextContainer = {
         let container = PrevOrNextContainer()
         container.nextButton.setEnabled(false)
         return container
     }()
     
-    lazy var nextButtonClicked: Observable<Void> = buttonContainer.nextBtnClicked.asObservable()
-    lazy var prevButtonClicked: Observable<Void> = buttonContainer.prevBtnClicked.asObservable()
+    public lazy var nextButtonClicked: Observable<Void> = buttonContainer.nextBtnClicked.asObservable()
+    public lazy var prevButtonClicked: Observable<Void> = buttonContainer.prevBtnClicked.asObservable()
     
     // Observable
-    private let disposeBag = DisposeBag()
+    public let disposeBag = DisposeBag()
     
-    init(viewController vc: UIViewController) {
+    public init(viewController vc: UIViewController) {
         
         self.contentView = AddressContentView(viewController: vc)
         super.init(frame: .zero)
@@ -95,19 +94,6 @@ class AddressView: UIView {
             .addressValidation?
             .drive(onNext: { [buttonContainer] isValid in
                 buttonContainer.nextButton.setEnabled(isValid)
-            })
-            .disposed(by: disposeBag)
-    }
-    
-    public func bind(viewModel: RegisterRecruitmentPostViewModelable) {
-        
-        contentView.bind(viewModel: viewModel)
-        
-        // Output
-        viewModel
-            .addressInputNextable?
-            .drive(onNext: { [buttonContainer] isNextable in
-                buttonContainer.nextButton.setEnabled(isNextable)
             })
             .disposed(by: disposeBag)
     }

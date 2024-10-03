@@ -17,7 +17,7 @@ import Core
 import RxSwift
 import RxCocoa
 
-public protocol CheckApplicantViewModelable: BaseViewModel {
+protocol PostApplicantViewModelable: BaseViewModel {
     // Input
     var requestpostApplicantVO: PublishRelay<Void> { get }
     var exitButtonClicked: PublishRelay<Void> { get }
@@ -27,35 +27,35 @@ public protocol CheckApplicantViewModelable: BaseViewModel {
     var postApplicantVO: Driver<[PostApplicantVO]>? { get }
     var postCardVO: Driver<CenterEmployCardVO>? { get }
     
-    func createApplicantCardVM(vo: PostApplicantVO) -> ApplicantCardVM
+    var createCellViewModel: ((PostApplicantVO) -> ApplicantCardViewModelable)? { get }
 }
 
-public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
+class PostApplicantViewModel: BaseViewModel, PostApplicantViewModelable {
     
     @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
     
+    var createCellViewModel: ((PostApplicantVO) -> ApplicantCardViewModelable)?
+    var exitPage: (() -> ())?
+    
     // Init
     let postId: String
-    weak var coorindator: CheckApplicantCoordinatable?
     
-    public var exitButtonClicked: PublishRelay<Void> = .init()
-    public var requestpostApplicantVO: PublishRelay<Void> = .init()
+    var exitButtonClicked: PublishRelay<Void> = .init()
+    var requestpostApplicantVO: PublishRelay<Void> = .init()
     
+    var postApplicantVO: Driver<[PostApplicantVO]>?
+    var postCardVO: Driver<CenterEmployCardVO>?
     
-    public var postApplicantVO: Driver<[PostApplicantVO]>?
-    public var postCardVO: Driver<CenterEmployCardVO>?
-    
-    public init(postId: String, coorindator: CheckApplicantCoordinatable?) {
+    init(postId: String) {
         
         self.postId = postId
-        self.coorindator = coorindator
         
         super.init()
         
         exitButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                
-                self?.coorindator?.taskFinished()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
@@ -91,35 +91,32 @@ public class CheckApplicantVM: BaseViewModel, CheckApplicantViewModelable {
             .subscribe(alert)
             .disposed(by: disposeBag)
     }
-    
-    public func createApplicantCardVM(vo: PostApplicantVO) -> ApplicantCardVM {
-        .init(vo: vo, coordinator: coorindator)
-    }
 }
 
 
 // MARK: ApplicantCardVM
-public class ApplicantCardVM: ApplicantCardViewModelable {
+class ApplicantCardVM: ApplicantCardViewModelable {
     @Injected var cacheRepository: CacheRepository
+    
+    // Navigation
+    var presentApplicantDetail: ((String) -> ())?
     
     // Init
     let id: String
-    weak var coordinator: CheckApplicantCoordinatable?
     
-    public var showProfileButtonClicked: PublishRelay<Void> = .init()
-    public var employButtonClicked: PublishRelay<Void> = .init()
-    public var staredThisWorker: PublishRelay<Bool> = .init()
+    var showProfileButtonClicked: PublishRelay<Void> = .init()
+    var employButtonClicked: PublishRelay<Void> = .init()
+    var staredThisWorker: PublishRelay<Bool> = .init()
     
-    public var renderObject: Driver<ApplicantCardRO>?
-    public var displayingImage: RxCocoa.Driver<UIImage>?
+    var renderObject: Driver<ApplicantCardRO>?
+    var displayingImage: RxCocoa.Driver<UIImage>?
     
     private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     let disposeBag = DisposeBag()
     
-    public init(vo: PostApplicantVO, coordinator: CheckApplicantCoordinatable?) {
+    init(vo: PostApplicantVO) {
         self.id = vo.workerId
-        self.coordinator = coordinator
         
         // MARK: RenderObject
         let publishRelay: BehaviorRelay<ApplicantCardRO> = .init(value: .mock)
@@ -138,11 +135,9 @@ public class ApplicantCardVM: ApplicantCardViewModelable {
         
         // MARK: 버튼 처리
         showProfileButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                coordinator?.showWorkerProfileScreen(
-                    profileId: id
-                )
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentApplicantDetail?(obj.id)
             })
             .disposed(by: disposeBag)
     }

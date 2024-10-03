@@ -8,7 +8,7 @@
 import Foundation
 import PresentationCore
 import AuthFeature
-import CenterFeature
+import CenterMainPageFeature
 import Domain
 
 public protocol OverallLogger:
