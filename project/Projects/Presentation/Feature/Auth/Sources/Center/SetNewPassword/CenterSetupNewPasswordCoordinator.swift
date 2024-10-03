@@ -28,6 +28,9 @@ public class CenterSetupNewPasswordCoordinator: Coordinator2 {
     weak var pageViewController: UIPageViewController?
     var currentStage: SetNewPasswordStage!
     
+    // State
+    private var passwordSetupSuccess: Bool = false
+    
     public init(router: Router) {
         self.router = router
     }
@@ -45,7 +48,8 @@ public class CenterSetupNewPasswordCoordinator: Coordinator2 {
         }
         
         viewModel.presentCompleteAndDismiss = { [weak self] in
-            self?.router.popModule(animated: false)
+            self?.passwordSetupSuccess = true
+            self?.router.popModule(animated: true)
         }
         
         self.stageViewControllers = [
@@ -70,7 +74,15 @@ public class CenterSetupNewPasswordCoordinator: Coordinator2 {
             router.popModule(animated: true)
         }
         
-        router.push(module: viewController, animated: true)
+        router.push(module: viewController, animated: true) { [weak self] in
+            guard let self else { return }
+            if passwordSetupSuccess == true {
+                router.presentSnackBar(
+                    bottomPadding: 70,
+                    object: .init(titleText: "비밀번호 변경 성공")
+                )
+            }
+        }
         excuteStage(.phoneNumber, moveTo: .next)
     }
 }
