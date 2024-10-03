@@ -9,6 +9,7 @@ import Foundation
 import BaseFeature
 import SplashFeature
 import AuthFeature
+import CenterMainPageFeature
 import Core
 
 
@@ -97,8 +98,12 @@ extension AppCoordinator {
     
     
     /// CenterMainFlow를 시작합니다.
-    func runCenterMainPageFlow() {
-        printIfDebug("CenterMain")
+    @discardableResult
+    func runCenterMainPageFlow() -> CenterMainPageCoordinator {
+        let coordinator = CenterMainPageCoordinator(router: router)
+        addChild(coordinator)
+        coordinator.start()
+        return coordinator
     }
     
     
@@ -175,4 +180,13 @@ extension AppCoordinator {
         return coordinator
     }
     
+}
+
+// MARK: Center Main Page
+extension AppCoordinator {
+    
+    func centerPostBoardFlow() {
+        
+        
+    }
 }

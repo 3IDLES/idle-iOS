@@ -28,10 +28,7 @@ public class RecruitmentManagementCoordinator: RecruitmentManagementCoordinatabl
     }
     
     public func start() {
-        let coordinator = CenterRecruitmentPostBoardScreenCoordinator(navigationController: navigationController)
-        addChildCoordinator(coordinator)
-        coordinator.parent = self
-        coordinator.start()
+        
     }
     
     public func coordinatorDidFinish() {

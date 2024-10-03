@@ -1,6 +1,6 @@
 //
 //  IdleTabBar.swift
-//  DSKit
+//  BaseFeature
 //
 //  Created by choijunios on 8/15/24.
 //
@@ -10,14 +10,14 @@ import RxSwift
 import RxCocoa
 import DSKit
 
-public protocol IdleMainPageItemable: Hashable & CaseIterable {
+public protocol TabBarItem: Hashable & CaseIterable {
     var tabItemIdleIcon: UIImage { get }
     var tabItemAccentIcon: UIImage { get }
     var tabItemText: String { get }
     var pageOrderNumber: Int { get }
 }
 
-public class IdleTabBar<Item: IdleMainPageItemable>: UIViewController {
+public class IdleTabBar<Item: TabBarItem>: UIViewController {
 
     // 탭바구성
     public private(set) var controllers: [Item: UIViewController] = [:]

@@ -29,10 +29,14 @@ public protocol RouterProtocol {
     // pop시 호출할 클로저를 여기서 지정(항상 최상단 VC가 팝되지 않음으로)
     func push(module: Module, animated: Bool, popCompletion: (() -> Void)?)
     
+    func push(module: Module, to: UINavigationController, animated: Bool, popCompletion: (() -> Void)?)
+    
     
     
     // MARK: pop module
     func popModule(animated: Bool)
+    
+    func popModule(_ module: Module, from: UINavigationController, animated: Bool, popCompletion: (() -> Void)?)
     
     /// 특정 모듈까지 네비게이션 스택을 비움
     func popTo(module: Module, animated: Bool)
@@ -111,11 +115,38 @@ public final class Router: NSObject, RouterProtocol {
         )
     }
     
+    public func push(module: Module, to: UINavigationController, animated: Bool, popCompletion: (() -> Void)? = nil) {
+        
+        completion[module.getRawPointer] = popCompletion
+        
+        to.pushViewController(module, animated: animated)
+    }
+    
     public func popModule(animated: Bool) {
         
         if let module = rootController?.popViewController(animated: animated) {
             
             if let transitionInterval = rootController?.transitionCoordinator?.transitionDuration {
+                DispatchQueue.main.asyncAfter(deadline: .now()+transitionInterval) { [weak self] in
+                    
+                    let pointer = module.getRawPointer
+                    self?.completion[pointer]?()
+                    self?.completion.removeValue(forKey: pointer)
+                }
+                return
+            }
+            
+            let pointer = module.getRawPointer
+            completion[pointer]?()
+            completion.removeValue(forKey: pointer)
+        }
+    }
+    
+    public func popModule(_ module: Module, from: UINavigationController, animated: Bool, popCompletion: (() -> Void)?) {
+        
+        if let module = from.popViewController(animated: animated) {
+            
+            if let transitionInterval = from.transitionCoordinator?.transitionDuration {
                 DispatchQueue.main.asyncAfter(deadline: .now()+transitionInterval) { [weak self] in
                     
                     let pointer = module.getRawPointer
