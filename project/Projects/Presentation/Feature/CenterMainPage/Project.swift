@@ -2,7 +2,7 @@
 //  Project.swift
 //  ProjectDescriptionHelpers
 //
-//  Created by choijunios on 2024/07/25
+//  Created by choijunios on 2024/10/03
 //
 
 import ProjectDescription
@@ -11,7 +11,7 @@ import ConfigurationPlugin
 import DependencyPlugin
 
 let project = Project(
-    name: "Root",
+    name: "CenterMainPage",
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
@@ -19,31 +19,16 @@ let project = Project(
         
         /// FeatureConcrete
         .target(
-            name: "RootFeature",
+            name: "CenterMainPageFeature",
             destinations: DeploymentSettings.platforms,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: [
-                "Sources/**",
-                SecretSource.amplitudeConfig,
-            ],
+            sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-
                 // Presentation
-                D.Presentation.SplashFeature,
-                D.Presentation.AuthFeature,
-                D.Presentation.CenterMainPageFeature,
-                
-                
-                D.Presentation.WorkerFeature,
-                D.Presentation.CenterFeature,
-                D.Presentation.NotificationPageFeature,
-                
-                // ThirParty
-                D.ThirdParty.Amplitude,
-                D.ThirdParty.FirebaseMessaging,
+                D.Presentation.BaseFeature,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -52,7 +37,7 @@ let project = Project(
         
         /// FeatureConcrete ExampleApp
         .target(
-            name: "Root_ExampleApp",
+            name: "CenterMainPage_ExampleApp",
             destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -61,7 +46,7 @@ let project = Project(
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
-                .target(name: "RootFeature"),
+                .target(name: "CenterMainPageFeature"),
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -70,14 +55,14 @@ let project = Project(
     ],
     schemes: [
         Scheme.makeSchemes(
-            .target("RootFeature"),
+            .target("CenterMainPageFeature"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
             ]
         ),
         Scheme.makeSchemes(
-            .target("Root_ExampleApp"),
+            .target("CenterMainPage_ExampleApp"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
