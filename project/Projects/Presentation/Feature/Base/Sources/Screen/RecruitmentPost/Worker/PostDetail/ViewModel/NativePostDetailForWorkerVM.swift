@@ -284,7 +284,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             .disposed(by: disposeBag)
     }
         
-    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: RecruitmentPostType) -> RxSwift.Single<Bool> {
+    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: PostOriginType) -> RxSwift.Single<Bool> {
         
         return Single<Bool>.create { [weak self] observer in
             

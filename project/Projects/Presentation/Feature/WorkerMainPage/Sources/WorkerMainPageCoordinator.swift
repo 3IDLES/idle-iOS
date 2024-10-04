@@ -11,7 +11,7 @@ import Domain
 import Core
 
 public enum WorkerMainPageCoordinatorDestination {
-    case postDetailPage(id: String)
+    case postDetailPage(id: String, type: PostOriginType)
     case authFlow
     case myProfilePage
     case accountDeregisterPage
@@ -72,7 +72,7 @@ extension WorkerMainPageCoordinator {
         case .postBoard:
             presentPostBoardPage(controller: navigationController)
         case .preferredPost:
-            presentLikedAndAppliedPostBoardPage(controller: navigationController)
+            presentStarredAndAppliedPostBoardPage(controller: navigationController)
         case .setting:
             presentSettingPage(controller: navigationController)
         }
@@ -85,18 +85,71 @@ public extension WorkerMainPageCoordinator {
     /// 포스트 보드
     func presentPostBoardPage(controller: UINavigationController) {
         
+        let viewModel = MainPostBoardViewModel()
+        viewModel.presentMyProfile = { [weak self] in
+            self?.startFlow(.myProfilePage)
+        }
+        viewModel.presentPostDetailPage = { [weak self] id, type in
+            self?.startFlow(.postDetailPage(id: id, type: type))
+        }
         
+        let viewController = MainPostBoardViewController()
+        viewController.bind(viewModel: viewModel)
+        
+        router.push(
+            module: viewController,
+            to: controller,
+            animated: false
+        )
     }
     
     /// 좋아요/지원한 포스트 보드
-    func presentLikedAndAppliedPostBoardPage(controller: UINavigationController) {
+    func presentStarredAndAppliedPostBoardPage(controller: UINavigationController) {
         
+        let appliedPostViewModel = AppliedPostBoardViewModel()
+        appliedPostViewModel.presentPostDetailPage = { [weak self] id, type in
+            self?.startFlow(.postDetailPage(id: id, type: type))
+        }
         
+        let starredPostViewModel = StarredPostBoardViewModel()
+        starredPostViewModel.presentPostDetailPage = { [weak self] id, type in
+            self?.startFlow(.postDetailPage(id: id, type: type))
+        }
+        
+        let viewController = StarredAndAppliedPostViewController()
+        viewController.bind(
+            appliedPostVM: appliedPostViewModel,
+            starredPostVM: starredPostViewModel
+        )
+        
+        router.push(
+            module: viewController,
+            to: controller,
+            animated: false
+        )
     }
     
     /// 세팅화면
     func presentSettingPage(controller: UINavigationController) {
         
+        let viewModel = SettingPageViewModel()
+        viewModel.presentDeregisterPage = { [weak self] in
+            self?.startFlow(.accountDeregisterPage)
+        }
+        viewModel.presentMyProfilePage = { [weak self] in
+            self?.startFlow(.myProfilePage)
+        }
+        viewModel.changeToAuthFlow = { [weak self] in
+            self?.startFlow(.authFlow)
+        }
         
+        let viewController = SettingPageViewController()
+        viewController.bind(viewModel: viewModel)
+        
+        router.push(
+            module: viewController,
+            to: controller,
+            animated: false
+        )
     }
 }

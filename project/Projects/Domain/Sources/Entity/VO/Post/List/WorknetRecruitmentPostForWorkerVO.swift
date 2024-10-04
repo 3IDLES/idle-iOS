@@ -10,7 +10,7 @@ import Foundation
 public struct WorknetRecruitmentPostVO: RecruitmentPostForWorkerRepresentable {
     
     // protocol required
-    public var postType: RecruitmentPostType
+    public var postType: PostOriginType
     public var beFavoritedTime: Date?
     
     public let id: String
@@ -31,7 +31,7 @@ public struct WorknetRecruitmentPostVO: RecruitmentPostForWorkerRepresentable {
         payInfo: String,
         applyDeadlineString: String,
         isFavorite: Bool,
-        postType: RecruitmentPostType,
+        postType: PostOriginType,
         beFavoritedTime: Date? = nil
     ) {
         self.id = id

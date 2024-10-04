@@ -71,7 +71,7 @@ public protocol RecruitmentPostRepository: RepositoryBase {
     func applyToPost(postId: String, method: ApplyType) -> Single<Void>
     
     /// 요양보호사 즐겨찾기 공고 추가
-    func addFavoritePost(postId: String, type: RecruitmentPostType) -> Single<Void>
+    func addFavoritePost(postId: String, type: PostOriginType) -> Single<Void>
     
     /// 요양보호사 즐겨찾기 공고 삭제
     func removeFavoritePost(postId: String) -> Single<Void>

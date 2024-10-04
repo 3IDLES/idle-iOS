@@ -37,7 +37,7 @@ public enum RcruitmentPostAPI {
     
     // Favorite posts
     case getNativeFavoritePost
-    case addFavoritePost(id: String, jobPostingType: RecruitmentPostType)
+    case addFavoritePost(id: String, jobPostingType: PostOriginType)
     case removeFavoritePost(id: String)
 }
 

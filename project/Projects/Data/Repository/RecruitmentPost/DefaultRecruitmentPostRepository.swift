@@ -165,7 +165,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
             .mapToVoid()
     }
     
-    public func addFavoritePost(postId: String, type: RecruitmentPostType) -> Single<Void> {
+    public func addFavoritePost(postId: String, type: PostOriginType) -> Single<Void> {
         recruitmentPostService
             .request(api: .addFavoritePost(id: postId, jobPostingType: type), with: .withToken)
             .mapToVoid()

@@ -10,7 +10,7 @@ import Foundation
 public struct NativeRecruitmentPostForWorkerVO: RecruitmentPostForWorkerRepresentable {
     
     // protocol required
-    public var postType: RecruitmentPostType
+    public var postType: PostOriginType
     public var beFavoritedTime: Date?
     
     public let postId: String
@@ -55,7 +55,7 @@ public struct NativeRecruitmentPostForWorkerVO: RecruitmentPostForWorkerRepresen
         distanceFromWorkPlace: Int,
         applyTime: Date?,
         isFavorite: Bool,
-        postType: RecruitmentPostType,
+        postType: PostOriginType,
         beFavoritedTime: Date?
     ) {
         self.postId = postId

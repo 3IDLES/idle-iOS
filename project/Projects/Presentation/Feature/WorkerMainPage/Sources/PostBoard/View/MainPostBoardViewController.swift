@@ -16,7 +16,7 @@ import RxCocoa
 import RxSwift
 
 
-public class WorkerRecruitmentPostBoardVC: BaseViewController {
+class MainPostBoardViewController: BaseViewController {
     typealias NativeCell = WorkerNativeEmployCardCell
     typealias WorknetCell = WorkerWorknetEmployCardCell
     
@@ -40,19 +40,19 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     var postData: [RecruitmentPostForWorkerRepresentable] = []
     let requestNextPage: PublishRelay<Void> = .init()
     
-    public init() {
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         setTableView()
         setLayout()
     }
     
-    public func bind(viewModel: WorkerRecruitmentPostBoardVMable) {
+    func bind(viewModel: WorkerRecruitmentPostBoardVMable) {
         
         super.bind(viewModel: viewModel)
         
@@ -177,13 +177,13 @@ public class WorkerRecruitmentPostBoardVC: BaseViewController {
     }
 }
 
-extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelegate {
+extension MainPostBoardViewController: UITableViewDataSource, UITableViewDelegate {
     
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         postData.count
     }
     
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         var cell: UITableViewCell!
         
@@ -227,8 +227,8 @@ extension WorkerRecruitmentPostBoardVC: UITableViewDataSource, UITableViewDelega
 }
 
 // MARK: ScrollView관련
-extension WorkerRecruitmentPostBoardVC {
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+extension MainPostBoardViewController {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         let height = scrollView.frame.height
@@ -278,7 +278,7 @@ fileprivate class WorkerMainTopContainer: UIView {
         setAutoLayout(innerViews: innerViews)
     }
     
-    public required init(coder: NSCoder) { fatalError() }
+    required init(coder: NSCoder) { fatalError() }
     
     func setApearance() {
         

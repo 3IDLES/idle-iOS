@@ -10,6 +10,7 @@ import BaseFeature
 import SplashFeature
 import AuthFeature
 import CenterMainPageFeature
+import WorkerMainPageFeature
 import Domain
 import Core
 
@@ -111,12 +112,10 @@ extension AppCoordinator {
     func runCenterMainPageFlow() -> CenterMainPageCoordinator {
         let coordinator = CenterMainPageCoordinator(router: router)
         coordinator.startFlow = { [weak self] destination in
-            
             guard let self else { return }
-            
             switch destination {
             case .workerProfilePage(let workerId):
-                workerProfileFlow(id: workerId)
+                workerProfileFlow(mode: .otherProfile(id: workerId))
             case .createPostPage:
                 createPostFlow()
             case .myCenterProfilePage:
@@ -135,8 +134,26 @@ extension AppCoordinator {
     
     
     /// WorkerMainFlow를 시작합니다.
-    func runWorkerMainPageFlow() {
-        printIfDebug("WorkerMain")
+    @discardableResult
+    func runWorkerMainPageFlow() -> WorkerMainPageCoordinator {
+        let coordinator = WorkerMainPageCoordinator(router: router)
+        coordinator.startFlow = { [weak self] destination in
+            guard let self else { return }
+            switch destination {
+            case .accountDeregisterPage:
+                accountDeregister(userType: .worker)
+            case .authFlow:
+                runAuthFlow()
+            case .myProfilePage:
+                workerProfileFlow(mode: .myProfile)
+            case .postDetailPage(let id, let type):
+                postDetailForWorkerFlow(postId: id, origin: type)
+            }
+        }
+        
+        executeChild(coordinator)
+        
+        return coordinator
     }
     
     
@@ -221,13 +238,18 @@ extension AppCoordinator {
         
         return coordinator
     }
+    
+    @discardableResult
+    func postDetailForWorkerFlow(postId: String, origin: PostOriginType) {
+        printIfDebug("postDetail")
+    }
 }
 
 // MARK: User profile
 extension AppCoordinator {
     
    @discardableResult
-    func workerProfileFlow(id: String) {
+    func workerProfileFlow(mode: ProfileMode) {
         printIfDebug("worker profile")
     }
     
@@ -242,6 +264,6 @@ extension AppCoordinator {
     
     @discardableResult
      func accountDeregister(userType: UserType) {
-        
+         printIfDebug("deregister")
      }
 }
