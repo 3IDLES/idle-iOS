@@ -1,5 +1,5 @@
 //
-//  WorkerSettingVM.swift
+//  SettingPageViewModel.swift
 //  WorkerFeature
 //
 //  Created by choijunios on 8/25/24.
@@ -17,49 +17,32 @@ import Core
 import RxCocoa
 import RxSwift
 
-public protocol WorkerSettingVMable: BaseViewModel {
+class SettingPageViewModel: BaseViewModel {
     
-    // Input
-    var viewWillAppear: PublishRelay<Void> { get }
-    var myProfileButtonClicked: PublishRelay<Void> { get }
-    var approveToPushNotification: PublishRelay<Bool> { get }
-    
-    var signOutButtonComfirmed: PublishRelay<Void> { get }
-    var removeAccountButtonClicked: PublishRelay<Void> { get }
-    
-    var additionalInfoButtonClieck: PublishRelay<SettingAdditionalInfoType> { get }
-    
-    // Output
-    var pushNotificationApproveState: Driver<Bool>? { get }
-    var showSettingAlert: Driver<Void>? { get }
-    
-    // SignOut
-    func createSingOutVM() -> IdleAlertViewModelable
-}
-
-public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
-    
-    // Init
-    weak var coordinator: WorkerSettingScreenCoordinator?
+    // Injected
     @Injected var settingUseCase: SettingScreenUseCase
     @Injected var centerProfileUseCase: CenterProfileUseCase
     
+    // Navigation(
+    var presentMyProfilePage: (() -> ())?
+    var changeToAuthFlow: (() -> ())?
+    var presentDeregisterPage: (() -> ())?
+    
     // Input
-    public let viewWillAppear: PublishRelay<Void> = .init()
-    public let myProfileButtonClicked: PublishRelay<Void> = .init()
-    public let approveToPushNotification: PublishRelay<Bool> = .init()
+    let viewWillAppear: PublishRelay<Void> = .init()
+    let myProfileButtonClicked: PublishRelay<Void> = .init()
+    let approveToPushNotification: PublishRelay<Bool> = .init()
     
-    public let signOutButtonComfirmed: PublishRelay<Void> = .init()
-    public let removeAccountButtonClicked: PublishRelay<Void> = .init()
+    let signOutButtonComfirmed: PublishRelay<Void> = .init()
+    let removeAccountButtonClicked: PublishRelay<Void> = .init()
     
-    public let additionalInfoButtonClieck: PublishRelay<SettingAdditionalInfoType> = .init()
+    let additionalInfoButtonClieck: PublishRelay<SettingAdditionalInfoType> = .init()
     
     // Output
-    public var pushNotificationApproveState: Driver<Bool>?
-    public var showSettingAlert: Driver<Void>?
+    var pushNotificationApproveState: Driver<Bool>?
+    var showSettingAlert: Driver<Void>?
     
-    public init(coordinator: WorkerSettingScreenCoordinator?) {
-        self.coordinator = coordinator
+    override init() {
         
         super.init()
         
@@ -111,9 +94,10 @@ public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
         
         // MARK: 내프로필 보기
         myProfileButtonClicked
-            .subscribe(onNext: { [weak self] _ in
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
                 
-                self?.coordinator?.showMyProfileScreen()
+                obj.presentMyProfilePage?()
             })
             .disposed(by: disposeBag)
         
@@ -147,21 +131,20 @@ public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
         let signOutFailure = signOutRequestResult.compactMap { $0.error }
         
         signOutSuccess
-            .subscribe(onNext: { [weak self] _ in
-                
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
                 // 로그이아웃 성공 -> 원격알림 토큰 제거
                 NotificationCenter.default.post(name: .requestDeleteTokenFromServer, object: nil)
-                
-                self?.coordinator?.popToRoot()
+                obj.changeToAuthFlow?()
             })
             .disposed(by: disposeBag)
         
         
         // MARK: 회원 탈퇴
         removeAccountButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                
-                self?.coordinator?.startRemoveWorkerAccountFlow()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentDeregisterPage?()
             })
             .disposed(by: disposeBag)
         
@@ -181,7 +164,7 @@ public class WorkerSettingVM: BaseViewModel, WorkerSettingVMable {
         .disposed(by: disposeBag)
     }
     
-    public func createSingOutVM() -> any DSKit.IdleAlertViewModelable {
+    func createSingOutVM() -> any DSKit.IdleAlertViewModelable {
         let viewModel = CenterSingOutVM(
             title: "로그아웃하시겠어요?",
             description: "",

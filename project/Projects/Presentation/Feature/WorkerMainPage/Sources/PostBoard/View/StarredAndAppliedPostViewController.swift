@@ -15,7 +15,7 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-public class StarredAndAppliedVC: BaseViewController {
+class StarredAndAppliedPostViewController: BaseViewController {
     enum TabBarState: Int, CaseIterable {
         case applied = 0
         case starred = 1
@@ -59,13 +59,13 @@ public class StarredAndAppliedVC: BaseViewController {
         initialItem: .init(id: currentState)
     )!
     
-    public init() {
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         setAppearance()
         setLayout()
         setObservable()
@@ -156,9 +156,9 @@ public class StarredAndAppliedVC: BaseViewController {
         ])
     }
     
-    public func bind(
-        appliedPostVM: AppliedPostBoardVM,
-        starredPostVM: StarredPostBoardVM
+    func bind(
+        appliedPostVM: AppliedPostBoardViewModel,
+        starredPostVM: StarredPostBoardViewModel
     ) {
          
         viewControllerDict[.applied]?.bind(viewModel: appliedPostVM)

@@ -17,20 +17,21 @@ import RxCocoa
 import RxSwift
 
 
-public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
+class AppliedPostBoardViewModel: BaseViewModel, WorkerPagablePostBoardVMable {
     
-    @Injected public var recruitmentPostUseCase: RecruitmentPostUseCase
+    // Injected
+    @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
     
-    // Init
-    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
+    // Navigation
+    var presentPostDetailPage: ((String, PostOriginType) -> ())?
     
     // Input
-    public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
-    public var requestNextPage: RxRelay.PublishRelay<Void> = .init()
-    public var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
+    var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
+    var requestNextPage: RxRelay.PublishRelay<Void> = .init()
+    var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
     
     // Output
-    public var postBoardData: RxCocoa.Driver<BoardRefreshResult>?
+    var postBoardData: RxCocoa.Driver<BoardRefreshResult>?
     
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
@@ -38,8 +39,7 @@ public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
     /// 가장최신의 데이터를 홀드, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
     private let currentPostVO: BehaviorRelay<[RecruitmentPostForWorkerRepresentable]> = .init(value: [])
     
-    public init(coordinator: WorkerRecruitmentBoardCoordinatable) {
-        self.coordinator = coordinator
+    override init() {
         self.nextPagingRequest = .initial
         
         super.init()
@@ -146,5 +146,9 @@ public class AppliedPostBoardVM: BaseViewModel, WorkerPagablePostBoardVMable {
             .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .subscribe(self.dismissLoading)
             .disposed(by: disposeBag)
+    }
+    
+    func showPostDetail(postType: Domain.PostOriginType, id: String) {
+        self.presentPostDetailPage?(id, postType)
     }
 }

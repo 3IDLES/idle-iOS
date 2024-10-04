@@ -168,7 +168,7 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
         convert(task: repository.applyToPost(postId: postId, method: method))
     }
     
-    public func addFavoritePost(postId: String, type: RecruitmentPostType) -> Single<Result<Void, DomainError>> {
+    public func addFavoritePost(postId: String, type: PostOriginType) -> Single<Result<Void, DomainError>> {
         convert(task: repository.addFavoritePost(postId: postId, type: type))
     }
     

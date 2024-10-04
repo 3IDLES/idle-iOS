@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum RecruitmentPostType: String, Codable {
+public enum PostOriginType: String, Codable {
     case native="CAREMEET"
     case workNet="WORKNET"
     
@@ -22,10 +22,10 @@ public enum RecruitmentPostType: String, Codable {
 }
 
 public struct RecruitmentPostInfo {
-    public let type: RecruitmentPostType
+    public let type: PostOriginType
     public let id: String
     
-    public init(type: RecruitmentPostType, id: String) {
+    public init(type: PostOriginType, id: String) {
         self.type = type
         self.id = id
     }

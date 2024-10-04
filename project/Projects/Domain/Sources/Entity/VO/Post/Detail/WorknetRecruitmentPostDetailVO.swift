@@ -27,7 +27,7 @@ public struct WorknetRecruitmentPostDetailVO: Decodable {
     public let centerName: String
     public let centerAddress: String
     public let jobPostingUrl: String
-    public let jobPostingType: RecruitmentPostType
+    public let jobPostingType: PostOriginType
     public let isFavorite: Bool
     
     public init(
@@ -49,7 +49,7 @@ public struct WorknetRecruitmentPostDetailVO: Decodable {
         centerName: String,
         centerAddress: String,
         jobPostingUrl: String,
-        jobPostingType: RecruitmentPostType,
+        jobPostingType: PostOriginType,
         isFavorite: Bool
     ) {
         self.id = id

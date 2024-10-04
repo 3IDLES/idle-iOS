@@ -20,6 +20,6 @@ public struct RecruitmentPostListForWorkerVO {
     }
 }
 public protocol RecruitmentPostForWorkerRepresentable {
-    var postType: RecruitmentPostType { get }
+    var postType: PostOriginType { get }
     var beFavoritedTime: Date? { get }
 }

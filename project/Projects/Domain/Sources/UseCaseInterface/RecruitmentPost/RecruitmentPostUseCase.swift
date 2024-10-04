@@ -66,7 +66,7 @@ public protocol RecruitmentPostUseCase: BaseUseCase {
     func applyToPost(postId: String, method: ApplyType) -> Single<Result<Void, DomainError>>
     
     /// 요양보호사 즐겨찾기 공고 추가
-    func addFavoritePost(postId: String, type: RecruitmentPostType) -> Single<Result<Void, DomainError>>
+    func addFavoritePost(postId: String, type: PostOriginType) -> Single<Result<Void, DomainError>>
     
     /// 요양보호사 즐겨찾기 공고 삭제
     func removeFavoritePost(postId: String) -> Single<Result<Void, DomainError>>

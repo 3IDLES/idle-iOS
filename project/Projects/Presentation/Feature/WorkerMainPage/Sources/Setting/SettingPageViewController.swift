@@ -15,7 +15,7 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-public class WorkerSettingVC: BaseViewController {
+class SettingPageViewController: BaseViewController {
     
     // Init
     
@@ -61,13 +61,13 @@ public class WorkerSettingVC: BaseViewController {
         return button
     }()
     
-    public init() {
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public func bind(viewModel: WorkerSettingVMable) {
+    func bind(viewModel: SettingPageViewModel) {
         
         super.bind(viewModel: viewModel)
         
@@ -127,7 +127,7 @@ public class WorkerSettingVC: BaseViewController {
             .disposed(by: disposeBag)
     }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         setAppearance()
         setLayout()
@@ -205,7 +205,7 @@ public class WorkerSettingVC: BaseViewController {
         signOutButton
             .rx.tap
             .subscribe(onNext: { [weak self] _ in
-                guard let self, let vm = viewModel as? WorkerSettingVMable else { return }
+                guard let self, let vm = viewModel as? SettingPageViewModel else { return }
                 let signOutVM = vm.createSingOutVM()
                 showIdleModal(viewModel: signOutVM)
             })

@@ -16,13 +16,11 @@ import Core
 import RxCocoa
 import RxSwift
 
-public typealias BoardRefreshResult = (isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])
+typealias BoardRefreshResult = (isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])
 
 /// 페이징 보드
-public protocol WorkerPagablePostBoardVMable: BaseViewModel, AppliableWorkerEmployCardVMable {
-    
-    var coordinator: WorkerRecruitmentBoardCoordinatable? { get }
-    
+protocol WorkerPagablePostBoardVMable: BaseViewModel, AppliableWorkerEmployCardVMable {
+
     var recruitmentPostUseCase: RecruitmentPostUseCase { get }
     
     /// 다음 페이지를 요청합니다.
@@ -36,13 +34,13 @@ public protocol WorkerPagablePostBoardVMable: BaseViewModel, AppliableWorkerEmpl
 }
 
 /// 페이징 + 지원하기
-public protocol WorkerAppliablePostBoardVMable: WorkerPagablePostBoardVMable {
+protocol WorkerAppliablePostBoardVMable: WorkerPagablePostBoardVMable {
     /// 지원하기 Alert
     var idleAlertVM: Driver<IdleAlertViewModelable>? { get }
 }
 
 /// 페이징 + 지원하기 + 요양보호사 위치정보
-public protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable {
+protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable {
     
     /// 요양보호사 위치정보를 요청합니다.
     var requestWorkerLocation: PublishRelay<Void> { get }
@@ -54,26 +52,27 @@ public protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable
     var workerLocationTitleText: Driver<String>? { get }
 }
 
-public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostBoardVMable {
+class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
     
-    @Injected public var recruitmentPostUseCase: RecruitmentPostUseCase
+    @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
     @Injected var workerProfileUseCase: WorkerProfileUseCase
     
-    // Init
-    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
+    // Navigation
+    var presentMyProfile: (() -> ())?
+    var presentPostDetailPage: ((String, PostOriginType) -> ())?
     
     // Output
-    public var postBoardData: Driver<(isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])>?
-    public var workerLocationTitleText: Driver<String>?
-    public var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
+    var postBoardData: Driver<(isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])>?
+    var workerLocationTitleText: Driver<String>?
+    var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
     
     // Input
-    public var editProfileButtonClicked: PublishRelay<Void> = .init()
-    public var requestInitialPageRequest: PublishRelay<Void> = .init()
-    public var requestWorkerLocation: PublishRelay<Void> = .init()
-    public var requestNextPage: PublishRelay<Void> = .init()
-    public var applyButtonClicked: PublishRelay<(postId: String, postTitle: String)> = .init()
+    var editProfileButtonClicked: PublishRelay<Void> = .init()
+    var requestInitialPageRequest: PublishRelay<Void> = .init()
+    var requestWorkerLocation: PublishRelay<Void> = .init()
+    var requestNextPage: PublishRelay<Void> = .init()
+    var applyButtonClicked: PublishRelay<(postId: String, postTitle: String)> = .init()
     
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
@@ -84,8 +83,7 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
     // Observable
     let dispostBag = DisposeBag()
     
-    public init(coordinator: WorkerRecruitmentBoardCoordinatable) {
-        self.coordinator = coordinator
+    override init() {
         
         super.init()
         
@@ -263,9 +261,9 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
         // MARK: 프로필 수정
         editProfileButtonClicked
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] in
-                guard let self else { return }
-                self.coordinator?.showWorkerProfile()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentMyProfile?()
             })
             .disposed(by: dispostBag)
         
@@ -290,19 +288,16 @@ public class WorkerRecruitmentPostBoardVM: BaseViewModel, WorkerRecruitmentPostB
         }
         return resultParts.joined(separator: " ")
     }
+    
+    func showPostDetail(postType: Domain.PostOriginType, id: String) {
+        self.presentPostDetailPage?(id, postType)
+    }
 }
 
 // MARK: WorkerPagablePostBoardVMable + Extension
 extension WorkerPagablePostBoardVMable {
     
-    public func showPostDetail(postType: RecruitmentPostType, id: String) {
-        coordinator?.showPostDetail(postInfo: .init(
-            type: postType,
-            id: id
-        ))
-    }
-    
-    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: RecruitmentPostType) -> RxSwift.Single<Bool> {
+    func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: PostOriginType) -> RxSwift.Single<Bool> {
         
         return Single<Bool>.create { [weak self] observer in
             

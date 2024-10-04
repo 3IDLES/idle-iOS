@@ -16,23 +16,24 @@ import Core
 import RxCocoa
 import RxSwift
 
-public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
+class StarredPostBoardViewModel: BaseViewModel, WorkerAppliablePostBoardVMable {
     
     // Init
-    public weak var coordinator: WorkerRecruitmentBoardCoordinatable?
-    @Injected public var recruitmentPostUseCase: RecruitmentPostUseCase
+    @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
+    
+    // Navigation
+    var presentPostDetailPage: ((String, PostOriginType) -> ())?
     
     // Input
-    public var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
-    public var requestNextPage: RxRelay.PublishRelay<Void> = .init()
-    public var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
+    var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
+    var requestNextPage: RxRelay.PublishRelay<Void> = .init()
+    var applyButtonClicked: RxRelay.PublishRelay<(postId: String, postTitle: String)> = .init()
     
     // Output
-    public var postBoardData: RxCocoa.Driver<BoardRefreshResult>?
-    public var idleAlertVM: RxCocoa.Driver<IdleAlertViewModelable>?
+    var postBoardData: RxCocoa.Driver<BoardRefreshResult>?
+    var idleAlertVM: RxCocoa.Driver<IdleAlertViewModelable>?
     
-    public init(coordinator: WorkerRecruitmentBoardCoordinatable) {
-        self.coordinator = coordinator
+    override init() {
         
         super.init()
         
@@ -129,5 +130,9 @@ public class StarredPostBoardVM: BaseViewModel, WorkerAppliablePostBoardVMable {
                 dismissLoading.onNext(())
             })
             .disposed(by: disposeBag)
+    }
+    
+    func showPostDetail(postType: Domain.PostOriginType, id: String) {
+        self.presentPostDetailPage?(id, postType)
     }
 }
