@@ -267,10 +267,7 @@ public class EditPostVC: BaseViewController {
         }
     }
     
-    private func setObservable() {
-        
-        
-    }
+    private func setObservable() { }
     
     public func bind(viewModel: EditPostViewModelable) {
         

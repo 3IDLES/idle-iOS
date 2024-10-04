@@ -39,24 +39,27 @@ public enum RegisterRecruitmentPostInputSection: CaseIterable {
     }
 }
 
-public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostViewModelable {
+public class CreatePostViewModel: BaseViewModel, RegisterRecruitmentPostViewModelable {
     
     //Init
     @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
-    public weak var coordinator: (any PresentationCore.RegisterRecruitmentPostCoordinatable)?
+    
+    // Navigation
+    var exitPage: (() -> ())?
+    var presentEditPostPage: ((EditPostViewModelable) -> ())?
+    var presentCompletePage: (() -> ())?
+    var presentPostOverviewPage: ((PostOverviewViewModelable) -> ())?
     
     // MARK: Edit Screen
-    public weak var editPostCoordinator: EditPostCoordinator?
-    public var editViewExitButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var saveButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var requestSaveFailure: RxCocoa.Driver<DefaultAlertContentVO>?
+    public var editViewExitButtonClicked: PublishRelay<Void> = .init()
+    public var saveButtonClicked: PublishRelay<Void> = .init()
+    public var requestSaveFailure: Driver<DefaultAlertContentVO>?
     
     // MARK: OverView Screen
-    public weak var postOverviewCoordinator: PostOverviewCoordinator?
     public var postEditButtonClicked: PublishRelay<Void> = .init()
     public var overViewExitButtonClicked: PublishRelay<Void> = .init()
     public var registerButtonClicked: PublishRelay<Void> = .init()
-    public var overViewWillAppear: RxRelay.PublishRelay<Void> = .init()
+    public var overViewWillAppear: PublishRelay<Void> = .init()
     
     public var workerEmployCardVO: Driver<WorkerNativeEmployCardVO>?
     
@@ -140,8 +143,7 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         return dict
     }()
     
-    public init(coordinator: RegisterRecruitmentPostCoordinatable) {
-        self.coordinator = coordinator
+    public override init() {
         
         super.init()
         
@@ -411,22 +413,25 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
             .disposed(by: disposeBag)
         
         postEditButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.showEditPostScreen()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentEditPostPage?(self)
             })
             .disposed(by: disposeBag)
         
         overViewExitButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                self?.postOverviewCoordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
 
         // MARK: ----- Edit -----
         editViewExitButtonClicked
-            .subscribe(onNext: { [weak self] in
-                self?.editPostCoordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
@@ -439,12 +444,10 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         let requestSaveSuccess = requestSaveResult.filter { $0 == nil }
         
         requestSaveSuccess
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                updateToState()
-                
-                // 저장이 성공적으로 완료되어 코디네이터와 뷰컨트롤러 종료
-                editPostCoordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.updateToState()
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
@@ -484,9 +487,10 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
         // 공고 등록 성공
         registerPostResult
             .compactMap { $0.value }
-            .subscribe { [weak self] _ in
-                self?.coordinator?.showRegisterCompleteScreen()
-            }
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentCompletePage?()
+            })
             .disposed(by: disposeBag)
             
         
@@ -573,10 +577,10 @@ public class RegisterRecruitmentPostVM: BaseViewModel, RegisterRecruitmentPostVi
     }
     
     public func showOverView() {
-        coordinator?.showOverViewScreen()
+        presentPostOverviewPage?(self)
     }
     
     public func exit() {
-        coordinator?.registerFinished()
+        exitPage?()
     }
 }

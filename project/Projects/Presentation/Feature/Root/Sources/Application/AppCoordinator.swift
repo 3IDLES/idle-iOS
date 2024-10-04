@@ -106,6 +106,8 @@ extension AppCoordinator {
             switch destination {
             case .workerProfilePage(let workerId):
                 self?.workerProfileFlow(id: workerId)
+            case .createPost:
+                self?.createPostFlow()
             }
         }
         
@@ -190,6 +192,22 @@ extension AppCoordinator {
     
 }
 
+// MARK: Post
+extension AppCoordinator {
+    
+    @discardableResult
+    func createPostFlow() -> CreatePostCoordinator {
+        
+        let coordinator = CreatePostCoordinator(
+            router: router,
+            presentingModule: router.topViewController!
+        )
+        addChild(coordinator)
+        coordinator.start()
+        
+        return coordinator
+    }
+}
 
 // MARK: User profile
 extension AppCoordinator {

@@ -40,11 +40,13 @@ public class CustomerInformationContentView: UIView {
     // 성별 선택
     let maleBtn: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "남성", initial: .normal)
+        btn.label.attrTextColor = DSColor.gray500.color
         btn.label.typography = .Body3
         return btn
     }()
     let femaleBtn: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "여성", initial: .normal)
+        btn.label.attrTextColor = DSColor.gray500.color
         btn.label.typography = .Body3
         return btn
     }()

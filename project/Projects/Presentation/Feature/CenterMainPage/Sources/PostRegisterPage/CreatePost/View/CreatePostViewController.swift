@@ -55,7 +55,7 @@ public protocol RegisterRecruitmentPostViewModelable:
     func exit()
 }
 
-public class RegisterRecruitmentPostVC: BaseViewController {
+public class CreatePostViewController: BaseViewController {
     
     @Injected var logger: PostRegisterLogger
     

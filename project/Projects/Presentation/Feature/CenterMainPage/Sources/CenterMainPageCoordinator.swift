@@ -12,6 +12,7 @@ import Core
 
 public enum CenterMainPageCoordinatorDestination {
     case workerProfilePage(id: String)
+    case createPost
 }
 
 public enum CenterMainPageInternalDestination {
@@ -88,7 +89,7 @@ extension CenterMainPageCoordinator {
         
         let viewModel = PostBoardPageViewModel()
         viewModel.presentRegisterPostPage = { [weak self] in
-            self?.presentRegisterPostPage()
+            self?.startFlow(.createPost)
         }
         viewModel.createPostCellViewModel = { [weak self] info, state in
             
@@ -165,8 +166,8 @@ extension CenterMainPageCoordinator {
     public func presentPostDetailPage(postId: String, postState: PostState) {
         let viewModel = PostDetailViewModel(postId: postId, postState: postState)
         
-        viewModel.presentApplicantPage = { [weak self] applicantId in
-            self?.startFlow(.workerProfilePage(id: applicantId))
+        viewModel.presentApplicantPage = { [weak self] postId in
+            self?.presentPostApplicantPage(postId: postId)
         }
         viewModel.presentPostEditPage = { [weak self] postId in
             self?.presentPostEditPage(postId: postId)
@@ -182,10 +183,5 @@ extension CenterMainPageCoordinator {
         viewController.bind(viewModel: viewModel)
 
         router.push(module: viewController, animated: true)
-    }
-    
-    public func presentRegisterPostPage() {
-        
-        
     }
 }
