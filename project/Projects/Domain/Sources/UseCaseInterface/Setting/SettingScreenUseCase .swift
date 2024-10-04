@@ -31,8 +31,6 @@ public protocol SettingScreenUseCase: BaseUseCase {
     func getApplicationPolicyUrl() -> URL
     
     // MARK: Worker
-    /// 센터 프로필정보 가져오기
-    func getWorkerProfile() -> WorkerProfileVO
     
     /// 요양보호사 회원 탈퇴
     func deregisterWorkerAccount(
@@ -43,9 +41,6 @@ public protocol SettingScreenUseCase: BaseUseCase {
     func signoutWorkerAccount() -> Single<Result<Void, DomainError>>
     
     // MARK: Center
-    
-    /// 센터 프로필정보 가져오기
-    func getCenterProfile() -> CenterProfileVO
     
     /// 센터 회원 탈퇴
     func deregisterCenterAccount(

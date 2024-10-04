@@ -10,6 +10,7 @@ import BaseFeature
 import SplashFeature
 import AuthFeature
 import CenterMainPageFeature
+import Domain
 import Core
 
 
@@ -111,11 +112,19 @@ extension AppCoordinator {
         let coordinator = CenterMainPageCoordinator(router: router)
         coordinator.startFlow = { [weak self] destination in
             
+            guard let self else { return }
+            
             switch destination {
             case .workerProfilePage(let workerId):
-                self?.workerProfileFlow(id: workerId)
+                workerProfileFlow(id: workerId)
             case .createPost:
-                self?.createPostFlow()
+                createPostFlow()
+            case .myCenterProfile:
+                centerProfileFlow(mode: .myProfile)
+            case .authFlow:
+                runAuthFlow()
+            case .accountDeregister:
+                accountDeregister(userType: .center)
             }
         }
         
@@ -223,7 +232,16 @@ extension AppCoordinator {
     }
     
     @discardableResult
-     func centerProfileFlow() {
+     func centerProfileFlow(mode: ProfileMode) {
          printIfDebug("center profile")
+     }
+}
+
+// MARK: Account Deregister
+extension AppCoordinator {
+    
+    @discardableResult
+     func accountDeregister(userType: UserType) {
+        
      }
 }

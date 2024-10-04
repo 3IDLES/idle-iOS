@@ -15,7 +15,7 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-public class CenterSettingVC: BaseViewController {
+class CenterSettingViewController: BaseViewController {
     
     // Init
     
@@ -65,13 +65,13 @@ public class CenterSettingVC: BaseViewController {
         return button
     }()
     
-    public init() {
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public func bind(viewModel: CenterSettingVMable) {
+    func bind(viewModel: CenterSettingVMable) {
         
         super.bind(viewModel: viewModel)
         
@@ -146,7 +146,7 @@ public class CenterSettingVC: BaseViewController {
             .disposed(by: disposeBag)
     }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         setAppearance()
         setLayout()
@@ -248,5 +248,5 @@ public class CenterSettingVC: BaseViewController {
 @available(iOS 17.0, *)
 #Preview("Preview", traits: .defaultLayout) {
     
-    CenterSettingVC()
+    CenterSettingViewController()
 }

@@ -13,6 +13,9 @@ import Core
 public enum CenterMainPageCoordinatorDestination {
     case workerProfilePage(id: String)
     case createPost
+    case authFlow
+    case myCenterProfile
+    case accountDeregister
 }
 
 public enum CenterMainPageInternalDestination {
@@ -79,15 +82,16 @@ extension CenterMainPageCoordinator {
         case .postBoard:
             presentPostBoardPage(controller: navigationController)
         case .setting:
-            return
+            presentSettingPage(controller: navigationController)
         }
     }
 }
 
 // MARK: TabPageFlow
-extension CenterMainPageCoordinator {
+public extension CenterMainPageCoordinator {
     
-    public func presentPostBoardPage(controller: UINavigationController) {
+    /// 포스트 보드
+    func presentPostBoardPage(controller: UINavigationController) {
         
         let viewModel = PostBoardPageViewModel()
         viewModel.presentRegisterPostPage = { [weak self] in
@@ -113,6 +117,30 @@ extension CenterMainPageCoordinator {
         }
         
         let viewController = PostBoardPageViewController()
+        viewController.bind(viewModel: viewModel)
+        
+        router.push(
+            module: viewController,
+            to: controller,
+            animated: false
+        )
+    }
+    
+    /// 세팅화면
+    func presentSettingPage(controller: UINavigationController) {
+        
+        let viewModel = CenterSettingViewModel()
+        viewModel.changeToAuthFlow = { [weak self] in
+            self?.startFlow(.authFlow)
+        }
+        viewModel.presentMyProfile = { [weak self] in
+            self?.startFlow(.myCenterProfile)
+        }
+        viewModel.presentAccountDeregisterPage = { [weak self] in
+            self?.startFlow(.accountDeregister)
+        }
+        
+        let viewController = CenterSettingViewController()
         viewController.bind(viewModel: viewModel)
         
         router.push(

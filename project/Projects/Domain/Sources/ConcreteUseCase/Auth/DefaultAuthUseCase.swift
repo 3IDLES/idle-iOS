@@ -41,7 +41,7 @@ public class DefaultAuthUseCase: AuthUseCase {
     // 센터 로그인 실행
     public func loginCenterAccount(id: String, password: String) -> Single<Result<Void, DomainError>> {
         let task = authRepository.requestCenterLogin(id: id, password: password)
-            .map { [userInfoLocalRepository] _ in
+            .map { [userInfoLocalRepository] vo in
                 userInfoLocalRepository.updateUserType(.center)
             }
         return convert(task: task)
