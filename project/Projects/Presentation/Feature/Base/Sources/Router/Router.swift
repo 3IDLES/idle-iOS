@@ -276,7 +276,7 @@ public extension Router {
 // MARK: Snack bar
 public extension Router {
     
-    func presentSnackBar(bottomPadding: CGFloat, object: IdleSnackBarRO) {
+    func presentSnackBarController(bottomPadding: CGFloat, object: IdleSnackBarRO) {
         let snackBarController = IdleSnackBarController(
             bottomPaddingFromSafeArea: bottomPadding,
             object: object

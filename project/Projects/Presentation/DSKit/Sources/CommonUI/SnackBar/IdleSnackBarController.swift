@@ -26,6 +26,8 @@ public class IdleSnackBarController: UIViewController {
     
     let bottomPadding: CGFloat
     
+    var isDismissing = false
+    
     public init(bottomPaddingFromSafeArea: CGFloat, object: IdleSnackBarRO) {
         self.bottomPadding = bottomPaddingFromSafeArea
         super.init(nibName: nil, bundle: nil)
@@ -33,6 +35,7 @@ public class IdleSnackBarController: UIViewController {
         self.snackBar.applyRO(object)
         
         setAppearance()
+        setGesture()
         setLayout()
         setObservable()
     }
@@ -41,6 +44,11 @@ public class IdleSnackBarController: UIViewController {
     
     private func setAppearance() {
         view.backgroundColor = .clear
+    }
+    
+    private func setGesture() {
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(onTap(gesture:)))
+        view.addGestureRecognizer(recognizer)
     }
     
     private func setLayout() {
@@ -59,23 +67,37 @@ public class IdleSnackBarController: UIViewController {
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        let displayingTime: CGFloat = 2
-        
         snackBar.transform = .init(translationX: 0, y: snackBar.bounds.height+bottomPadding)
         
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn) {
             self.snackBar.transform = .identity
             self.snackBar.alpha = 1.0
         } completion: { _ in
-            
-            UIView.animate(withDuration: 0.2, delay: displayingTime, options: .curveEaseIn) { [weak self] in
-                guard let self else { return }
-                snackBar.transform = .init(translationX: 0, y: snackBar.bounds.height+bottomPadding)
-                snackBar.alpha = 0.0
-            } completion: { _ in
-                self.dismiss(animated: false)
+            DispatchQueue.main.asyncAfter(deadline: .now()+2) {
+                self.dismissSnackBar()
             }
         }
     }
+    
+    @objc
+    private func onTap(gesture: UITapGestureRecognizer) {
+        dismissSnackBar()
+    }
+    
+    private func dismissSnackBar() {
+        
+        if isDismissing { return }
+        
+        isDismissing = true
+        
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn) { [weak self] in
+            guard let self else { return }
+            snackBar.transform = .init(translationX: 0, y: snackBar.bounds.height+bottomPadding)
+            snackBar.alpha = 0.0
+        } completion: { _ in
+            self.dismiss(animated: false)
+        }
+    }
 }
+
 

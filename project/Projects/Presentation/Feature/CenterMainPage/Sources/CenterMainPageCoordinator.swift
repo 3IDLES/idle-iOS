@@ -177,7 +177,7 @@ extension CenterMainPageCoordinator {
         }
         viewModel.exitPageWithSnackBar = { [weak self] (object, padding) in
             self?.router.popModule(animated: true)
-            self?.router.presentSnackBar(bottomPadding: padding, object: object)
+            self?.router.presentSnackBarController(bottomPadding: padding, object: object)
         }
         
         let viewController = EditPostVC()
@@ -198,7 +198,8 @@ extension CenterMainPageCoordinator {
             self?.router.popModule(animated: true)
         }
         viewModel.exitWithSnackBar = { [weak self] object, padding in
-            self?.router.presentSnackBar(bottomPadding: padding, object: object)
+            self?.router.popModule(animated: true)
+            self?.router.presentSnackBarController(bottomPadding: padding, object: object)
         }
         
         let viewController = PostDetailForCenterVC()
