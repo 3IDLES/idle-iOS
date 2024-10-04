@@ -43,6 +43,8 @@ public enum CenterAccountRegisterCoordinatorDestination {
 
 public class CenterAccountRegisterCoordinator: Coordinator2 {
     
+    public var onFinish: (() -> ())?
+    
     @Injected var logger: CenterRegisterLogger
     
     let router: Router
@@ -116,7 +118,9 @@ public class CenterAccountRegisterCoordinator: Coordinator2 {
             self?.router.popModule(animated: true)
         }
         
-        router.push(module: viewController, animated: true)
+        router.push(module: viewController, animated: true) { [weak self] in
+            self?.onFinish?()
+        }
         
         excuteStage(.name, moveTo: .next)
         

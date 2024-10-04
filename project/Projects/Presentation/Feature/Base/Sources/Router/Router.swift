@@ -50,11 +50,11 @@ public protocol RouterProtocol {
     
     // MARK: change window
     /// 키 윈도우의 rootController를 변경, 페인드 인/아웃 애니메이션 적용됨
-    func replaceRootModuleTo(module: Module, animated: Bool, completion: RoutingCompletion?)
+    func replaceRootModuleTo(module: Module, animated: Bool, dismissCompletion: RoutingCompletion?)
     
     
     /// RootController를 생성및 KeyWindow의 루트로 지정
-    func setRootModuleTo(module: Module)
+    func setRootModuleTo(module: Module, popCompletion: RoutingCompletion?)
     
     
     /// Default alert를 표출
@@ -180,7 +180,7 @@ public final class Router: NSObject, RouterProtocol {
         rootController?.setViewControllers([module], animated: animated)
     }
     
-    public func replaceRootModuleTo(module: Module, animated: Bool, completion: (() -> Void)? = nil) {
+    public func replaceRootModuleTo(module: Module, animated: Bool, dismissCompletion: (() -> Void)? = nil) {
         
         guard let keyWindow = UIWindow.keyWindow else { return }
         
@@ -189,11 +189,17 @@ public final class Router: NSObject, RouterProtocol {
         
         self.rootController = navigationController
         
+        if let willReplacedModule = keyWindow.rootViewController {
+            
+            let pointer = willReplacedModule.getRawPointer
+            completion[pointer]?()
+            completion.removeValue(forKey: pointer)
+        }
+        
         if !animated {
             // 애니메이션이 없는 경우
             setRootModuleTo(module: module)
-            completion?()
-            
+            completion[module.getRawPointer] = dismissCompletion
             return
         }
         
@@ -202,7 +208,7 @@ public final class Router: NSObject, RouterProtocol {
             module.view.addSubview(snapshot)
             keyWindow.rootViewController = navigationController
             
-            completion?()
+            completion[navigationController.getRawPointer] = dismissCompletion
             
             UIView.animate(withDuration: 0.35, animations: {
                 snapshot.layer.opacity = 0
@@ -212,10 +218,14 @@ public final class Router: NSObject, RouterProtocol {
         }
     }
     
-    public func setRootModuleTo(module: Module) {
+    public func setRootModuleTo(module: Module, popCompletion: RoutingCompletion? = nil) {
         guard let keyWindow = UIWindow.keyWindow else { return }
         let navigationController = UINavigationController(rootViewController: module)
         navigationController.setNavigationBarHidden(true, animated: false)
+        
+        if let popCompletion {
+            completion[navigationController.getRawPointer] = popCompletion
+        }
         
         keyWindow.rootViewController = navigationController
         

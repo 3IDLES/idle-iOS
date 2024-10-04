@@ -29,6 +29,16 @@ public class AppCoordinator: BaseCoordinator {
 
 extension AppCoordinator {
     
+    func executeChild(_ coordinator: Coordinator2) {
+        coordinator.onFinish = { [weak self, weak coordinator] in
+            if let coordinator {
+                self?.removeChild(coordinator)
+            }
+        }
+        addChild(coordinator)
+        coordinator.start()
+    }
+    
     /// SplashFlow를 시작합니다.
     @discardableResult
     func runSplashFlow() -> SplashCoordinator {
@@ -58,8 +68,7 @@ extension AppCoordinator {
             }
         }
         
-        addChild(coordinator)
-        coordinator.start()
+        executeChild(coordinator)
         
         return coordinator
     }
@@ -84,8 +93,7 @@ extension AppCoordinator {
             }
         }
         
-        addChild(coordinator)
-        coordinator.start()
+        executeChild(coordinator)
         
         return coordinator
     }
@@ -111,8 +119,8 @@ extension AppCoordinator {
             }
         }
         
-        addChild(coordinator)
-        coordinator.start()
+        executeChild(coordinator)
+        
         return coordinator
     }
     
@@ -147,8 +155,7 @@ extension AppCoordinator {
             }
         }
         
-        addChild(coordinator)
-        coordinator.start()
+        executeChild(coordinator)
         
         return coordinator
     }
@@ -166,8 +173,7 @@ extension AppCoordinator {
             }
         }
         
-        addChild(coordinator)
-        coordinator.start()
+        executeChild(coordinator)
         
         return coordinator
     }
@@ -184,8 +190,7 @@ extension AppCoordinator {
             }
         }
         
-        addChild(coordinator)
-        coordinator.start()
+        executeChild(coordinator)
         
         return coordinator
     }
@@ -202,8 +207,8 @@ extension AppCoordinator {
             router: router,
             presentingModule: router.topViewController!
         )
-        addChild(coordinator)
-        coordinator.start()
+        
+        executeChild(coordinator)
         
         return coordinator
     }

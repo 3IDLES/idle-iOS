@@ -21,6 +21,8 @@ enum SetNewPasswordStage: Int {
 
 public class CenterSetupNewPasswordCoordinator: Coordinator2 {
     
+    public var onFinish: (() -> ())?
+    
     let router: Router
     
     // PageConroller
@@ -82,7 +84,10 @@ public class CenterSetupNewPasswordCoordinator: Coordinator2 {
                     object: .init(titleText: "비밀번호 변경 성공")
                 )
             }
+            
+            onFinish?()
         }
+        
         excuteStage(.phoneNumber, moveTo: .next)
     }
 }
