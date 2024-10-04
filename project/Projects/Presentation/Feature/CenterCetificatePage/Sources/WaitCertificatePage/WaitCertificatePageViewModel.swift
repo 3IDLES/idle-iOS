@@ -1,6 +1,6 @@
 //
 //  WaitCertificatePageViewModel.swift
-//  CenterFeature
+//  WaitCertificatePageCoordinator
 //
 //  Created by choijunios on 9/11/24.
 //

@@ -1,8 +1,8 @@
 //
 //  CenterProfileRegisterOverviewVC.swift
-//  CenterFeature
+//  CenterCetificatePageFeature
 //
-//  Created by choijunios on 9/12/24.
+//  Created by choijunios on 10/4/24.
 //
 
 import UIKit
@@ -15,7 +15,7 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-public class CenterProfileRegisterOverviewVC: BaseViewController {
+public class MakeCenterProfileOverviewViewController: BaseViewController {
     
     // Init
     
@@ -249,7 +249,7 @@ public class CenterProfileRegisterOverviewVC: BaseViewController {
         
     }
     
-    func bind(viewModel: RegisterProfileOverviewVM) {
+    func bind(viewModel: MakeCenterProfileOverviewViewModel) {
         
         super.bind(viewModel: viewModel)
         

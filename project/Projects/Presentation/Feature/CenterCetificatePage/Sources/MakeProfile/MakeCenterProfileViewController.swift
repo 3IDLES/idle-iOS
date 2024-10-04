@@ -1,6 +1,6 @@
 //
 //  RegisterCenterInfoVC.swift
-//  CenterFeature
+//  WaitCertificatePageCoordinator
 //
 //  Created by choijunios on 7/26/24.
 //
@@ -22,8 +22,9 @@ enum RegisterCenterInfoPage: Int, CaseIterable {
     case imageAndIntroduction = 2
 }
 
-public protocol RegisterCenterInfoViewModelable: AddressInputViewModelable {
+protocol MakeCenterProfileVMable: AddressInputViewModelable {
     // Input
+    var backButtonClicked: PublishRelay<Void> { get }
     var editingName: PublishRelay<String> { get }
     var editingCenterNumber: PublishRelay<String> { get }
     
@@ -42,20 +43,17 @@ fileprivate protocol RegisterCenterInfoVCViews: UIView {
     var nextButtonClicked: Observable<Void> { get }
     var prevButtonClicked: Observable<Void> { get }
     
-    func bind(viewModel vm: RegisterCenterInfoViewModelable)
+    func bind(viewModel vm: MakeCenterProfileVMable)
 }
 
 extension AddressView: RegisterCenterInfoVCViews {
-    func bind(viewModel vm: any RegisterCenterInfoViewModelable) {
+    func bind(viewModel vm: any MakeCenterProfileVMable) {
         bind(viewModel: vm as AddressInputViewModelable)
     }
 }
 
-public class RegisterCenterInfoVC: BaseViewController {
-    
-    // Init
-    public weak var coordinator: RegisterCenterInfoCoordinator?
-    
+class MakeCenterProfileViewController: BaseViewController {
+
     // Not init
     /// 현재 스크린의 넓이를 의미합니다.
     private var screenWidth: CGFloat {
@@ -71,8 +69,8 @@ public class RegisterCenterInfoVC: BaseViewController {
     var currentIndex: Int = 0
 
     // View
-    let navigationBar: NavigationBarType1 = {
-        let bar = NavigationBarType1(navigationTitle: "센터 회원가입")
+    let navigationBar: IdleNavigationBar = {
+        let bar = IdleNavigationBar(titleText: "센터 정보 등록")
         return bar
     }()
     lazy var statusBar: ProcessStatusBar = {
@@ -82,29 +80,31 @@ public class RegisterCenterInfoVC: BaseViewController {
         )
         return view
     }()
+    
+    let exitPageEvent: PublishRelay<Void> = .init()
 
-    public init(coordinator: RegisterCenterInfoCoordinator?) {
-        
-        self.coordinator = coordinator
+    init(viewModel: MakeCenterProfileVMable) {
         
         super.init(nibName: nil, bundle: nil)
+        
+        super.bind(viewModel: viewModel)
         
         // View를 생성
         // View를 여기서 생성하는 이유는 bind매서드호출시(viewDidLoad이후) view들을 바인딩 시키기 위해서 입니다.
         createPages()
         setPagesLayoutAndObservable()
+        bindViewModel()
     }
     required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         // ViewController
         setAppearance()
         setLayout()
-        setObservable()
     }
     
     /// 화면의 넓이를 안전하게 접근할 수 있는 시점, 화면 관련 속성들이 설정되어 있으므로 nil이 아닙니다.
-    public override func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         if !pagesAreSetted {
             pagesAreSetted = true
             displayPageView()
@@ -115,17 +115,6 @@ public class RegisterCenterInfoVC: BaseViewController {
         view.clipsToBounds = true
         view.backgroundColor = .white
         view.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
-    }
-    
-    private func setObservable() {
-        
-        // 뒤로가기 바인딩
-        navigationBar
-            .eventPublisher
-            .subscribe { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
-            }
-            .disposed(by: disposeBag)
     }
     
     private func setLayout() {
@@ -139,11 +128,11 @@ public class RegisterCenterInfoVC: BaseViewController {
         }
         
         NSLayoutConstraint.activate([
-            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
-            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
+            navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
-            statusBar.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 7),
+            statusBar.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
             statusBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
         ])
@@ -157,10 +146,7 @@ public class RegisterCenterInfoVC: BaseViewController {
             case .address:
                 AddressView(viewController: self)
             case .imageAndIntroduction:
-                ImageAndIntroductionView(
-                    coordinator: coordinator,
-                    viewController: self
-                )
+                ImageAndIntroductionView(viewController: self)
             }
         }
     }
@@ -204,6 +190,10 @@ public class RegisterCenterInfoVC: BaseViewController {
             .subscribe(onNext: { [weak self] _ in
                 self?.prev()
             })
+            .disposed(by: disposeBag)
+        
+        navigationBar.backButton.rx.tap
+            .bind(to: exitPageEvent)
             .disposed(by: disposeBag)
     }
     
@@ -253,16 +243,13 @@ public class RegisterCenterInfoVC: BaseViewController {
                 willShowView.transform = .identity
             }
         } else {
-            
-            // 돌아가기, Coordinator호출
-            coordinator?.registerFinished()
+            exitPageEvent.accept(())
         }
     }
     
-    public func bind(viewModel: RegisterCenterInfoViewModelable) {
+    func bindViewModel() {
         
-        // RC=1
-        super.bind(viewModel: viewModel)
+        let viewModel = self.viewModel as! MakeCenterProfileVMable
         
         // Output
         
@@ -271,10 +258,14 @@ public class RegisterCenterInfoVC: BaseViewController {
             .forEach { pv in
                 pv.bind(viewModel: viewModel)
             }
+        
+        exitPageEvent
+            .bind(to: viewModel.backButtonClicked)
+            .disposed(by: disposeBag)
     }
 }
 
-extension RegisterCenterInfoVC {
+extension MakeCenterProfileViewController {
     
     // MARK: CenterInfoView (이름 + 센터 연락처)
     class NameAndPhoneNumberView: UIView, RegisterCenterInfoVCViews {
@@ -364,7 +355,7 @@ extension RegisterCenterInfoVC {
         
         private let disposeBag = DisposeBag()
         
-        public func bind(viewModel vm: RegisterCenterInfoViewModelable) {
+        func bind(viewModel vm: MakeCenterProfileVMable) {
             // input
             nameField
                 .eventPublisher
@@ -389,10 +380,8 @@ extension RegisterCenterInfoVC {
     // MARK: 센터 소개 (프로필 사진 + 센터소개)
     class ImageAndIntroductionView: UIView, RegisterCenterInfoVCViews {
         
-        weak var coordinator: RegisterCenterInfoCoordinator?
-        
         // init
-        public weak var viewController: UIViewController!
+        weak var viewController: UIViewController!
         
         // View
         private let processTitle: IdleLabel = {
@@ -436,8 +425,7 @@ extension RegisterCenterInfoVC {
         // Observable
         private let disposeBag = DisposeBag()
         
-        init(coordinator: RegisterCenterInfoCoordinator?, viewController: UIViewController) {
-            self.coordinator = coordinator
+        init(viewController: UIViewController) {
             self.viewController = viewController
             super.init(frame: .zero)
             setAppearance()
@@ -531,7 +519,7 @@ extension RegisterCenterInfoVC {
             ])
         }
         
-        public func bind(viewModel: RegisterCenterInfoViewModelable) {
+        func bind(viewModel: MakeCenterProfileVMable) {
             
             // Input
             centerIntroductionField

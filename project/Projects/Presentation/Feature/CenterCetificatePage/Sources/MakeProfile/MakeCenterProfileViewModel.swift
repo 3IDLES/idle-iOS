@@ -1,6 +1,6 @@
 //
 //  RegisterCenterInfoVM.swift
-//  AuthFeature
+//  WaitCertificatePageCoordinator
 //
 //  Created by choijunios on 7/26/24.
 //
@@ -16,31 +16,32 @@ import RxCocoa
 import RxSwift
 
 
-public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelable {
-    
-    // Init
-    weak var coordinator: RegisterCenterInfoCoordinator?
+class MakeCenterProfileViewModel: BaseViewModel, MakeCenterProfileVMable {
+
+    // Navigation
+    var presentOverviewPage: ((CenterProfileRegisterState) -> ())?
+    var changeToAuthFlow: (() -> ())?
     
     // Input
-    public var editingName: PublishRelay<String> = .init()
-    public var editingCenterNumber: PublishRelay<String> = .init()
-    public var editingAddress: PublishRelay<AddressInformation> = .init()
-    public var editingDetailAddress: PublishRelay<String> = .init()
-    public var editingCenterIntroduction: PublishRelay<String> = .init()
-    public var editingCenterImage: PublishRelay<UIImage> = .init()
-    public var completeButtonPressed: PublishRelay<Void> = .init()
+    var backButtonClicked: PublishRelay<Void> = .init()
+    var editingName: PublishRelay<String> = .init()
+    var editingCenterNumber: PublishRelay<String> = .init()
+    var editingAddress: PublishRelay<AddressInformation> = .init()
+    var editingDetailAddress: PublishRelay<String> = .init()
+    var editingCenterIntroduction: PublishRelay<String> = .init()
+    var editingCenterImage: PublishRelay<UIImage> = .init()
+    var completeButtonPressed: PublishRelay<Void> = .init()
     
     // Output
-    public var nameAndNumberValidation: Driver<Bool>? = nil
-    public var addressValidation: Driver<Bool>? = nil
-    public var introductionValidation: Driver<Bool>? = nil
-    public var imageValidation: Driver<UIImage>? = nil
+    var nameAndNumberValidation: Driver<Bool>? = nil
+    var addressValidation: Driver<Bool>? = nil
+    var introductionValidation: Driver<Bool>? = nil
+    var imageValidation: Driver<UIImage>? = nil
     
     // StatObject
     private let stateObject = CenterProfileRegisterState()
 
-    public init(coordinator: RegisterCenterInfoCoordinator) {
-        self.coordinator = coordinator
+    override init() {
         super.init()
         
         // Set stream
@@ -120,12 +121,18 @@ public class RegisterCenterInfoVM: BaseViewModel, RegisterCenterInfoViewModelabl
             .asDriver(onErrorJustReturn: .init())
         
         self.completeButtonPressed
-            .subscribe(onNext: { [weak self] _ in
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
                 
-                guard let self else { return }
+                obj.presentOverviewPage?(obj.stateObject)
+            })
+            .disposed(by: disposeBag)
+        
+        backButtonClicked
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
                 
-                // 프리뷰화면으로 이동
-                self.coordinator?.showPreviewScreen(stateObject: stateObject)
+                obj.changeToAuthFlow?()
             })
             .disposed(by: disposeBag)
         

@@ -67,7 +67,7 @@ extension AppCoordinator {
             case .centerCertificatePage:
                 runCenterCertificateFlow()
             case .centerMakeProfilePage:
-                runCenterMakeProfileFlow()
+                runMakeCenterProfileFlow()
             }
         }
         
@@ -103,6 +103,7 @@ extension AppCoordinator {
     
     
     /// CenterCetrificateFlow를 시작합니다.
+    @discardableResult
     func runCenterCertificateFlow() -> WaitCertificatePageCoordinator {
         let coordinator = WaitCertificatePageCoordinator(router: router)
         coordinator.startFlow = { [weak self] destination in
@@ -111,7 +112,7 @@ extension AppCoordinator {
             case .authFlow:
                 runAuthFlow()
             case .makeProfileFlow:
-                runCenterMakeProfileFlow()
+                runMakeCenterProfileFlow()
             }
         }
         
@@ -172,8 +173,18 @@ extension AppCoordinator {
     
     
     /// CenterMakeProfileFlow를 시작합니다.
-    func runCenterMakeProfileFlow() {
-        printIfDebug("Center make profile")
+    func runMakeCenterProfileFlow() {
+        let coordinator = MakeCenterProfilePageCoordinator(router: router)
+        coordinator.startFlow = { [weak self] destination in
+            switch destination {
+            case .authFlow:
+                self?.runAuthFlow()
+            case .centerMainPageFlow:
+                self?.runCenterMainPageFlow()
+            }
+        }
+        
+        executeChild(coordinator)
     }
 }
 

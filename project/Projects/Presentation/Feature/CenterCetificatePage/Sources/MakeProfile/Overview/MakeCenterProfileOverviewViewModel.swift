@@ -15,12 +15,15 @@ import Core
 import RxSwift
 import RxCocoa
 
-class RegisterProfileOverviewVM: BaseViewModel {
+class MakeCenterProfileOverviewViewModel: BaseViewModel {
     
+    // Injection
     @Injected var profileUseCase: CenterProfileUseCase
     
-    // Init
-    weak var coordinator: CenterProfileRegisterOverviewCoordinator?
+    // Navigation
+    var presentCompleteScreen: ((AnonymousCompleteVCRenderObject) -> ())?
+    var presentCenterMainPage: (() -> ())?
+    var exitPage: (() -> ())?
     
     // input
     let backButtonClicked: PublishSubject<Void> = .init()
@@ -30,11 +33,7 @@ class RegisterProfileOverviewVM: BaseViewModel {
     var renderObject: CenterProfileRegisterState
     
     
-    init(
-        coordinator: CenterProfileRegisterOverviewCoordinator,
-        stateObject: CenterProfileRegisterState
-    ) {
-        self.coordinator = coordinator
+    init(stateObject: CenterProfileRegisterState) {
         self.renderObject = stateObject
         
         super.init()
@@ -49,25 +48,33 @@ class RegisterProfileOverviewVM: BaseViewModel {
         
         backButtonClicked
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
-        registerResult.subscribe(onNext: { [weak self] result in
-            
-            guard let self else { return }
-            
+        registerResult
+            .unretained(self)
+            .subscribe(onNext: { (obj, result) in
+        
             switch result {
             case .success:
-                coordinator.showCompleteScreen()
+                let object = AnonymousCompleteVCRenderObject(
+                    titleText: "센터 정보를 등록했어요!",
+                    descriptionText: "",
+                    completeButtonText: "확인") { [weak self] in
+                        self?.presentCenterMainPage?()
+                    }
+                obj.presentCompleteScreen?(object)
+                
             case .failure(let error):
                 let alertVO = DefaultAlertContentVO(
                     title: "프로필 등록 오류",
                     message: error.message
                 )
                 
-                alert.onNext(alertVO)
+                obj.alert.onNext(alertVO)
             }
         })
         .disposed(by: disposeBag)

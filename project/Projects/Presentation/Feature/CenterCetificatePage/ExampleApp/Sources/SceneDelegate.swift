@@ -14,6 +14,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
+    lazy var coordiantor = MakeCenterProfilePageCoordinator(router: router)
+    
     let router = Router()
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -28,7 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             DomainAssembly()
         ])
 
-        let coordiantor = WaitCertificatePageCoordinator(router: router)
+        
         coordiantor.start()
     }
 }
