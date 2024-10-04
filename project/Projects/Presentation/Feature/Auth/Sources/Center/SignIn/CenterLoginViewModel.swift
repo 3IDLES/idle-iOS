@@ -46,13 +46,13 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        let loginResult = input.loginButtonPressed
+        let loginResult = mapEndLoading(mapStartLoading(input.loginButtonPressed.asObservable())
             .flatMap { [unowned self, input] _ in
                 let id = input.editingId.value
                 let password = input.editingPassword.value
                 return self.authUseCase
                     .loginCenterAccount(id: id, password: password)
-            }
+            })
             .share()
         
         let loginSuccess = loginResult.compactMap { $0.value }

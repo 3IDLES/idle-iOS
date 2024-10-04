@@ -81,16 +81,6 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
         URL(string: "")!
     }
     
-    public func getWorkerProfile() -> WorkerProfileVO {
-        // 세팅화면이라면 반드시 존재해야한다.
-        userInfoLocalRepository.getCurrentWorkerData()!
-    }
-    
-    public func getCenterProfile() -> CenterProfileVO {
-        // 세팅화면이라면 반드시 존재해야한다.
-        userInfoLocalRepository.getCurrentCenterData()!
-    }
-    
     // MARK: 회원탈퇴 & 로그아웃
     // 센터 회원탈퇴
     public func deregisterCenterAccount(reasons: [String], password: String) -> RxSwift.Single<Result<Void, DomainError>> {

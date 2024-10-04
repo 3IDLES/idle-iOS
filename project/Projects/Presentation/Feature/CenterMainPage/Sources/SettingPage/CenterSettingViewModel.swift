@@ -17,7 +17,7 @@ import Core
 import RxCocoa
 import RxSwift
 
-public protocol CenterSettingVMable: BaseViewModel {
+protocol CenterSettingVMable: BaseViewModel {
     
     // Input
     var viewWillAppear: PublishRelay<Void> { get }
@@ -38,28 +38,32 @@ public protocol CenterSettingVMable: BaseViewModel {
     func createSingOutVM() -> IdleAlertViewModelable
 }
 
-public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
+class CenterSettingViewModel: BaseViewModel, CenterSettingVMable {
     
+    // Injected
     @Injected var settingUseCase: SettingScreenUseCase
+    @Injected var profileUseCase: CenterProfileUseCase
+
+    // Naviagtion
+    var changeToAuthFlow: (() -> ())?
+    var presentMyProfile: (() -> ())?
+    var presentAccountDeregisterPage: (() -> ())?
     
-    // Init
-    weak var coordinator: CenterSettingScreenCoordinator?
     
-    public var viewWillAppear: PublishRelay<Void> = .init()
-    public var myCenterProfileButtonClicked: PublishRelay<Void> = .init()
-    public var approveToPushNotification: PublishRelay<Bool> = .init()
+    var viewWillAppear: PublishRelay<Void> = .init()
+    var myCenterProfileButtonClicked: PublishRelay<Void> = .init()
+    var approveToPushNotification: PublishRelay<Bool> = .init()
     
-    public var signOutButtonComfirmed: PublishRelay<Void> = .init()
-    public var removeAccountButtonClicked: PublishRelay<Void> = .init()
+    var signOutButtonComfirmed: PublishRelay<Void> = .init()
+    var removeAccountButtonClicked: PublishRelay<Void> = .init()
     
-    public let additionalInfoButtonClieck: PublishRelay<SettingAdditionalInfoType> = .init()
+    let additionalInfoButtonClieck: PublishRelay<SettingAdditionalInfoType> = .init()
     
-    public var pushNotificationApproveState: RxCocoa.Driver<Bool>?
-    public var centerInfo: RxCocoa.Driver<(name: String, location: String)>?
-    public var showSettingAlert: Driver<Void>?
+    var pushNotificationApproveState: RxCocoa.Driver<Bool>?
+    var centerInfo: RxCocoa.Driver<(name: String, location: String)>?
+    var showSettingAlert: Driver<Void>?
     
-    public init(coordinator: CenterSettingScreenCoordinator?) {
-        self.coordinator = coordinator
+    override init() {
         
         super.init()
         
@@ -111,19 +115,27 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
         
         
         // MARK: 센터카드 정보 알아내기
-        centerInfo = viewWillAppear
-            .map { [settingUseCase] centerProfileVO in
-                let vo = settingUseCase.getCenterProfile()
-                return (vo.centerName, vo.roadNameAddress)
+        let fetchProfileResult = viewWillAppear
+            .flatMap { [profileUseCase] _ in
+                profileUseCase
+                    .getProfile(mode: .myProfile)
+            }
+        
+        let fetchSuccess = fetchProfileResult.compactMap { $0.value }
+        let fetchFailure = fetchProfileResult.compactMap { $0.error }
+        
+        centerInfo = fetchSuccess
+            .map { centerProfileVO in
+                (centerProfileVO.centerName, centerProfileVO.roadNameAddress)
             }
             .asDriver(onErrorJustReturn: ("재가요양센터", "대한민국"))
             
         
-        // MARK: 센터 정보로 이동하기
+        // MARK: 내 센터 정보로 이동하기
         myCenterProfileButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                self.coordinator?.showMyCenterProfile()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentMyProfile?()
             })
             .disposed(by: disposeBag)
         
@@ -158,27 +170,30 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
         let signOutFailure = signOutRequestResult.compactMap { $0.error }
         
         signOutSuccess
-            .subscribe(onNext: { [weak self] _ in
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
                 
                 // 로그이아웃 성공 -> 원격알림 토큰 제거
                 NotificationCenter.default.post(name: .requestDeleteTokenFromServer, object: nil)
                 
-                self?.coordinator?.popToRoot()
+                obj.changeToAuthFlow?()
             })
             .disposed(by: disposeBag)
         
         
         // MARK: 회원 탈퇴
         removeAccountButtonClicked
-            .subscribe(onNext: { [weak self] _ in
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
                 
-                self?.coordinator?.startRemoveCenterAccountFlow()
+                obj.presentAccountDeregisterPage?()
             })
             .disposed(by: disposeBag)
         
         
         // MARK: Alert
         Observable.merge(
+            fetchFailure.map { $0.message },
             approveRequestError.map { _ in "알람수신 동의 실패" },
             signOutFailure.map { $0.message }
         )
@@ -192,7 +207,7 @@ public class CenterSettingVM: BaseViewModel, CenterSettingVMable {
         .disposed(by: disposeBag)
     }
     
-    public func createSingOutVM() -> any DSKit.IdleAlertViewModelable {
+    func createSingOutVM() -> any DSKit.IdleAlertViewModelable {
         let viewModel = CenterSingOutVM(
             title: "로그아웃하시겠어요?",
             description: "",
