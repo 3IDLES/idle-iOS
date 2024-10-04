@@ -117,13 +117,13 @@ extension AppCoordinator {
             switch destination {
             case .workerProfilePage(let workerId):
                 workerProfileFlow(id: workerId)
-            case .createPost:
+            case .createPostPage:
                 createPostFlow()
-            case .myCenterProfile:
+            case .myCenterProfilePage:
                 centerProfileFlow(mode: .myProfile)
             case .authFlow:
                 runAuthFlow()
-            case .accountDeregister:
+            case .accountDeregisterPage:
                 accountDeregister(userType: .center)
             }
         }

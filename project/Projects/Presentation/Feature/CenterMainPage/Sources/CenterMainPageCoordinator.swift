@@ -12,18 +12,10 @@ import Core
 
 public enum CenterMainPageCoordinatorDestination {
     case workerProfilePage(id: String)
-    case createPost
+    case createPostPage
     case authFlow
-    case myCenterProfile
-    case accountDeregister
-}
-
-public enum CenterMainPageInternalDestination {
-    
-    case registerPostPage
-    case postDetailPage(postId: String, postState: PostState)
-    case postApplicantPage(postId: String)
-    case postEditPage(postId: String)
+    case myCenterProfilePage
+    case accountDeregisterPage
 }
 
 public class CenterMainPageCoordinator: BaseCoordinator {
@@ -95,7 +87,7 @@ public extension CenterMainPageCoordinator {
         
         let viewModel = PostBoardPageViewModel()
         viewModel.presentRegisterPostPage = { [weak self] in
-            self?.startFlow(.createPost)
+            self?.startFlow(.createPostPage)
         }
         viewModel.createPostCellViewModel = { [weak self] info, state in
             
@@ -134,10 +126,10 @@ public extension CenterMainPageCoordinator {
             self?.startFlow(.authFlow)
         }
         viewModel.presentMyProfile = { [weak self] in
-            self?.startFlow(.myCenterProfile)
+            self?.startFlow(.myCenterProfilePage)
         }
         viewModel.presentAccountDeregisterPage = { [weak self] in
-            self?.startFlow(.accountDeregister)
+            self?.startFlow(.accountDeregisterPage)
         }
         
         let viewController = CenterSettingViewController()
