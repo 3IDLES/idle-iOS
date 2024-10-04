@@ -10,6 +10,7 @@ import Domain
 import PresentationCore
 import BaseFeature
 import Core
+import DSKit
 
 
 import RxSwift
@@ -17,14 +18,18 @@ import RxCocoa
 
 public class EditPostVM: BaseViewModel, EditPostViewModelable {
     
+    // Injected
     @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
+    
+    // Navigation
+    var exitPage: (() -> ())?
+    var exitPageWithSnackBar: ((IdleSnackBarRO, CGFloat) -> ())?
     
     // Init
     let id: String
     
     // MARK: Edit Screen
     public var editPostViewWillAppear: RxRelay.PublishRelay<Void> = .init()
-    public weak var editPostCoordinator: EditPostCoordinator?
     public var editViewExitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var saveButtonClicked: RxRelay.PublishRelay<Void> = .init()
     public var requestSaveFailure: RxCocoa.Driver<DefaultAlertContentVO>?
@@ -346,8 +351,9 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
         applicationDetailViewNextable = applicationDetailInputValidation.asDriver(onErrorJustReturn: false)
         
         editViewExitButtonClicked
-            .subscribe(onNext: { [weak self] in
-                self?.editPostCoordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
@@ -405,13 +411,10 @@ public class EditPostVM: BaseViewModel, EditPostViewModelable {
         let editingRequestFailure = editingRequestResult.compactMap { $0.error }
         
         editingRequestSuccess
-            .subscribe { [weak self] _ in
-                guard let self else { return }
-                
-                // 성공적으로 수정됨
-                self.editPostCoordinator?
-                    .coordinatorDidFinishWithSnackBar(ro: .init(titleText: "공고가 수정되었어요."))
-            }
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPageWithSnackBar?(IdleSnackBarRO(titleText: "공고가 수정되었어요."), 84)
+            })
             .disposed(by: disposeBag)
         
         Observable

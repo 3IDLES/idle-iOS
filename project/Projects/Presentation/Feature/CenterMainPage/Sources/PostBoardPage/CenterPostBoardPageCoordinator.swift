@@ -10,20 +10,12 @@ import BaseFeature
 import Core
 import Domain
 
-public enum CenterPostBoardPageCoordinatorDestination {
-    
-    case registerPostPage
-    case postDetailPage(postId: String, postState: PostState)
-    case postApplicantPage(postId: String)
-    case postEditPage(postId: String)
-}
-
 public class CenterPostBoardPageCoordinator: Coordinator2 {
     
     let router: Router
     let tabController: UINavigationController
     
-    public var startFLow: ((CenterPostBoardPageCoordinatorDestination) -> ())!
+    public var startFLow: ((CenterMainPageInternalDestination) -> ())!
     
     public init(router: Router, tabController: UINavigationController) {
         self.router = router

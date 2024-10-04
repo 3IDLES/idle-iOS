@@ -26,7 +26,7 @@ public class EditPostCoordinator: ChildCoordinator {
     ) {
         self.viewModel = viewModel
         self.navigationController = navigationController
-        viewModel.editPostCoordinator = self
+//        viewModel.editPostCoordinator = self
     }
     
     deinit {

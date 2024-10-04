@@ -17,9 +17,8 @@ import Core
 import RxCocoa
 import RxSwift
 
-protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelable & ClosedPostViewModelable {
-}
 
+typealias CenterRecruitmentPostBoardViewModelable = OnGoingPostViewModelable & ClosedPostViewModelable
 
 class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModelable {
     
