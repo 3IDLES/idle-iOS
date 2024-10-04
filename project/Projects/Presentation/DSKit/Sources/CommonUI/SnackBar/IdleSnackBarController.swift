@@ -21,9 +21,6 @@ public class IdleSnackBarController: UIViewController {
     let snackBar = IdleSnackBar(frame: .zero)
     let bottomPadding: CGFloat
     
-    
-    let snackBarHeight: CGFloat = 48
-    
     public init(bottomPaddingFromSafeArea: CGFloat, object: IdleSnackBarRO) {
         self.bottomPadding = bottomPaddingFromSafeArea
         super.init(nibName: nil, bundle: nil)
@@ -46,13 +43,10 @@ public class IdleSnackBarController: UIViewController {
         snackBar.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            snackBar.heightAnchor.constraint(equalToConstant: snackBarHeight),
             snackBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 20),
             snackBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
             snackBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -bottomPadding)
         ])
-        
-        snackBar.transform = .init(translationX: 0, y: snackBarHeight+bottomPadding)
         snackBar.alpha = 0.0
     }
     
@@ -63,6 +57,8 @@ public class IdleSnackBarController: UIViewController {
         
         let displayingTime: CGFloat = 2
         
+        snackBar.transform = .init(translationX: 0, y: snackBar.bounds.height+bottomPadding)
+        
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn) {
             self.snackBar.transform = .identity
             self.snackBar.alpha = 1.0
@@ -70,7 +66,7 @@ public class IdleSnackBarController: UIViewController {
             
             UIView.animate(withDuration: 0.2, delay: displayingTime, options: .curveEaseIn) { [weak self] in
                 guard let self else { return }
-                snackBar.transform = .init(translationX: 0, y: snackBarHeight+bottomPadding)
+                snackBar.transform = .init(translationX: 0, y: snackBar.bounds.height+bottomPadding)
                 snackBar.alpha = 0.0
             } completion: { _ in
                 self.dismiss(animated: false)
