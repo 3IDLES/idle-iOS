@@ -10,7 +10,7 @@ import Foundation
 
 public protocol Coordinator2: AnyObject {
     
-//    var onFinish: (() -> ())? { get }
+    var onFinish: (() -> ())? { get set }
     
     /// Coordinator를 시작한다.
     func start()
@@ -36,7 +36,6 @@ open class BaseCoordinator: Coordinator2 {
     }
     
     public func removeChild(_ coordinator: Coordinator2) {
-        
         children.removeAll { $0 === coordinator}
     }
 }

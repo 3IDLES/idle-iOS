@@ -66,7 +66,9 @@ public class SplashCoordinator: BaseCoordinator {
         
         router.setRootModuleTo(
             module: module
-        )
+        ) { [weak self] in
+            self?.onFinish?()
+        }
         
         checkNetworkFlow()
         checkForceUpdateFlow()

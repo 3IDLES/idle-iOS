@@ -13,6 +13,8 @@ import Core
 
 public class CreatePostCoordinator: Coordinator2 {
     
+    public var onFinish: (() -> ())?
+    
     public typealias Module = UIViewController
     
     @Injected var logger: PostRegisterLogger
@@ -23,6 +25,10 @@ public class CreatePostCoordinator: Coordinator2 {
     public init(router: Router, presentingModule: Module) {
         self.router = router
         self.presentingModule = presentingModule
+    }
+    
+    deinit {
+        printIfDebug("deinit \(CreatePostCoordinator.self)")
     }
     
     public func start() {
@@ -45,8 +51,7 @@ public class CreatePostCoordinator: Coordinator2 {
         viewController.bind(viewModel: viewModel)
         
         router.push(module: viewController, animated: true) { [weak self] in
-            
-            
+            self?.onFinish?()
         }
         
         // MARK: 공고등록 시작 로깅

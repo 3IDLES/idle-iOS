@@ -12,6 +12,8 @@ import Domain
 
 public class CenterPostBoardPageCoordinator: Coordinator2 {
     
+    public var onFinish: (() -> ())?
+    
     let router: Router
     let tabController: UINavigationController
     

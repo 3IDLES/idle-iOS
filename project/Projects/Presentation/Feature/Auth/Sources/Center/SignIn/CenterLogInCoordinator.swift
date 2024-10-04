@@ -38,7 +38,9 @@ public class CenterLogInCoordinator: BaseCoordinator {
         }
         let viewController = CenterLoginViewController(viewModel: viewModel)
         
-        router.push(module: viewController, animated: true)
+        router.push(module: viewController, animated: true) { [weak self] in
+            self?.onFinish?()
+        }
     }
     
     func startSetupNewPasswordFlow() {

@@ -40,6 +40,8 @@ public enum WorkerAccountRegisterCoordinatorDestination {
 
 public class WorkerAccountRegisterCoordinator: Coordinator2 {
     
+    public var onFinish: (() -> ())?
+    
     // Injected
     @Injected var logger: WorkerRegisterLogger
     
@@ -108,7 +110,9 @@ public class WorkerAccountRegisterCoordinator: Coordinator2 {
             self?.router.popModule(animated: true)
         }
         
-        router.push(module: viewController, animated: true)
+        router.push(module: viewController, animated: true) { [weak self] in
+            self?.onFinish?()
+        }
         
         excuteStage(.phoneNumber, moveTo: .next)
         

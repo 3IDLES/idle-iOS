@@ -17,6 +17,8 @@ public enum AuthCoordinatorDestination {
 
 public class AuthCoordinator: Coordinator2 {
     
+    public var onFinish: (() -> ())?
+    
     let router: Router
     
     public init(router: Router) {
@@ -47,6 +49,8 @@ public class AuthCoordinator: Coordinator2 {
         router.replaceRootModuleTo(
             module: viewController,
             animated: true
-        )
+        ) { [weak self] in
+            self?.onFinish?()
+        }
     }
 }

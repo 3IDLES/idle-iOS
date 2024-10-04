@@ -51,7 +51,9 @@ public class CenterMainPageCoordinator: BaseCoordinator {
             info: pageInfo
         )
         
-        router.replaceRootModuleTo(module: tabBarModule, animated: true)
+        router.replaceRootModuleTo(module: tabBarModule, animated: true) { [weak self] in
+            self?.onFinish?()
+        }
     }
 }
 

@@ -16,6 +16,8 @@ enum PostApplicantPageCoordinatorDestination {
 
 class PostApplicantPageCoordinator: Coordinator2 {
     
+    var onFinish: (() -> ())?
+    
     let postId: String
     let router: Router
     
