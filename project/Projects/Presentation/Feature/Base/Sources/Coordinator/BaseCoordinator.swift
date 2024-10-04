@@ -10,6 +10,8 @@ import Foundation
 
 public protocol Coordinator2: AnyObject {
     
+//    var onFinish: (() -> ())? { get }
+    
     /// Coordinator를 시작한다.
     func start()
 }
@@ -17,6 +19,8 @@ public protocol Coordinator2: AnyObject {
 
 /// 자식 코디네이터를 가질 수 있는 코디네이터
 open class BaseCoordinator: Coordinator2 {
+    
+    public var onFinish: (() -> ())?
     
     var children: [Coordinator2] = []
     

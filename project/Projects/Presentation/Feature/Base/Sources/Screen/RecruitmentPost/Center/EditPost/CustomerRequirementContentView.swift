@@ -31,11 +31,13 @@ public class CustomerRequirementContentView: UIView {
     let mealSupportBtn1: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "필요", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     let mealSupportBtn2: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "불필요", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     
@@ -44,11 +46,13 @@ public class CustomerRequirementContentView: UIView {
     let toiletSupportBtn1: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "필요", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     let toiletSupportBtn2: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "불필요", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     
@@ -57,11 +61,13 @@ public class CustomerRequirementContentView: UIView {
     let movingSupportBtn1: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "필요", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     let movingSupportBtn2: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "불필요", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     
@@ -69,26 +75,31 @@ public class CustomerRequirementContentView: UIView {
     let dailySupport_cleaning: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "청소", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     let dailySupport_laundary: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "빨래", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     let dailySupport_walking: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "산책", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     let dailySupport_exercise: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "운동보조", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     let dailySupport_listener: StateButtonTyp1 = {
         let btn = StateButtonTyp1(text: "말벗", initial: .normal)
         btn.label.typography = .Body3
+        btn.label.attrTextColor = DSColor.gray500.color
         return btn
     }()
     

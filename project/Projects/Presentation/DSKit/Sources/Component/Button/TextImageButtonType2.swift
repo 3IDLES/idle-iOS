@@ -14,7 +14,7 @@ public class TextImageButtonType2: TappableUIView {
     
     public let textLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
-        label.textColor = DSKitAsset.Colors.gray500.color
+        label.attrTextColor = DSKitAsset.Colors.gray500.color
         return label
     }()
     

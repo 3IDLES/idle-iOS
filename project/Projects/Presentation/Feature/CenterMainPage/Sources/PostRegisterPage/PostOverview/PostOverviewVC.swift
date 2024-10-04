@@ -27,9 +27,6 @@ public protocol PostOverviewViewModelable:
     AddressInputViewContentVMable,
     PostDetailDisplayingViewModelable
 {
-    
-    var postOverviewCoordinator: PostOverviewCoordinator? { get set }
-    
     /// 공고등록에 성공한 경우 해당 이벤트를 전달 받습니다
     var workerEmployCardVO: Driver<WorkerNativeEmployCardVO>? { get }
     

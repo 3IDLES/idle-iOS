@@ -46,6 +46,10 @@ class PostDetailForCenterVC: BaseViewController {
         button.imageView.tintColor = DSKitAsset.Colors.gray300.color
         button.layoutMargins = .zero
         button.layer.borderWidth = 0.0
+        
+        // 미지원기능
+        button.isHidden = true
+        
         return button
     }()
     

@@ -74,7 +74,7 @@ public final class Router: NSObject, RouterProtocol {
     var transition: UIViewControllerAnimatedTransitioning?
     
     /// 네비게이션 최상단ViewController
-    var topViewController: UIViewController? {
+    public var topViewController: UIViewController? {
         rootController?.topViewController
     }
     
