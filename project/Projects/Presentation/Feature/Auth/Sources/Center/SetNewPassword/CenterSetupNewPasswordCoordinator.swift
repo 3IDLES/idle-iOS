@@ -79,7 +79,7 @@ public class CenterSetupNewPasswordCoordinator: Coordinator2 {
         router.push(module: viewController, animated: true) { [weak self] in
             guard let self else { return }
             if passwordSetupSuccess == true {
-                router.presentSnackBar(
+                router.presentSnackBarController(
                     bottomPadding: 70,
                     object: .init(titleText: "비밀번호 변경 성공")
                 )
