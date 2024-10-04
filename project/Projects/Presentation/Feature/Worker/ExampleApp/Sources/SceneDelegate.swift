@@ -18,7 +18,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         self.window = UIWindow(windowScene: windowScene)
         
-        window?.rootViewController = WorkerSettingVC()
         window?.makeKeyAndVisible()
     }
 }
