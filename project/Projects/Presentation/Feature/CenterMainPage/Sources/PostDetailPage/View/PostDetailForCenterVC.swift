@@ -15,7 +15,7 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-public class PostDetailForCenterVC: BaseViewController {
+class PostDetailForCenterVC: BaseViewController {
     
     // Init
     
@@ -60,13 +60,13 @@ public class PostDetailForCenterVC: BaseViewController {
     let customerInfoOV = CustomerInformationDisplayingView(userType: .center)
     let applyInfoOverView = ApplicationDetailDisplayingView()
     
-    public init() {
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         setAppearance()
         setLayout()
         setObservable()
@@ -238,7 +238,7 @@ public class PostDetailForCenterVC: BaseViewController {
         
     }
     
-    public func bind(viewModel: PostDetailViewModelable) {
+    func bind(viewModel: PostDetailViewModelable) {
         
         super.bind(viewModel: viewModel)
         

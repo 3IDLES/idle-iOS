@@ -17,7 +17,7 @@ import RxSwift
 import RxCocoa
 
 
-public protocol PostDetailViewModelable:
+protocol PostDetailViewModelable:
     AnyObject,
     PostDetailDisplayingViewModelable,
     BaseViewModel
@@ -55,30 +55,36 @@ public protocol PostDetailViewModelable:
     var viewWillAppear: PublishRelay<Void> { get }
 }
 
-public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
+class PostDetailViewModel: BaseViewModel, PostDetailViewModelable {
     
+    // Injected
     @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
+    
+    // Naviagtion
+    var presentPostEditPage: ((String) -> ())?
+    var presentApplicantPage: ((String) -> ())?
+    var exitWithSnackBar: ((IdleSnackBarRO, CGFloat) -> ())?
+    var exitPage: (() -> ())?
     
     // Init
     let postId: String
     let postState: PostState
-    weak var coordinator: PostDetailForCenterCoordinator?
     
     // MARK: DetailVC Interaction
-    public var applicantCount: Int?
-    public var workerEmployCardVO: Driver<WorkerNativeEmployCardVO>?
-    public var requestDetailFailure: Driver<DefaultAlertContentVO>?
-    public var showOptionSheet: Driver<PostState>?
+    var applicantCount: Int?
+    var workerEmployCardVO: Driver<WorkerNativeEmployCardVO>?
+    var requestDetailFailure: Driver<DefaultAlertContentVO>?
+    var showOptionSheet: Driver<PostState>?
     
-    public let postEditButtonClicked: PublishRelay<Void> = .init()
-    public let exitButtonClicked: PublishRelay<Void> = .init()
-    public let checkApplicationButtonClicked: PublishRelay<Void> = .init()
-    public let optionButtonClicked: PublishRelay<Void> = .init()
-    public let removePostButtonClicked: PublishRelay<Void> = .init()
-    public let closePostButtonClicked: PublishRelay<Void> = .init()
-    public let showAsWorkerButtonClicked: PublishRelay<Void> = .init()
+    let postEditButtonClicked: PublishRelay<Void> = .init()
+    let exitButtonClicked: PublishRelay<Void> = .init()
+    let checkApplicationButtonClicked: PublishRelay<Void> = .init()
+    let optionButtonClicked: PublishRelay<Void> = .init()
+    let removePostButtonClicked: PublishRelay<Void> = .init()
+    let closePostButtonClicked: PublishRelay<Void> = .init()
+    let showAsWorkerButtonClicked: PublishRelay<Void> = .init()
     
-    public let viewWillAppear: PublishRelay<Void> = .init()
+    let viewWillAppear: PublishRelay<Void> = .init()
     
     
     // MARK: fetched
@@ -89,10 +95,10 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
     private let fetched_addressInfo: BehaviorRelay<AddressInputStateObject> = .init(value: .init())
     
     // MARK: Casting
-    public var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>?
-    public var casting_customerRequirement: Driver<CustomerRequirementStateObject>?
-    public var casting_customerInformation: Driver<CustomerInformationStateObject>?
-    public var casting_applicationDetail: Driver<ApplicationDetailStateObject>?
+    var casting_workTimeAndPay: Driver<WorkTimeAndPayStateObject>?
+    var casting_customerRequirement: Driver<CustomerRequirementStateObject>?
+    var casting_customerInformation: Driver<CustomerInformationStateObject>?
+    var casting_applicationDetail: Driver<ApplicationDetailStateObject>?
     public var casting_addressInput: Driver<AddressInputStateObject>?
     
     
@@ -109,15 +115,9 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
     // MARK: ETC
     public var applicantCountText: Driver<String>?
     
-    init(
-            postId: String,
-            postState: PostState,
-            coordinator: PostDetailForCenterCoordinator?
-        )
-    {
+    init(postId: String, postState: PostState) {
         self.postId = postId
         self.postState = postState
-        self.coordinator = coordinator
         
         super.init()
         
@@ -198,8 +198,9 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
         
         // 공고 수정 버튼
         postEditButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.showPostEditScreen(postId: postId)
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentPostEditPage?(postId)
             })
             .disposed(by: disposeBag)
         
@@ -233,9 +234,9 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
         
         Observable
             .merge(closePostSuccessSnackBarRO, removePostSuccessSnackBarRO)
-            .subscribe(onNext: { [weak self] ro in
-                self?.coordinator?
-                    .coordinatorDidFinishWithSnackBar(ro: ro)
+            .unretained(self)
+            .subscribe(onNext: { (obj, snackBarObject) in
+                obj.exitWithSnackBar?(snackBarObject, 84)
             })
             .disposed(by: disposeBag)
         
@@ -253,25 +254,27 @@ public class PostDetailForCenterVM: BaseViewModel, PostDetailViewModelable {
         
         
         // 요양보호사 화면으로 보기 버튼
-        showAsWorkerButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                
-                // 코디네이터 이용
-                
-            })
-            .disposed(by: disposeBag)
+//        showAsWorkerButtonClicked
+//            .subscribe(onNext: { [weak self] _ in
+//                
+//                // 코디네이터 이용
+//                
+//            })
+//            .disposed(by: disposeBag)
         
         // 나가기 버튼
         exitButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
         // 지원자확인 버튼
         checkApplicationButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.showCheckApplicantScreen(postId: postId)
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentApplicantPage?(obj.postId)
             })
             .disposed(by: disposeBag)
     }

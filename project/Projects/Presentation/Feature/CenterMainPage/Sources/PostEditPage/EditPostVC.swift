@@ -23,7 +23,6 @@ public protocol EditPostViewModelable:
     WorkTimeAndPayContentVMable,
     AddressInputViewContentVMable
 {
-    var editPostCoordinator: EditPostCoordinator? { get set }
     var editViewExitButtonClicked: PublishRelay<Void> { get }
     var saveButtonClicked: PublishRelay<Void> { get }
     var requestSaveFailure: Driver<DefaultAlertContentVO>? { get }

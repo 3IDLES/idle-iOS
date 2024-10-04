@@ -14,6 +14,14 @@ public enum CenterMainPageCoordinatorDestination {
     case workerProfilePage(id: String)
 }
 
+public enum CenterMainPageInternalDestination {
+    
+    case registerPostPage
+    case postDetailPage(postId: String, postState: PostState)
+    case postApplicantPage(postId: String)
+    case postEditPage(postId: String)
+}
+
 public class CenterMainPageCoordinator: BaseCoordinator {
     
     let router: Router
@@ -22,6 +30,7 @@ public class CenterMainPageCoordinator: BaseCoordinator {
     
     public init(router: Router) {
         self.router = router
+        super.init()
     }
     
     public override func start() {
@@ -65,62 +74,114 @@ extension CenterMainPageCoordinator {
         
         switch tab {
         case .postBoard:
-            let coordinator = CenterPostBoardPageCoordinator(
-                router: router,
-                tabController: navigationController
-            )
-            
-            coordinator.startFLow = { [weak self] destination in
-                
-                guard let self else { return }
-                
-                switch destination {
-                case .postApplicantPage(let postId):
-                    presentPostApplicantPage(postId: postId)
-                case .postEditPage(let postId):
-                    presentPostEditPage(postId: postId)
-                case .postDetailPage(let postId, let postState):
-                    presentPostDetailPage(postId: postId, postState: postState)
-                case .registerPostPage:
-                    presentRegisterPostPage()
-                }
-            }
-            
-            addChild(coordinator)
-            coordinator.start()
-            
+            presentPostBoardPage(controller: navigationController)
         case .setting:
             return
         }
     }
 }
 
-// MARK: SubFlow
+// MARK: TabPageFlow
+extension CenterMainPageCoordinator {
+    
+    public func presentPostBoardPage(controller: UINavigationController) {
+        
+        let viewModel = PostBoardPageViewModel()
+        viewModel.presentRegisterPostPage = { [weak self] in
+            self?.presentRegisterPostPage()
+        }
+        viewModel.createPostCellViewModel = { [weak self] info, state in
+            
+            let cellViewModel = CenterEmployCardVM(
+                postInfo: info,
+                postState: state
+            )
+            cellViewModel.presentPostDetailPage = { [weak self] id, state in
+                self?.presentPostDetailPage(postId: id, postState: state)
+            }
+            cellViewModel.presentPostApplicantPage = { [weak self] id in
+                self?.presentPostApplicantPage(postId: id)
+            }
+            cellViewModel.presentPostEditPage = { [weak self] id in
+                self?.presentPostEditPage(postId: id)
+            }
+            
+            return cellViewModel
+        }
+        
+        let viewController = PostBoardPageViewController()
+        viewController.bind(viewModel: viewModel)
+        
+        router.push(
+            module: viewController,
+            to: controller,
+            animated: false
+        )
+    }
+}
+
+// MARK: SubPages
 extension CenterMainPageCoordinator {
     
     public func presentPostApplicantPage(postId: String) {
-        let coordinator = PostApplicantPageCoordinator(
-            router: router,
-            postId: postId
-        )
         
-        coordinator.startFlow = { [weak self] destination in
-            switch destination {
-            case .applicantDetail(let id):
-                self?.startFlow(.workerProfilePage(id: id))
+        let viewModel = PostApplicantViewModel(postId: postId)
+        viewModel.createCellViewModel = { applicantVO in
+            
+            let cellViewModel = ApplicantCardVM(vo: applicantVO)
+            
+            cellViewModel.presentApplicantDetail = { [weak self] applicantId in
+                
+                self?.startFlow(.workerProfilePage(id: applicantId))
             }
+            
+            return cellViewModel
+        }
+        viewModel.exitPage = { [weak self] in
+            self?.router.popModule(animated: true)
         }
         
-        addChild(coordinator)
-        coordinator.start()
+        let viewController = PostApplicantViewController()
+        viewController.bind(viewModel: viewModel)
+        
+        router.push(module: viewController, animated: true)
     }
     
     public func presentPostEditPage(postId: String) {
+        let viewModel = EditPostVM(id: postId)
+        viewModel.exitPage = { [weak self] in
+            self?.router.popModule(animated: true)
+        }
+        viewModel.exitPageWithSnackBar = { [weak self] (object, padding) in
+            self?.router.popModule(animated: true)
+            self?.router.presentSnackBar(bottomPadding: padding, object: object)
+        }
         
+        let viewController = EditPostVC()
+        viewController.bind(viewModel: viewModel)
+        router.push(module: viewController, animated: true)
     }
     
     public func presentPostDetailPage(postId: String, postState: PostState) {
+        let viewModel = PostDetailViewModel(postId: postId, postState: postState)
         
+        viewModel.presentApplicantPage = { [weak self] applicantId in
+            self?.startFlow(.workerProfilePage(id: applicantId))
+        }
+        viewModel.presentPostEditPage = { [weak self] postId in
+            self?.presentPostEditPage(postId: postId)
+        }
+        viewModel.exitPage = { [weak self] in
+            self?.router.popModule(animated: true)
+        }
+        viewModel.exitWithSnackBar = { [weak self] object, padding in
+            self?.router.presentSnackBar(bottomPadding: padding, object: object)
+        }
+        
+        let viewController = PostDetailForCenterVC()
+        viewController.bind(viewModel: viewModel)
+
+        router.push(module: viewController, animated: true)
     }
     
     public func presentRegisterPostPage() {
