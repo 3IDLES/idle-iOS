@@ -18,7 +18,12 @@ public class IdleSnackBarController: UIViewController {
     // Init
     
     // View
-    let snackBar = IdleSnackBar(frame: .zero)
+    let snackBar: IdleSnackBar = {
+        let bar = IdleSnackBar(frame: .zero)
+        bar.alpha = 0.0
+        return bar
+    }()
+    
     let bottomPadding: CGFloat
     
     public init(bottomPaddingFromSafeArea: CGFloat, object: IdleSnackBarRO) {
@@ -47,7 +52,6 @@ public class IdleSnackBarController: UIViewController {
             snackBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -20),
             snackBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -bottomPadding)
         ])
-        snackBar.alpha = 0.0
     }
     
     private func setObservable() { }
