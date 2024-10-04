@@ -11,6 +11,9 @@ import Domain
 import Swinject
 
 public struct DomainAssembly: Assembly {
+    
+    public init() { }
+    
     public func assemble(container: Container) {
         
         // MARK: UseCase

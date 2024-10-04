@@ -1,5 +1,5 @@
 //
-//  CenterCertificateIntroVM.swift
+//  WaitCertificatePageViewModel.swift
 //  CenterFeature
 //
 //  Created by choijunios on 9/11/24.
@@ -15,12 +15,13 @@ import Core
 import RxSwift
 import RxCocoa
 
-public class CenterCertificateIntroVM: BaseViewModel {
+class WaitCertificatePageViewModel: BaseViewModel {
     
     @Injected var centerCertificateUseCase: CenterCertificateUseCase
     
-    // Init
-    weak var coordinator: CenterCertificateCoordinator?
+    // Navigation
+    var changeToAuthPage: (() -> ())?
+    var presentMakeProfilePage: (() -> ())?
     
     // input
     let requestCurrentStatus: PublishSubject<Void> = .init()
@@ -34,8 +35,7 @@ public class CenterCertificateIntroVM: BaseViewModel {
     // internal
     private let signOutButtonComfirmed: PublishSubject<Void> = .init()
     
-    public init(coordinator: CenterCertificateCoordinator) {
-        self.coordinator = coordinator
+    override init() {
         super.init()
         
         // MARK: 로그아웃
@@ -68,10 +68,9 @@ public class CenterCertificateIntroVM: BaseViewModel {
         let signOutFailure = signOutRequestResult.compactMap { $0.error }
         
         signOutSuccess
-            .subscribe(onNext: { [weak self] _ in
-                
-                guard let self else { return }
-                self.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.changeToAuthPage?()
             })
             .disposed(by: disposeBag)
         
@@ -94,13 +93,14 @@ public class CenterCertificateIntroVM: BaseViewModel {
         let requestCurrentStatusFailure = requestCurrentStatusResult.compactMap { $0.error }
         
         self.currentStatus = requestCurrentStatusSuccess
-            .compactMap({ [weak self] vo in
+            .unretained(self)
+            .compactMap({ (obj, vo) in
                 
                 let status = vo.centerManagerAccountStatus
                 
                 if status == .approved {
                     
-                    self?.coordinator?.coordinatorDidFinish()
+                    obj.presentMakeProfilePage?()
                     
                     return nil
                 }
@@ -115,7 +115,7 @@ public class CenterCertificateIntroVM: BaseViewModel {
                 message: error.message
             )
         }
-        
+
         
         // MARK: 인증 요청하기
         let certificateRequestResult = mapEndLoading(mapStartLoading(certificateRequestButtonClicked)

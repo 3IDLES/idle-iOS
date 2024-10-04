@@ -11,6 +11,7 @@ import SplashFeature
 import AuthFeature
 import CenterMainPageFeature
 import WorkerMainPageFeature
+import CenterCetificatePageFeature
 import Domain
 import Core
 
@@ -102,8 +103,21 @@ extension AppCoordinator {
     
     
     /// CenterCetrificateFlow를 시작합니다.
-    func runCenterCertificateFlow() {
-        printIfDebug("CenterCertificate")
+    func runCenterCertificateFlow() -> WaitCertificatePageCoordinator {
+        let coordinator = WaitCertificatePageCoordinator(router: router)
+        coordinator.startFlow = { [weak self] destination in
+            guard let self else { return }
+            switch destination {
+            case .authFlow:
+                runAuthFlow()
+            case .makeProfileFlow:
+                runCenterMakeProfileFlow()
+            }
+        }
+        
+        executeChild(coordinator)
+        
+        return coordinator
     }
     
     

@@ -14,6 +14,9 @@ import DataSource
 import Swinject
 
 public struct DataAssembly: Assembly {
+    
+    public init() { }
+    
     public func assemble(container: Container) {
         
         // MARK: Service

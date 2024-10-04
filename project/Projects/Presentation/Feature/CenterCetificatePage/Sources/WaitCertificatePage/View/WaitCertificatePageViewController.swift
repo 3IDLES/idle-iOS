@@ -1,5 +1,5 @@
 //
-//  CenterCertificateIntroductionVC.swift
+//  WaitCertificatePageViewController.swift
 //  CenterFeature
 //
 //  Created by choijunios on 9/8/24.
@@ -15,7 +15,7 @@ import BaseFeature
 import RxCocoa
 import RxSwift
 
-public class CenterCertificateIntroductionVC: BaseViewController {
+public class WaitCertificatePageViewController: BaseViewController {
     
     // Init
     
@@ -73,9 +73,9 @@ public class CenterCertificateIntroductionVC: BaseViewController {
         pageViewController.delegate = self
         
         self.pages = [
-            ("센터 관리자 인증 시", "요양보호사 정보를\n한눈에 확인할 수 있어요", CenterFeatureAsset.workerProfileOnboarding.image),
-            ("센터 관리자 인증 시", "요양보호사 구인 공고를\n간편하게 등록할 수 있어요", CenterFeatureAsset.postRegisterOnboarding.image),
-            ("센터 관리자 인증 시", "요양보호사를 즐겨찾기하고\n직접 연락해 능동적으로 구인해요", CenterFeatureAsset.favoriteWorkerOnboarding.image),
+            ("센터 관리자 인증 시", "요양보호사 정보를\n한눈에 확인할 수 있어요", CenterCetificatePageFeatureAsset.workerProfileOnboarding.image),
+            ("센터 관리자 인증 시", "요양보호사 구인 공고를\n간편하게 등록할 수 있어요", CenterCetificatePageFeatureAsset.postRegisterOnboarding.image),
+            ("센터 관리자 인증 시", "요양보호사를 즐겨찾기하고\n직접 연락해 능동적으로 구인해요", CenterCetificatePageFeatureAsset.favoriteWorkerOnboarding.image),
         ].map { (text1, text2, image) in
             let vc = CenterCertificateIntroductionSubVC(
                 title1Text: text1,
@@ -138,7 +138,7 @@ public class CenterCertificateIntroductionVC: BaseViewController {
         
     }
     
-    func bind(viewModel: CenterCertificateIntroVM) {
+    func bind(viewModel: WaitCertificatePageViewModel) {
         
         super.bind(viewModel: viewModel)
         
@@ -202,7 +202,7 @@ public class CenterCertificateIntroductionVC: BaseViewController {
     }
 }
 
-extension CenterCertificateIntroductionVC: UIPageViewControllerDelegate, UIPageViewControllerDataSource {
+extension WaitCertificatePageViewController: UIPageViewControllerDelegate, UIPageViewControllerDataSource {
     
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         let nextIndex = (currentPageIndex+1) % pages.count
