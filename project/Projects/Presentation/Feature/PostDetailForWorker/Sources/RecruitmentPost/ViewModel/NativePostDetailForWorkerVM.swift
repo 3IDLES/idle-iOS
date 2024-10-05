@@ -1,6 +1,6 @@
 //
 //  NativePostDetailForWorkerVM.swift
-//  BaseFeature
+//  PostDetailForWorkerFeature
 //
 //  Created by choijunios on 8/15/24.
 //
@@ -9,6 +9,7 @@ import UIKit
 import Domain
 import DSKit
 import PresentationCore
+import BaseFeature
 import Core
 
 
@@ -39,13 +40,18 @@ public protocol NativePostDetailForWorkerViewModelable: BaseViewModel {
 
 public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWorkerViewModelable {
 
-    public weak var coordinator: PostDetailForWorkerCoodinator?
-    
-    // Init
-    private let postInfo: RecruitmentPostInfo
+    // Injected
     @Injected private var recruitmentPostUseCase: RecruitmentPostUseCase
     @Injected private var workerProfileUseCase: WorkerProfileUseCase
     @Injected private var centerProfileUseCase: CenterProfileUseCase
+    
+    // Naviagtion
+    var presentSnackBar: ((IdleSnackBarRO) -> ())?
+    var presentCenterProfile: ((String) -> ())?
+    var exitPage: (() -> ())?
+    
+    // Init
+    private let id: String
     
     // Ouput
     public var postForWorkerBundle: RxCocoa.Driver<RecruitmentPostForWorkerBundle>?
@@ -64,17 +70,16 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
 
     private var centerInfoForCSCache: CenterInfoForCS?
     
-    public init(postInfo: RecruitmentPostInfo, coordinator: PostDetailForWorkerCoodinator?) {
+    public init(id: String) {
         
-        self.postInfo = postInfo
-        self.coordinator = coordinator
+        self.id = id
         
         super.init()
         
         let getPostDetailResult = viewWillAppear
             .flatMap { [recruitmentPostUseCase] _ in
                 recruitmentPostUseCase
-                    .getNativePostDetailForWorker(id: postInfo.id)
+                    .getNativePostDetailForWorker(id: id)
             }
             .share()
         
@@ -170,9 +175,9 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
         
         // MARK: 버튼 처리
         backButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                self.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
@@ -197,7 +202,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
                 
                 // 리스트화면에서는 앱내 지원만 지원합니다.
                 recruitmentPostUseCase
-                    .applyToPost(postId: postInfo.id, method: .app)
+                    .applyToPost(postId: id, method: .app)
             })
             .share()
         
@@ -208,9 +213,10 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             .asDriver(onErrorDriveWith: .never())
         
         applyRequestSuccess
-            .subscribe { [weak self] _ in
-                guard let self else { return }
-                self.snackBar.onNext(.init(titleText: "지원이 완료되었어요."))
+            .unretained(self)
+            .subscribe { (obj, _) in
+                let object = IdleSnackBarRO(titleText: "지원이 완료되었어요.")
+                obj.presentSnackBar?(object)
             }
             .disposed(by: disposeBag)
         
@@ -251,7 +257,7 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
             .flatMap { [weak self] isFavoriteRequest in
                 self?.setPostFavoriteState(
                     isFavoriteRequest: isFavoriteRequest,
-                    postId: postInfo.id,
+                    postId: id,
                     postType: .native
                 ) ?? .never()
             }
@@ -261,10 +267,10 @@ public class NativePostDetailForWorkerVM: BaseViewModel ,NativePostDetailForWork
         // 센터 프로필 조회 버튼클릭
         centerCardClicked
             .withLatestFrom(getPostDetailSuccess)
-            .subscribe(onNext: { [weak self] bundle in
-                guard let self else { return }
-                let centerId = bundle.centerInfo.centerId
-                self.coordinator?.showCenterProfileScreen(centerId: centerId)
+            .unretained(self)
+            .subscribe(onNext: { (obj, postDetailbundle) in
+                let centerId = postDetailbundle.centerInfo.centerId
+                obj.presentCenterProfile?(centerId)
             })
             .disposed(by: disposeBag)
         

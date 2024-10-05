@@ -9,13 +9,14 @@ import UIKit
 import PresentationCore
 import Domain
 import DSKit
+import BaseFeature
 
 
 import RxCocoa
 import RxSwift
 
 /// 센토도 요양보호사가 보는 공고화면을 볼 수 있기 때문에 해당뷰를 BaseFeature에 구현하였습니다.
-public class NativePostDetailForWorkerVC: BaseViewController {
+class NativePostDetailForWorkerVC: BaseViewController {
 
     // Init
     
@@ -41,13 +42,13 @@ public class NativePostDetailForWorkerVC: BaseViewController {
         return btn
     }()
     
-    public init() {
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         setAppearance()
         setLayout()
     }
@@ -108,7 +109,7 @@ public class NativePostDetailForWorkerVC: BaseViewController {
         ])
     }
 
-    public func bind(viewModel: NativePostDetailForWorkerViewModelable) {
+    func bind(viewModel: NativePostDetailForWorkerViewModelable) {
         
         super.bind(viewModel: viewModel)
         
@@ -267,7 +268,7 @@ public class NativePostDetailForWorkerVC: BaseViewController {
 }
 
 // MARK: PostDetailContentView
-public class PostDetailForWorkerContentView: UIView {
+class PostDetailForWorkerContentView: UIView {
     
     /// 구인공고 카드
     let cardView: WorkerNativeEmployCard = {
@@ -287,14 +288,14 @@ public class PostDetailForWorkerContentView: UIView {
     /// 센터 프로필로 이동하는 카드및 센터정보 표시
     let centerInfoCard = CenterInfoCardView()
     
-    public init() {
+    init() {
         super.init(frame: .zero)
         
         setAppearance()
         setLayout()
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
     func setAppearance() {
         

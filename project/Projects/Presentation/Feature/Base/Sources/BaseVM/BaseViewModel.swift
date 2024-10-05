@@ -22,10 +22,6 @@ open class BaseViewModel {
     public let alertObject: PublishSubject<IdleAlertObject> = .init()
     var alertObjectDriver: Driver<IdleAlertObject>?
     
-    // Snack bar
-    public let snackBar: PublishSubject<IdleSnackBarRO> = .init()
-    var snackBarDriver: Driver<IdleSnackBarRO>?
-    
     // MARK: SnackBarStack
     private var snackBarStack: [IdleSnackBarRO] = []
     
@@ -46,34 +42,12 @@ open class BaseViewModel {
         
         self.alertObjectDriver = alertObject
             .asDriver(onErrorDriveWith: .never())
-        
-        self.snackBarDriver = snackBar
-            .asDriver(onErrorDriveWith: .never())
             
         self.showLoadingDriver = showLoading
             .asDriver(onErrorDriveWith: .never())
         
         self.dismissLoadingDriver = dismissLoading
             .asDriver(onErrorDriveWith: .never())
-        
-        // life cycle
-        viewDidAppear
-            .compactMap { [weak self] in
-                let bars = self?.snackBarStack
-                self?.snackBarStack = []
-                return bars
-            }
-            .flatMap { bars in
-                Observable
-                    .from(bars)
-                    .concatMap { ro in
-                        Observable
-                            .just(ro)
-                            .delay(.milliseconds(350), scheduler: MainScheduler.instance)
-                    }
-            }
-            .bind(to: snackBar)
-            .disposed(by: disposeBag)
     }
     
     public func mapStartLoading<T>(_ target: Observable<T>) -> Observable<T> {
@@ -97,9 +71,5 @@ open class BaseViewModel {
                 
                 return item
             }
-    }
-    
-    public func addSnackBar(ro: IdleSnackBarRO) {
-        self.snackBarStack.append(ro)
     }
 }

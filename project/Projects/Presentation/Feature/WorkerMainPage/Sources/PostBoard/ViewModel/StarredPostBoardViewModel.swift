@@ -22,7 +22,7 @@ class StarredPostBoardViewModel: BaseViewModel, WorkerAppliablePostBoardVMable {
     @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
     
     // Navigation
-    var presentPostDetailPage: ((String, PostOriginType) -> ())?
+    var presentPostDetailPage: ((RecruitmentPostInfo) -> ())?
     
     // Input
     var requestInitialPageRequest: RxRelay.PublishRelay<Void> = .init()
@@ -133,6 +133,6 @@ class StarredPostBoardViewModel: BaseViewModel, WorkerAppliablePostBoardVMable {
     }
     
     func showPostDetail(postType: Domain.PostOriginType, id: String) {
-        self.presentPostDetailPage?(id, postType)
+        self.presentPostDetailPage?(.init(type: postType, id: id))
     }
 }

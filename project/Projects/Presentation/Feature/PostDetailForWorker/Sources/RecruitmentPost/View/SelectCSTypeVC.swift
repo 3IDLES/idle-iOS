@@ -7,6 +7,7 @@
 
 import UIKit
 import PresentationCore
+import BaseFeature
 import Domain
 import DSKit
 

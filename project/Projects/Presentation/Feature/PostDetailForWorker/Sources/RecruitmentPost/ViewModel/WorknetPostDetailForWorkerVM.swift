@@ -8,6 +8,7 @@
 import UIKit
 import Domain
 import PresentationCore
+import BaseFeature
 import DSKit
 import Core
 
@@ -15,7 +16,7 @@ import Core
 import RxCocoa
 import RxSwift
 
-public protocol WorknetPostDetailForWorkerViewModelable: BaseViewModel {
+protocol WorknetPostDetailForWorkerViewModelable: BaseViewModel {
     
     // Output
     var postDetail: Driver<WorknetRecruitmentPostDetailVO>? { get }
@@ -28,37 +29,38 @@ public protocol WorknetPostDetailForWorkerViewModelable: BaseViewModel {
     var starButtonClicked: PublishRelay<Bool> { get }
 }
 
-public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWorkerViewModelable {
+class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWorkerViewModelable {
     
+    // Injection
     @Injected private var recruitmentPostUseCase: RecruitmentPostUseCase
     @Injected private var workerProfileUseCase: WorkerProfileUseCase
     
-    public weak var coordinator: PostDetailForWorkerCoodinator?
+    // Navigation
+    var exitPage: (() -> ())?
     
     // Init
-    private let postInfo: RecruitmentPostInfo
+    private let id: String
     
     // Ouput
-    public var postDetail: RxCocoa.Driver<WorknetRecruitmentPostDetailVO>?
-    public var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
-    public var starButtonRequestResult: Driver<Bool>?
+    var postDetail: RxCocoa.Driver<WorknetRecruitmentPostDetailVO>?
+    var locationInfo: RxCocoa.Driver<WorkPlaceAndWorkerLocationMapRO>?
+    var starButtonRequestResult: Driver<Bool>?
     
     // Input
-    public var requestRefresh: RxRelay.PublishRelay<Void> = .init()
-    public var backButtonClicked: RxRelay.PublishRelay<Void> = .init()
-    public var starButtonClicked: RxRelay.PublishRelay<Bool> = .init()
+    var requestRefresh: RxRelay.PublishRelay<Void> = .init()
+    var backButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    var starButtonClicked: RxRelay.PublishRelay<Bool> = .init()
 
     
-    public init(postInfo: RecruitmentPostInfo, coordinator: PostDetailForWorkerCoodinator?) {
-        self.postInfo = postInfo
-        self.coordinator = coordinator
+    init(id: String) {
+        self.id = id
         
         super.init()
         
         let getPostDetailResult = requestRefresh
             .flatMap { [recruitmentPostUseCase] _ in
                 recruitmentPostUseCase
-                    .getWorknetPostDetailForWorker(id: postInfo.id)
+                    .getWorknetPostDetailForWorker(id: id)
             }
             .share()
         
@@ -71,7 +73,7 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
                     title: "공고 불러오기 실패",
                     message: error.message
                 ) { [weak self] in
-                    self?.coordinator?.coordinatorDidFinish()
+                    self?.exitPage?()
                 }
             }
         
@@ -133,9 +135,9 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
         
         // MARK: 버튼 처리
         backButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                guard let self else { return }
-                self.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
 
@@ -144,7 +146,7 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
             .flatMap { [weak self] isFavoriteRequest in
                 self?.setPostFavoriteState(
                     isFavoriteRequest: isFavoriteRequest,
-                    postId: postInfo.id,
+                    postId: id,
                     postType: .native
                 ) ?? .never()
             }
@@ -161,7 +163,7 @@ public class WorknetPostDetailForWorkerVM: BaseViewModel, WorknetPostDetailForWo
             .disposed(by: disposeBag)
     }
         
-    public func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: PostOriginType) -> RxSwift.Single<Bool> {
+    func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: PostOriginType) -> RxSwift.Single<Bool> {
         
         return Single<Bool>.create { [weak self] observer in
             

@@ -7,14 +7,15 @@
 
 import UIKit
 import PresentationCore
-import Domain
+import BaseFeature
 import DSKit
+import Domain
 
 
 import RxCocoa
 import RxSwift
 
-public class WorknetPostDetailForWorkerVC: BaseViewController {
+class WorknetPostDetailForWorkerVC: BaseViewController {
     
     // Init
     
@@ -37,7 +38,7 @@ public class WorknetPostDetailForWorkerVC: BaseViewController {
     // 워크넷 링크
     var workNetPostLink: URL?
     
-    public init() {
+    init() {
         
         super.init(nibName: nil, bundle: nil)
         
@@ -115,9 +116,9 @@ public class WorknetPostDetailForWorkerVC: BaseViewController {
         return view
     }()
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
-    public func bind(viewModel: WorknetPostDetailForWorkerViewModelable) {
+    func bind(viewModel: WorknetPostDetailForWorkerViewModelable) {
         
         super.bind(viewModel: viewModel)
         

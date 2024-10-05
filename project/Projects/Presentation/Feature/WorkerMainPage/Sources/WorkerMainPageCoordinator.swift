@@ -11,7 +11,7 @@ import Domain
 import Core
 
 public enum WorkerMainPageCoordinatorDestination {
-    case postDetailPage(id: String, type: PostOriginType)
+    case postDetailPage(info: RecruitmentPostInfo)
     case authFlow
     case myProfilePage
     case accountDeregisterPage
@@ -90,7 +90,10 @@ public extension WorkerMainPageCoordinator {
             self?.startFlow(.myProfilePage)
         }
         viewModel.presentPostDetailPage = { [weak self] id, type in
-            self?.startFlow(.postDetailPage(id: id, type: type))
+            self?.startFlow(.postDetailPage(info: .init(type: type, id: id)))
+        }
+        viewModel.presentSnackBar = { [weak self] object, padding in
+            self?.router.presentSnackBarController(bottomPadding: padding, object: object)
         }
         
         let viewController = MainPostBoardViewController()
@@ -107,13 +110,13 @@ public extension WorkerMainPageCoordinator {
     func presentStarredAndAppliedPostBoardPage(controller: UINavigationController) {
         
         let appliedPostViewModel = AppliedPostBoardViewModel()
-        appliedPostViewModel.presentPostDetailPage = { [weak self] id, type in
-            self?.startFlow(.postDetailPage(id: id, type: type))
+        appliedPostViewModel.presentPostDetailPage = { [weak self] info in
+            self?.startFlow(.postDetailPage(info: info))
         }
         
         let starredPostViewModel = StarredPostBoardViewModel()
-        starredPostViewModel.presentPostDetailPage = { [weak self] id, type in
-            self?.startFlow(.postDetailPage(id: id, type: type))
+        starredPostViewModel.presentPostDetailPage = { [weak self] info in
+            self?.startFlow(.postDetailPage(info: info))
         }
         
         let viewController = StarredAndAppliedPostViewController()

@@ -13,6 +13,7 @@ import CenterMainPageFeature
 import WorkerMainPageFeature
 import CenterCetificatePageFeature
 import AccountDeregisterFeature
+import PostDetailForWorkerFeature
 
 import Domain
 import Core
@@ -163,8 +164,8 @@ extension AppCoordinator {
                 runAuthFlow()
             case .myProfilePage:
                 workerProfileFlow(mode: .myProfile)
-            case .postDetailPage(let id, let type):
-                postDetailForWorkerFlow(postId: id, origin: type)
+            case .postDetailPage(let info):
+                postDetailForWorkerFlow(postInfo: info)
             }
         }
         
@@ -267,8 +268,20 @@ extension AppCoordinator {
     }
     
     @discardableResult
-    func postDetailForWorkerFlow(postId: String, origin: PostOriginType) {
-        printIfDebug("postDetail")
+    func postDetailForWorkerFlow(postInfo: RecruitmentPostInfo) -> PostDetailForWorkerCoodinator {
+        let coordinator = PostDetailForWorkerCoodinator(
+            router: router,
+            postInfo: postInfo
+        )
+        coordinator.startFlow = { [weak self] destination in
+            switch destination {
+            case .centerProfile(let mode):
+                self?.centerProfileFlow(mode: mode)
+            }
+        }
+        
+        executeChild(coordinator)
+        return coordinator
     }
 }
 
