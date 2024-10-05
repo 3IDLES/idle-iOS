@@ -21,7 +21,7 @@ public class PasswordForDeregisterVM: BaseViewModel {
     
     // Navigation
     var changeToAuthFlow: (() -> ())?
-    var backToSettingPage: (() -> ())?
+    var backToPrevModule: (() -> ())?
     var exitPage: (() -> ())?
     
     public let deregisterButtonClicked: PublishRelay<String> = .init()
@@ -50,7 +50,7 @@ public class PasswordForDeregisterVM: BaseViewModel {
                 NotificationCenter.default.post(name: .requestDeleteTokenFromServer, object: nil)
                 
                 // RootCoordinator로 이동
-                obj.backToSettingPage?()
+                obj.changeToAuthFlow?()
             })
             .disposed(by: disposeBag)
         
@@ -66,7 +66,7 @@ public class PasswordForDeregisterVM: BaseViewModel {
             .observe(on: MainScheduler.instance)
             .unretained(self)
             .subscribe(onNext: { (obj, _) in
-                obj.backToSettingPage?()
+                obj.backToPrevModule?()
             })
             .disposed(by: disposeBag)
         

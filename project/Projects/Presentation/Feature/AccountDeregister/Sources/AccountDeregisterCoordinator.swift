@@ -39,7 +39,7 @@ public class AccountDeregisterCoordinator: Coordinator2 {
     }
 }
 
-extension AccountDeregisterCoordinator {
+public extension AccountDeregisterCoordinator {
     
     func startWorkerFlow() {
         
@@ -78,7 +78,7 @@ extension AccountDeregisterCoordinator {
     func startPhonenumberAuthFlow(_ reasons: [String]) {
         
         let viewModel = PasswordForDeregisterVM(reasons: reasons)
-        viewModel.backToSettingPage = { [weak self] in
+        viewModel.backToPrevModule = { [weak self] in
             if let module = self?.belowModule {
                 self?.router.popTo(module: module, animated: true)
             }
@@ -89,10 +89,31 @@ extension AccountDeregisterCoordinator {
         viewModel.exitPage = { [weak self] in
             self?.router.popModule(animated: true)
         }
+        
+        let viewController = PasswordForDeregisterVC()
+        viewController.bind(viewModel: viewModel)
+        
+        router.push(module: viewController, animated: true)
     }
     
     func startPasswordAuthFlow(_ reasons: [String]) {
         
+        let viewModel = PhoneNumberValidationForDeregisterVM(reasons: reasons)
+        viewModel.backToPrevModule = { [weak self] in
+            if let module = self?.belowModule {
+                self?.router.popTo(module: module, animated: true)
+            }
+        }
+        viewModel.changeToAuthFlow = { [weak self] in
+            self?.startFlow(.accountAuthFlow)
+        }
+        viewModel.exitPage = { [weak self] in
+            self?.router.popModule(animated: true)
+        }
         
+        let viewController = PhoneNumberValidationForDeregisterVC()
+        viewController.bind(viewModel: viewModel)
+        
+        router.push(module: viewController, animated: true)
     }
 }
