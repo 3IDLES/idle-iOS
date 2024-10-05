@@ -14,6 +14,7 @@ import WorkerMainPageFeature
 import CenterCetificatePageFeature
 import AccountDeregisterFeature
 import PostDetailForWorkerFeature
+import UserProfileFeature
 
 import Domain
 import Core
@@ -288,14 +289,13 @@ extension AppCoordinator {
 // MARK: User profile
 extension AppCoordinator {
     
-   @discardableResult
     func workerProfileFlow(mode: ProfileMode) {
         printIfDebug("worker profile")
     }
     
-    @discardableResult
      func centerProfileFlow(mode: ProfileMode) {
-         printIfDebug("center profile")
+         let coordinator = CenterProfileCoordinator(router: router, mode: mode)
+         executeChild(coordinator)
      }
 }
 

@@ -23,11 +23,11 @@ struct ChangeCenterInformation {
     let image: UIImage?
 }
 
-public protocol CenterProfileViewModelable: BaseViewModel, CenterProfileInputable & CenterProfileOutputable {
-    var profileMode: ProfileMode { get }
+protocol CenterProfileViewModelable: BaseViewModel, CenterProfileInputable & CenterProfileOutputable {
+    var mode: ProfileMode { get }
 }
 
-public protocol CenterProfileInputable {
+protocol CenterProfileInputable {
     var readyToFetch: PublishRelay<Void> { get }
     var editingButtonPressed: PublishRelay<Void> { get }
     var editingFinishButtonPressed: PublishRelay<Void> { get }
@@ -38,7 +38,7 @@ public protocol CenterProfileInputable {
     var exitButtonClicked: PublishRelay<Void> { get }
 }
 
-public protocol CenterProfileOutputable {
+protocol CenterProfileOutputable {
     var navigationBarTitle: String { get }
     var centerName: Driver<String>? { get }
     var centerLocation: Driver<String>? { get }
@@ -50,14 +50,17 @@ public protocol CenterProfileOutputable {
 }
 
 
-public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
+class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
+    // Init
+    let mode: ProfileMode
+    
+    // Injected
     @Injected var cacheRepository: CacheRepository
     @Injected var profileUseCase: CenterProfileUseCase
     
-    weak var coordinator: CenterProfileCoordinator?
-    
-    public let profileMode: ProfileMode
+    // Navigation
+    var exitPage: (() -> ())?
     
     private var fetchedPhoneNumber: String?
     private var fetchedIntroduction: String?
@@ -65,27 +68,27 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
     private var editingImageInfo: ImageUploadInfo?
     
-    public var readyToFetch: PublishRelay<Void> = .init()
-    public var editingButtonPressed: PublishRelay<Void> = .init()
-    public var editingFinishButtonPressed: PublishRelay<Void> = .init()
-    public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
-    public var editingInstruction: BehaviorRelay<String> = .init(value: "")
-    public var selectedImage: PublishRelay<UIImage> = .init()
-    public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    var readyToFetch: PublishRelay<Void> = .init()
+    var editingButtonPressed: PublishRelay<Void> = .init()
+    var editingFinishButtonPressed: PublishRelay<Void> = .init()
+    var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
+    var editingInstruction: BehaviorRelay<String> = .init(value: "")
+    var selectedImage: PublishRelay<UIImage> = .init()
+    var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
     // 기본 데이터
-    public let navigationBarTitle: String
-    public var centerName: Driver<String>?
-    public var centerLocation: Driver<String>?
-    public var centerPhoneNumber: Driver<String>?
-    public var centerIntroduction: Driver<String>?
-    public var displayingImage: Driver<UIImage?>?
+    let navigationBarTitle: String
+    var centerName: Driver<String>?
+    var centerLocation: Driver<String>?
+    var centerPhoneNumber: Driver<String>?
+    var centerIntroduction: Driver<String>?
+    var displayingImage: Driver<UIImage?>?
     
     // 수정 상태 여부
-    public var isEditingMode: Driver<Bool>?
+    var isEditingMode: Driver<Bool>?
     
     // 요구사항 X
-    public var editingValidation: Driver<Void>?
+    var editingValidation: Driver<Void>?
     
     // Image
     private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
@@ -102,10 +105,9 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         )
     }
     
-    public init(mode: ProfileMode, coordinator: CenterProfileCoordinator) {
+    init(mode: ProfileMode) {
         
-        self.profileMode = mode
-        self.coordinator = coordinator
+        self.mode = mode
         
         let navigationBarTitle = (mode == .myProfile ? "내 센터 정보" : "센터 정보")
         self.navigationBarTitle = navigationBarTitle
@@ -114,8 +116,9 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         
         // MARK: fetch from server
         let profileRequestResult = readyToFetch
-            .flatMap { [profileMode, profileUseCase] _ in
-                profileUseCase.getProfile(mode: profileMode)
+            .unretained(self)
+            .flatMap { (obj, _) in
+                obj.profileUseCase.getProfile(mode: obj.mode)
             }
             .share()
         
@@ -278,8 +281,9 @@ public class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             
         // MARK: Exit Button
         exitButtonClicked
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         

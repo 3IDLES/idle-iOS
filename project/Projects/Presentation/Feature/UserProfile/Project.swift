@@ -2,7 +2,7 @@
 //  Project.swift
 //  ProjectDescriptionHelpers
 //
-//  Created by choijunios on 2024/07/19
+//  Created by choijunios on 2024/10/05
 //
 
 import ProjectDescription
@@ -11,7 +11,7 @@ import ConfigurationPlugin
 import DependencyPlugin
 
 let project = Project(
-    name: "Worker",
+    name: "UserProfile",
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
@@ -19,7 +19,7 @@ let project = Project(
         
         /// FeatureConcrete
         .target(
-            name: "WorkerFeature",
+            name: "UserProfileFeature",
             destinations: DeploymentSettings.platforms,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -27,6 +27,7 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
+                // Presentation
                 D.Presentation.BaseFeature,
             ],
             settings: .settings(
@@ -36,7 +37,7 @@ let project = Project(
         
         /// FeatureConcrete ExampleApp
         .target(
-            name: "Worker_ExampleApp",
+            name: "UserProfile_ExampleApp",
             destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -45,7 +46,7 @@ let project = Project(
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
-                .target(name: "WorkerFeature"),
+                .target(name: "UserProfileFeature"),
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -54,14 +55,14 @@ let project = Project(
     ],
     schemes: [
         Scheme.makeSchemes(
-            .target("WorkerFeature"),
+            .target("UserProfileFeature"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
             ]
         ),
         Scheme.makeSchemes(
-            .target("Worker_ExampleApp"),
+            .target("UserProfile_ExampleApp"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName

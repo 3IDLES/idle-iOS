@@ -39,10 +39,7 @@ let project = Project(
                 D.Presentation.CenterCetificatePageFeature,
                 D.Presentation.AccountDeregisterFeature,
                 D.Presentation.PostDetailForWorkerFeature,
-                
-                
-                D.Presentation.WorkerFeature,
-                D.Presentation.CenterFeature,
+                D.Presentation.UserProfileFeature,
                 D.Presentation.NotificationPageFeature,
                 
                 // ThirParty

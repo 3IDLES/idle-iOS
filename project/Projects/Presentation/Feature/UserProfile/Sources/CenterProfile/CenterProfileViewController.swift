@@ -16,7 +16,7 @@ import RxSwift
 import RxCocoa
 
 
-public class CenterProfileViewController: BaseViewController {
+class CenterProfileViewController: BaseViewController {
     
     // View
     lazy var navigationBar: IdleNavigationBar = {
@@ -120,7 +120,7 @@ public class CenterProfileViewController: BaseViewController {
         return view
     }()
     
-    public init() {
+    init() {
         
         super.init(nibName: nil, bundle: nil)
         
@@ -266,7 +266,7 @@ public class CenterProfileViewController: BaseViewController {
     
     }
     
-    public func bind(viewModel: CenterProfileViewModelable) {
+    func bind(viewModel: CenterProfileViewModelable) {
         
         super.bind(viewModel: viewModel)
         
@@ -279,7 +279,7 @@ public class CenterProfileViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         // 내 센터보기 상태인 경우(수정가능한 프로필 상태)
-        if case .myProfile = viewModel.profileMode {
+        if case .myProfile = viewModel.mode {
             
             profileEditButton
                 .eventPublisher
@@ -357,7 +357,7 @@ public class CenterProfileViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         // MARK: Edit Mode
-        if case .myProfile = viewModel.profileMode {
+        if case .myProfile = viewModel.mode {
             
             viewModel
                 .isEditingMode?
