@@ -34,9 +34,9 @@ public class SelectReasonCoordinator: ChildCoordinator {
         var vm: DeregisterReasonVMable!
         switch userType {
         case .center:
-            vm = CenterDeregisterReasonsVM(coordinator: self)
+            vm = CenterDeregisterReasonsVM()
         case .worker:
-            vm = WorkerDeregisterReasonsVM(coordinator: self)
+            vm = WorkerDeregisterReasonsVM()
         }
         
         let vc = DeregisterReasonVC()

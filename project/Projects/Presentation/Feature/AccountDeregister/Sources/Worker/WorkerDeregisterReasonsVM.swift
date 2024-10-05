@@ -14,25 +14,29 @@ import RxCocoa
 
 public class WorkerDeregisterReasonsVM: BaseViewModel, DeregisterReasonVMable {
     
-    public weak var coordinator: SelectReasonCoordinator?
+    // Navigation
+    var presentPhonenumberAuthPage: (([String]) -> ())?
+    var exitPage: (() -> ())?
+    
     public var exitButonClicked: RxRelay.PublishRelay<Void> = .init()
     public var acceptDeregisterButonClicked: PublishRelay<[String]> = .init()
     public var userType: UserType = .worker
     
-    public init(coordinator: SelectReasonCoordinator) {
-        self.coordinator = coordinator
+    public override init() {
         
         super.init()
         
         acceptDeregisterButonClicked
-            .subscribe(onNext: { [weak self] reasons in
-                self?.coordinator?.showPhoneNumberAuthScreen(reasons: reasons)
+            .unretained(self)
+            .subscribe(onNext: { (obj, reasons) in
+                obj.presentPhonenumberAuthPage?(reasons)
             })
             .disposed(by: disposeBag)
         
         exitButonClicked
-            .subscribe(onNext: { [weak self] reasons in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
     }

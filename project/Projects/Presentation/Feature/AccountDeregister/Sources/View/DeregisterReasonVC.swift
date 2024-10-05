@@ -17,7 +17,6 @@ import RxSwift
 
 public protocol DeregisterReasonVMable: BaseViewModel {
     var userType: UserType { get }
-    var coordinator: SelectReasonCoordinator? { get }
     var exitButonClicked: PublishRelay<Void> { get }
     var acceptDeregisterButonClicked: PublishRelay<[String]> { get }
 }

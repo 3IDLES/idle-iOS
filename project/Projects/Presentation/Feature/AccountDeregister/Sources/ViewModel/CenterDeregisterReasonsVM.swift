@@ -13,26 +13,30 @@ import RxSwift
 import RxCocoa
 
 public class CenterDeregisterReasonsVM: BaseViewModel, DeregisterReasonVMable {
+    
+    // Navigation
+    var presentPasswordAuthPage: (([String]) -> ())?
+    var exitPage: (() -> ())?
 
-    public weak var coordinator: SelectReasonCoordinator?
     public var exitButonClicked: RxRelay.PublishRelay<Void> = .init()
     public var acceptDeregisterButonClicked: PublishRelay<[String]> = .init()
     public var userType: UserType = .center
     
-    public init(coordinator: SelectReasonCoordinator) {
-        self.coordinator = coordinator
+    public override init() {
         
         super.init()
         
         acceptDeregisterButonClicked
-            .subscribe(onNext: { [weak self] reasons in
-                self?.coordinator?.showPasswordAuthScreen(reasons: reasons)
+            .unretained(self)
+            .subscribe(onNext: { (obj, reasons) in
+                obj.presentPasswordAuthPage?(reasons)
             })
             .disposed(by: disposeBag)
         
         exitButonClicked
-            .subscribe(onNext: { [weak self] reasons in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
     }
