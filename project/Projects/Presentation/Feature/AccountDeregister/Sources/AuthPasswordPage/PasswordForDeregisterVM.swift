@@ -16,25 +16,25 @@ import RxSwift
 
 public class PasswordForDeregisterVM: BaseViewModel {
 
+    // Injection
     @Injected var settingUseCase: SettingScreenUseCase
     
-    public weak var coordinator: PasswordForDeregisterCoordinator?
+    // Navigation
+    var changeToAuthFlow: (() -> ())?
+    var backToSettingPage: (() -> ())?
+    var exitPage: (() -> ())?
     
     public let deregisterButtonClicked: PublishRelay<String> = .init()
     public let backButtonClicked: PublishRelay<Void> = .init()
     public let cancelButtonClicked: PublishRelay<Void> = .init()
     
-    public init(
-        deregisterReasons: [String],
-        coordinator: PasswordForDeregisterCoordinator
-    ) {
-        self.coordinator = coordinator
-        
+    public init(reasons: [String]) {
         super.init()
         
         let deregisterResult = deregisterButtonClicked
-            .flatMap { [settingUseCase] password in
-                settingUseCase.deregisterWorkerAccount(reasons: deregisterReasons)
+            .unretained(self)
+            .flatMap { (obj, password) in
+                obj.settingUseCase.deregisterWorkerAccount(reasons: reasons)
             }
             .share()
         
@@ -43,27 +43,30 @@ public class PasswordForDeregisterVM: BaseViewModel {
 
         deregisterSuccess
             .observe(on: MainScheduler.asyncInstance)
-            .subscribe(onNext: { [weak self] _ in
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
                 
                 // 회원탈퇴 성공 -> 원격알림 토큰 제거
                 NotificationCenter.default.post(name: .requestDeleteTokenFromServer, object: nil)
                 
                 // RootCoordinator로 이동
-                self?.coordinator?.popToRoot()
+                obj.backToSettingPage?()
             })
             .disposed(by: disposeBag)
         
         backButtonClicked
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
         cancelButtonClicked
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.cancelDeregister()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.backToSettingPage?()
             })
             .disposed(by: disposeBag)
         

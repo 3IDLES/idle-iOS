@@ -5,13 +5,21 @@
 //  Created by choijunios on 10/5/24.
 //
 
-import Foundation
+import UIKit
 import BaseFeature
 import Domain
+
+public enum AccountDeregisterCoordinatorDestination {
+    case accountAuthFlow
+}
 
 public class AccountDeregisterCoordinator: Coordinator2 {
     
     public var onFinish: (() -> ())?
+    
+    public var startFlow: ((AccountDeregisterCoordinatorDestination) -> ())!
+    
+    private weak var belowModule: UIViewController?
     
     let router: Router
     let userType: UserType
@@ -22,8 +30,12 @@ public class AccountDeregisterCoordinator: Coordinator2 {
     }
     
     public func start() {
-        
-        
+        switch userType {
+        case .center:
+            startCenterFlow()
+        case .worker:
+            startWorkerFlow()
+        }
     }
 }
 
@@ -42,6 +54,7 @@ extension AccountDeregisterCoordinator {
         let viewController = DeregisterReasonVC()
         viewController.bind(viewModel: viewModel)
         
+        belowModule = router.topViewController
         router.push(module: viewController, animated: true)
     }
     
@@ -58,12 +71,24 @@ extension AccountDeregisterCoordinator {
         let viewController = DeregisterReasonVC()
         viewController.bind(viewModel: viewModel)
         
+        belowModule = router.topViewController
         router.push(module: viewController, animated: true)
     }
     
     func startPhonenumberAuthFlow(_ reasons: [String]) {
         
-        
+        let viewModel = PasswordForDeregisterVM(reasons: reasons)
+        viewModel.backToSettingPage = { [weak self] in
+            if let module = self?.belowModule {
+                self?.router.popTo(module: module, animated: true)
+            }
+        }
+        viewModel.changeToAuthFlow = { [weak self] in
+            self?.startFlow(.accountAuthFlow)
+        }
+        viewModel.exitPage = { [weak self] in
+            self?.router.popModule(animated: true)
+        }
     }
     
     func startPasswordAuthFlow(_ reasons: [String]) {

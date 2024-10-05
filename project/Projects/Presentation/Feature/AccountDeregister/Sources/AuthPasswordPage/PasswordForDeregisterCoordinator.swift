@@ -35,10 +35,7 @@ public class PasswordForDeregisterCoordinator: ChildCoordinator {
     
     public func start() {
         let vc = PasswordForDeregisterVC()
-        let vm = PasswordForDeregisterVM(
-            deregisterReasons: reasons,
-            coordinator: self
-        )
+        let vm = PasswordForDeregisterVM(reasons: reasons)
         vc.bind(viewModel: vm)
         viewControllerRef = vc
         navigationController.pushViewController(vc, animated: true)
