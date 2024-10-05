@@ -120,6 +120,7 @@ class CenterSettingViewModel: BaseViewModel, CenterSettingVMable {
                 profileUseCase
                     .getProfile(mode: .myProfile)
             }
+            .share()
         
         let fetchSuccess = fetchProfileResult.compactMap { $0.value }
         let fetchFailure = fetchProfileResult.compactMap { $0.error }

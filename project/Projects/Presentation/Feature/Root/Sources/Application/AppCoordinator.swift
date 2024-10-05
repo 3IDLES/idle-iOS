@@ -11,6 +11,9 @@ import SplashFeature
 import AuthFeature
 import CenterMainPageFeature
 import WorkerMainPageFeature
+import CenterCetificatePageFeature
+import AccountDeregisterFeature
+
 import Domain
 import Core
 
@@ -66,7 +69,7 @@ extension AppCoordinator {
             case .centerCertificatePage:
                 runCenterCertificateFlow()
             case .centerMakeProfilePage:
-                runCenterMakeProfileFlow()
+                runMakeCenterProfileFlow()
             }
         }
         
@@ -102,8 +105,22 @@ extension AppCoordinator {
     
     
     /// CenterCetrificateFlow를 시작합니다.
-    func runCenterCertificateFlow() {
-        printIfDebug("CenterCertificate")
+    @discardableResult
+    func runCenterCertificateFlow() -> WaitCertificatePageCoordinator {
+        let coordinator = WaitCertificatePageCoordinator(router: router)
+        coordinator.startFlow = { [weak self] destination in
+            guard let self else { return }
+            switch destination {
+            case .authFlow:
+                runAuthFlow()
+            case .makeProfileFlow:
+                runMakeCenterProfileFlow()
+            }
+        }
+        
+        executeChild(coordinator)
+        
+        return coordinator
     }
     
     
@@ -158,8 +175,18 @@ extension AppCoordinator {
     
     
     /// CenterMakeProfileFlow를 시작합니다.
-    func runCenterMakeProfileFlow() {
-        printIfDebug("Center make profile")
+    func runMakeCenterProfileFlow() {
+        let coordinator = MakeCenterProfilePageCoordinator(router: router)
+        coordinator.startFlow = { [weak self] destination in
+            switch destination {
+            case .authFlow:
+                self?.runAuthFlow()
+            case .centerMainPageFlow:
+                self?.runCenterMainPageFlow()
+            }
+        }
+        
+        executeChild(coordinator)
     }
 }
 
@@ -263,7 +290,16 @@ extension AppCoordinator {
 extension AppCoordinator {
     
     @discardableResult
-     func accountDeregister(userType: UserType) {
-         printIfDebug("deregister")
+     func accountDeregister(userType: UserType) -> AccountDeregisterCoordinator {
+         let coordinator = AccountDeregisterCoordinator(router: router, userType: userType)
+         coordinator.startFlow = { [weak self] destination in
+             switch destination {
+             case .accountAuthFlow:
+                 self?.runAuthFlow()
+             }
+         }
+         
+         executeChild(coordinator)
+         return coordinator
      }
 }
