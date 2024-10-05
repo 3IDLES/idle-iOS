@@ -134,7 +134,7 @@ extension AppCoordinator {
             guard let self else { return }
             switch destination {
             case .workerProfilePage(let workerId):
-                workerProfileFlow(mode: .otherProfile(id: workerId))
+                workerProfileFlow(id: workerId)
             case .createPostPage:
                 createPostFlow()
             case .myCenterProfilePage:
@@ -164,7 +164,7 @@ extension AppCoordinator {
             case .authFlow:
                 runAuthFlow()
             case .myProfilePage:
-                workerProfileFlow(mode: .myProfile)
+                workerMyProfileFlow()
             case .postDetailPage(let info):
                 postDetailForWorkerFlow(postInfo: info)
             }
@@ -289,14 +289,20 @@ extension AppCoordinator {
 // MARK: User profile
 extension AppCoordinator {
     
-    func workerProfileFlow(mode: ProfileMode) {
-        printIfDebug("worker profile")
+    func workerProfileFlow(id: String) {
+        let coordinator = WorkerProfileCoordinator(router: router, id: id)
+        executeChild(coordinator)
     }
     
-     func centerProfileFlow(mode: ProfileMode) {
-         let coordinator = CenterProfileCoordinator(router: router, mode: mode)
-         executeChild(coordinator)
-     }
+    func workerMyProfileFlow() {
+        let coordinator = WorkerMyProfileCoordinator(router: router)
+        executeChild(coordinator)
+    }
+    
+    func centerProfileFlow(mode: ProfileMode) {
+        let coordinator = CenterProfileCoordinator(router: router, mode: mode)
+        executeChild(coordinator)
+    }
 }
 
 // MARK: Account Deregister

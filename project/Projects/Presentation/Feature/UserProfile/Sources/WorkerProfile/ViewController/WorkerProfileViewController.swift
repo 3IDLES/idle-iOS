@@ -15,9 +15,7 @@ import BaseFeature
 import RxSwift
 import RxCocoa
 
-public class WorkerProfileViewController: DisposableViewController {
-    
-    private var viewModel: (any WorkerProfileViewModelable)?
+class WorkerProfileViewController: BaseViewController {
     
     // 네비게이션 바
     lazy var navigationBar: IdleNavigationBar = {
@@ -60,7 +58,7 @@ public class WorkerProfileViewController: DisposableViewController {
     }()
     
     // 즐겨찾기 버튼
-//    public let starButton: IconWithColorStateButton = {
+//    let starButton: IconWithColorStateButton = {
 //        let button = IconWithColorStateButton(
 //            representImage: DSKitAsset.Icons.subscribeStar.image,
 //            normalColor: DSKitAsset.Colors.gray200.color,
@@ -182,9 +180,7 @@ public class WorkerProfileViewController: DisposableViewController {
         return label
     }()
     
-    let disposeBag = DisposeBag()
-    
-    public init() {
+    init() {
         
         super.init(nibName: nil, bundle: nil)
         
@@ -192,7 +188,7 @@ public class WorkerProfileViewController: DisposableViewController {
         setAutoLayout()
     }
     
-    public required init?(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError()
     }
     
@@ -419,7 +415,7 @@ public class WorkerProfileViewController: DisposableViewController {
     }
     
     /// 다른 프로필 확인용 바인딩 입니다.
-    public func bind(_ viewModel: OtherWorkerProfileViewModelable) {
+    func bind(_ viewModel: OtherWorkerProfileViewModelable) {
         bind(viewModel as WorkerProfileViewModelable)
         
         phoneCallButton
@@ -429,26 +425,22 @@ public class WorkerProfileViewController: DisposableViewController {
     }
     
     /// 내프로필 접속용 바인딩 입니다.
-    public func bind(_ viewModel: WorkerProfileEditViewModelable) {
+    func bind(_ viewModel: WorkerProfileEditViewModelable) {
         bind(viewModel as WorkerProfileViewModelable)
+        
+        // Edit button
+        profileEditButton
+            .eventPublisher
+            .observe(on: MainScheduler.instance)
+            .bind(to: viewModel.editButtonClicked)
+            .disposed(by: disposeBag)
     }
     
     private func bind(_ viewModel: any WorkerProfileViewModelable) {
         
-        self.viewModel = viewModel
+        super.bind(viewModel: viewModel)
         
         // Input
-        profileEditButton
-            .eventPublisher
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self, viewModel] _ in
-                let editVC = EditWorkerProfileViewController()
-                editVC.bind(viewModel: viewModel as! WorkerProfileEditViewModelable)
-                editVC.modalPresentationStyle = .fullScreen
-                self?.navigationController?.pushViewController(editVC, animated: true)
-            })
-            .disposed(by: disposeBag)
-        
         navigationBar
             .backButton.rx.tap
             .bind(to: viewModel.exitButtonClicked)
@@ -497,7 +489,7 @@ public class WorkerProfileViewController: DisposableViewController {
             .disposed(by: disposeBag)
     }
     
-    public func cleanUp() {
+    func cleanUp() {
         
     }
 }

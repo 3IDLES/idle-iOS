@@ -6,22 +6,19 @@
 //
 
 import UIKit
-import PresentationCore
+import BaseFeature
 import Domain
 import Core
 
-public class WorkerProfileCoordinator: ChildCoordinator {
+public class WorkerProfileCoordinator: Coordinator2 {
     
-    public weak var viewControllerRef: UIViewController?
-    public weak var parent: ParentCoordinator?
+    public var onFinish: (() -> ())?
+    let router: Router
+    let id: String
     
-    let profileMode: ProfileMode
-    public let navigationController: UINavigationController
-    
-    public init(profileMode: ProfileMode, navigationController: UINavigationController) {
-        
-        self.profileMode = profileMode
-        self.navigationController = navigationController
+    public init(router: Router, id: String) {
+        self.router = router
+        self.id = id
     }
     
     deinit {
@@ -29,22 +26,15 @@ public class WorkerProfileCoordinator: ChildCoordinator {
     }
     
     public func start() {
-        let vc = WorkerProfileViewController()
-        
-        switch profileMode {
-        case .myProfile:
-            let vm = WorkerMyProfileViewModel(coordinator: self)
-            vc.bind(vm)
-        case .otherProfile(let id):
-            let vm = WorkerProfileViewModel(coordinator: self, workerId: id)
-            vc.bind(vm)
+
+        let viewModel = WorkerProfileViewModel(id: id)
+        viewModel.exitPage = { [weak self] in
+            self?.router.popModule(animated: true)
         }
-        viewControllerRef = vc
-        navigationController.pushViewController(vc, animated: true)
-    }
-    
-    public func coordinatorDidFinish() {
-        popViewController(animated: true)
-        parent?.removeChildCoordinator(self)
+        
+        let viewController = WorkerProfileViewController()
+        viewController.bind(viewModel)
+        
+        router.push(module: viewController, animated: true)
     }
 }

@@ -18,8 +18,20 @@ import RxSwift
 import RxCocoa
 import SDWebImageWebPCoder
 
-public protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
+protocol WorkerProfileViewModelable: BaseViewModel {
     
+    // Input
+    var viewWillAppear: PublishRelay<Void> { get }
+    var exitButtonClicked: PublishRelay<Void> { get }
+    
+    // Output
+    var displayingImage: Driver<UIImage?>? { get }
+    var profileRenderObject: Driver<WorkerProfileRenderObject>? { get }
+}
+
+protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
+    
+    var editButtonClicked: PublishRelay<Void> { get }
     var requestUpload: PublishRelay<Void> { get }
     var editingImage: PublishRelay<UIImage> { get }
     var editingIsJobFinding: PublishRelay<Bool> { get }
@@ -30,38 +42,39 @@ public protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
     
     
     var uploadSuccess: Driver<Void>? { get }
-    var alert: Driver<DefaultAlertContentVO>? { get }
 }
 
-public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
-    
+class WorkerMyProfileViewModel: BaseViewModel, WorkerProfileEditViewModelable {
+
+    // Injeced
     @Injected var cacheRepository: CacheRepository
     @Injected var workerProfileUseCase: WorkerProfileUseCase
-    
-    public weak var coordinator: WorkerProfileCoordinator?
-    
-    
+
+    // Navigation
+    var exitPage: (() -> ())?
+    var presentEditPage: ((WorkerProfileEditViewModelable) -> ())?
+    var presentDefaultAlert: ((DefaultAlertObject) -> ())?
     
     // Input(Editing)
-    public var requestUpload: PublishRelay<Void> = .init()
-    public var editingImage: PublishRelay<UIImage> = .init()
-    public var editingIsJobFinding: PublishRelay<Bool> = .init()
-    public var editingExpYear: PublishRelay<Int> = .init()
-    public var editingAddress: PublishRelay<AddressInformation> = .init()
-    public var editingIntroduce: PublishRelay<String> = .init()
-    public var editingSpecialty: PublishRelay<String> = .init()
+    var editButtonClicked: PublishRelay<Void> = .init()
+    var requestUpload: PublishRelay<Void> = .init()
+    var editingImage: PublishRelay<UIImage> = .init()
+    var editingIsJobFinding: PublishRelay<Bool> = .init()
+    var editingExpYear: PublishRelay<Int> = .init()
+    var editingAddress: PublishRelay<AddressInformation> = .init()
+    var editingIntroduce: PublishRelay<String> = .init()
+    var editingSpecialty: PublishRelay<String> = .init()
     
     // Input(Rendering)
-    public var viewWillAppear: PublishRelay<Void> = .init()
+    var viewWillAppear: PublishRelay<Void> = .init()
     
-    public var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
     // Output
-    public var uploadSuccess: Driver<Void>?
-    public var alert: Driver<DefaultAlertContentVO>?
+    var uploadSuccess: Driver<Void>?
     
-    public var profileRenderObject: Driver<WorkerProfileRenderObject>?
-    public var displayingImage: Driver<UIImage?>?
+    var profileRenderObject: Driver<WorkerProfileRenderObject>?
+    var displayingImage: Driver<UIImage?>?
     private let rederingState: BehaviorRelay<WorkerProfileRenderObject> = .init(value: .createRO(isMyProfile: true, vo: .mock))
     
     // Image
@@ -74,16 +87,24 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
     
     let disposbag: DisposeBag = .init()
     
-    public init(coordinator: WorkerProfileCoordinator?) {
+    override init() {
         
-        self.coordinator = coordinator
+        super.init()
+        
+        editButtonClicked
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                
+                obj.presentEditPage?(self)
+            })
+            .disposed(by: disposbag)
         
         // Input(Rendering)
-        let fetchedProfileVOResult = viewWillAppear
+        let fetchedProfileVOResult = mapEndLoading(mapStartLoading(viewWillAppear.asObservable())
             .flatMap { [unowned self] _ in
                 
                 fetchProfileVO()
-            }
+            })
             .share()
         
         let fetchedProfileVOSuccess = fetchedProfileVOResult
@@ -124,8 +145,9 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
             .asDriver(onErrorJustReturn: nil)
         
         exitButtonClicked
-            .subscribe(onNext: { [weak self] in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposbag)
         
@@ -140,13 +162,12 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
             }
             .share()
         
-        let imageValidationFailure = imageValidationResult
+        let imageValidationFailureAlert = imageValidationResult
             .filter { $0 == nil }
             .map { _ in
-                DefaultAlertContentVO(
-                    title: "이미지 선택 오류",
-                    message: "지원하지 않는 이미지 형식입니다."
-                )
+                DefaultAlertObject()
+                    .setTitle("이미지 선택 오류")
+                    .setDescription("지원하지 않는 이미지 형식입니다.")
             }
         
         editingIsJobFinding
@@ -181,31 +202,35 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
             }
             .disposed(by: disposbag)
         
-        let editingRequestResult = requestUpload
+        let editingRequestResult = mapEndLoading(mapStartLoading(requestUpload.asObservable())
             .flatMap { [unowned self] _ in
                 requestUpload(editObject: editingState)
-            }
+            })
             .share()
         
-        let editingRequestFailure = editingRequestResult
+        let editingRequestFailureAlert = editingRequestResult
             .compactMap { $0.error }
             .map { error in
-                DefaultAlertContentVO(
-                    title: "공고 수정 오류",
-                    message: error.message
-            )
-        }
+                DefaultAlertObject()
+                    .setTitle("공고 수정 오류")
+                    .setDescription(error.message)
+            }
         
         uploadSuccess = editingRequestResult
             .compactMap { $0.value }
             .asDriver(onErrorRecover: { _ in fatalError() })
         
-        alert = Observable
+        Observable
             .merge(
-                imageValidationFailure,
-                editingRequestFailure
+                imageValidationFailureAlert,
+                editingRequestFailureAlert
             )
-            .asDriver(onErrorJustReturn: .default)
+            .unretained(self)
+            .subscribe { (obj, alertVO) in
+                obj.presentDefaultAlert?(alertVO)
+            }
+            .disposed(by: disposbag)
+            
         
         profileRenderObject = rederingState.asDriver(onErrorRecover: { _ in fatalError() })
     }
@@ -215,7 +240,7 @@ public class WorkerMyProfileViewModel: WorkerProfileEditViewModelable {
             .getProfile(mode: .myProfile)
     }
     
-    public func requestUpload(editObject: WorkerProfileStateObject) -> Single<Result<Void, DomainError>> {
+    func requestUpload(editObject: WorkerProfileStateObject) -> Single<Result<Void, DomainError>> {
         
         var submitObject: WorkerProfileStateObject = .init()
         

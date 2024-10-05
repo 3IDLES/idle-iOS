@@ -7,7 +7,7 @@
 
 import UIKit
 import PresentationCore
-import DSKit
+import BaseFeature
 import Domain
 import Repository
 import Core
@@ -17,32 +17,34 @@ import RxSwift
 import RxCocoa
 
 /// 자신의 프로필을 확인하는 경우가 아닌 센터측에서 요양보호사를 보는 경우
-public protocol OtherWorkerProfileViewModelable: WorkerProfileViewModelable {
+protocol OtherWorkerProfileViewModelable: WorkerProfileViewModelable {
     
     var phoneCallButtonClicked: PublishRelay<Void> { get }
 }
 
-public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
+class WorkerProfileViewModel: BaseViewModel, OtherWorkerProfileViewModelable {
     
+    // Init
+    let id: String
+    
+    // Injected
     @Injected var cacheRepository: CacheRepository
     @Injected var workerProfileUseCase: WorkerProfileUseCase
     
-    // Init
-    let workerId: String
-    public weak var coordinator: WorkerProfileCoordinator?
+    // Navigation
+    var exitPage: (() -> ())?
     
     // Input(Rendering)
-    public var viewWillAppear: PublishRelay<Void> = .init()
-    public var exitButtonClicked: PublishRelay<Void> = .init()
-    public var phoneCallButtonClicked: PublishRelay<Void> = .init()
+    var viewWillAppear: PublishRelay<Void> = .init()
+    var exitButtonClicked: PublishRelay<Void> = .init()
+    var phoneCallButtonClicked: PublishRelay<Void> = .init()
     
     // Output
     var uploadSuccess: Driver<Void>?
-    public var alert: Driver<DefaultAlertContentVO>?
     
-    public var profileRenderObject: Driver<WorkerProfileRenderObject>?
+    var profileRenderObject: Driver<WorkerProfileRenderObject>?
     private let rederingState: BehaviorRelay<WorkerProfileRenderObject> = .init(value: .createRO(isMyProfile: true, vo: .mock))
-    public var displayingImage: RxCocoa.Driver<UIImage?>?
+    var displayingImage: RxCocoa.Driver<UIImage?>?
     
     // Image
     private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
@@ -54,21 +56,18 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
     
     let disposbag: DisposeBag = .init()
     
-    public init(
-        coordinator: WorkerProfileCoordinator?,
-        workerId: String
-    ) {
+    init(id: String) {
         
-        self.coordinator = coordinator
-        self.workerId = workerId
+        self.id = id
+        
+        super.init()
         
         // Input(Rendering)
-        let fetchedProfileVOResult = viewWillAppear
-            .flatMap { [unowned self] _ in
-                
-                fetchProfileVO()
-            }
-            .share()
+        let fetchedProfileVOResult = mapEndLoading(mapStartLoading(viewWillAppear.asObservable())
+                .flatMap { [unowned self] _ in
+                    fetchProfileVO()
+                })
+                .share()
         
         let fetchedProfileVOSuccess = fetchedProfileVOResult
             .compactMap { $0.value }
@@ -99,8 +98,9 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
             .asDriver(onErrorDriveWith: .never())
         
         exitButtonClicked
-            .subscribe(onNext: { [weak self] in
-                self?.coordinator?.coordinatorDidFinish()
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
             })
             .disposed(by: disposbag)
         
@@ -129,7 +129,7 @@ public class WorkerProfileViewModel: OtherWorkerProfileViewModelable {
     
     private func fetchProfileVO() -> Single<Result<WorkerProfileVO, DomainError>> {
         workerProfileUseCase
-            .getProfile(mode: .otherProfile(id: self.workerId))
+            .getProfile(mode: .otherProfile(id: id))
     }
 }
 

@@ -393,6 +393,8 @@ public class EditWorkerProfileViewController: BaseViewController {
     
     func bind(viewModel: WorkerProfileEditViewModelable) {
         
+        super.bind(viewModel: viewModel)
+        
         // RO
         viewModel
             .profileRenderObject?
@@ -420,16 +422,6 @@ public class EditWorkerProfileViewController: BaseViewController {
                 guard let self else { return }
                 UIView.transition(with: view, duration: 0.2) {
                     self.workerProfileImage .image = image
-                }
-            })
-            .disposed(by: disposeBag)
-        
-        // 수정 실패 수신
-        viewModel
-            .alert?
-            .drive(onNext: { [weak self] vo in
-                self?.showAlert(vo: vo) { [weak self] in
-                    self?.navigationController?.popViewController(animated: true)
                 }
             })
             .disposed(by: disposeBag)
