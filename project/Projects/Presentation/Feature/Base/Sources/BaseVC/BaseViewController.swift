@@ -54,14 +54,6 @@ open class BaseViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        // Snack bar
-        viewModel
-            .snackBarDriver?
-            .drive(onNext: { [weak self] snackBarRO in
-                self?.showSnackBar(ro: snackBarRO)
-            })
-            .disposed(by: disposeBag)
-        
         // 로딩
         viewModel
             .showLoadingDriver?
@@ -124,90 +116,36 @@ public extension BaseViewController {
     }
 }
 
-// MARK: Snack bar
-extension BaseViewController {
-    
-    func showSnackBar(ro: IdleSnackBarRO) {
-        
-        let viewSize = self.view.bounds.size
-        let horizontalPadding: CGFloat = 20
-        let bottomPadding: CGFloat = 20 + snackBarBottomPadding
-        
-        let snackBarHeight: CGFloat = 48
-        let snackBarWidth: CGFloat = viewSize.width - horizontalPadding*2
-        
-        let snackBarXPos: CGFloat = horizontalPadding
-        let snackBarYPos: CGFloat = viewSize.height - bottomPadding - snackBarHeight
-        
-        let snackBar = IdleSnackBar(
-            frame: .init(
-                origin: .init(x: snackBarXPos, y: snackBarYPos),
-                size: .init(width: snackBarWidth, height: snackBarHeight)
-            )
-        )
-        
-        // ro적용
-        snackBar.applyRO(ro)
-        
-        // 스낵바를 하단에 감춘다
-        snackBar.transform = .init(translationX: 0, y: snackBarHeight+bottomPadding)
-        snackBar.alpha = 0.25
-        
-        // 뷰계층에 추가
-        view.addSubview(snackBar)
-        
-        let snackBarShowingDuration: CGFloat = 2
-        
-        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn) {
-            snackBar.transform = .identity
-            snackBar.alpha = 1.0
-        } completion: { _ in
-            
-            UIView.animate(withDuration: 0.2, delay: snackBarShowingDuration, options: .curveEaseIn) {
-                snackBar.transform = .init(translationX: 0, y: snackBarHeight+horizontalPadding)
-                snackBar.alpha = 0.25
-            } completion: { _ in
-                snackBar.removeFromSuperview()
-            }
-        }
-    }
-}
-
+// MARK: Default loading screen
 public extension BaseViewController {
     
     func showDefaultLoadingScreen() {
+    
+        let loadingView = DefaultLoadingView()
+        loadingView.alpha = 0.0
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(loadingView)
         
-        guard let _ = self.parent else { return }
+        NSLayoutConstraint.activate([
+            loadingView.topAnchor.constraint(equalTo: view.topAnchor),
+            loadingView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            loadingView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
         
-        let vc = DefaultLoadingVC()
-        loadingVC = vc
-        vc.modalPresentationStyle = .overFullScreen
-        isLoadingPresenting = true
-        present(vc, animated: false) {
-            
-            if self.loadingDimissionRequested {
-                DispatchQueue.main.async { [weak self] in
-                    vc.dismiss(animated: false) {
-                        self?.loadingVC = nil
-                    }
-                    self?.isLoadingPresenting = false
-                }
-            } else {
-                self.isLoadingPresenting = false
-            }
+        UIView.animate(withDuration: 0.25) {
+            loadingView.alpha = 1.0
         }
     }
     
     func dismissDefaultLoadingScreen() {
-        if let loadingVC {
+        
+        if let loadingView = view.subviews.first(where: { $0 is DefaultLoadingView }) {
             
-            if !isLoadingPresenting {
-                loadingVC.dismiss(animated: false) {
-                    self.loadingVC = nil
-                }
-            } else {
-                loadingDimissionRequested = true
+            UIView.animate(withDuration: 0.25) {
+                loadingView.alpha = 0.0
             }
+            loadingView.removeFromSuperview()
         }
     }
 }

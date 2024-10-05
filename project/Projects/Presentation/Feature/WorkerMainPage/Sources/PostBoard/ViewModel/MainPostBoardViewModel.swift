@@ -59,6 +59,7 @@ class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
     
     // Navigation
     var presentMyProfile: (() -> ())?
+    var presentSnackBar: ((IdleSnackBarRO, CGFloat) -> ())?
     var presentPostDetailPage: ((String, PostOriginType) -> ())?
     
     // Output
@@ -135,11 +136,10 @@ class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
         
         // 스낵바
         applyRequestSuccess
-            .subscribe { [weak self] _ in
-                
-                self?.snackBar.onNext(
-                    .init(titleText: "지원이 완료되었어요.")
-                )
+            .unretained(self)
+            .subscribe { (obj, _) in
+                let object = IdleSnackBarRO(titleText: "지원이 완료되었어요.")
+                obj.presentSnackBar?(object, 70)
             }
             .disposed(by: dispostBag)
         

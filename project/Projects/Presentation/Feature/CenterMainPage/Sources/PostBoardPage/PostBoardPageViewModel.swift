@@ -27,6 +27,7 @@ class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModel
     
     // Navigation
     var presentRegisterPostPage: (() -> ())?
+    var presentSnackBar: ((IdleSnackBarRO, CGFloat) -> ())?
     var createPostCellViewModel: ((RecruitmentPostInfoForCenterVO, PostState) -> CenterEmployCardViewModelable)!
 
     var requestOngoingPost: PublishRelay<Void> = .init()
@@ -127,10 +128,11 @@ class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModel
         
         // 새로고침
         closePostSuccess
-            .map({ [weak self] value in
+            .unretained(self)
+            .map({ (obj, value) in
                 // 스낵바
-                self?.snackBar.onNext(.init(titleText: "채용을 종료했어요."))
-                
+                let snackBarObject = IdleSnackBarRO(titleText: "채용을 종료했어요.")
+                obj.presentSnackBar?(snackBarObject, 70)
                 return value
             })
             .bind(to: requestOngoingPost)

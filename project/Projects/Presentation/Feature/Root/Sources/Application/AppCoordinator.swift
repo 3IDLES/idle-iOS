@@ -13,6 +13,8 @@ import CenterMainPageFeature
 import WorkerMainPageFeature
 import CenterCetificatePageFeature
 import AccountDeregisterFeature
+import PostDetailForWorkerFeature
+import UserProfileFeature
 
 import Domain
 import Core
@@ -132,7 +134,7 @@ extension AppCoordinator {
             guard let self else { return }
             switch destination {
             case .workerProfilePage(let workerId):
-                workerProfileFlow(mode: .otherProfile(id: workerId))
+                workerProfileFlow(id: workerId)
             case .createPostPage:
                 createPostFlow()
             case .myCenterProfilePage:
@@ -162,9 +164,9 @@ extension AppCoordinator {
             case .authFlow:
                 runAuthFlow()
             case .myProfilePage:
-                workerProfileFlow(mode: .myProfile)
-            case .postDetailPage(let id, let type):
-                postDetailForWorkerFlow(postId: id, origin: type)
+                workerMyProfileFlow()
+            case .postDetailPage(let info):
+                postDetailForWorkerFlow(postInfo: info)
             }
         }
         
@@ -267,23 +269,40 @@ extension AppCoordinator {
     }
     
     @discardableResult
-    func postDetailForWorkerFlow(postId: String, origin: PostOriginType) {
-        printIfDebug("postDetail")
+    func postDetailForWorkerFlow(postInfo: RecruitmentPostInfo) -> PostDetailForWorkerCoodinator {
+        let coordinator = PostDetailForWorkerCoodinator(
+            router: router,
+            postInfo: postInfo
+        )
+        coordinator.startFlow = { [weak self] destination in
+            switch destination {
+            case .centerProfile(let mode):
+                self?.centerProfileFlow(mode: mode)
+            }
+        }
+        
+        executeChild(coordinator)
+        return coordinator
     }
 }
 
 // MARK: User profile
 extension AppCoordinator {
     
-   @discardableResult
-    func workerProfileFlow(mode: ProfileMode) {
-        printIfDebug("worker profile")
+    func workerProfileFlow(id: String) {
+        let coordinator = WorkerProfileCoordinator(router: router, id: id)
+        executeChild(coordinator)
     }
     
-    @discardableResult
-     func centerProfileFlow(mode: ProfileMode) {
-         printIfDebug("center profile")
-     }
+    func workerMyProfileFlow() {
+        let coordinator = WorkerMyProfileCoordinator(router: router)
+        executeChild(coordinator)
+    }
+    
+    func centerProfileFlow(mode: ProfileMode) {
+        let coordinator = CenterProfileCoordinator(router: router, mode: mode)
+        executeChild(coordinator)
+    }
 }
 
 // MARK: Account Deregister

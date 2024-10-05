@@ -2,7 +2,7 @@
 //  Project.swift
 //  ProjectDescriptionHelpers
 //
-//  Created by choijunios on 2024/07/25
+//  Created by choijunios on 2024/10/05
 //
 
 import ProjectDescription
@@ -11,7 +11,7 @@ import ConfigurationPlugin
 import DependencyPlugin
 
 let project = Project(
-    name: "Root",
+    name: "PostDetailForWorker",
     settings: .settings(
         configurations: IdleConfiguration.emptyConfigurations
     ),
@@ -19,32 +19,16 @@ let project = Project(
         
         /// FeatureConcrete
         .target(
-            name: "RootFeature",
+            name: "PostDetailForWorkerFeature",
             destinations: DeploymentSettings.platforms,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_version,
-            sources: [
-                "Sources/**",
-                SecretSource.amplitudeConfig,
-            ],
+            sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-
                 // Presentation
-                D.Presentation.SplashFeature,
-                D.Presentation.AuthFeature,
-                D.Presentation.CenterMainPageFeature,
-                D.Presentation.WorkerMainPageFeature,
-                D.Presentation.CenterCetificatePageFeature,
-                D.Presentation.AccountDeregisterFeature,
-                D.Presentation.PostDetailForWorkerFeature,
-                D.Presentation.UserProfileFeature,
-                D.Presentation.NotificationPageFeature,
-                
-                // ThirParty
-                D.ThirdParty.Amplitude,
-                D.ThirdParty.FirebaseMessaging,
+                D.Presentation.BaseFeature,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -53,7 +37,7 @@ let project = Project(
         
         /// FeatureConcrete ExampleApp
         .target(
-            name: "Root_ExampleApp",
+            name: "PostDetailForWorker_ExampleApp",
             destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
@@ -62,7 +46,7 @@ let project = Project(
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
-                .target(name: "RootFeature"),
+                .target(name: "PostDetailForWorkerFeature"),
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -71,14 +55,14 @@ let project = Project(
     ],
     schemes: [
         Scheme.makeSchemes(
-            .target("RootFeature"),
+            .target("PostDetailForWorkerFeature"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
             ]
         ),
         Scheme.makeSchemes(
-            .target("Root_ExampleApp"),
+            .target("PostDetailForWorker_ExampleApp"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName
