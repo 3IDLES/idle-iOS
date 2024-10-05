@@ -95,6 +95,12 @@
     - 새로운 모듈을 생성하는 경우 의존하는 모듈들의 `Mash-O`임입을 일일히 확인해야 하는 것이 번거로웠습니다.
     - `tuist graph` 명령어를 사용하여 전체적인 모듈의존구조를 파악하기 쉬웠습니다.
     - Tuist scaffold를 사용해 새로운 모듈 생성을 쉽게할 수 있었습니다.
+ 
+
+## 모듈 의존성그래프
+※ 해당 그래프는 `tuist graph`를 통해 성생했습니다.
+
+![Example Image](./project/graph.png)
 
 ### 클린아키텍처
 
@@ -108,7 +114,25 @@
 - 사용한 이유
   - 비지니스 로직을 View와 분리하기위해 사용했습니다.
   - View는 UI표현이외에 관심사에서 최대한 격리하여 재사용성을 높일 수 있었습니다.
-      
-## 모듈 의존성그래프
 
-![Example Image](./project/graph.png)
+## Router
+
+`Router`타입은 프로그램 내에서 네비게이션 역할을 담당하도록했습니다.
+1. push를 통해 RootController(**UINavigationController**)에 화면을 삽입합니다.
+2. RootController에 모달화면을 present합니다.
+3. 3번 기능을 바탕으로 재사용 가능한 UI(스낵바, 기본Alert, 커스텀Alert)를 관리하도록 했습니다.
+
+## 코디네이터(Coordinator)
+
+코디네이터는 ViewModel과 ViewController를 생성하고 두 객체사이를 **매게(bind)하는 역할**을 수행합니다.
+그리고 Router가 수행할 수 있는 작업을 ViewModel에 전달하여 유저상호작용이 화면전환에 개입할 수 있도록 합니다.
+
+![image](https://github.com/user-attachments/assets/02773949-8097-4649-8d4c-ac09cc74c3e4)
+
+### 코디네이터 구조
+
+AppCoordinator는 최상단 코디네이터 입니다. 
+최상단 코디네이터는 여러가지 화면에 대한 Flow를 가지며, Flow가 Flow를 호출할 수 있는 경우 AppCoordinator를 통해 서로에게 접근할 수 있도록 설계했습니다.
+종속관계가 필요한 경우는 계층화를 하였습니다.
+아래 사진에 같은 색을 가지는 Flow는 같은 객체내에 구현되어 있어 서로에게 접근이 가능합니다.
+![image](https://github.com/user-attachments/assets/7a8eff2c-1018-490c-b74e-8c582fed7e81)
