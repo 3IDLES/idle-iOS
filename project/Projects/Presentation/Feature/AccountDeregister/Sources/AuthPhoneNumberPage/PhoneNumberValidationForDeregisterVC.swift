@@ -1,6 +1,6 @@
 //
 //  PhoneNumberValidationForDeregisterVC.swift
-//  RootFeature
+//  AccountDeregisterFeature
 //
 //  Created by choijunios on 8/25/24.
 //
@@ -9,7 +9,6 @@ import UIKit
 import BaseFeature
 import PresentationCore
 import DSKit
-import AuthFeature
 
 
 import RxCocoa

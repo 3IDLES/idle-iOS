@@ -1,6 +1,6 @@
 //
 //  AuthInOutStreamManager+Name.swift
-//  AuthFeature
+//  BaseFeature
 //
 //  Created by choijunios on 7/15/24.
 //
@@ -13,9 +13,7 @@ import Core
 import RxSwift
 import RxCocoa
 
-public enum AuthInOutStreamManager { }
-
-extension AuthInOutStreamManager {
+public extension AuthInOutStreamManager {
     
     static func enterNameInOut(
         input: EnterNameInputable & AnyObject,

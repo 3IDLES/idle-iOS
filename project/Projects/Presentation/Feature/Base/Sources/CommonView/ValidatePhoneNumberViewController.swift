@@ -1,6 +1,6 @@
 //
 //  ValidatePhoneNumberViewController.swift
-//  AuthFeature
+//  BaseFeature
 //
 //  Created by choijunios on 6/30/24.
 //
@@ -9,7 +9,6 @@ import UIKit
 import DSKit
 import Domain
 import PresentationCore
-import BaseFeature
 
 
 import RxSwift
@@ -35,7 +34,7 @@ public protocol AuthPhoneNumberOutputable {
     var loginSuccess: Driver<Void>? { get set }
 }
 
-class ValidatePhoneNumberViewController<T: ViewModelType>: UIViewController
+public class ValidatePhoneNumberViewController<T: ViewModelType>: UIViewController
 where
     T.Input: AuthPhoneNumberInputable & PageProcessInputable,
     T.Output: AuthPhoneNumberOutputable {
@@ -124,7 +123,7 @@ where
     
     required init?(coder: NSCoder) { fatalError() }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         
         view.backgroundColor = .clear
     }

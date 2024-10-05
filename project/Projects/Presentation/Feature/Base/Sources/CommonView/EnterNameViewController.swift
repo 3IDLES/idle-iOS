@@ -1,6 +1,6 @@
 //
 //  EnterNameViewController.swift
-//  AuthFeature
+//  BaseFeature
 //
 //  Created by choijunios on 6/30/24.
 //
@@ -10,7 +10,6 @@ import DSKit
 import RxSwift
 import RxCocoa
 import PresentationCore
-import BaseFeature
 
 public protocol EnterNameInputable {
     var editingName: PublishRelay<String> { get }

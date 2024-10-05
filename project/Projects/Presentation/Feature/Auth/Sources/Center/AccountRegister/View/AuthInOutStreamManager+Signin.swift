@@ -1,14 +1,15 @@
 //
-//  AuthInOutStreamManager+IdPassword.swift
+//  AuthInOutStreamManager.swift
 //  AuthFeature
 //
-//  Created by choijunios on 7/15/24.
+//  Created by choijunios on 10/5/24.
 //
 
 import UIKit
 import PresentationCore
 import Domain
 import Core
+import BaseFeature
 
 
 import RxSwift
@@ -71,7 +72,7 @@ extension AuthInOutStreamManager {
         input: SetPasswordInputable & AnyObject,
         output: SetPasswordOutputable & AnyObject,
         useCase: AuthInputValidationUseCase,
-        stateTracker: @escaping (String) -> ()) 
+        stateTracker: @escaping (String) -> ())
     {
         var output = output
         output.passwordValidation = input.editingPasswords

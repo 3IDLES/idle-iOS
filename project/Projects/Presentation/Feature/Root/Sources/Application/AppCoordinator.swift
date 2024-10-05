@@ -12,6 +12,8 @@ import AuthFeature
 import CenterMainPageFeature
 import WorkerMainPageFeature
 import CenterCetificatePageFeature
+import AccountDeregisterFeature
+
 import Domain
 import Core
 
@@ -288,7 +290,16 @@ extension AppCoordinator {
 extension AppCoordinator {
     
     @discardableResult
-     func accountDeregister(userType: UserType) {
-         printIfDebug("deregister")
+     func accountDeregister(userType: UserType) -> AccountDeregisterCoordinator {
+         let coordinator = AccountDeregisterCoordinator(router: router, userType: userType)
+         coordinator.startFlow = { [weak self] destination in
+             switch destination {
+             case .accountAuthFlow:
+                 self?.runAuthFlow()
+             }
+         }
+         
+         executeChild(coordinator)
+         return coordinator
      }
 }

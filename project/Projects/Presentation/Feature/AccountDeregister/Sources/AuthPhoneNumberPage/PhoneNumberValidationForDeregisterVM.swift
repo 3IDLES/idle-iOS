@@ -1,13 +1,12 @@
 //
 //  PhoneNumberValidationForDeregisterVM.swift
-//  RootFeature
+//  AccountDeregisterFeature
 //
 //  Created by choijunios on 8/25/24.
 //
 
 import Foundation
 import Domain
-import AuthFeature
 import BaseFeature
 import Core
 

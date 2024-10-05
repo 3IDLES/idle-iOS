@@ -1,6 +1,6 @@
 //
 //  PasswordForDeregisterVC.swift
-//  CenterFeature
+//  AccountDeregisterFeature
 //
 //  Created by choijunios on 8/21/24.
 //

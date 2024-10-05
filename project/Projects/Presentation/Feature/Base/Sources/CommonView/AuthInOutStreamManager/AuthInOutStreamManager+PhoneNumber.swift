@@ -1,6 +1,6 @@
 //
 //  AuthInOutStreamManager+PhoneNumber.swift
-//  AuthFeature
+//  BaseFeature
 //
 //  Created by choijunios on 7/15/24.
 //
@@ -194,7 +194,7 @@ public extension AuthInOutStreamManager {
     }
 }
 
-extension AuthInOutStreamManager {
+public extension AuthInOutStreamManager {
     
     static func formatPhoneNumber(phoneNumber: String) -> String {
         let s1 = phoneNumber.startIndex
