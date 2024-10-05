@@ -176,38 +176,32 @@ extension BaseViewController {
 public extension BaseViewController {
     
     func showDefaultLoadingScreen() {
+    
+        let loadingView = DefaultLoadingView()
+        loadingView.alpha = 0.0
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(loadingView)
         
-        guard let _ = self.parent else { return }
+        NSLayoutConstraint.activate([
+            loadingView.topAnchor.constraint(equalTo: view.topAnchor),
+            loadingView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            loadingView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
         
-        let vc = DefaultLoadingVC()
-        loadingVC = vc
-        vc.modalPresentationStyle = .overFullScreen
-        isLoadingPresenting = true
-        present(vc, animated: false) {
-            
-            if self.loadingDimissionRequested {
-                DispatchQueue.main.async { [weak self] in
-                    vc.dismiss(animated: false) {
-                        self?.loadingVC = nil
-                    }
-                    self?.isLoadingPresenting = false
-                }
-            } else {
-                self.isLoadingPresenting = false
-            }
+        UIView.animate(withDuration: 0.25) {
+            loadingView.alpha = 1.0
         }
     }
     
     func dismissDefaultLoadingScreen() {
-        if let loadingVC {
+        
+        if let loadingView = view.subviews.first(where: { $0 is DefaultLoadingView }) {
             
-            if !isLoadingPresenting {
-                loadingVC.dismiss(animated: false) {
-                    self.loadingVC = nil
-                }
-            } else {
-                loadingDimissionRequested = true
+            UIView.animate(withDuration: 0.25) {
+                loadingView.alpha = 0.0
             }
+            loadingView.removeFromSuperview()
         }
     }
 }

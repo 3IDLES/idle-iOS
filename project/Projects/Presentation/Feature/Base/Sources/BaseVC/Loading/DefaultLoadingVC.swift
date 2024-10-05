@@ -14,50 +14,34 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-public class DefaultLoadingVC: UIViewController {
+public class DefaultLoadingView: UIView {
     
-    let customTranstionDelegate = CustomTransitionDelegate()
+    let indicator: UIActivityIndicatorView = .init()
     
-    // Init
-    
-    // View
-    private let loadingView: UIActivityIndicatorView = .init()
-    
-    
-    // Observable
-    private let disposeBag = DisposeBag()
-    
-    public init() {
-        super.init(nibName: nil, bundle: nil)
-        self.transitioningDelegate = customTranstionDelegate
-    }
-    
-    public required init?(coder: NSCoder) { fatalError() }
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
         setAppearance()
         setLayout()
-        
-        loadingView.startAnimating()
+        indicator.startAnimating()
     }
     
+    public required init?(coder: NSCoder) { nil }
+    
     private func setAppearance() {
-        view.backgroundColor = DSColor.gray050.color.withAlphaComponent(0.5)
+        self.backgroundColor = DSColor.gray050.color.withAlphaComponent(0.5)
     }
     
     private func setLayout() {
         [
-            loadingView
+            indicator
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)
+            self.addSubview($0)
         }
         
         NSLayoutConstraint.activate([
-            loadingView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            loadingView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            indicator.centerYAnchor.constraint(equalTo: self.centerYAnchor),
         ])
     }
 }
-
