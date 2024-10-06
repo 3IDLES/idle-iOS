@@ -36,7 +36,7 @@ public class AppCoordinator: BaseCoordinator {
 
 extension AppCoordinator {
     
-    func executeChild(_ coordinator: Coordinator2) {
+    func executeChild(_ coordinator: Coordinator) {
         coordinator.onFinish = { [weak self, weak coordinator] in
             if let coordinator {
                 self?.removeChild(coordinator)

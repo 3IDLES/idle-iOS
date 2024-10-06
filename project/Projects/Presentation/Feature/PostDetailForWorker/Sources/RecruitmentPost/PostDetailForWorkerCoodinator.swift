@@ -14,7 +14,7 @@ public enum PostDetailForWorkerCoodinatorDestination {
     case centerProfile(mode: ProfileMode)
 }
 
-public class PostDetailForWorkerCoodinator: Coordinator2 {
+public class PostDetailForWorkerCoodinator: Coordinator {
 
     public var startFlow: ((PostDetailForWorkerCoodinatorDestination) -> ())!
     

@@ -1,6 +1,6 @@
 //
 //  CenterRecruitmentPostBoardVM.swift
-//  CenterFeature
+//  CenterMainPageFeature
 //
 //  Created by choijunios on 8/13/24.
 //
@@ -262,4 +262,8 @@ class CenterEmployCardVM: CenterEmployCardViewModelable {
             })
             .disposed(by: disposeBag)
     }
+}
+
+extension Notification.Name {
+    static let removePostRequestFromCell: Notification.Name = .init("removePostRequestFromCell")
 }

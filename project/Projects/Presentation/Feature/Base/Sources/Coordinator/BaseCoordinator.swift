@@ -7,35 +7,25 @@
 
 import Foundation
 
-
-public protocol Coordinator2: AnyObject {
-    
-    var onFinish: (() -> ())? { get set }
-    
-    /// Coordinator를 시작한다.
-    func start()
-}
-
-
 /// 자식 코디네이터를 가질 수 있는 코디네이터
-open class BaseCoordinator: Coordinator2 {
+open class BaseCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     
-    var children: [Coordinator2] = []
+    var children: [Coordinator] = []
     
-    public init(children: [Coordinator2] = []) {
+    public init(children: [Coordinator] = []) {
         self.children = children
     }
     
     open func start() { }
     
-    public func addChild(_ coordinator: Coordinator2) {
+    public func addChild(_ coordinator: Coordinator) {
         
         children.append(coordinator)
     }
     
-    public func removeChild(_ coordinator: Coordinator2) {
+    public func removeChild(_ coordinator: Coordinator) {
         children.removeAll { $0 === coordinator}
     }
 }

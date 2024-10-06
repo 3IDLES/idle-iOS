@@ -38,7 +38,7 @@ public enum WorkerAccountRegisterCoordinatorDestination {
     case workerMainPage
 }
 
-public class WorkerAccountRegisterCoordinator: Coordinator2 {
+public class WorkerAccountRegisterCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     

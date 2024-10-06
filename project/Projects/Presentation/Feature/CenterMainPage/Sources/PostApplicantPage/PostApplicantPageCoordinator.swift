@@ -14,7 +14,7 @@ enum PostApplicantPageCoordinatorDestination {
     case applicantDetail(id: String)
 }
 
-class PostApplicantPageCoordinator: Coordinator2 {
+class PostApplicantPageCoordinator: Coordinator {
     
     var onFinish: (() -> ())?
     

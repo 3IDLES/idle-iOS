@@ -18,7 +18,7 @@ public protocol DeepLinkTreeNode {
 
 public protocol DeepLinkExecutable: DeepLinkTreeNode {
     @discardableResult
-    func execute(with coordinator: Coordinator2, userInfo: [String: String]?) -> Coordinator2?
+    func execute(with coordinator: Coordinator, userInfo: [String: String]?) -> Coordinator?
 }
 
 extension DeepLinkExecutable {
