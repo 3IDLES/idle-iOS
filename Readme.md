@@ -124,9 +124,13 @@
 
 ## 코디네이터(Coordinator)
 
-코디네이터는 ViewModel과 ViewController를 생성하고 두 객체사이를 **매게(bind)하는 역할**을 수행합니다.
-그리고 Router가 수행할 수 있는 작업을 ViewModel에 전달하여 유저상호작용이 화면전환에 개입할 수 있도록 합니다.
+코디네이터는 ViewModel과 ViewController를 생성하고 두 객체사이를 **매개(bind)하는 역할**을 수행합니다.
+유저가 화면전환에 관여하는 기능의 경우 **ViewModel**에 클로저 형태로 Router의 네비게이션 기능을 전달하도록 구현했습니다.
+라우터와 뷰모델이 서로 의존관계를 가지지 않음으로써 각자의 관심사에 집중할 수 있도록 설계하였습니다.
 
+<img width="700" alt="스크린샷 2024-10-06 오전 10 22 33" src="https://github.com/user-attachments/assets/607187ab-86ee-430e-9acb-454b9b45c47a">
+
+위 코드가 실행되는 장소는 코디네이터 객체 내부입니다.
 ![image](https://github.com/user-attachments/assets/02773949-8097-4649-8d4c-ac09cc74c3e4)
 
 ### 코디네이터 구조
