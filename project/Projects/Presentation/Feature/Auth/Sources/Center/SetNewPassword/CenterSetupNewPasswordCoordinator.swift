@@ -19,7 +19,7 @@ enum SetNewPasswordStage: Int {
     case finish
 }
 
-public class CenterSetupNewPasswordCoordinator: Coordinator2 {
+public class CenterSetupNewPasswordCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     

@@ -11,7 +11,7 @@ import Domain
 import BaseFeature
 import Core
 
-public class CreatePostCoordinator: Coordinator2 {
+public class CreatePostCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     

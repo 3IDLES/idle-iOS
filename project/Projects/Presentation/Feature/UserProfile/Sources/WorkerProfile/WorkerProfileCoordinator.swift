@@ -10,7 +10,7 @@ import BaseFeature
 import Domain
 import Core
 
-public class WorkerProfileCoordinator: Coordinator2 {
+public class WorkerProfileCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     let router: Router

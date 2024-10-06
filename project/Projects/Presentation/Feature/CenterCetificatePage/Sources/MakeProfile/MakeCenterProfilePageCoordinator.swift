@@ -15,7 +15,7 @@ public enum MakeCenterProfilePageCoordinatorDestination {
     case authFlow
 }
 
-public class MakeCenterProfilePageCoordinator: Coordinator2 {
+public class MakeCenterProfilePageCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     

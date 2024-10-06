@@ -8,7 +8,7 @@
 import Foundation
 import BaseFeature
 
-public class WorkerMyProfileCoordinator: Coordinator2 {
+public class WorkerMyProfileCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     let router: Router

@@ -41,7 +41,7 @@ public enum CenterAccountRegisterCoordinatorDestination {
     case centerMainPage
 }
 
-public class CenterAccountRegisterCoordinator: Coordinator2 {
+public class CenterAccountRegisterCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     

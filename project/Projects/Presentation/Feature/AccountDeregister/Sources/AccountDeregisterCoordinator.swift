@@ -13,7 +13,7 @@ public enum AccountDeregisterCoordinatorDestination {
     case accountAuthFlow
 }
 
-public class AccountDeregisterCoordinator: Coordinator2 {
+public class AccountDeregisterCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     

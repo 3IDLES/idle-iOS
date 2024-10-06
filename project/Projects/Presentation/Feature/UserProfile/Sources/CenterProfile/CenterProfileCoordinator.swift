@@ -11,7 +11,7 @@ import BaseFeature
 import Domain
 
 /// 내센터, 다른 센터를 모두 불러올 수 있습니다.
-public class CenterProfileCoordinator: Coordinator2 {
+public class CenterProfileCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     

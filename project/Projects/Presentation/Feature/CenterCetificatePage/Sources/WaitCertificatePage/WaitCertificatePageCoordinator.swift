@@ -15,7 +15,7 @@ public enum WaitCertificatePageCoordinatorDestination {
     case makeProfileFlow
 }
 
-public class WaitCertificatePageCoordinator: Coordinator2 {
+public class WaitCertificatePageCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     

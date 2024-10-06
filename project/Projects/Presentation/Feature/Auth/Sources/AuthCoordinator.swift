@@ -15,7 +15,7 @@ public enum AuthCoordinatorDestination {
     case loginPage
 }
 
-public class AuthCoordinator: Coordinator2 {
+public class AuthCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     
