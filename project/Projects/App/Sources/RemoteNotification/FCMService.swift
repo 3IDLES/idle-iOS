@@ -36,11 +36,10 @@ class FCMService: NSObject {
                 
                 if let token = Messaging.messaging().fcmToken {
                     
-                    notificationTokenManageUseCase.setNotificationToken(
-                        token: token) { result in
+                    notificationTokenManageUseCase.setNotificationToken(token: token) { result in
                             
-                            print("FCMService 토큰 전송 \(result ? "완료" : "실패")")
-                        }
+                        print("FCMService 토큰 전송 \(result ? "완료" : "실패")")
+                    }
                 }
             }
         
@@ -67,7 +66,6 @@ extension FCMService: MessagingDelegate {
             print("FCM토큰: \(fcmToken)")
             
             notificationTokenManageUseCase.setNotificationToken(token: fcmToken) { isSuccess in
-                
                 print(isSuccess ? "토큰 전송 성공" : "토큰 전송 실패")
             }
         }
