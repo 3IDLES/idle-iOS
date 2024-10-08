@@ -76,16 +76,24 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
     // MARK: 회원탈퇴 & 로그아웃
     // 센터 회원탈퇴
     public func deregisterCenterAccount(reasons: [String], password: String) -> RxSwift.Single<Result<Void, DomainError>> {
-        authRepository
-            .deregisterCenterAccount(reasons: reasons, password: password)
-            .map { [weak self] _ in 
-                self?.removeAllLocalData()
+        
+        notificationTokenUseCase
+            .deleteNotificationToken()
+            .flatMap{ [authRepository] result in
                 
-                return ()
-            }
-            .flatMap { [notificationTokenUseCase] _ in
-                notificationTokenUseCase
-                    .deleteNotificationToken()
+                switch result {
+                case .success:
+                    let task = authRepository
+                        .deregisterCenterAccount(reasons: reasons, password: password)
+                        .map { [weak self] _ in
+                            self?.removeAllLocalData()
+                            
+                            return ()
+                        }
+                    return self.convert(task: task)
+                case .failure:
+                    return Single.just(result)
+                }
             }
     }
     
