@@ -10,18 +10,18 @@ import RxSwift
 public protocol AuthRepository: RepositoryBase {
     
     // MARK: Center
-    func requestRegisterCenterAccount(managerName: String, phoneNumber: String, businessNumber: String, id: String, password: String) -> Single<Void>
-    func requestCenterLogin(id: String, password: String) -> Single<Void>
-    func signoutCenterAccount() -> Single<Void>
-    func deregisterCenterAccount(reasons: [String], password: String) -> Single<Void>
-    func getCenterJoinStatus() -> Single<CenterJoinStatusInfoVO>
-    func requestCenterJoin() -> Single<Void>
-    func setNewPassword(phoneNumber: String, password: String) -> Single<Void>
+    func requestRegisterCenterAccount(managerName: String, phoneNumber: String, businessNumber: String, id: String, password: String) -> Single<Result<Void, DomainError>>
+    func requestCenterLogin(id: String, password: String) -> Single<Result<Void, DomainError>>
+    func signoutCenterAccount() -> Single<Result<Void, DomainError>>
+    func deregisterCenterAccount(reasons: [String], password: String) -> Single<Result<Void, DomainError>>
+    func getCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>>
+    func requestCenterJoin() -> Single<Result<Void, DomainError>>
+    func setNewPassword(phoneNumber: String, password: String) -> Single<Result<Void, DomainError>>
     
     
     // MARK: Worker
-    func requestRegisterWorkerAccount(registerState: WorkerRegisterState) -> Single<Void>
-    func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Void>
-    func signoutWorkerAccount() -> Single<Void>
-    func deregisterWorkerAccount(reasons: [String]) -> Single<Void>
+    func requestRegisterWorkerAccount(registerState: WorkerRegisterState) -> Single<Result<Void, DomainError>>
+    func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Result<Void, DomainError>>
+    func signoutWorkerAccount() -> Single<Result<Void, DomainError>>
+    func deregisterWorkerAccount(reasons: [String]) -> Single<Result<Void, DomainError>>
 }

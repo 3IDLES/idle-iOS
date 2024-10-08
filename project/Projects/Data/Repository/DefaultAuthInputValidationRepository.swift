@@ -8,6 +8,7 @@
 import Foundation
 import DataSource
 import Domain
+import Core
 
 
 import RxSwift
@@ -18,30 +19,40 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
     
     public init() { }
     
-    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Void> {
+    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<Void, DomainError>> {
         
-        networkService
+        let dataTask = networkService
             .request(api: .startPhoneNumberAuth(phoneNumber: phoneNumber), with: .plain)
-            .map { _ in return () }
+            .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Void> {
+    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<Void, DomainError>> {
         
-        networkService.request(api: .checkAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber), with: .plain)
-            .map { _ in return () }
+        let dataTask = networkService.request(api: .checkAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber), with: .plain)
+            .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<BusinessInfoVO> {
+    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<BusinessInfoVO, DomainError>> {
         
-        networkService.requestDecodable(
+        let dataTask = networkService.requestDecodable(
             api: .authenticateBusinessNumber(businessNumber: businessNumber),
             with: .plain
         ).map { (dto: BusinessInfoDTO) in dto.toEntity() }
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func requestCheckingIdDuplication(id: String) -> Single<Void> {
-        networkService.request(api: .checkIdDuplication(id: id), with: .plain)
-            .map { _ in return () }
+    public func requestCheckingIdDuplication(id: String) -> Single<Result<Void, DomainError>> {
+        
+        let dataTask = networkService
+            .request(api: .checkIdDuplication(id: id), with: .plain)
+            .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
 }
 

@@ -15,7 +15,7 @@ public protocol RepositoryBase { }
 public extension RepositoryBase {
     
     /// Repository로 부터 전달받은 언어레벨의 에러를 도메인 특화 에러로 변경하고, error를 Result의 Failure로, 성공을 Success로 변경합니다.
-    func convert<T>(task: Single<T>) -> Single<Result<T, DomainError>> {
+    func convertToDomain<T>(task: Single<T>) -> Single<Result<T, DomainError>> {
         Single.create { single in
             let disposable = task
                 .subscribe { success in

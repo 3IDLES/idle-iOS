@@ -13,8 +13,6 @@ import DataSource
 import Moya
 import RxSwift
 
-
-
 public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     
     private var recruitmentPostService: RecruitmentPostService = .init()
@@ -29,132 +27,160 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
         }
     }
     
-    // MARK:  Center
-    public func registerPost(bundle: RegisterRecruitmentPostBundle) -> RxSwift.Single<Void> {
+    // MARK: Center
+    public func registerPost(bundle: RegisterRecruitmentPostBundle) -> RxSwift.Single<Result<Void, DomainError>> {
         
         let encodedData = try! JSONEncoder().encode(bundle.toDTO())
-        
-        return recruitmentPostService.request(api: .registerPost(postData: encodedData), with: .withToken)
+        let dataTask = recruitmentPostService.request(api: .registerPost(postData: encodedData), with: .withToken)
             .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
 
-    public func getPostDetailForCenter(id: String) -> RxSwift.Single<RegisterRecruitmentPostBundle> {
+    public func getPostDetailForCenter(id: String) -> RxSwift.Single<Result<RegisterRecruitmentPostBundle, DomainError>> {
         
-        recruitmentPostService.request(api: .postDetail(id: id, userType: .center), with: .withToken)
+        let dataTask = recruitmentPostService.request(api: .postDetail(id: id, userType: .center), with: .withToken)
             .map(RecruitmentPostFetchDTO.self)
             .map { dto in
                 dto.toEntity()
             }
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func editPostDetail(id: String, bundle: RegisterRecruitmentPostBundle) -> RxSwift.Single<Void> {
+    public func editPostDetail(id: String, bundle: RegisterRecruitmentPostBundle) -> RxSwift.Single<Result<Void, DomainError>> {
         
         let encodedData = try! JSONEncoder().encode(bundle.toDTO())
-        
-        return recruitmentPostService.request(
+        let dataTask = recruitmentPostService.request(
             api: .editPost(id: id, postData: encodedData),
             with: .withToken
         ).map { _ in () }
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func getOngoingPosts() -> RxSwift.Single<[RecruitmentPostInfoForCenterVO]> {
-        return recruitmentPostService.request(api: .getOnGoingPosts, with: .withToken)
+    public func getOngoingPosts() -> RxSwift.Single<Result<[RecruitmentPostInfoForCenterVO], DomainError>> {
+        let dataTask = recruitmentPostService.request(api: .getOnGoingPosts, with: .withToken)
             .map(RecruitmentPostForCenterListDTO.self)
             .map({ $0.jobPostings.map { $0.toVO() } })
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func getClosedPosts() -> RxSwift.Single<[RecruitmentPostInfoForCenterVO]> {
-        return recruitmentPostService.request(api: .getClosedPosts, with: .withToken)
+    public func getClosedPosts() -> RxSwift.Single<Result<[RecruitmentPostInfoForCenterVO], DomainError>> {
+        let dataTask = recruitmentPostService.request(api: .getClosedPosts, with: .withToken)
             .map(RecruitmentPostForCenterListDTO.self)
             .map({ $0.jobPostings.map { $0.toVO() } })
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func getPostApplicantCount(id: String) -> RxSwift.Single<Int> {
-        recruitmentPostService.request(api: .getPostApplicantCount(id: id), with: .withToken)
+    public func getPostApplicantCount(id: String) -> RxSwift.Single<Result<Int, DomainError>> {
+        let dataTask = recruitmentPostService.request(api: .getPostApplicantCount(id: id), with: .withToken)
             .map(PostApplicantCountDTO.self)
             .map { dto in
                 dto.applicantCount
             }
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func getPostApplicantScreenData(id: String) -> RxSwift.Single<PostApplicantScreenVO> {
-        recruitmentPostService.request(api: .getApplicantList(id: id), with: .withToken)
+    public func getPostApplicantScreenData(id: String) -> RxSwift.Single<Result<PostApplicantScreenVO, DomainError>> {
+        let dataTask = recruitmentPostService.request(api: .getApplicantList(id: id), with: .withToken)
             .map(PostApplicantScreenDTO.self)
             .map { dto in
                 dto.toVO()
             }
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func closePost(id: String) -> RxSwift.Single<Void> {
-        recruitmentPostService.request(api: .closePost(id: id), with: .withToken)
+    public func closePost(id: String) -> RxSwift.Single<Result<Void, DomainError>> {
+        let dataTask = recruitmentPostService.request(api: .closePost(id: id), with: .withToken)
             .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func removePost(id: String) -> RxSwift.Single<Void> {
-        recruitmentPostService.request(api: .removePost(id: id), with: .withToken)
+    public func removePost(id: String) -> RxSwift.Single<Result<Void, DomainError>> {
+        let dataTask = recruitmentPostService.request(api: .removePost(id: id), with: .withToken)
             .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
     // MARK: Worker
-    public func getNativePostDetailForWorker(id: String) -> RxSwift.Single<RecruitmentPostForWorkerBundle> {
-        recruitmentPostService.request(
+    public func getNativePostDetailForWorker(id: String) -> RxSwift.Single<Result<RecruitmentPostForWorkerBundle, DomainError>> {
+        let dataTask = recruitmentPostService.request(
             api: .postDetail(id: id, userType: .worker),
             with: .withToken
         )
         .mapToEntity(NativeRecruitmentPostDetailDTO.self)
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func getWorknetPostDetailForWorker(id: String) -> RxSwift.Single<WorknetRecruitmentPostDetailVO> {
-        crawlingPostService
+    public func getWorknetPostDetailForWorker(id: String) -> RxSwift.Single<Result<WorknetRecruitmentPostDetailVO, DomainError>> {
+        let dataTask = crawlingPostService
             .request(api: .getDetail(postId: id), with: .withToken)
             .mapToEntity(WorknetRecruitmentPostDetailDTO.self)
+        
+        return convertToDomain(task: dataTask)
     }
     
-    
-    public func getNativePostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
-        
-        recruitmentPostService.request(
+    public func getNativePostListForWorker(nextPageId: String?, requestCnt: Int = 10) -> RxSwift.Single<Result<RecruitmentPostListForWorkerVO, DomainError>> {
+        let dataTask = recruitmentPostService.request(
             api: .getOnGoingNativePostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
         .mapToEntity(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func getNativeFavoritePostListForWorker() -> RxSwift.Single<[RecruitmentPostForWorkerRepresentable]> {
-        recruitmentPostService.request(
+    public func getNativeFavoritePostListForWorker() -> RxSwift.Single<Result<[RecruitmentPostForWorkerRepresentable], DomainError>> {
+        let dataTask = recruitmentPostService.request(
             api: .getNativeFavoritePost,
             with: .withToken
         )
         .mapToEntity(FavoriteNativeRecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func getWorknetFavoritePostListForWorker() -> RxSwift.Single<[RecruitmentPostForWorkerRepresentable]> {
-        crawlingPostService.request(
+    public func getWorknetFavoritePostListForWorker() -> RxSwift.Single<Result<[RecruitmentPostForWorkerRepresentable], DomainError>> {
+        let dataTask = crawlingPostService.request(
             api: .getWorknetFavoritePost,
             with: .withToken
         )
         .mapToEntity(FavoriteWorknetRecruitmentPostListForWorkerDTO<WorkNetRecruitmentPostForWorkerDTO>.self)
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
-        recruitmentPostService.request(
+    public func getAppliedPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<Result<RecruitmentPostListForWorkerVO, DomainError>> {
+        let dataTask = recruitmentPostService.request(
             api: .getAppliedPostListForWorker(nextPageId: nextPageId, requestCnt: String(requestCnt)),
             with: .withToken
         )
         .mapToEntity(RecruitmentPostListForWorkerDTO<NativeRecruitmentPostForWorkerDTO>.self)
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func getWorknetPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<RecruitmentPostListForWorkerVO> {
-        crawlingPostService
+    public func getWorknetPostListForWorker(nextPageId: String?, requestCnt: Int) -> RxSwift.Single<Result<RecruitmentPostListForWorkerVO, DomainError>> {
+        let dataTask = crawlingPostService
             .request(
                 api: .getPostList(nextPageId: nextPageId, requestCnt: requestCnt),
                 with: .withToken
             )
             .mapToEntity(RecruitmentPostListForWorkerDTO<WorkNetRecruitmentPostForWorkerDTO>.self)
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func applyToPost(postId: String, method: ApplyType) -> Single<Void> {
-        applyService
+    public func applyToPost(postId: String, method: ApplyType) -> Single<Result<Void, DomainError>> {
+        let dataTask = applyService
             .request(
                 api: .applys(
                     jobPostingId: postId,
@@ -163,20 +189,27 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
                 with: .withToken
             )
             .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func addFavoritePost(postId: String, type: PostOriginType) -> Single<Void> {
-        recruitmentPostService
+    public func addFavoritePost(postId: String, type: PostOriginType) -> Single<Result<Void, DomainError>> {
+        let dataTask = recruitmentPostService
             .request(api: .addFavoritePost(id: postId, jobPostingType: type), with: .withToken)
             .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
-    public func removeFavoritePost(postId: String) -> Single<Void> {
-        recruitmentPostService
+    public func removeFavoritePost(postId: String) -> Single<Result<Void, DomainError>> {
+        let dataTask = recruitmentPostService
             .request(api: .removeFavoritePost(id: postId), with: .withToken)
             .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
 }
+
 
 // MARK: 공고등록 정보를 DTO로 변환하는 영역
 extension RegisterRecruitmentPostBundle {

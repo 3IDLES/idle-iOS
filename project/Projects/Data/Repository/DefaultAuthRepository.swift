@@ -28,7 +28,7 @@ public extension DefaultAuthRepository {
         businessNumber: String,
         id: String,
         password: String
-    ) -> Single<Void> {
+    ) -> Single<Result<Void, DomainError>> {
         
         let dto = CenterRegistrationDTO(
             identifier: id,
@@ -40,26 +40,34 @@ public extension DefaultAuthRepository {
         
         let data = (try? JSONEncoder().encode(dto)) ?? Data()
         
-        return networkService.request(api: .registerCenterAccount(data: data), with: .plain)
-            .map { _ in return () }
+        let dataTask = networkService.request(api: .registerCenterAccount(data: data), with: .plain)
+            .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
-    func requestCenterLogin(id: String, password: String) -> Single<Void> {
-        return networkService.requestDecodable(api: .centerLogin(id: id, password: password), with: .plain)
-            .flatMap { [unowned self] in saveTokenToStore(token: $0) }
+    func requestCenterLogin(id: String, password: String) -> Single<Result<Void, DomainError>> {
+        let dataTask = networkService.requestDecodable(api: .centerLogin(id: id, password: password), with: .plain)
+            .flatMap { [unowned self] in
+                saveTokenToStore(token: $0)
+            }
+        
+        return convertToDomain(task: dataTask)
     }
     
-    func signoutCenterAccount() -> RxSwift.Single<Void> {
-        networkService
+    func signoutCenterAccount() -> Single<Result<Void, DomainError>> {
+        let dataTask = networkService
             .request(api: .signoutCenterAccount, with: .withToken)
-            .map {  _ in }
+            .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
-    func deregisterCenterAccount(reasons: [String], password: String) -> RxSwift.Single<Void> {
+    func deregisterCenterAccount(reasons: [String], password: String) -> Single<Result<Void, DomainError>> {
         
         let reasonString = reasons.joined(separator: "|")
         
-        return networkService
+        let dataTask = networkService
             .request(
                 api: .deregisterCenterAccount(
                     reason: reasonString,
@@ -67,25 +75,33 @@ public extension DefaultAuthRepository {
                 ),
                 with: .withToken
             )
-            .map { _ in }
+            .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
-    func getCenterJoinStatus() -> RxSwift.Single<CenterJoinStatusInfoVO> {
-        networkService
+    func getCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>> {
+        let dataTask = networkService
             .request(api: .centerJoinStatus, with: .withToken)
             .map(CenterJoinStatusInfoVO.self)
+        
+        return convertToDomain(task: dataTask)
     }
     
-    func requestCenterJoin() -> Single<Void> {
-        networkService
+    func requestCenterJoin() -> Single<Result<Void, DomainError>> {
+        let dataTask = networkService
             .request(api: .requestCenterJoin, with: .withToken)
             .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
     
-    func setNewPassword(phoneNumber: String, password: String) -> Single<Void> {
-        networkService
+    func setNewPassword(phoneNumber: String, password: String) -> Single<Result<Void, DomainError>> {
+        let dataTask = networkService
             .request(api: .makeNewPassword(phoneNumber: phoneNumber, newPassword: password), with: .plain)
             .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
 }
 
@@ -93,7 +109,7 @@ public extension DefaultAuthRepository {
 public extension DefaultAuthRepository {
     
     /// 요양보호사의 경우 회원가입시 곧바로 토큰을 발급받습니다.
-    func requestRegisterWorkerAccount(registerState: WorkerRegisterState) -> Single<Void> {
+    func requestRegisterWorkerAccount(registerState: WorkerRegisterState) -> Single<Result<Void, DomainError>> {
         let dto = WorkerRegistrationDTO(
             carerName: registerState.name,
             birthYear: registerState.birthYear,
@@ -105,32 +121,37 @@ public extension DefaultAuthRepository {
         
         let data = (try? JSONEncoder().encode(dto)) ?? Data()
         
-        return networkService.requestDecodable(api: .registerWorkerAccount(data: data), with: .plain)
+        let dataTask = networkService.requestDecodable(api: .registerWorkerAccount(data: data), with: .plain)
             .flatMap { [unowned self] in saveTokenToStore(token: $0) }
-    }
-    
-    func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Void> {
-        return networkService.requestDecodable(api: .workerLogin(phoneNumber: phoneNumber, verificationNumber: authNumber), with: .plain)
-            .flatMap { [unowned self] in saveTokenToStore(token: $0) }
-    }
-    
-    func signoutWorkerAccount() -> RxSwift.Single<Void> {
-        networkService
-            .request(api: .signoutWorkerAccount, with: .withToken)
-            .map {  _ in }
-    }
-    
-    func deregisterWorkerAccount(reasons: [String]) -> RxSwift.Single<Void> {
-        let reasonString = reasons.joined(separator: "|")
         
-        return networkService
+        return convertToDomain(task: dataTask)
+    }
+    
+    func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Result<Void, DomainError>> {
+        let dataTask = networkService.requestDecodable(api: .workerLogin(phoneNumber: phoneNumber, verificationNumber: authNumber), with: .plain)
+            .flatMap { [unowned self] in saveTokenToStore(token: $0) }
+        
+        return convertToDomain(task: dataTask)
+    }
+    
+    func signoutWorkerAccount() -> Single<Result<Void, DomainError>> {
+        let dataTask = networkService
+            .request(api: .signoutWorkerAccount, with: .withToken)
+            .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
+    }
+    
+    func deregisterWorkerAccount(reasons: [String]) -> Single<Result<Void, DomainError>> {
+        let reasonString = reasons.joined(separator: "|")
+        let dataTask = networkService
             .request(
-                api: .deregisterWorkerAccount(
-                    reason: reasonString
-                ),
+                api: .deregisterWorkerAccount(reason: reasonString),
                 with: .withToken
             )
-            .map { _ in }
+            .mapToVoid()
+        
+        return convertToDomain(task: dataTask)
     }
 }
 
