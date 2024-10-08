@@ -24,12 +24,6 @@ public protocol SettingScreenUseCase: BaseUseCase {
     /// 알림동의를 요청합니다.
     func requestNotificationPermission() -> Maybe<NotificationApproveAction>
     
-    /// 개인정보 처리방침 웹 URL을 가져옵니다.
-    func getPersonalDataUsageDescriptionUrl() -> URL
-    
-    /// 어플리케이션 이용약관을 가져옵니다.
-    func getApplicationPolicyUrl() -> URL
-    
     // MARK: Worker
     
     /// 요양보호사 회원 탈퇴

@@ -9,6 +9,7 @@ import Foundation
 import Domain
 import Repository
 import DataSource
+import RootFeature
 
 
 import Swinject
@@ -56,6 +57,16 @@ public struct DataAssembly: Assembly {
         // MARK: 구인공고 레포지토리
         container.register(RecruitmentPostRepository.self) { _ in
             return DefaultRecruitmentPostRepository()
+        }
+        
+        // MARK: 토큰 전송 레포지토리
+        container.register(NotificationTokenTransferRepository.self) { _ in
+            return DefaultNotificationTokenTransferRepository()
+        }
+        
+        // MARK: 토큰 획득 레포지토리
+        container.register(NotificationTokenRepository.self) { _ in
+            return RootFeature.FCMTokenRepository()
         }
     }
 }

@@ -97,10 +97,6 @@ public extension AuthInOutStreamManager {
             output.loginSuccess = loginResult
                 .compactMap { $0.value }
                 .map { phoneNumber in
-                    
-                    // 원격 알림 토큰 전송
-                    NotificationCenter.default.post(name: .requestTransportTokenToServer, object: nil)
-                    
                     printIfDebug("✅ 요양보호사 로그인 성공")
                     return ()
                 }

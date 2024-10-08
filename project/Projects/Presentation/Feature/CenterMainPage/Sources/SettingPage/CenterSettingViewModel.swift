@@ -173,10 +173,6 @@ class CenterSettingViewModel: BaseViewModel, CenterSettingVMable {
         signOutSuccess
             .unretained(self)
             .subscribe(onNext: { (obj, _) in
-                
-                // 로그이아웃 성공 -> 원격알림 토큰 제거
-                NotificationCenter.default.post(name: .requestDeleteTokenFromServer, object: nil)
-                
                 obj.changeToAuthFlow?()
             })
             .disposed(by: disposeBag)

@@ -6,26 +6,29 @@
 //
 
 import Foundation
+import Core
 
 
 import RxSwift
 
 public class DefaultAuthUseCase: AuthUseCase {
 
-    let authRepository: AuthRepository
-    let userProfileRepository: UserProfileRepository
-    let userInfoLocalRepository: UserInfoLocalRepository
+    // UseCase
+    @Injected var notificationTokenUseCase: NotificationTokenUseCase
     
-    public init(authRepository: AuthRepository, userProfileRepository: UserProfileRepository, userInfoLocalRepository: UserInfoLocalRepository) {
-        self.authRepository = authRepository
-        self.userProfileRepository = userProfileRepository
-        self.userInfoLocalRepository = userInfoLocalRepository
-    }
+    // Repository
+    @Injected var authRepository: AuthRepository
+    @Injected var userProfileRepository: UserProfileRepository
+    @Injected var userInfoLocalRepository: UserInfoLocalRepository
+    
+    public init() { }
     
     // 센터 회원가입 실행
     public func registerCenterAccount(registerState: CenterRegisterState) -> Single<Result<Void, DomainError>> {
         
-        let task = authRepository.requestRegisterCenterAccount(
+        // #1. 회원가입 실행
+        authRepository
+            .requestRegisterCenterAccount(
                 managerName: registerState.name,
                 phoneNumber: registerState.phoneNumber,
                 businessNumber: registerState.businessNumber,
@@ -33,24 +36,31 @@ public class DefaultAuthUseCase: AuthUseCase {
                 password: registerState.password
             )
             .map { [userInfoLocalRepository] _ in
+                // #2. 유저정보 로컬에 저장
                 userInfoLocalRepository.updateUserType(.center)
             }
-        return convert(task: task)
+            .flatMap { [notificationTokenUseCase] _ in
+                // #3. 원격알림 토큰을 서버에 전송
+                notificationTokenUseCase.setNotificationToken()
+            }
     }
     
     // 센터 로그인 실행
     public func loginCenterAccount(id: String, password: String) -> Single<Result<Void, DomainError>> {
-        let task = authRepository.requestCenterLogin(id: id, password: password)
+        authRepository.requestCenterLogin(id: id, password: password)
             .map { [userInfoLocalRepository] vo in
                 userInfoLocalRepository.updateUserType(.center)
             }
-        return convert(task: task)
+            .flatMap { [notificationTokenUseCase] _ in
+                // 원격알림 토큰을 서버에 전송
+                notificationTokenUseCase.setNotificationToken()
+            }
     }
     
     // 요양 보호사 회원가입 실행, 성공한 경우 프로필 Fetch후 저장
     public func registerWorkerAccount(registerState: WorkerRegisterState) -> Single<Result<Void, DomainError>> {
         
-        let task = authRepository
+        authRepository
             .requestRegisterWorkerAccount(registerState: registerState)
             .flatMap { [userProfileRepository] _ in
                 userProfileRepository.getWorkerProfile(mode: .myProfile)
@@ -59,14 +69,16 @@ public class DefaultAuthUseCase: AuthUseCase {
                 userInfoLocalRepository.updateUserType(.worker)
                 userInfoLocalRepository.updateCurrentWorkerData(vo: vo)
             }
-        
-        return convert(task: task)
+            .flatMap { [notificationTokenUseCase] _ in
+                // 원격알림 토큰을 서버에 전송
+                notificationTokenUseCase.setNotificationToken()
+            }
     }
     
     // 요양 보호사 로그인 실행, 성공한 경우 프로필 Fetch후 저장
     public func loginWorkerAccount(phoneNumber: String, authNumber: String) -> Single<Result<Void, DomainError>> {
         
-        let task = authRepository.requestWorkerLogin(phoneNumber: phoneNumber, authNumber: authNumber)
+        authRepository.requestWorkerLogin(phoneNumber: phoneNumber, authNumber: authNumber)
                 .flatMap { [userProfileRepository] _ in
                     userProfileRepository.getWorkerProfile(mode: .myProfile)
                 }
@@ -74,8 +86,10 @@ public class DefaultAuthUseCase: AuthUseCase {
                     userInfoLocalRepository.updateUserType(.worker)
                     userInfoLocalRepository.updateCurrentWorkerData(vo: vo)
                 }
-        
-        return convert(task: task)
+                .flatMap { [notificationTokenUseCase] _ in
+                    // 원격알림 토큰을 서버에 전송
+                    notificationTokenUseCase.setNotificationToken()
+                }
     }
     
     public func checkCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>> {

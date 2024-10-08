@@ -17,22 +17,19 @@ public struct DomainAssembly: Assembly {
     public func assemble(container: Container) {
         
         // MARK: UseCase
+        container.register(NotificationTokenUseCase.self) { _ in
+            return DefaultNotificationTokenUseCase()
+        }
+        .inObjectScope(.container)
+        
         container.register(AuthInputValidationUseCase.self) { resolver in
             let repository = resolver.resolve(AuthInputValidationRepository.self)!
             
             return DefaultAuthInputValidationUseCase(repository: repository)
         }
         
-        container.register(AuthUseCase.self) { resolver in
-            let authRepository = resolver.resolve(AuthRepository.self)!
-            let userProfileRepository = resolver.resolve(UserProfileRepository.self)!
-            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
-            
-            return DefaultAuthUseCase(
-                authRepository: authRepository,
-                userProfileRepository: userProfileRepository,
-                userInfoLocalRepository: userInfoLocalRepository
-            )
+        container.register(AuthUseCase.self) { _ in
+            return DefaultAuthUseCase()
         }
         
         container.register(CenterProfileUseCase.self) { resolver in
@@ -61,14 +58,8 @@ public struct DomainAssembly: Assembly {
             )
         }
         
-        container.register(SettingScreenUseCase.self) { resolver in
-            let authRepository = resolver.resolve(AuthRepository.self)!
-            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
-            
-            return DefaultSettingUseCase(
-                authRepository: authRepository,
-                userInfoLocalRepository: userInfoLocalRepository
-            )
+        container.register(SettingScreenUseCase.self) { _ in
+            return DefaultSettingUseCase()
         }
         
         container.register(CenterCertificateUseCase.self) { resolver in
@@ -79,10 +70,6 @@ public struct DomainAssembly: Assembly {
                 authRepository: authRepository,
                 userInfoLocalRepository: userInfoLocalRepository
             )
-        }
-        
-        container.register(NotificationTokenManage.self) { resolver in
-            DefaultNotificationTokenManage()
         }
     }
 }

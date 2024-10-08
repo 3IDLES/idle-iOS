@@ -62,10 +62,6 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
         loginSuccess
             .unretained(self)
             .subscribe(onNext: { (obj, _) in
-                
-                // 원격 알림 토큰 저장요청
-                NotificationCenter.default.post(name: .requestTransportTokenToServer, object: nil)
-                
                 // 센터 메인화면으로 이동
                 obj.presentCenterMainPage()
             })

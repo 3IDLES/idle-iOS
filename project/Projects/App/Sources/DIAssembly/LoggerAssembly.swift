@@ -8,7 +8,6 @@
 import Foundation
 import RootFeature
 import AuthFeature
-import CenterFeature
 import PresentationCore
 import CenterMainPageFeature
 

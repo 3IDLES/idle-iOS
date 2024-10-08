@@ -12,10 +12,10 @@ public protocol NotificationTokenRepository: AnyObject {
     // delegate
     var delegate: NotificationTokenRepositoryDelegate? { get set }
     
-    func getToken() -> String
+    func getToken() -> String?
 }
 
-public protocol NotificationTokenRepositoryDelegate {
+public protocol NotificationTokenRepositoryDelegate: AnyObject {
     
     func notificationToken(freshToken: String)
 }
