@@ -1,5 +1,5 @@
 //
-//  DefaultNotificationTokenManage.swift
+//  DefaultNotificationTokenUseCase.swift
 //  ConcreteUseCase
 //
 //  Created by choijunios on 9/26/24.
@@ -7,7 +7,9 @@
 
 import Foundation
 
-public class DefaultNotificationTokenManage: NotificationTokenManage {
+public class DefaultNotificationTokenUseCase: NotificationTokenUseCase {
+    
+    
     
     public init() { }
     
