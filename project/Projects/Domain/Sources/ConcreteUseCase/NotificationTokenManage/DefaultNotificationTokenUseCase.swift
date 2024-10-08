@@ -31,7 +31,9 @@ public class DefaultNotificationTokenUseCase: NotificationTokenUseCase {
             return .just(.failure(.clientException))
         }
         
-        let notificationToken = tokenRepository.getToken()
+        guard let notificationToken = tokenRepository.getToken() else {
+            return .just(.failure(.resourceNotFound))
+        }
         
         return tokenTransferRepository
             .sendToken(token: notificationToken, userType: userType)
@@ -39,7 +41,9 @@ public class DefaultNotificationTokenUseCase: NotificationTokenUseCase {
     
     public func deleteNotificationToken() -> Single<Result<Void, DomainError>> {
         
-        let notificationToken = tokenRepository.getToken()
+        guard let notificationToken = tokenRepository.getToken() else {
+            return .just(.failure(.resourceNotFound))
+        }
         
         return tokenTransferRepository
             .deleteToken(token: notificationToken)

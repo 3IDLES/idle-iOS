@@ -45,10 +45,6 @@ public class PasswordForDeregisterVM: BaseViewModel {
             .observe(on: MainScheduler.asyncInstance)
             .unretained(self)
             .subscribe(onNext: { (obj, _) in
-                
-                // 회원탈퇴 성공 -> 원격알림 토큰 제거
-                NotificationCenter.default.post(name: .requestDeleteTokenFromServer, object: nil)
-                
                 // RootCoordinator로 이동
                 obj.changeToAuthFlow?()
             })

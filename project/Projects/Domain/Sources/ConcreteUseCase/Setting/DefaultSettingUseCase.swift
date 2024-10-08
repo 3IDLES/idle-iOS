@@ -7,19 +7,21 @@
 
 import Foundation
 import UserNotifications
+import Core
 
 
 import RxSwift
 
 public class DefaultSettingUseCase: SettingScreenUseCase {
     
-    let authRepository: AuthRepository
-    let userInfoLocalRepository: UserInfoLocalRepository
+    // UseCase
+    @Injected var notificationTokenUseCase: NotificationTokenUseCase
     
-    public init(authRepository: AuthRepository, userInfoLocalRepository: UserInfoLocalRepository) {
-        self.authRepository = authRepository
-        self.userInfoLocalRepository = userInfoLocalRepository
-    }
+    // Repository
+    @Injected var authRepository: AuthRepository
+    @Injected var userInfoLocalRepository: UserInfoLocalRepository
+    
+    public init() { }
     
     public func checkPushNotificationApproved() -> Single<Bool> {
         Single<Bool>.create { single in
@@ -71,39 +73,42 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
         }
     }
     
-    public func getPersonalDataUsageDescriptionUrl() -> URL {
-        // MARK: TODO
-        URL(string: "")!
-    }
-    
-    public func getApplicationPolicyUrl() -> URL {
-        // MARK: TODO
-        URL(string: "")!
-    }
-    
     // MARK: 회원탈퇴 & 로그아웃
     // 센터 회원탈퇴
     public func deregisterCenterAccount(reasons: [String], password: String) -> RxSwift.Single<Result<Void, DomainError>> {
-        let task = authRepository
+        authRepository
             .deregisterCenterAccount(reasons: reasons, password: password)
             .map { [weak self] _ in 
                 self?.removeAllLocalData()
                 
                 return ()
             }
-        return convert(task: task)
+            .flatMap { [notificationTokenUseCase] _ in
+                notificationTokenUseCase
+                    .deleteNotificationToken()
+            }
     }
     
     // 센터 로그아웃
     public func signoutCenterAccount() -> RxSwift.Single<Result<Void, DomainError>> {
-        let task = authRepository
-            .signoutCenterAccount()
-            .map { [weak self] _ in
-                self?.removeAllLocalData()
+        notificationTokenUseCase
+            .deleteNotificationToken()
+            .flatMap{ [authRepository] result in
                 
-                return ()
+                switch result {
+                case .success:
+                    let task = authRepository
+                        .signoutCenterAccount()
+                        .map { [weak self] ads in
+                            self?.removeAllLocalData()
+                            
+                            return ads
+                        }
+                    return self.convert(task: task)
+                case .failure:
+                    return Single.just(result)
+                }
             }
-        return convert(task: task)
     }
     
     // 요양보호사 회원탈퇴
