@@ -38,9 +38,9 @@ public extension BaseUseCase {
                 let domainError = DomainError(code: code)
                 
                 if domainError == .undefinedCode {
-#if DEBUG
+                    #if DEBUG
                     print("‼️ 정의되지 않은 에러코드가 발견되었습니다. 노션을 확인해주세요")
-#endif
+                    #endif
                 }
                 
                 return domainError

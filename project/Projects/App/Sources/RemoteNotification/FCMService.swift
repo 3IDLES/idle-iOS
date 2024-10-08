@@ -14,8 +14,6 @@ import FirebaseMessaging
 
 class FCMService: NSObject {
     
-    @Injected var notificationTokenManageUseCase: NotificationTokenManage
-    
     override public init() {
         super.init()
         Messaging.messaging().delegate = self
