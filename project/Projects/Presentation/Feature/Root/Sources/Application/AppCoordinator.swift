@@ -15,14 +15,21 @@ import CenterCetificatePageFeature
 import AccountDeregisterFeature
 import PostDetailForWorkerFeature
 import UserProfileFeature
-
 import Domain
 import Core
 
 
+import RxSwift
+
 public class AppCoordinator: BaseCoordinator {
     
+    /// main router
     let router: Router
+    
+    /// notification helper
+    let notificationHelper: RemoteNotificationHelper = .init()
+    
+    let disposeBag: DisposeBag = .init()
     
     public init(router: Router) {
         self.router = router
@@ -51,6 +58,7 @@ extension AppCoordinator {
     func runSplashFlow() -> SplashCoordinator {
         
         let coordinator = SplashCoordinator(router: router)
+        coordinator.delegate = self
         
         coordinator.startFlow = { [weak self] destination in
             
@@ -321,4 +329,33 @@ extension AppCoordinator {
          executeChild(coordinator)
          return coordinator
      }
+}
+
+
+// MARK: watch push notifications
+extension AppCoordinator: SplashCoordinatorDelegate {
+    
+    public func splashCoordinator(satisfiedAllCondition: Bool) {
+        
+        if !satisfiedAllCondition { return }
+        
+        notificationHelper
+            .deeplinks
+            .observe(on: MainScheduler.instance)
+            .subscribe (onNext: { [weak self] bundle in
+                
+                guard let self else { return }
+                
+                var currentCoordinator: Coordinator? = self
+                
+                bundle.deeplinks
+                    .forEach { deeplink in
+                        currentCoordinator = deeplink.execute(
+                            with: currentCoordinator!,
+                            userInfo: bundle.userInfo
+                        )
+                    }
+            })
+            .disposed(by: disposeBag)
+    }
 }

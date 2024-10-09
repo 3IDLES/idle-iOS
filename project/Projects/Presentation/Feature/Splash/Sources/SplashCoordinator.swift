@@ -36,6 +36,8 @@ public class SplashCoordinator: BaseCoordinator {
     
     public var startFlow: ((SplashCoordinatorDestination) -> ())!
     
+    public weak var delegate: SplashCoordinatorDelegate?
+    
     // #1. 네트워크 연결상태 확인
     private let networkCheckingPassed: PublishSubject<Void> = .init()
     
@@ -85,6 +87,7 @@ public class SplashCoordinator: BaseCoordinator {
             .subscribe(onNext: { (object, arg1) in
                 let (_, _, userType) = arg1
                 object.startFlow(.mainPage(userType: userType))
+                object.delegate?.splashCoordinator(satisfiedAllCondition: true)
             })
             .disposed(by: disposeBag)
     }
@@ -431,3 +434,7 @@ private extension SplashCoordinator {
     }
 }
 
+public protocol SplashCoordinatorDelegate: AnyObject {
+    
+    func splashCoordinator(satisfiedAllCondition: Bool)
+}
