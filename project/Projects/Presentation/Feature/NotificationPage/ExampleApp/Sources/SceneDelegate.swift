@@ -58,7 +58,7 @@ public class TestNotificationPageUseCase: NotificationPageUseCase {
     
     public func getNotificationList() -> Single<Result<[NotificationCellInfo], DomainError>> {
         
-        let task = Single<[NotificationCellInfo]>.create { observer in
+        let task = Single<Result<[NotificationCellInfo], DomainError>>.create { observer in
             
             var mockData: [NotificationCellInfo] = []
             
@@ -77,12 +77,12 @@ public class TestNotificationPageUseCase: NotificationPageUseCase {
                 contentsOf: (0..<5).map { _ in NotificationCellInfo.create(createdDay: -15) }
             )
             
-            observer(.success(mockData))
+            observer(.success(.success(mockData)))
             
             
             return Disposables.create { }
         }
         
-        return convert(task: task)
+        return task
     }
 }

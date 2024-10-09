@@ -25,10 +25,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         window?.makeKeyAndVisible()
         
-        DependencyInjector.shared.assemble([
-            DataAssembly(),
-            DomainAssembly()
-        ])
+//        DependencyInjector.shared.assemble([
+//            DataAssembly(),
+//            DomainAssembly()
+//        ])
 
         
         coordiantor.start()
