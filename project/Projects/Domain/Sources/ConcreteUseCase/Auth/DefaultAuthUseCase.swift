@@ -60,11 +60,23 @@ public class DefaultAuthUseCase: AuthUseCase {
     // 요양 보호사 회원가입 실행, 성공한 경우 프로필 Fetch후 저장
     public func registerWorkerAccount(registerState: WorkerRegisterState) -> Single<Result<Void, DomainError>> {
         
-        authRepository
-            .requestRegisterWorkerAccount(registerState: registerState)
+        let registerResult = authRepository.requestRegisterWorkerAccount(registerState: registerState)
+        
+        let registerSuccess = registerResult.compactMap({ $0.value })
+        let registerFailure = registerResult.compactMap({ $0.error })
+        
+        let fetchProfileResult = registerSuccess
+            .asObservable()
             .flatMap { [userProfileRepository] _ in
-                userProfileRepository.getWorkerProfile(mode: .myProfile)
+                userProfileRepository
+                    .getWorkerProfile(mode: .myProfile)
             }
+            .share()
+            
+        let fetchProfileSuccess = fetchProfileResult.compactMap { $0.value}
+        let fetchProfileFailure = fetchProfileResult.compactMap { $0.error}
+                
+        let saveAndNotificationResult = fetchProfileSuccess
             .map { [userInfoLocalRepository] vo in
                 userInfoLocalRepository.updateUserType(.worker)
                 userInfoLocalRepository.updateCurrentWorkerData(vo: vo)
@@ -73,30 +85,54 @@ public class DefaultAuthUseCase: AuthUseCase {
                 // 원격알림 토큰을 서버에 전송
                 notificationTokenUseCase.setNotificationToken()
             }
+        
+        return Observable.merge(
+            saveAndNotificationResult,
+            Observable
+                .merge(registerFailure.asObservable(), fetchProfileFailure.asObservable())
+                .map { error -> Result<Void, DomainError> in .failure(error) }
+        ).asSingle()
     }
     
     // 요양 보호사 로그인 실행, 성공한 경우 프로필 Fetch후 저장
     public func loginWorkerAccount(phoneNumber: String, authNumber: String) -> Single<Result<Void, DomainError>> {
         
-        authRepository.requestWorkerLogin(phoneNumber: phoneNumber, authNumber: authNumber)
+        let loginResult = authRepository.requestWorkerLogin(phoneNumber: phoneNumber, authNumber: authNumber)
+                .asObservable()
                 .flatMap { [userProfileRepository] _ in
                     userProfileRepository.getWorkerProfile(mode: .myProfile)
                 }
-                .map { [userInfoLocalRepository] vo in
-                    userInfoLocalRepository.updateUserType(.worker)
-                    userInfoLocalRepository.updateCurrentWorkerData(vo: vo)
-                }
-                .flatMap { [notificationTokenUseCase] _ in
-                    // 원격알림 토큰을 서버에 전송
-                    notificationTokenUseCase.setNotificationToken()
-                }
+                .share()
+        
+        let loginSuccess = loginResult.compactMap { $0.value }
+        let loginFailure = loginResult.compactMap { $0.error }
+        
+        let tokenTransferResult = loginSuccess
+            .asObservable()
+            .map { [userInfoLocalRepository] vo in
+                userInfoLocalRepository.updateUserType(.worker)
+                userInfoLocalRepository.updateCurrentWorkerData(vo: vo)
+            }
+            .flatMap { [notificationTokenUseCase] _ in
+                // 원격알림 토큰을 서버에 전송
+                notificationTokenUseCase.setNotificationToken()
+            }
+        
+        return Observable
+            .merge(
+                tokenTransferResult,
+                loginFailure.map({ error -> Result<Void, DomainError> in
+                    .failure(error)
+                }).asObservable()
+            )
+            .asSingle()
     }
     
     public func checkCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>> {
-        convert(task: authRepository.getCenterJoinStatus())
+        authRepository.getCenterJoinStatus()
     }
     
     public func setNewPassword(phoneNumber: String, password: String) -> Single<Result<Void, DomainError>> {
-        convert(task: authRepository.setNewPassword(phoneNumber: phoneNumber, password: password))
+        authRepository.setNewPassword(phoneNumber: phoneNumber, password: password)
     }
 }

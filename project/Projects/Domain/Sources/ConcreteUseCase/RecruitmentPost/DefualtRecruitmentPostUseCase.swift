@@ -26,11 +26,7 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
             inputs.applicationDetail.deadlineDate = oneMonthLater
         }
         
-        return convert(
-            task: repository.registerPost(
-                bundle: inputs
-            )
-        )
+        return repository.registerPost(bundle: inputs)
     }
     
     public func editRecruitmentPost(id: String, inputs: RegisterRecruitmentPostBundle) -> RxSwift.Single<Result<Void, DomainError>> {
@@ -40,65 +36,68 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
             inputs.applicationDetail.deadlineDate = oneMonthLater
         }
         
-        return convert(
-            task: repository.editPostDetail(
-                id: id,
-                bundle: inputs
-            )
-        )
+        return repository.editPostDetail(id: id, bundle: inputs)
     }
     
     public func getPostDetailForCenter(id: String) -> RxSwift.Single<Result<RegisterRecruitmentPostBundle, DomainError>> {
-        convert(task: repository.getPostDetailForCenter(id: id))
+        repository.getPostDetailForCenter(id: id)
     }
     
     public func getNativePostDetailForWorker(id: String) -> RxSwift.Single<Result<RecruitmentPostForWorkerBundle, DomainError>> {
-        convert(task: repository.getNativePostDetailForWorker(id: id))
+        repository.getNativePostDetailForWorker(id: id)
     }
     
     public func getWorknetPostDetailForWorker(id: String) -> RxSwift.Single<Result<WorknetRecruitmentPostDetailVO, DomainError>> {
-        convert(task: repository.getWorknetPostDetailForWorker(id: id))
+        repository.getWorknetPostDetailForWorker(id: id)
     }
     
-    public func getOngoingPosts() -> RxSwift.Single<Result<[RecruitmentPostInfoForCenterVO], DomainError>> {
-        let task = repository
+    public func getOngoingPosts() -> Single<Result<[RecruitmentPostInfoForCenterVO], DomainError>> {
+        
+        repository
             .getOngoingPosts()
-            .map { postInfo in
-                postInfo.forEach { vo in vo.state = .onGoing }
-                return postInfo
+            .map { result -> Result<[RecruitmentPostInfoForCenterVO], DomainError> in
+                
+                if case .success(let postInfos) = result {
+                    
+                    return .success(postInfos.map { $0.setState(.onGoing) })
+                }
+                return result
             }
-        return convert(task: task)
     }
     
     public func getClosedPosts() -> RxSwift.Single<Result<[RecruitmentPostInfoForCenterVO], DomainError>> {
-        let task = repository
+        
+        repository
             .getClosedPosts()
-            .map { postInfo in
-                postInfo.forEach { vo in vo.state = .closed }
-                return postInfo
+            .map { result -> Result<[RecruitmentPostInfoForCenterVO], DomainError> in
+                
+                if case .success(let postInfos) = result {
+                    
+                    return .success(postInfos.map { $0.setState(.closed) })
+                }
+                return result
             }
-        return convert(task: task)
     }
     
     public func closePost(id: String) -> Single<Result<Void, DomainError>> {
-        convert(task: repository.closePost(id: id))
+        repository.closePost(id: id)
     }
     
     public func removePost(id: String) -> Single<Result<Void, DomainError>> {
-        convert(task: repository.removePost(id: id))
+        repository.removePost(id: id)
     }
     
     public func getPostApplicantCount(id: String) -> RxSwift.Single<Result<Int, DomainError>> {
-        convert(task: repository.getPostApplicantCount(id: id))
+        repository.getPostApplicantCount(id: id)
     }
     
     public func getPostApplicantScreenData(id: String) -> RxSwift.Single<Result<PostApplicantScreenVO, DomainError>> {
-        convert(task: repository.getPostApplicantScreenData(id: id))
+        repository.getPostApplicantScreenData(id: id)
     }
     
     public func getPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> Single<Result<RecruitmentPostListForWorkerVO, DomainError>> {
         
-        let stream: Single<RecruitmentPostListForWorkerVO>!
+        let stream: Single<Result<RecruitmentPostListForWorkerVO, DomainError>>!
         
         switch request {
         case .initial:
@@ -121,26 +120,43 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
             }
         }
         
-        return convert(task: stream)
+        return stream
     }
     
     public func getFavoritePostListForWorker() -> RxSwift.Single<Result<[RecruitmentPostForWorkerRepresentable], DomainError>> {
         
-        let nativeList = repository.getNativeFavoritePostListForWorker()
-        let worknetList = repository.getWorknetFavoritePostListForWorker()
+        let fetchNativeListResult = repository.getNativeFavoritePostListForWorker()
+        let nativeSuccess = fetchNativeListResult.compactMap { $0.value }
+        let nativeFailure = fetchNativeListResult.compactMap { $0.error }
         
-        let task = Single
-            .zip(nativeList, worknetList)
-            .map { (native, worknet) in
-                native + worknet
+        let fetchWorknetListResult = repository
+            .getWorknetFavoritePostListForWorker()
+            .asObservable()
+            .share()
+        let worknetSuccess = fetchWorknetListResult.compactMap { $0.value }
+        let worknetFailure = fetchWorknetListResult.compactMap { $0.error }
+        
+        
+        let successZip = Observable
+            .zip(nativeSuccess.asObservable(), worknetSuccess.asObservable())
+            .map { (native, worknet) -> Result<[RecruitmentPostForWorkerRepresentable], DomainError> in
+                .success(native + worknet)
             }
         
-        return convert(task: task)
+        let failureMerge = Observable
+            .merge(nativeFailure.asObservable(), worknetFailure.asObservable())
+            .map { error -> Result<[RecruitmentPostForWorkerRepresentable], DomainError> in
+                .failure(error)
+            }
+        
+        return Observable
+            .merge(successZip, failureMerge)
+            .asSingle()
     }
     
     public func getAppliedPostListForWorker(request: PostPagingRequestForWorker, postCount: Int) -> RxSwift.Single<Result<RecruitmentPostListForWorkerVO, DomainError>> {
         
-        let stream: Single<RecruitmentPostListForWorkerVO>!
+        let stream: Single<Result<RecruitmentPostListForWorkerVO, DomainError>>!
         
         switch request {
         case .initial:
@@ -161,18 +177,18 @@ public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
             }
         }
         
-        return convert(task: stream)
+        return stream
     }
     
     public func applyToPost(postId: String, method: ApplyType) -> RxSwift.Single<Result<Void, DomainError>> {
-        convert(task: repository.applyToPost(postId: postId, method: method))
+        repository.applyToPost(postId: postId, method: method)
     }
     
     public func addFavoritePost(postId: String, type: PostOriginType) -> Single<Result<Void, DomainError>> {
-        convert(task: repository.addFavoritePost(postId: postId, type: type))
+        repository.addFavoritePost(postId: postId, type: type)
     }
     
     public func removeFavoritePost(postId: String) -> Single<Result<Void, DomainError>> {
-        convert(task: repository.removeFavoritePost(postId: postId))
+        repository.removeFavoritePost(postId: postId)
     }
 }

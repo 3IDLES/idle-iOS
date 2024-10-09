@@ -26,10 +26,8 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
     
     // MARK: 전화번호 인증
     public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<String, DomainError>> {
-        convert(task: self.repository
+        repository
             .requestPhoneNumberAuthentication(phoneNumber: phoneNumber)
-            .map { _ in phoneNumber }
-        )
     }
     
     public func checkPhoneNumberIsValid(phoneNumber: String) -> Bool {
@@ -40,18 +38,14 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
     }
     
     public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<String, DomainError>> {
-        convert(task: repository
+        repository
             .authenticateAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber)
-            .map({ _ in phoneNumber })
-        )
     }
     
     // MARK: 사업자 번호 인증
-    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<(businessNumber: String, vo: BusinessInfoVO), DomainError>> {
-        convert(task: repository
+    public func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<BusinessInfoVO, DomainError>> {
+        repository
             .requestBusinessNumberAuthentication(businessNumber: businessNumber)
-            .map({ vo in (businessNumber, vo) })
-        )
     }
     
     public func checkBusinessNumberIsValid(businessNumber: String) -> Bool {
@@ -69,11 +63,9 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         return predicate.evaluate(with: id)
     }
     
-    public func requestCheckingIdDuplication(id: String) -> Single<Result<String, DomainError>> {
-        convert(task: repository
+    public func requestCheckingIdDuplication(id: String) -> Single<Result<Void, DomainError>> {
+        repository
             .requestCheckingIdDuplication(id: id)
-            .map({ _ in id })
-        )
     }
     
     public func checkPasswordIsValid(password: String) -> Bool {

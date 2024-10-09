@@ -22,37 +22,35 @@ public class DefaultCenterCertificateUseCase: CenterCertificateUseCase {
     
     public func requestCenterCertificate() -> RxSwift.Single<Result<Void, DomainError>> {
         
-        convert(task: authRepository.requestCenterJoin())
+        authRepository.requestCenterJoin()
     }
     
     public func getCenterJoinStatus() -> RxSwift.Single<Result<CenterJoinStatusInfoVO, DomainError>> {
-        convert(task: authRepository.getCenterJoinStatus())
+        
+        authRepository.getCenterJoinStatus()
     }
     
     // 센터 로그아웃
     public func signoutCenterAccount() -> RxSwift.Single<Result<Void, DomainError>> {
-        let task = authRepository
+        authRepository
             .signoutCenterAccount()
-            .map { [weak self] _ in
-                self?.removeAllLocalData()
-                
-                return ()
+            .map { [weak self] result in
+                if case .success = result {
+                    self?.userInfoLocalRepository.removeAllData()
+                }
+                return result
             }
-        return convert(task: task)
     }
     
     // 요양보호사 로그아웃
     public func signoutWorkerAccount() -> RxSwift.Single<Result<Void, DomainError>> {
-        let task = authRepository
+        authRepository
             .signoutWorkerAccount()
-            .map { [weak self] _ in
-                self?.removeAllLocalData()
-                
-                return ()
+            .map { [weak self] result in
+                if case .success = result {
+                    self?.userInfoLocalRepository.removeAllData()
+                }
+                return result
             }
-        return convert(task: task)
-    }
-    private func removeAllLocalData() {
-        userInfoLocalRepository.removeAllData()
     }
 }

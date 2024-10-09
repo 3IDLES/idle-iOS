@@ -37,7 +37,7 @@ extension AuthInOutStreamManager {
         // 중복성 검사
         let idDuplicationValidation = input
             .requestIdDuplicationValidation
-            .flatMap { [unowned useCase] id in
+            .flatMap { [useCase] id in
                 
                 printIfDebug("[CenterRegisterViewModel] 중복성 검사 대상 id: \(id)")
                 
@@ -46,16 +46,17 @@ extension AuthInOutStreamManager {
                 print("✅ 디버그모드에서 아이디 중복검사 미실시")
                 // ☑️ 상태추적 ☑️
                 stateTracker(id)
-                return Single.just(Result<String, DomainError>.success(id))
+                return Single.just(Result<Void, DomainError>.success(()))
                 #endif
                 
                 return useCase.requestCheckingIdDuplication(id: id)
             }
         
-        output.idDuplicationValidation = idDuplicationValidation
-            .map { [stateTracker] result in
+        output.idDuplicationValidation = Observable
+            .combineLatest(idDuplicationValidation, input.requestIdDuplicationValidation)
+            .map { [stateTracker] (result, id) in
                 switch result {
-                case .success(let id):
+                case .success:
                     printIfDebug("[CenterRegisterViewModel] 중복체크 결과: ✅ 성공")
                     // 🚀 상태추적 🚀
                     stateTracker(id)

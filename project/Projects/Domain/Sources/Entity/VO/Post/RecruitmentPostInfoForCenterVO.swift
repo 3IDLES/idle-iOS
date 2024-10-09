@@ -40,4 +40,9 @@ public class RecruitmentPostInfoForCenterVO {
         self.applyDeadline = applyDeadline
         self.createdAt = createdAt
     }
+    
+    func setState(_ to: PostState) -> Self {
+        state = to
+        return self
+    }
 }

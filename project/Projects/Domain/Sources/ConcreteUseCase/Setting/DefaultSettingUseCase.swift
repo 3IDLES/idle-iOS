@@ -83,16 +83,16 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
                 
                 switch result {
                 case .success:
-                    let task = authRepository
+                    authRepository
                         .deregisterCenterAccount(reasons: reasons, password: password)
-                        .map { [weak self] _ in
-                            self?.removeAllLocalData()
-                            
-                            return ()
+                        .map { [weak self] result in
+                            if case .success = result {
+                                self?.removeAllLocalData()
+                            }
+                            return result
                         }
-                    return self.convert(task: task)
                 case .failure:
-                    return Single.just(result)
+                    Single.just(result)
                 }
             }
     }
@@ -105,42 +105,42 @@ public class DefaultSettingUseCase: SettingScreenUseCase {
                 
                 switch result {
                 case .success:
-                    let task = authRepository
+                    authRepository
                         .signoutCenterAccount()
-                        .map { [weak self] ads in
-                            self?.removeAllLocalData()
-                            
-                            return ads
+                        .map { [weak self] result in
+                            if case .success = result {
+                                self?.removeAllLocalData()
+                            }
+                            return result
                         }
-                    return self.convert(task: task)
                 case .failure:
-                    return Single.just(result)
+                    Single.just(result)
                 }
             }
     }
     
     // 요양보호사 회원탈퇴
     public func deregisterWorkerAccount(reasons: [String]) -> RxSwift.Single<Result<Void, DomainError>> {
-        let task = authRepository
+        authRepository
             .deregisterWorkerAccount(reasons: reasons)
-            .map { [weak self] _ in
-                self?.removeAllLocalData()
-                
-                return ()
+            .map { [weak self] result in
+                if case .success = result {
+                    self?.removeAllLocalData()
+                }
+                return result
             }
-        return convert(task: task)
     }
     
     // 요양보호사 로그아웃
     public func signoutWorkerAccount() -> RxSwift.Single<Result<Void, DomainError>> {
-        let task = authRepository
+        authRepository
             .signoutWorkerAccount()
-            .map { [weak self] _ in
-                self?.removeAllLocalData()
-                
-                return ()
+            .map { [weak self] result in
+                if case .success = result {
+                    self?.removeAllLocalData()
+                }
+                return result
             }
-        return convert(task: task)
     }
     
     private func removeAllLocalData() {

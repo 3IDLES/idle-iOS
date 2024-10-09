@@ -55,7 +55,7 @@ public protocol AuthInputValidationUseCase: BaseUseCase {
     ///     - Observable<BusinessNumberAuthResult>
     
     // MARK: 사업자 번호 조회
-    func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<(businessNumber: String, vo: BusinessInfoVO), DomainError>>
+    func requestBusinessNumberAuthentication(businessNumber: String) -> Single<Result<BusinessInfoVO, DomainError>>
     
     // #5.
     /// 사업자 번호 유효성 로직
@@ -79,7 +79,7 @@ public protocol AuthInputValidationUseCase: BaseUseCase {
     ///     - id : "idle1234"
     /// - returns:
     ///     - Bool, true: 가능, flase: 증복
-    func requestCheckingIdDuplication(id: String) -> Single<Result<String, DomainError>>
+    func requestCheckingIdDuplication(id: String) -> Single<Result<Void, DomainError>>
     
     // #8.
     /// 아이디 유효성확인 로직
