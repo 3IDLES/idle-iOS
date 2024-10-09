@@ -11,7 +11,7 @@ public protocol DeepLinkTreeNode {
     
     var name: String { get }
     var children: [DeepLinkExecutable] { get }
-//    var isDestination: Bool { get set }
+    var isDestination: Bool { get set }
     
     func findChild(name: String) -> DeepLinkExecutable?
 }
@@ -21,7 +21,7 @@ public protocol DeepLinkExecutable: DeepLinkTreeNode {
     func execute(with coordinator: Coordinator, userInfo: [String: String]?) -> Coordinator?
 }
 
-extension DeepLinkExecutable {
+public extension DeepLinkExecutable {
     
     func findChild(name: String) -> DeepLinkExecutable? {
         children.first(where: { $0.name == name })
