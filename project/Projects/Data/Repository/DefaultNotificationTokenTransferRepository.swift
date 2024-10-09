@@ -28,7 +28,7 @@ public class DefaultNotificationTokenTransferRepository: NotificationTokenTransf
             )
             .mapToVoid()
         
-        return convert(task: dataTask)
+        return convertToDomain(task: dataTask)
     }
     
     public func deleteToken(token: String) -> Single<Result<Void, DomainError>> {
@@ -40,6 +40,6 @@ public class DefaultNotificationTokenTransferRepository: NotificationTokenTransf
             )
             .mapToVoid()
         
-        return convert(task: dataTask)
+        return convertToDomain(task: dataTask)
     }
 }

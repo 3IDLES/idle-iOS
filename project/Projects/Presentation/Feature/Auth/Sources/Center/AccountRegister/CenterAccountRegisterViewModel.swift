@@ -228,19 +228,23 @@ extension CenterAccountRegisterViewModel {
             }
             .asDriver(onErrorJustReturn: false)
         
-        let businessNumberValidationResult = input
+        let requestingBusinessNumber = input
             .requestBusinessNumberValidation
+            .withLatestFrom(input.editingBusinessNumber)
+            .map { unformedNumber in
+                let formatted = AuthInOutStreamManager.formatBusinessNumber(businessNumber: unformedNumber)
+                return formatted
+            }
+        
+        let businessNumberValidationResult = requestingBusinessNumber
             .compactMap { $0 }
-            .flatMap { [weak self, input, inputValidationUseCase] _ in
+            .flatMap { [weak self, inputValidationUseCase] businessNumber in
                 
                 // 로딩 시작
                 self?.showLoading.onNext(())
                 
-                let businessNumber = input.editingBusinessNumber.value
-                let formatted = AuthInOutStreamManager.formatBusinessNumber(businessNumber: businessNumber)
-                printIfDebug("[CenterAccountRegisterViewModel] 사업자 번호 인증 요청: \(formatted)")
                 return inputValidationUseCase
-                    .requestBusinessNumberAuthentication(businessNumber: formatted)
+                    .requestBusinessNumberAuthentication(businessNumber: businessNumber)
             }
             .share()
         
@@ -251,9 +255,11 @@ extension CenterAccountRegisterViewModel {
             })
             .disposed(by: disposeBag)
         
-        
-        output.businessNumberVO = businessNumberValidationResult
+        let businessNumberValidationSuccess = businessNumberValidationResult
             .compactMap { $0.value }
+        
+        output.businessNumberVO = Observable
+            .combineLatest(requestingBusinessNumber, businessNumberValidationSuccess)
             .map { [stateObject] (businessNumber, infoVO) in
                 printIfDebug("✅ 사업자번호 검색 성공")
                 // 🚀 상태추적 🚀

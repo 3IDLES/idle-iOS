@@ -144,6 +144,8 @@ public class DefaultUserProfileRepository: UserProfileRepository {
     public func uploadImage(_ userType: UserType, imageInfo: ImageUploadInfo) -> Single<Result<Void, DomainError>> {
         
         let getPreSignedUrlResult = getPreSignedUrl(userType, ext: imageInfo.ext)
+            .asObservable()
+            .share()
         
         let getPreSignedUrlSuccess = getPreSignedUrlResult.compactMap { $0.value }
         let getPreSignedUrlFailure = getPreSignedUrlResult.compactMap { $0.error }
@@ -163,6 +165,7 @@ public class DefaultUserProfileRepository: UserProfileRepository {
                         }
                     }
             }
+            .share()
         
         let uploadImageToPreSignedUrlSuccess = uploadImageToPreSignedUrlResult.compactMap { $0.value }
         let uploadImageToPreSignedUrlFailure = uploadImageToPreSignedUrlResult.compactMap { $0.error }

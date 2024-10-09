@@ -19,19 +19,19 @@ public class DefaultAuthInputValidationRepository: AuthInputValidationRepository
     
     public init() { }
     
-    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<Void, DomainError>> {
+    public func requestPhoneNumberAuthentication(phoneNumber: String) -> Single<Result<String, DomainError>> {
         
         let dataTask = networkService
             .request(api: .startPhoneNumberAuth(phoneNumber: phoneNumber), with: .plain)
-            .mapToVoid()
+            .map { _ in phoneNumber }
         
         return convertToDomain(task: dataTask)
     }
     
-    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<Void, DomainError>> {
+    public func authenticateAuthNumber(phoneNumber: String, authNumber: String) -> Single<Result<String, DomainError>> {
         
         let dataTask = networkService.request(api: .checkAuthNumber(phoneNumber: phoneNumber, authNumber: authNumber), with: .plain)
-            .mapToVoid()
+            .map { _ in phoneNumber }
         
         return convertToDomain(task: dataTask)
     }

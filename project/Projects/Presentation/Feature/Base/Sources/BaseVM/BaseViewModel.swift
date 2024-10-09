@@ -50,7 +50,7 @@ open class BaseViewModel {
             .asDriver(onErrorDriveWith: .never())
     }
     
-    public func mapStartLoading<T>(_ target: Observable<T>) -> Observable<T> {
+    public func mapStartLoading<T: ObservableType>(_ target: T) -> Observable<T.Element> {
         
         target
             .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
@@ -62,7 +62,7 @@ open class BaseViewModel {
             }
     }
     
-    public func mapEndLoading<T>(_ target: Observable<T>) -> Observable<T> {
+    public func mapEndLoading<T: ObservableType>(_ target: T) -> Observable<T.Element> {
         
         target
             .map { [weak self] item in

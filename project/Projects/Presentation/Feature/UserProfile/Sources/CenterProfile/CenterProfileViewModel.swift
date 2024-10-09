@@ -33,7 +33,7 @@ protocol CenterProfileInputable {
     var editingFinishButtonPressed: PublishRelay<Void> { get }
     var editingPhoneNumber: BehaviorRelay<String> { get }
     var editingInstruction: BehaviorRelay<String> { get }
-    var selectedImage: PublishRelay<UIImage> { get }
+    var selectedImage: BehaviorRelay<UIImage?> { get }
     
     var exitButtonClicked: PublishRelay<Void> { get }
 }
@@ -73,7 +73,7 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     var editingFinishButtonPressed: PublishRelay<Void> = .init()
     var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
     var editingInstruction: BehaviorRelay<String> = .init(value: "")
-    var selectedImage: PublishRelay<UIImage> = .init()
+    var selectedImage: BehaviorRelay<UIImage?> = .init(value: nil)
     var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
     // 기본 데이터
@@ -84,6 +84,8 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     var centerIntroduction: Driver<String>?
     var displayingImage: Driver<UIImage?>?
     
+    var originalPhonenumber: String = ""
+    
     // 수정 상태 여부
     var isEditingMode: Driver<Bool>?
     
@@ -92,18 +94,6 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
     // Image
     private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
-    
-    func checkModification() -> (String?, String?, ImageUploadInfo?) {
-        
-        let phoneNumber = editingPhoneNumber.value
-        let instruction = editingInstruction.value
-        
-        return (
-            phoneNumber == fetchedPhoneNumber ? nil : phoneNumber,
-            instruction == fetchedIntroduction ? nil : instruction,
-            editingImageInfo
-        )
-    }
     
     init(mode: ProfileMode) {
         
@@ -115,18 +105,18 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         super.init()
         
         // MARK: fetch from server
-        let profileRequestResult = readyToFetch
+        let profileRequestResult = mapEndLoading(mapStartLoading(readyToFetch)
             .unretained(self)
             .flatMap { (obj, _) in
                 obj.profileUseCase.getProfile(mode: obj.mode)
-            }
+            })
             .share()
         
         let profileRequestSuccess = profileRequestResult
             .compactMap { $0.value }
             .share()
         
-        let profileRequestFailure = profileRequestResult
+        let profileRequestFailureAlert = profileRequestResult
             .compactMap { $0.error }
             .map { error in
                 DefaultAlertContentVO(
@@ -156,64 +146,72 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             .map { [weak self] in
                 let phoneNumber = $0.officeNumber
                 self?.fetchedPhoneNumber = phoneNumber
+                self?.originalPhonenumber = phoneNumber
                 return phoneNumber
             }
             .asDriver(onErrorJustReturn: "")
         
-        let fetchCenterImageInfo = profileRequestSuccess
+        let fetchCenterImageInfo = mapEndLoading(mapStartLoading(profileRequestSuccess)
             .compactMap { $0.profileImageInfo }
             .observe(on: imageDownLoadScheduler)
             .flatMap { [cacheRepository] downloadInfo in
                 cacheRepository
                     .getImage(imageInfo: downloadInfo)
-            }.map { image -> UIImage? in
-                image
-            }
+            }.map { image -> UIImage? in image })
         
         // MARK: image validation
-        let imageValidationResult = selectedImage
-            .map { [unowned self] image -> UIImage? in
-                guard let imageInfo = self.validateSelectedImage(image: image) else { return nil }
-                printIfDebug("✅ 업로드 가능한 이미지 타입 \(imageInfo.ext)")
-                self.editingImageInfo = imageInfo
-                return image
-            }
-            .share()
-        
-        let imageValidationFailure = imageValidationResult
-            .filter { $0 == nil }
-            .map { _ in
-                DefaultAlertContentVO(
-                    title: "이미지 선택 오류",
-                    message: "지원하지 않는 이미지 형식입니다."
-                )
-            }
-        
         let displayingImageDriver = Observable
             .merge(
                 fetchCenterImageInfo,
-                imageValidationResult
+                selectedImage.compactMap { $0 }
             )
             .asDriver(onErrorJustReturn: .init())
         
         
         // 최신 값들 + 버튼이 눌릴 경우 변경 로직이 실행된다.
-        let editingRequestResult = mapEndLoading(mapStartLoading(editingFinishButtonPressed.asObservable())
-            .map({ [unowned self] _ in
-                checkModification()
-            })
-            .flatMap { [profileUseCase, editingPhoneNumber] (inputs) in
-                
-                let (phoneNumber, introduction, imageInfo) = inputs
+        let checkImageSelectionResult = mapStartLoading(editingFinishButtonPressed)
+            .withLatestFrom(selectedImage)
+            .share()
+        
+        let imageSelected = checkImageSelectionResult.compactMap { $0 }
+        let imageDoesntSelected = checkImageSelectionResult
+            .filter { $0 == nil }
+            .map { _ -> ImageUploadInfo? in nil }
+        
+        let imageEncodingResult = imageSelected
+            .observe(on: ConcurrentDispatchQueueScheduler(qos: .userInitiated))
+            .map { image -> ImageUploadInfo? in
+                ImageUploadInfo.create(image: image)
+            }
+            .share()
+        
+        
+        let imageEcodingSuccess = imageEncodingResult.filter { $0 != nil }
+        let imageEcodingFailure = mapEndLoading(imageEncodingResult.filter { $0 == nil })
+        
+        let imageEncodingFailureAlert = imageEcodingFailure.map { _ in
+            DefaultAlertContentVO(
+                title: "이미지 선택 오류",
+                message: "지원하지 않는 이미지 형식입니다."
+            )
+        }
+        
+        let imageProcessingFinishWithSuccess = Observable.merge(imageEcodingSuccess, imageDoesntSelected)
+        
+        
+        let editingRequestResult = mapEndLoading(imageProcessingFinishWithSuccess
+            .unretained(self)
+            .flatMap { (obj, imageInfo) in
+                let (phoneNumber, introduction) = obj.checkTextInputModification()
                 
                 // 변경이 발생하지 않은 곳은 nil값이 전달된다.
                 if let _ = phoneNumber { printIfDebug("✅ 전화번호 변경되었음") }
                 if let _ = introduction { printIfDebug("✅ 센터소개 변경되었음") }
                 if let _ = imageInfo { printIfDebug("✅ 센터 이미지 변경되었음") }
                 
-                // 전화번호는 무조건 포함시켜야 함으로 아래와 같이 포함합니다.
-                return profileUseCase.updateProfile(
-                    phoneNumber: phoneNumber ?? editingPhoneNumber.value,
+                // 전화번호는 무조건 포함시켜야 함으로 변경이 발생하지 않더라도 아래와 같이 포함합니다.
+                return obj.profileUseCase.updateProfile(
+                    phoneNumber: phoneNumber ?? obj.originalPhonenumber,
                     introduction: introduction,
                     imageInfo: imageInfo
                 )
@@ -233,7 +231,7 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             }
             .asDriver(onErrorJustReturn: ())
         
-        let editingRequestFailure = editingRequestResult
+        let editingRequestFailureAlert = editingRequestResult
             .compactMap({ $0.error })
             .map({ error in
                 // 변경 실패 Alert
@@ -272,9 +270,9 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         
         Observable
             .merge(
-                profileRequestFailure,
-                editingRequestFailure,
-                imageValidationFailure
+                profileRequestFailureAlert,
+                editingRequestFailureAlert,
+                imageEncodingFailureAlert
             )
             .subscribe(self.alert)
             .disposed(by: disposeBag)
@@ -296,7 +294,14 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         self.editingValidation = editingValidation
     }
     
-    func validateSelectedImage(image: UIImage) -> ImageUploadInfo? {
-        .create(image: image)
+    func checkTextInputModification() -> (String?, String?) {
+        
+        let phoneNumber = editingPhoneNumber.value
+        let instruction = editingInstruction.value
+        
+        return (
+            phoneNumber == fetchedPhoneNumber ? nil : phoneNumber,
+            instruction == fetchedIntroduction ? nil : instruction
+        )
     }
 }
