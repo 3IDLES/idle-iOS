@@ -41,15 +41,13 @@
     
 <tr>
 <td><b>센터관리자 공고 마감/삭제</b></td>
-<td></td>
+<td><b>공고 지원자 알림</b></td>
 <td></td>
 </tr>
 
 <tr>
-<td>
-<img src="https://github.com/user-attachments/assets/247ea098-afc7-47ea-9707-ed0ddc856909" width=300/>    
-</td>
-<td></td>
+<td><img src="https://github.com/user-attachments/assets/247ea098-afc7-47ea-9707-ed0ddc856909" width=300/></td>
+<td><img src="https://github.com/user-attachments/assets/ef8dcd9f-fbc4-4c76-adfc-39fcc6a762d6" width=300/></td>
 <td></td>
 </tr> 
 
