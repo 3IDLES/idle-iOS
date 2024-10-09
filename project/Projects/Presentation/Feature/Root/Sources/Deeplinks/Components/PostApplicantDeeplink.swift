@@ -1,5 +1,5 @@
 //
-//  PostApplicantDeepLink.swift
+//  PostApplicantDeeplink.swift
 //  RootFeature
 //
 //  Created by choijunios on 10/9/24.
@@ -9,23 +9,23 @@ import Foundation
 import CenterMainPageFeature
 import BaseFeature
 
-class PostApplicantDeepLink: DeepLinkExecutable {
+class PostApplicantDeeplink: DeeplinkExecutable {
     
     var name: String = "PostApplicantPage"
     
-    var children: [DeepLinkExecutable] = []
+    var children: [DeeplinkExecutable] = []
     
     var isDestination: Bool = false
     
     init() { }
     
-    func execute(with coordinator: Coordinator, userInfo: [String : String]?) -> Coordinator? {
+    func execute(with coordinator: any BaseFeature.Coordinator, userInfo: [AnyHashable : Any]?) -> Coordinator? {
         
         guard let centerMainPageCoordinator = coordinator as? CenterMainPageCoordinator else {
             return nil
         }
         
-        guard let postId = userInfo?["postId"] else { return nil }
+        guard let postId = userInfo?["postId"] as? String else { return nil }
         
         centerMainPageCoordinator.presentPostApplicantPage(postId: postId)
         

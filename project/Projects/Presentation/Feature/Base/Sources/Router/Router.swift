@@ -190,25 +190,15 @@ public final class Router: NSObject, RouterProtocol {
         self.rootController = navigationController
         
         if let willReplacedModule = keyWindow.rootViewController {
-            
+            // 이미 키윈도우가 존재했던 경우 dismissCompletion실행
             let pointer = willReplacedModule.getRawPointer
             completion[pointer]?()
             completion.removeValue(forKey: pointer)
         }
         
-        if !animated {
-            // 애니메이션이 없는 경우
-            setRootModuleTo(module: module)
-            completion[module.getRawPointer] = dismissCompletion
-            return
-        }
-        
-        if let snapshot = keyWindow.snapshotView(afterScreenUpdates: true) {
+        if animated, let snapshot = keyWindow.snapshotView(afterScreenUpdates: true) {
             
             module.view.addSubview(snapshot)
-            keyWindow.rootViewController = navigationController
-            
-            completion[navigationController.getRawPointer] = dismissCompletion
             
             UIView.animate(withDuration: 0.35, animations: {
                 snapshot.layer.opacity = 0
@@ -216,6 +206,10 @@ public final class Router: NSObject, RouterProtocol {
                 snapshot.removeFromSuperview()
             })
         }
+        
+        keyWindow.rootViewController = navigationController
+        keyWindow.makeKeyAndVisible()
+        completion[navigationController.getRawPointer] = dismissCompletion
     }
     
     public func setRootModuleTo(module: Module, popCompletion: RoutingCompletion? = nil) {

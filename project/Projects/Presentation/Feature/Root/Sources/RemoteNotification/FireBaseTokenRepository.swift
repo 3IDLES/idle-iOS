@@ -7,6 +7,7 @@
 
 import Foundation
 import Domain
+import Core
 
 
 import FirebaseMessaging
@@ -31,7 +32,7 @@ extension FCMTokenRepository: MessagingDelegate {
     public func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         
         if let fcmToken {
-            
+            printIfDebug(fcmToken)
             delegate?.notificationToken(freshToken: fcmToken)
         }
     }
