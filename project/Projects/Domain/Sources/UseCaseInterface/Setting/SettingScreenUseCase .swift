@@ -10,20 +10,8 @@ import Foundation
 
 import RxSwift
 
-public enum NotificationApproveAction: Equatable {
-    case openSystemSetting
-    case granted
-    case error(message: String)
-}
-
 public protocol SettingScreenUseCase: BaseUseCase {
-    
-    /// 현재 알람수신 동의 여부를 확인합니다.
-    func checkPushNotificationApproved() -> Single<Bool>
-    
-    /// 알림동의를 요청합니다.
-    func requestNotificationPermission() -> Maybe<NotificationApproveAction>
-    
+
     // MARK: Worker
     
     /// 요양보호사 회원 탈퇴
