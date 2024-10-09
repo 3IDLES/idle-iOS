@@ -6,11 +6,11 @@
 //
 
 import UIKit
+import UserNotifications
 import BaseFeature
 import PresentationCore
 import Domain
 import DSKit
-import UserNotifications
 import Core
 
 
@@ -54,16 +54,16 @@ class SettingPageViewModel: BaseViewModel {
         )
         
         let currentNotificationAuthStatus = refreshNotificationStatusRequest
-            .flatMap { [settingUseCase] _ in
-                settingUseCase.checkPushNotificationApproved()
+            .flatMap { _ in
+                RemoteNotificationAuthHelper.shared.checkPushNotificationApproved()
             }
         
         let requestApproveNotification = approveToPushNotification.filter { $0 }.map { _ in () }
         let requestDenyNotification = approveToPushNotification.filter { !$0 }.map { _ in () }
         
         let approveRequestResult = requestApproveNotification
-            .flatMap { [settingUseCase] _ in
-                settingUseCase
+            .flatMap { _ in
+                RemoteNotificationAuthHelper.shared
                     .requestNotificationPermission()
             }
             

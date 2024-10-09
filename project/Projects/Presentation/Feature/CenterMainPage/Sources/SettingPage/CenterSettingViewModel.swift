@@ -75,17 +75,16 @@ class CenterSettingViewModel: BaseViewModel, CenterSettingVMable {
         )
         
         let currentNotificationAuthStatus = refreshNotificationStatusRequest
-            .flatMap { [settingUseCase] _ in
-                settingUseCase.checkPushNotificationApproved()
+            .flatMap { _ in
+                RemoteNotificationAuthHelper.shared.checkPushNotificationApproved()
             }
         
         let requestApproveNotification = approveToPushNotification.filter { $0 }.map { _ in () }
         let requestDenyNotification = approveToPushNotification.filter { !$0 }.map { _ in () }
         
         let approveRequestResult = requestApproveNotification
-            .flatMap { [settingUseCase] _ in
-                settingUseCase
-                    .requestNotificationPermission()
+            .flatMap { _ in
+                RemoteNotificationAuthHelper.shared.requestNotificationPermission()
             }
             
         let approveGranted = approveRequestResult.filter { $0 == .granted }
