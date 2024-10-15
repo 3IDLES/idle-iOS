@@ -17,6 +17,7 @@ public enum APIType {
     case external(url: String)
     case applys
     case notificationToken
+    case notifications
 }
 
 // MARK: BaseAPI
@@ -46,6 +47,8 @@ public extension BaseAPI {
             baseStr = url
         case .notificationToken:
             baseStr += "/fcm"
+        case .notifications:
+            baseStr += "/notifications"
         }
         
         return URL(string: baseStr)!
