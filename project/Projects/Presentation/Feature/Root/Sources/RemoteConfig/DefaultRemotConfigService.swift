@@ -58,21 +58,4 @@ public class DefaultRemoteConfigService: RemoteConfigService {
         
         return remoteConfig[key].boolValue
     }
-    
-    public func getForceUpdateInfo() -> ForceUpdateInfo? {
-        let jsonData = remoteConfig["forceUpdate_iOS"].jsonValue
-        
-        if let jsonData {
-            
-            do {
-                let data = try JSONSerialization.data(withJSONObject: jsonData)
-                let decoded = try JSONDecoder().decode(ForceUpdateInfo.self, from: data)
-                return decoded
-            } catch {
-                
-                return nil
-            }
-        }
-        return nil
-    }
 }

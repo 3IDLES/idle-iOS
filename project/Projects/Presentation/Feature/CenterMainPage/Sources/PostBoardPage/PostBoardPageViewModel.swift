@@ -18,29 +18,48 @@ import RxCocoa
 import RxSwift
 
 
-typealias CenterRecruitmentPostBoardViewModelable = OnGoingPostViewModelable & ClosedPostViewModelable
+protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelable & ClosedPostViewModelable {
+    
+    /// ‼️임시조치: 알림 확인창 오픈 여부를 설정합니다.
+    var showNotificationButton: Bool { get }
+}
 
 class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModelable {
     
     // Injected
     @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
+    @Injected var remoteConfigService: RemoteConfigService
     
     // Navigation
     var presentRegisterPostPage: (() -> ())?
     var presentSnackBar: ((IdleSnackBarRO, CGFloat) -> ())?
     var createPostCellViewModel: ((RecruitmentPostInfoForCenterVO, PostState) -> CenterEmployCardViewModelable)!
 
+    // Input
     var requestOngoingPost: PublishRelay<Void> = .init()
     var requestClosedPost: PublishRelay<Void> = .init()
     var registerPostButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
+    // Output
     var ongoingPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
     var closedPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
     var showRemovePostAlert: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
     
+    var showNotificationButton: Bool = false
+    
     public override init() {
         
         super.init()
+        
+        // Notification버튼 활성화 여부
+        do {
+            let value = try remoteConfigService.getBoolProperty(key: "show_notification_button")
+            self.showNotificationButton = value
+        } catch {
+            fatalError(error.localizedDescription)
+        }
+        // -----------------------------------------------
+        
         
         let requestOngoingPostResult = requestOngoingPost
             .flatMap { [weak self, recruitmentPostUseCase] _ in
