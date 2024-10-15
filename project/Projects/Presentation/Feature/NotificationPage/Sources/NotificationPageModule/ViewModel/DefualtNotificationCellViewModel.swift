@@ -16,13 +16,18 @@ import RxSwift
 import RxCocoa
 
 
-class NotificationCellViewModel: NotificationCellViewModelable {
+class NotificationCellViewModel {
     
+    // Injected
     @Injected var cacheRepository: CacheRepository
+    @Injected var notificationsRepository: NotificationsRepository
     
-    let cellInfo: NotificationCellInfo
+    // Navigation
+    var presentAlert: ((DefaultAlertContentVO) -> ())?
     
-    // Inout
+    let notificationVO: NotificationVO
+    
+    // Input
     var cellClicked: PublishSubject<Void> = .init()
     
     // Output
@@ -31,36 +36,61 @@ class NotificationCellViewModel: NotificationCellViewModelable {
     
     let disposeBag: DisposeBag = .init()
     
-    init(cellInfo: NotificationCellInfo) {
-        self.cellInfo = cellInfo
+    init(notificationVO: NotificationVO) {
+        self.notificationVO = notificationVO
         
-        let isReadSubject = BehaviorSubject(value: cellInfo.isRead)
+        let isReadSubject = BehaviorSubject(value: notificationVO.isRead)
         
         // MARK: 읽음 정보
         isRead = isReadSubject
             .asDriver(onErrorDriveWith: .never())
         
         // MARK: 프로필 이미지
-        profileImage = cacheRepository
-            .getImage(imageInfo: cellInfo.imageInfo)
-            .asDriver(onErrorDriveWith: .never())
+        
+        if let imageDownloadInfo = notificationVO.imageDownloadInfo {
+            profileImage = cacheRepository
+                .getImage(imageInfo: imageDownloadInfo)
+                .asDriver(onErrorDriveWith: .never())
+        }
         
         // MARK: 클릭 이벤트
-        cellClicked
-            .subscribe(onNext: { [isReadSubject] _ in
+        let readRequestResult = cellClicked
+            .unretained(self)
+            .flatMap { (obj, _) in
                 
-                // 읽음 처리
-                isReadSubject.onNext(true)
+                let notificationId = obj.notificationVO.id
                 
-                // 알림 디테일로 이동
-                let _ = cellInfo.id
+                return obj.notificationsRepository
+                    .readNotification(id: notificationId)
+            }
+            .share()
+        
+        let readRequestSuccess = readRequestResult.compactMap { $0.value }
+        let readRequestFailure = readRequestResult.compactMap { $0.error }
+        
+        // 읽음 처리
+        readRequestSuccess
+            .map({ _ in true })
+            .bind(to: isReadSubject)
+            .disposed(by: disposeBag)
+        
+        // 읽기 실패
+        readRequestFailure
+            .unretained(self)
+            .subscribe(onNext: { (obj, error) in
+                let alertVO = DefaultAlertContentVO(
+                    title: "알림 확인 실패",
+                    message: error.message
+                )
+                
+                obj.presentAlert?(alertVO)
             })
             .disposed(by: disposeBag)
     }
     
     func getTimeText() -> String {
         
-        let diff = Date.now.timeIntervalSince(cellInfo.notificationDate)
+        let diff = Date.now.timeIntervalSince(notificationVO.createdDate)
         
         switch diff {
         case 0..<60:

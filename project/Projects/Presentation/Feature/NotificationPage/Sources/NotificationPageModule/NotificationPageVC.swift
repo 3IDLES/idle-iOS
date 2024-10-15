@@ -16,19 +16,19 @@ import RxSwift
 import RxCocoa
 
 
-public protocol NotificationPageViewModelable: BaseViewModel {
+protocol NotificationPageViewModelable: BaseViewModel {
     
     // Input
     var viewWillAppear: PublishSubject<Void> { get }
     
     // Output
-    var tableData: Driver<[SectionInfo: [NotificationCellInfo]]>? { get }
+    var tableData: Driver<[SectionInfo: [NotificationVO]]>? { get }
     
     /// Cell ViewModel생성
-    func createCellVM(info: NotificationCellInfo) -> NotificationCellViewModelable
+    func createCellVM(vo: NotificationVO) -> NotificationCellViewModel
 }
 
-public enum SectionInfo: Int, CaseIterable {
+enum SectionInfo: Int, CaseIterable {
     case today
     case week
     case month
@@ -46,7 +46,7 @@ public enum SectionInfo: Int, CaseIterable {
 }
 
 
-public class NotificationPageVC: BaseViewController {
+class NotificationPageVC: BaseViewController {
     
     typealias Cell = NotificationCell
     
@@ -54,7 +54,7 @@ public class NotificationPageVC: BaseViewController {
     
     
     // Table Data
-    private var tableData: [SectionInfo: [NotificationCellInfo]] = [:]
+    private var tableData: [SectionInfo: [NotificationVO]] = [:]
     
     // View
     let navigationBar: IdleNavigationBar = {
@@ -68,7 +68,7 @@ public class NotificationPageVC: BaseViewController {
         return tableView
     }()
     
-    public init(viewModel: NotificationPageViewModelable) {
+    init(viewModel: NotificationPageViewModelable) {
         super.init(nibName: nil, bundle: nil)
         
         bindViewModel(viewModel: viewModel)
@@ -76,7 +76,7 @@ public class NotificationPageVC: BaseViewController {
         setUpTableView()
     }
     
-    public required init?(coder: NSCoder) { fatalError() }
+    required init?(coder: NSCoder) { fatalError() }
     
     private func setUpTableView() {
         
@@ -86,10 +86,14 @@ public class NotificationPageVC: BaseViewController {
             guard let self else { return Cell() }
             
             let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as! Cell
-            let vm = (viewModel as! NotificationPageViewModelable)
+            
+            let viewModel = (viewModel as! NotificationPageViewModelable)
+            
             let section = SectionInfo(rawValue: indexPath.section)!
-            let cellInfo = self.tableData[section]![indexPath.row]
-            let cellViewModel = vm.createCellVM(info: cellInfo)
+            
+            let notificationVO = self.tableData[section]![indexPath.row]
+            
+            let cellViewModel = viewModel.createCellVM(vo: notificationVO)
             
             cell.selectionStyle = .none
             cell.bind(viewModel: cellViewModel)
@@ -106,7 +110,7 @@ public class NotificationPageVC: BaseViewController {
         tableView.register(Cell.self, forCellReuseIdentifier: Cell.identifier)
     }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         setAppearance()
         setLayout()
@@ -177,22 +181,22 @@ public class NotificationPageVC: BaseViewController {
 // MARK: Header
 extension NotificationPageVC: UITableViewDelegate {
     
-    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let titleText = SectionInfo(rawValue: section)!
         return NotificationSectionHeader(titleText: titleText.korTwoLetterName)
     }
     
-    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         52
     }
     
-    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         let footerView = UIView()
         footerView.backgroundColor = DSColor.gray050.color
         return footerView
     }
     
-    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         switch section {
         case tableView.numberOfSections-1:
             return 0

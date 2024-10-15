@@ -50,6 +50,9 @@ protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable {
     
     /// 요양보호사 위치 정보를 전달합니다.
     var workerLocationTitleText: Driver<String>? { get }
+    
+    /// ‼️임시조치: 알림 확인창 오픈 여부를 설정합니다.
+    var showNotificationButton: Driver<Bool>? { get }
 }
 
 class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
@@ -66,6 +69,7 @@ class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
     var postBoardData: Driver<(isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])>?
     var workerLocationTitleText: Driver<String>?
     var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
+    var showNotificationButton: Driver<Bool>?
     
     
     // Input

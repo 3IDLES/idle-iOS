@@ -12,26 +12,11 @@ import DSKit
 import RxCocoa
 import RxSwift
 
-
-public protocol NotificationCellViewModelable {
-    
-    var cellInfo: NotificationCellInfo { get }
-    
-    // Input
-    var cellClicked: PublishSubject<Void> { get }
-    
-    // Output
-    var isRead: Driver<Bool>? { get }
-    var profileImage: Driver<UIImage>? { get }
-    
-    func getTimeText() -> String
-}
-
 class NotificationCell: UITableViewCell {
     
     static let identifier: String = .init(describing: NotificationCell.self)
     
-    var viewModel: NotificationCellViewModelable?
+    var viewModel: NotificationCellViewModel?
     var disposables: [Disposable?] = []
     
     let profileImageView: UIImageView = {
@@ -134,16 +119,16 @@ class NotificationCell: UITableViewCell {
         tap.onNext(())
     }
     
-    func bind(viewModel: NotificationCellViewModelable) {
+    func bind(viewModel: NotificationCellViewModel) {
         
         self.viewModel = viewModel
         
         // Render
-        let cellInfo = viewModel.cellInfo
+        let notificationVO = viewModel.notificationVO
         
         timeLabel.textString = viewModel.getTimeText()
-        titleLabel.textString = cellInfo.titleText
-        subTitleLabel.textString = cellInfo.subTitleText
+        titleLabel.textString = notificationVO.title
+        subTitleLabel.textString = notificationVO.body
         
         // Reactive
         disposables = [

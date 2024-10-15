@@ -15,14 +15,18 @@ import Core
 import RxSwift
 import RxCocoa
 
-public class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
+class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     
+    // Injected
     @Injected var notificationsRepository: NotificationsRepository
     
-    public var viewWillAppear: PublishSubject<Void> = .init()
-    public var tableData: Driver<[SectionInfo : [NotificationCellInfo]]>?
+    // Navigation
+    var presentAlert: ((DefaultAlertContentVO) -> ())?
     
-    public override init() {
+    var viewWillAppear: PublishSubject<Void> = .init()
+    var tableData: Driver<[SectionInfo : [NotificationVO]]>?
+    
+    override init() {
         super.init()
         
         let fetchResult = viewWillAppear
@@ -55,38 +59,42 @@ public class NotificationPageViewModel: BaseViewModel, NotificationPageViewModel
                     lhs.createdDate < rhs.createdDate
                 }
                 
-                var dict: [SectionInfo: [NotificationCellInfo]] = [:]
+                var dict: [SectionInfo: [NotificationVO]] = [:]
                 
-//                for item in sortedInfo {
-//                    let diffSeconds = Date.now.timeIntervalSince(item.createdDate)
-//                    let diffDate = diffSeconds / (60 * 60 * 24)
-//                    var section: SectionInfo!
-//                    
-//                    switch diffDate {
-//                        case 0...1:
-//                            section = .today
-//                        case 1...7:
-//                            section = .week
-//                        case 8...30:
-//                            section = .month
-//                        default:
-//                            continue
-//                    }
-//                    
-//                    if dict[section] != nil {
-//                        dict[section]!.append(item)
-//                    } else {
-//                        dict[section] = [item]
-//                    }
-//                }
-//                
+                for item in sortedInfo {
+                    let diffSeconds = Date.now.timeIntervalSince(item.createdDate)
+                    let diffDate = diffSeconds / (60 * 60 * 24)
+                    var section: SectionInfo!
+                    
+                    switch diffDate {
+                        case 0...1:
+                            section = .today
+                        case 1...7:
+                            section = .week
+                        case 8...30:
+                            section = .month
+                        default:
+                            continue
+                    }
+                    
+                    if dict[section] != nil {
+                        dict[section]!.append(item)
+                    } else {
+                        dict[section] = [item]
+                    }
+                }
+                
                 return dict
             }
             .asDriver(onErrorDriveWith: .never())
     }
     
-    public func createCellVM(info: NotificationCellInfo) -> NotificationCellViewModelable {
+    func createCellVM(vo: NotificationVO) -> NotificationCellViewModel {
         
-        NotificationCellViewModel(cellInfo: info)
+        let cellViewModel = NotificationCellViewModel(notificationVO: vo)
+        
+        cellViewModel.presentAlert = self.presentAlert
+        
+        return cellViewModel
     }
 }
