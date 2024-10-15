@@ -7,6 +7,7 @@
 
 import Foundation
 import Domain
+import Core
 
 
 import RxSwift
@@ -16,11 +17,9 @@ import RxMoya
 
 public class BaseNetworkService<TagetAPI: BaseAPI> {
     
-    public let keyValueStore: KeyValueStore
+    @Injected var keyValueStore: KeyValueStore
     
-    init(keyValueStore: KeyValueStore = KeyChainList.shared) {
-        self.keyValueStore = keyValueStore
-    }
+    init() { }
         
     private lazy var providerWithToken: MoyaProvider<TagetAPI> = {
         

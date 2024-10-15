@@ -8,11 +8,14 @@
 import Foundation
 import Domain
 import DataSource
+import Core
 
 
 import RxSwift
 
 public class DefaultAuthRepository: AuthRepository {
+    
+    @Injected var keyValueStore: KeyValueStore
     
     let networkService = AuthService()
     
@@ -158,17 +161,16 @@ public extension DefaultAuthRepository {
 // MARK: Token management
 extension DefaultAuthRepository {
     
-    private func saveTokenToStore(token: TokenDTO) -> Single<Void>{
+    private func saveTokenToStore(token: TokenDTO) -> Single<Void> {
         
-        if let accessToken = token.accessToken, let refreshToken = token.refreshToken {
-            
-            if let _ = try? networkService.keyValueStore.saveAuthToken(
-                accessToken: accessToken,
-                refreshToken: refreshToken
-            ) {
-                return .just(())
-            }
+        guard let accessToken = token.accessToken, let refreshToken = token.refreshToken else {
+            return .error(KeyValueStoreError.tokenSavingFailure)
         }
-        return .error(KeyValueStoreError.tokenSavingFailure)
+        do {
+            try keyValueStore.saveAuthToken(accessToken: accessToken, refreshToken: refreshToken)
+            return .just(())
+        } catch {
+            return .error(KeyValueStoreError.tokenSavingFailure)
+        }
     }
 }

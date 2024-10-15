@@ -9,9 +9,5 @@ import Foundation
 
 public class RecruitmentPostService: BaseNetworkService<RcruitmentPostAPI> {
     
-    public init() { }
-    
-    public override init(keyValueStore: KeyValueStore) {
-        super.init(keyValueStore: keyValueStore)
-    }
+    public override init() { }
 }
