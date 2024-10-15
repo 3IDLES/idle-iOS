@@ -21,6 +21,7 @@ public class DefaultRemoteConfigService: RemoteConfigService {
     
     public init() {
         let settings = RemoteConfigSettings()
+        settings.minimumFetchInterval = 0
         remoteConfig.configSettings = settings
     }
     
@@ -28,14 +29,8 @@ public class DefaultRemoteConfigService: RemoteConfigService {
         
         Single.create { [weak self] single in
             
-            self?.remoteConfig.fetch { status, error in
-                
-                if status == .success {
-                    self?.remoteConfig.activate()
-                    single(.success(.success(true)))
-                } else {
-                    single(.success(.success(false)))
-                }
+            self?.remoteConfig.fetchAndActivate { status, error in
+                single(.success(.success(status != .error)))
             }
             
             return Disposables.create { }
