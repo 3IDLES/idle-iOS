@@ -17,5 +17,5 @@ public protocol NotificationsRepository: RepositoryBase {
     
     func unreadNotificationCount() -> Sult<Int, DomainError>
     
-    func notifcationList() -> Sult<NotificationVO, DomainError>
+    func notifcationList() -> Sult<[NotificationVO], DomainError>
 }
