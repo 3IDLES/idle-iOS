@@ -14,8 +14,6 @@ import Core
 
 
 import RxSwift
-import FirebaseCrashlytics
-import FirebaseRemoteConfig
 
 public enum SplashCoordinatorDestination {
     case authPage
@@ -32,6 +30,7 @@ public class SplashCoordinator: BaseCoordinator {
     @Injected var centerProfileUseCase: CenterProfileUseCase
     @Injected var userInfoLocalRepository: UserInfoLocalRepository
     @Injected var router: RouterProtocol
+    @Injected var remoteConfig: RemoteConfigService
     
     public var startFlow: ((SplashCoordinatorDestination) -> ())!
     
@@ -187,23 +186,24 @@ private extension SplashCoordinator {
     func checkForceUpdateFlow() {
         
         let passForceUpdate = networkCheckingPassed
-            .flatMap({ _ in
-                RemoteConfigService.shared.fetchRemoteConfig()
+            .unretained(self)
+            .flatMap({ (obj, _) in
+                obj.remoteConfig.fetchRemoteConfig()
             })
             .compactMap { $0.value }
-            .map { isConfigFetched in
+            .unretained(self)
+            .map { (obj, isConfigFetched) in
                 
                 if !isConfigFetched {
-                    Crashlytics.crashlytics().log("Remote Config fetch실패")
+                    
                 }
                 
-                guard let config = RemoteConfigService.shared.getForceUpdateInfo() else {
-                    // ‼️ Config로딩 불가시 크래쉬
-                    Crashlytics.crashlytics().log("Remote Config획득 실패")
-                    fatalError("Remote Config fetching에러")
+                do {
+                    let config: ForceUpdateInfo = try obj.remoteConfig.getJSONProperty(key: "forceUpdate_iOS")
+                    return config
+                } catch {
+                    fatalError(error.localizedDescription)
                 }
-                
-                return config
             }
             .map { info in
                 

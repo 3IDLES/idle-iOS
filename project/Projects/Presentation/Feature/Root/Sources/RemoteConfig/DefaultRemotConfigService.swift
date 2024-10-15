@@ -1,23 +1,26 @@
 //
-//  RemoteConfigService.swift
-//  SplashFeature
+//  DefaultRemotConfigService.swift
+//  RootFeature
 //
-//  Created by choijunios on 9/29/24.
+//  Created by choijunios on 10/15/24.
 //
 
 import Foundation
-import FirebaseRemoteConfig
-import RxSwift
+import BaseFeature
 import Domain
 
-public class RemoteConfigService {
+
+import FirebaseRemoteConfig
+import RxSwift
+
+
+public class DefaultRemoteConfigService: RemoteConfigService {
     
-    static let shared: RemoteConfigService = .init()
-    
+    // Fetch된 이후 캐싱된다.
     private let remoteConfig = RemoteConfig.remoteConfig()
-    private let settings = RemoteConfigSettings()
     
-    private init() {
+    public init() {
+        let settings = RemoteConfigSettings()
         remoteConfig.configSettings = settings
     }
     
@@ -37,6 +40,23 @@ public class RemoteConfigService {
             
             return Disposables.create { }
         }
+    }
+    
+    public func getJSONProperty<T: Decodable>(key: String) throws -> T {
+        
+        guard let jsonData = remoteConfig[key].jsonValue else {
+            throw RemoteConfigError.keyDoesntExist(key: key)
+        }
+        
+        let data = try JSONSerialization.data(withJSONObject: jsonData)
+        let decoded = try JSONDecoder().decode(T.self, from: data)
+        
+        return decoded
+    }
+    
+    public func getBoolProperty(key: String) throws -> Bool {
+        
+        return remoteConfig[key].boolValue
     }
     
     public func getForceUpdateInfo() -> ForceUpdateInfo? {

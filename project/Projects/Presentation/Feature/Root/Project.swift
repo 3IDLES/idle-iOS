@@ -45,6 +45,8 @@ let project = Project(
                 // ThirParty
                 D.ThirdParty.Amplitude,
                 D.ThirdParty.FirebaseMessaging,
+                D.ThirdParty.FirebaseRemoteConfig,
+                D.ThirdParty.FirebaseCrashlytics
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

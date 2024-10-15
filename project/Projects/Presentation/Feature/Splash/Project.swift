@@ -29,10 +29,6 @@ let project = Project(
             dependencies: [
                 // Presentation
                 D.Presentation.BaseFeature,
-                
-                // ThirdParty
-                D.ThirdParty.FirebaseRemoteConfig,
-                D.ThirdParty.FirebaseCrashlytics,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
