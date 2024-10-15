@@ -14,7 +14,7 @@ public struct NotificationVO {
     public let title: String
     public let body: String
     public let createdDate: Date
-    public let imageUrl: URL?
+    public let imageDownloadInfo: ImageDownLoadInfo?
     public let notificationDetails: NotificationDetailVO?
     
     public init(
@@ -23,7 +23,7 @@ public struct NotificationVO {
         title: String,
         body: String,
         createdDate: Date,
-        imageUrl: URL?,
+        imageDownloadInfo: ImageDownLoadInfo?,
         notificationDetails: NotificationDetailVO?
     ) {
         self.id = id
@@ -31,7 +31,7 @@ public struct NotificationVO {
         self.title = title
         self.body = body
         self.createdDate = createdDate
-        self.imageUrl = imageUrl
+        self.imageDownloadInfo = imageDownloadInfo
         self.notificationDetails = notificationDetails
     }
 }

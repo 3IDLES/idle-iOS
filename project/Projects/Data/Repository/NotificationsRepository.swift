@@ -62,11 +62,6 @@ extension NotificationItemDTO: EntityRepresentable {
             printIfDebug("\(NotificationItemDTO.self): 생성날짜 디코딩 실패")
         }
         
-        var imageURL: URL?
-        if let imageUrlString, let url = URL(string: imageUrlString) {
-            imageURL = url
-        }
-        
         var notificationDetail: NotificationDetailVO?
         switch notificationType {
             case .APPLICANT:
@@ -75,13 +70,20 @@ extension NotificationItemDTO: EntityRepresentable {
                 }
         }
         
+        var imageDownloadInfo: ImageDownLoadInfo?
+        
+        if let imageUrlString {
+            
+            imageDownloadInfo = .parseURL(string: imageUrlString)
+        }
+        
         return NotificationVO(
             id: id,
             isRead: isRead,
             title: title,
             body: body,
             createdDate: createdDate,
-            imageUrl: imageURL,
+            imageDownloadInfo: imageDownloadInfo,
             notificationDetails: notificationDetail
         )
     }
