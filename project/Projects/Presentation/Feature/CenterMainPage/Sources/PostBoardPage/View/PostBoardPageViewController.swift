@@ -49,9 +49,9 @@ class PostBoardPageViewController: BaseViewController {
     // Init
     
     // View
-    let titleLabel: IdleLabel = {
-        let label = IdleLabel(typography: .Heading1)
-        label.textString = "공고 관리"
+    let topView: CenterMainPageTopView = {
+        let label = CenterMainPageTopView()
+        label.titleLabel.textString = "공고 관리"
         return label
     }()
     
@@ -80,7 +80,7 @@ class PostBoardPageViewController: BaseViewController {
     
     private func setLayout() {
         [
-            titleLabel,
+            topView,
             tabBar,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -88,10 +88,11 @@ class PostBoardPageViewController: BaseViewController {
         }
         
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
-            titleLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+            topView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            topView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            topView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             
-            tabBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            tabBar.topAnchor.constraint(equalTo: topView.bottomAnchor),
             tabBar.leftAnchor.constraint(equalTo: view.leftAnchor),
             tabBar.rightAnchor.constraint(equalTo: view.rightAnchor),
         ])
@@ -160,6 +161,9 @@ class PostBoardPageViewController: BaseViewController {
     func bind(viewModel: CenterRecruitmentPostBoardViewModelable) {
         
         super.bind(viewModel: viewModel)
+        
+        // 임시 설정
+        topView.notificationPageButton.isHidden = !viewModel.showNotificationButton
     
         (viewControllerDict[.onGoingPost] as? OnGoingPostVC)?.bind(viewModel: viewModel)
         (viewControllerDict[.closedPost] as? ClosedPostVC)?.bind(viewModel: viewModel)
