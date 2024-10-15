@@ -34,9 +34,15 @@ public class DefaultNotificationsRepository: NotificationsRepository {
         return convertToDomain(task: dataTask)
     }
     
-    public func notifcationList() -> Sult<NotificationVO, DomainError> {
+    public func notifcationList() -> Sult<[NotificationVO], DomainError> {
         let dataTask = service.request(api: .allNotifications, with: .withToken)
-            .mapToEntity(NotificationItemDTO.self)
+            .map { response in
+                let data = response.data
+                let decoded = try JSONDecoder().decode([NotificationItemDTO].self, from: data)
+                return decoded.map { dto in
+                    dto.toEntity()
+                }
+            }
         return convertToDomain(task: dataTask)
     }
 }
@@ -52,6 +58,7 @@ extension NotificationItemDTO: EntityRepresentable {
         
         if let formatted = dateFormatter.date(from: createdAt) {
             createdDate = formatted
+        } else {
             printIfDebug("\(NotificationItemDTO.self): 생성날짜 디코딩 실패")
         }
         
@@ -62,10 +69,10 @@ extension NotificationItemDTO: EntityRepresentable {
         
         var notificationDetail: NotificationDetailVO?
         switch notificationType {
-        case .APPLICANT:
-            if let postId = (notificationDetails as? ApplicantInfluxDTO)?.toEntity() {
-                notificationDetail = .applicant(id: postId)
-            }
+            case .APPLICANT:
+                if let postId = (notificationDetails as? ApplicantInfluxDTO)?.toEntity() {
+                    notificationDetail = .applicant(id: postId)
+                }
         }
         
         return NotificationVO(
