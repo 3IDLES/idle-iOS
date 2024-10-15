@@ -8,7 +8,7 @@
 import Foundation
 import Domain
 
-public protocol EntityRepresentable: Codable {
+public protocol EntityRepresentable: Decodable {
     associatedtype Entity
     func toEntity() -> Entity
 }
