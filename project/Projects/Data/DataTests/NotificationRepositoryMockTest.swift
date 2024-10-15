@@ -80,12 +80,3 @@ final class NotificationRepositoryMockTest: XCTestCase {
         wait(for: [expectation], timeout: 20)
     }
 }
-
-class TestAssembly: Assembly {
-    
-    func assemble(container: Swinject.Container) {
-        container.register(KeyValueStore.self) { _ in
-            TestKeyValueStore()
-        }
-    }
-}

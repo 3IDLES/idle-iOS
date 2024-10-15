@@ -17,7 +17,7 @@ import RxCocoa
 
 public class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     
-    @Injected var notificationPageUseCase: NotificationPageUseCase
+    @Injected var notificationsRepository: NotificationsRepository
     
     public var viewWillAppear: PublishSubject<Void> = .init()
     public var tableData: Driver<[SectionInfo : [NotificationCellInfo]]>?
@@ -26,9 +26,9 @@ public class NotificationPageViewModel: BaseViewModel, NotificationPageViewModel
         super.init()
         
         let fetchResult = viewWillAppear
-            .flatMap { [notificationPageUseCase] _ in
-                notificationPageUseCase
-                    .getNotificationList()
+            .unretained(self)
+            .flatMap { (obj, _) in
+                obj.notificationsRepository.notifcationList()
             }
             .share()
         
@@ -52,34 +52,34 @@ public class NotificationPageViewModel: BaseViewModel, NotificationPageViewModel
                 
                 // 날짜순 정렬
                 let sortedInfo = info.sorted { lhs, rhs in
-                    lhs.notificationDate > rhs.notificationDate
+                    lhs.createdDate < rhs.createdDate
                 }
                 
                 var dict: [SectionInfo: [NotificationCellInfo]] = [:]
                 
-                for item in sortedInfo {
-                    let diffSeconds = Date.now.timeIntervalSince(item.notificationDate)
-                    let diffDate = diffSeconds / (60 * 60 * 24)
-                    var section: SectionInfo!
-                    
-                    switch diffDate {
-                        case 0...1:
-                            section = .today
-                        case 1...7:
-                            section = .week
-                        case 8...30:
-                            section = .month
-                        default:
-                            continue
-                    }
-                    
-                    if dict[section] != nil {
-                        dict[section]!.append(item)
-                    } else {
-                        dict[section] = [item]
-                    }
-                }
-                
+//                for item in sortedInfo {
+//                    let diffSeconds = Date.now.timeIntervalSince(item.createdDate)
+//                    let diffDate = diffSeconds / (60 * 60 * 24)
+//                    var section: SectionInfo!
+//                    
+//                    switch diffDate {
+//                        case 0...1:
+//                            section = .today
+//                        case 1...7:
+//                            section = .week
+//                        case 8...30:
+//                            section = .month
+//                        default:
+//                            continue
+//                    }
+//                    
+//                    if dict[section] != nil {
+//                        dict[section]!.append(item)
+//                    } else {
+//                        dict[section] = [item]
+//                    }
+//                }
+//                
                 return dict
             }
             .asDriver(onErrorDriveWith: .never())
