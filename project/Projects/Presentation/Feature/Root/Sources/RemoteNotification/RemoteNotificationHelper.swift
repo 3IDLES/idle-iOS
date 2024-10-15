@@ -13,35 +13,37 @@ import Core
 
 import RxSwift
 
-struct DeeplinkBundle {
-    let deeplinks: [DeeplinkExecutable]
-    let userInfo: [AnyHashable: Any]?
+public protocol RemoteNotificationHelper {
+    
+    var deeplinks: BehaviorSubject<DeeplinkBundle> { get }
 }
 
-class RemoteNotificationHelper: NSObject {
+
+
+public class DefaultRemoteNotificationHelper: NSObject, RemoteNotificationHelper {
     
     // Observable
-    let deeplinks: BehaviorSubject<DeeplinkBundle> = .init(
+    public let deeplinks: BehaviorSubject<DeeplinkBundle> = .init(
         value: .init(deeplinks: [], userInfo: nil)
     )
     
     let deeplinkParser: DeeplinkParser = .init()
     
-    override init() {
+    public override init() {
         super.init()
         UNUserNotificationCenter.current().delegate = self
     }
 }
 
-extension RemoteNotificationHelper: UNUserNotificationCenterDelegate {
+extension DefaultRemoteNotificationHelper: UNUserNotificationCenterDelegate {
     
     /// 앱이 포그라운드에 있는 경우, 노티페이케이션이 도착하기만 하면 호출된다.
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         print("!!")
     }
     
     /// 앱이 백그라운드에 있는 경우, 유저가 노티피케이션을 통해 액션을 선택한 경우 호출
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
         let userInfo = response.notification.request.content.userInfo
         

@@ -17,14 +17,14 @@ public enum WaitCertificatePageCoordinatorDestination {
 
 public class WaitCertificatePageCoordinator: Coordinator {
     
+    // Injected
+    @Injected var router: RouterProtocol
+    
     public var onFinish: (() -> ())?
     
     public var startFlow: ((WaitCertificatePageCoordinatorDestination) -> ())!
-    
-    let router: Router
 
-    public init(router: Router) {
-        self.router = router
+    public init() {
     }
     
     deinit {

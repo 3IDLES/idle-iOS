@@ -43,10 +43,8 @@ public class WorkerAccountRegisterCoordinator: Coordinator {
     public var onFinish: (() -> ())?
     
     // Injected
+    @Injected var router: RouterProtocol
     @Injected var logger: WorkerRegisterLogger
-    
-    // Init
-    let router: Router
     
     // startFlow
     public var startFlow: ((WorkerAccountRegisterCoordinatorDestination) -> ())!
@@ -56,9 +54,7 @@ public class WorkerAccountRegisterCoordinator: Coordinator {
     var stageViewControllers: [UIViewController] = []
     private var currentStage: WorkerAccountRegisterStage!
     
-    public init(router: Router) {
-        self.router = router
-    }
+    public init() { }
     
     public func start() {
         

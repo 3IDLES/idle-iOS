@@ -23,17 +23,13 @@ import RxSwift
 
 public class AppCoordinator: BaseCoordinator {
     
-    /// main router
-    let router: Router
-    
-    /// notification helper
-    let notificationHelper: RemoteNotificationHelper = .init()
+    // Injected
+    @Injected var router: RouterProtocol
+    @Injected var notificationHelper: RemoteNotificationHelper
     
     let disposeBag: DisposeBag = .init()
     
-    public init(router: Router) {
-        self.router = router
-    }
+    public init() { }
     
     public override func start() {
         
@@ -57,7 +53,7 @@ extension AppCoordinator {
     @discardableResult
     func runSplashFlow() -> SplashCoordinator {
         
-        let coordinator = SplashCoordinator(router: router)
+        let coordinator = SplashCoordinator()
         coordinator.delegate = self
         
         coordinator.startFlow = { [weak self] destination in
@@ -92,7 +88,7 @@ extension AppCoordinator {
     /// AuthFlow를 시작합니다.
     @discardableResult
     func runAuthFlow() -> AuthCoordinator {
-        let coordinator = AuthCoordinator(router: router)
+        let coordinator = AuthCoordinator()
         
         coordinator.startFlow = { [weak self] destination in
             
@@ -117,7 +113,7 @@ extension AppCoordinator {
     /// CenterCetrificateFlow를 시작합니다.
     @discardableResult
     func runCenterCertificateFlow() -> WaitCertificatePageCoordinator {
-        let coordinator = WaitCertificatePageCoordinator(router: router)
+        let coordinator = WaitCertificatePageCoordinator()
         coordinator.startFlow = { [weak self] destination in
             guard let self else { return }
             switch destination {
@@ -137,7 +133,7 @@ extension AppCoordinator {
     /// CenterMainFlow를 시작합니다.
     @discardableResult
     func runCenterMainPageFlow() -> CenterMainPageCoordinator {
-        let coordinator = CenterMainPageCoordinator(router: router)
+        let coordinator = CenterMainPageCoordinator()
         coordinator.startFlow = { [weak self] destination in
             guard let self else { return }
             switch destination {
@@ -163,7 +159,7 @@ extension AppCoordinator {
     /// WorkerMainFlow를 시작합니다.
     @discardableResult
     func runWorkerMainPageFlow() -> WorkerMainPageCoordinator {
-        let coordinator = WorkerMainPageCoordinator(router: router)
+        let coordinator = WorkerMainPageCoordinator()
         coordinator.startFlow = { [weak self] destination in
             guard let self else { return }
             switch destination {
@@ -186,7 +182,7 @@ extension AppCoordinator {
     
     /// CenterMakeProfileFlow를 시작합니다.
     func runMakeCenterProfileFlow() {
-        let coordinator = MakeCenterProfilePageCoordinator(router: router)
+        let coordinator = MakeCenterProfilePageCoordinator()
         coordinator.startFlow = { [weak self] destination in
             switch destination {
             case .authFlow:
@@ -207,7 +203,7 @@ extension AppCoordinator {
     @discardableResult
     func centerAccountRegisterFlow() -> CenterAccountRegisterCoordinator {
         
-        let coordinator = CenterAccountRegisterCoordinator(router: router)
+        let coordinator = CenterAccountRegisterCoordinator()
         coordinator.startFlow = { [weak self] destination in
             
             guard let self else { return }
@@ -227,7 +223,7 @@ extension AppCoordinator {
     @discardableResult
     func workerAccountRegisterFlow() -> WorkerAccountRegisterCoordinator {
         
-        let coordinator = WorkerAccountRegisterCoordinator(router: router)
+        let coordinator = WorkerAccountRegisterCoordinator()
         coordinator.startFlow = { [weak self] destination in
             
             switch destination {
@@ -245,7 +241,7 @@ extension AppCoordinator {
     @discardableResult
     func centerLoginFlow() -> CenterLogInCoordinator {
         
-        let coordinator = CenterLogInCoordinator(router: router)
+        let coordinator = CenterLogInCoordinator()
         coordinator.startFlow = { [weak self] destination in
             switch destination {
             case .centerMainPage:
@@ -266,10 +262,7 @@ extension AppCoordinator {
     @discardableResult
     func createPostFlow() -> CreatePostCoordinator {
         
-        let coordinator = CreatePostCoordinator(
-            router: router,
-            presentingModule: router.topViewController!
-        )
+        let coordinator = CreatePostCoordinator()
         
         executeChild(coordinator)
         
@@ -278,10 +271,7 @@ extension AppCoordinator {
     
     @discardableResult
     func postDetailForWorkerFlow(postInfo: RecruitmentPostInfo) -> PostDetailForWorkerCoodinator {
-        let coordinator = PostDetailForWorkerCoodinator(
-            router: router,
-            postInfo: postInfo
-        )
+        let coordinator = PostDetailForWorkerCoodinator(postInfo: postInfo)
         coordinator.startFlow = { [weak self] destination in
             switch destination {
             case .centerProfile(let mode):
@@ -298,17 +288,17 @@ extension AppCoordinator {
 extension AppCoordinator {
     
     func workerProfileFlow(id: String) {
-        let coordinator = WorkerProfileCoordinator(router: router, id: id)
+        let coordinator = WorkerProfileCoordinator(id: id)
         executeChild(coordinator)
     }
     
     func workerMyProfileFlow() {
-        let coordinator = WorkerMyProfileCoordinator(router: router)
+        let coordinator = WorkerMyProfileCoordinator()
         executeChild(coordinator)
     }
     
     func centerProfileFlow(mode: ProfileMode) {
-        let coordinator = CenterProfileCoordinator(router: router, mode: mode)
+        let coordinator = CenterProfileCoordinator(mode: mode)
         executeChild(coordinator)
     }
 }
@@ -318,7 +308,7 @@ extension AppCoordinator {
     
     @discardableResult
      func accountDeregister(userType: UserType) -> AccountDeregisterCoordinator {
-         let coordinator = AccountDeregisterCoordinator(router: router, userType: userType)
+         let coordinator = AccountDeregisterCoordinator(userType: userType)
          coordinator.startFlow = { [weak self] destination in
              switch destination {
              case .accountAuthFlow:

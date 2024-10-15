@@ -20,12 +20,12 @@ public enum CenterMainPageCoordinatorDestination {
 
 public class CenterMainPageCoordinator: BaseCoordinator {
     
-    let router: Router
+    // Injected
+    @Injected var router: RouterProtocol
     
     public var startFlow: ((CenterMainPageCoordinatorDestination) -> ())!
     
-    public init(router: Router) {
-        self.router = router
+    public init() {
         super.init()
     }
     

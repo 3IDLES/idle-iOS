@@ -19,12 +19,12 @@ public enum WorkerMainPageCoordinatorDestination {
 
 public class WorkerMainPageCoordinator: BaseCoordinator {
     
-    let router: Router
+    // Injected
+    @Injected var router: RouterProtocol
     
     public var startFlow: ((WorkerMainPageCoordinatorDestination) -> ())!
     
-    public init(router: Router) {
-        self.router = router
+    public init() {
         super.init()
     }
     

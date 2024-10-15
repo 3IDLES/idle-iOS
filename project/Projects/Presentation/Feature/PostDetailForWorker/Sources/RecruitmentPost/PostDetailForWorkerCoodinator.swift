@@ -16,15 +16,16 @@ public enum PostDetailForWorkerCoodinatorDestination {
 
 public class PostDetailForWorkerCoodinator: Coordinator {
 
+    // Injected
+    @Injected var router: RouterProtocol
+    
     public var startFlow: ((PostDetailForWorkerCoodinatorDestination) -> ())!
     
     public var onFinish: (() -> ())?
     
-    let router: Router
     let postInfo: RecruitmentPostInfo
     
-    public init(router: Router, postInfo: RecruitmentPostInfo) {
-        self.router = router
+    public init(postInfo: RecruitmentPostInfo) {
         self.postInfo = postInfo
     }
     

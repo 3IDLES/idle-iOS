@@ -17,15 +17,14 @@ public enum MakeCenterProfilePageCoordinatorDestination {
 
 public class MakeCenterProfilePageCoordinator: Coordinator {
     
+    // Injected
+    @Injected var router: RouterProtocol
+    
     public var onFinish: (() -> ())?
     
     public var startFlow: ((MakeCenterProfilePageCoordinatorDestination) -> ())!
     
-    let router: Router
-    
-    public init(router: Router) {
-        self.router = router
-    }
+    public init() { }
     
     deinit {
         printIfDebug("\(String(describing: MakeCenterProfilePageCoordinator.self))")

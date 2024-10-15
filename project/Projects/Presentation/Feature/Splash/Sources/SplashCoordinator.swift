@@ -31,8 +31,7 @@ public class SplashCoordinator: BaseCoordinator {
     @Injected var workerProfileUseCase: WorkerProfileUseCase
     @Injected var centerProfileUseCase: CenterProfileUseCase
     @Injected var userInfoLocalRepository: UserInfoLocalRepository
-    
-    let router: Router
+    @Injected var router: RouterProtocol
     
     public var startFlow: ((SplashCoordinatorDestination) -> ())!
     
@@ -58,9 +57,7 @@ public class SplashCoordinator: BaseCoordinator {
     
     let disposeBag = DisposeBag()
     
-    public init(router: Router) {
-        self.router = router
-    }
+    public init() { }
     
     public override func start() {
          

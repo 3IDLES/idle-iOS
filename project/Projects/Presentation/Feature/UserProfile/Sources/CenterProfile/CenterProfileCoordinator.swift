@@ -9,17 +9,19 @@ import UIKit
 import PresentationCore
 import BaseFeature
 import Domain
+import Core
 
 /// 내센터, 다른 센터를 모두 불러올 수 있습니다.
 public class CenterProfileCoordinator: Coordinator {
     
+    // Injected
+    @Injected var router: RouterProtocol
+    
     public var onFinish: (() -> ())?
     
-    let router: Router
     let mode: ProfileMode
     
-    public init(router: Router, mode: ProfileMode) {
-        self.router = router
+    public init(mode: ProfileMode) {
         self.mode = mode
     }
     

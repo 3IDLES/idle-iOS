@@ -7,15 +7,16 @@
 
 import Foundation
 import BaseFeature
+import Core
 
 public class WorkerMyProfileCoordinator: Coordinator {
     
-    public var onFinish: (() -> ())?
-    let router: Router
+    // Injected
+    @Injected var router: RouterProtocol
     
-    public init(router: Router) {
-        self.router = router
-    }
+    public var onFinish: (() -> ())?
+    
+    public init() { }
         
     public func start() {
         

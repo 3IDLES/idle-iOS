@@ -17,14 +17,14 @@ public class CreatePostCoordinator: Coordinator {
     
     public typealias Module = UIViewController
     
+    // Injected
+    @Injected var router: RouterProtocol
     @Injected var logger: PostRegisterLogger
     
-    let router: Router
-    let presentingModule: Module
+    weak var presentingModule: Module?
     
-    public init(router: Router, presentingModule: Module) {
-        self.router = router
-        self.presentingModule = presentingModule
+    public init() {
+        self.presentingModule = router.topViewController
     }
     
     deinit {
@@ -79,7 +79,10 @@ public extension CreatePostCoordinator {
             descriptionText: "",
             completeButtonText: "확인") { [weak self] in
                 guard let self else { return }
-                router.popTo(module: presentingModule, animated: true)
+                
+                if let presentingModule {
+                    router.popTo(module: presentingModule, animated: true)
+                }
             }
         
         router.presentAnonymousCompletePage(object)

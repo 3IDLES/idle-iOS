@@ -43,11 +43,11 @@ public enum CenterAccountRegisterCoordinatorDestination {
 
 public class CenterAccountRegisterCoordinator: Coordinator {
     
-    public var onFinish: (() -> ())?
-    
+    // Injected
+    @Injected var router: RouterProtocol
     @Injected var logger: CenterRegisterLogger
     
-    let router: Router
+    public var onFinish: (() -> ())?
     
     public var startFlow: ((CenterAccountRegisterCoordinatorDestination) -> ())!
     
@@ -56,10 +56,7 @@ public class CenterAccountRegisterCoordinator: Coordinator {
     weak var pageViewController: UIPageViewController!
     private var currentStage: CenterAccountRegisterStage!
     
-    public init(router: Router) {
-        
-        self.router = router
-    }
+    public init() { }
     
     public func start() {
         

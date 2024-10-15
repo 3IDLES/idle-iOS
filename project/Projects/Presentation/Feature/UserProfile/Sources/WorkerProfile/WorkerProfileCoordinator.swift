@@ -12,12 +12,13 @@ import Core
 
 public class WorkerProfileCoordinator: Coordinator {
     
+    // Injected
+    @Injected var router: RouterProtocol
+    
     public var onFinish: (() -> ())?
-    let router: Router
     let id: String
     
-    public init(router: Router, id: String) {
-        self.router = router
+    public init(id: String) {
         self.id = id
     }
     

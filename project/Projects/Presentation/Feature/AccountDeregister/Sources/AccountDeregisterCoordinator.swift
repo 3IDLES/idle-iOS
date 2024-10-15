@@ -8,6 +8,7 @@
 import UIKit
 import BaseFeature
 import Domain
+import Core
 
 public enum AccountDeregisterCoordinatorDestination {
     case accountAuthFlow
@@ -15,17 +16,18 @@ public enum AccountDeregisterCoordinatorDestination {
 
 public class AccountDeregisterCoordinator: Coordinator {
     
+    // Injected
+    @Injected var router: RouterProtocol
+    
     public var onFinish: (() -> ())?
     
     public var startFlow: ((AccountDeregisterCoordinatorDestination) -> ())!
     
     private weak var belowModule: UIViewController?
     
-    let router: Router
     let userType: UserType
     
-    public init(router: Router, userType: UserType) {
-        self.router = router
+    public init(userType: UserType) {
         self.userType = userType
     }
     

@@ -15,6 +15,9 @@ public protocol RouterProtocol {
     typealias Module = UIViewController
     typealias RoutingCompletion = () -> Void
     
+    var topViewController: UIViewController? { get }
+    
+    
     // MARK: present modal module
     func present(_ module: Module, animated: Bool, modalPresentationSytle: UIModalPresentationStyle, completion: RoutingCompletion?)
     
@@ -27,16 +30,20 @@ public protocol RouterProtocol {
     
     // MARK: push module
     // pop시 호출할 클로저를 여기서 지정(항상 최상단 VC가 팝되지 않음으로)
-    func push(module: Module, animated: Bool, popCompletion: (() -> Void)?)
+    func push(module: Module, animated: Bool)
     
-    func push(module: Module, to: UINavigationController, animated: Bool, popCompletion: (() -> Void)?)
+    func push(module: Module, animated: Bool, popCompletion: @escaping RoutingCompletion)
     
+    func push(module: Module, to: UINavigationController, animated: Bool)
+    
+    func push(module: Module, to: UINavigationController, animated: Bool, popCompletion: @escaping RoutingCompletion)
     
     
     // MARK: pop module
     func popModule(animated: Bool)
     
-    func popModule(_ module: Module, from: UINavigationController, animated: Bool, popCompletion: (() -> Void)?)
+    func popModule(_ module: Module, from: UINavigationController, animated: Bool)
+    
     
     /// 특정 모듈까지 네비게이션 스택을 비움
     func popTo(module: Module, animated: Bool)
@@ -61,8 +68,16 @@ public protocol RouterProtocol {
     func presentDefaultAlertController(object: DefaultAlertObject)
     
     
-    /// Default alert를 표출
+    /// Idle alert를 표출
     func presentIdleAlertController(type: IdleBigAlertController.ButtonType, object: IdleAlertObject)
+    
+    
+    /// Snack bar 표출
+    func presentSnackBarController(bottomPadding: CGFloat, object: IdleSnackBarRO)
+    
+    
+    /// 완료 화면 표출
+    func presentAnonymousCompletePage(_ object: AnonymousCompleteVCRenderObject)
 }
 
 public final class Router: NSObject, RouterProtocol {
@@ -100,7 +115,7 @@ public final class Router: NSObject, RouterProtocol {
         )
     }
     
-    public func push(module: Module, animated: Bool, popCompletion: (() -> Void)? = nil) {
+    public func push(module: Module, animated: Bool, popCompletion: @escaping RoutingCompletion) {
         
         guard (module is UINavigationController) == false else {
             // 디버그 모드시 런타임에러발생시킴
@@ -109,15 +124,30 @@ public final class Router: NSObject, RouterProtocol {
         
         completion[module.getRawPointer] = popCompletion
         
+        push(module: module, animated: animated)
+    }
+    
+    public func push(module: Module, animated: Bool) {
+        
+        guard (module is UINavigationController) == false else {
+            // 디버그 모드시 런타임에러발생시킴
+            return assertionFailure("\(#function) 네비게이션 컨트롤러 삽입 불가")
+        }
+        
         rootController?.pushViewController(
             module,
             animated: animated
         )
     }
     
-    public func push(module: Module, to: UINavigationController, animated: Bool, popCompletion: (() -> Void)? = nil) {
+    public func push(module: Module, to: UINavigationController, animated: Bool, popCompletion: @escaping RoutingCompletion) {
         
         completion[module.getRawPointer] = popCompletion
+        
+        push(module: module, to: to, animated: animated)
+    }
+    
+    public func push(module: Module, to: UINavigationController, animated: Bool) {
         
         to.pushViewController(module, animated: animated)
     }
@@ -142,7 +172,7 @@ public final class Router: NSObject, RouterProtocol {
         }
     }
     
-    public func popModule(_ module: Module, from: UINavigationController, animated: Bool, popCompletion: (() -> Void)?) {
+    public func popModule(_ module: Module, from: UINavigationController, animated: Bool) {
         
         if let module = from.popViewController(animated: animated) {
             
@@ -162,6 +192,7 @@ public final class Router: NSObject, RouterProtocol {
         }
     }
     
+    
     public func popTo(module: Module, animated: Bool) {
     
         guard let controllers = rootController?.viewControllers else { return }
@@ -180,7 +211,7 @@ public final class Router: NSObject, RouterProtocol {
         rootController?.setViewControllers([module], animated: animated)
     }
     
-    public func replaceRootModuleTo(module: Module, animated: Bool, dismissCompletion: (() -> Void)? = nil) {
+    public func replaceRootModuleTo(module: Module, animated: Bool, dismissCompletion: RoutingCompletion?) {
         
         guard let keyWindow = UIWindow.keyWindow else { return }
         
@@ -212,7 +243,7 @@ public final class Router: NSObject, RouterProtocol {
         completion[navigationController.getRawPointer] = dismissCompletion
     }
     
-    public func setRootModuleTo(module: Module, popCompletion: RoutingCompletion? = nil) {
+    public func setRootModuleTo(module: Module, popCompletion: RoutingCompletion?) {
         guard let keyWindow = UIWindow.keyWindow else { return }
         let navigationController = UINavigationController(rootViewController: module)
         navigationController.setNavigationBarHidden(true, animated: false)

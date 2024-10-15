@@ -7,6 +7,7 @@
 
 import Foundation
 import BaseFeature
+import Core
 
 public enum AuthCoordinatorDestination {
     
@@ -17,13 +18,12 @@ public enum AuthCoordinatorDestination {
 
 public class AuthCoordinator: Coordinator {
     
+    // Injected
+    @Injected var router: RouterProtocol
+    
     public var onFinish: (() -> ())?
     
-    let router: Router
-    
-    public init(router: Router) {
-        self.router = router
-    }
+    public init() { }
     
     public var startFlow: ((AuthCoordinatorDestination) -> ())!
     

@@ -21,9 +21,10 @@ enum SetNewPasswordStage: Int {
 
 public class CenterSetupNewPasswordCoordinator: Coordinator {
     
-    public var onFinish: (() -> ())?
+    // Injected
+    @Injected var router: RouterProtocol
     
-    let router: Router
+    public var onFinish: (() -> ())?
     
     // PageConroller
     var stageViewControllers: [UIViewController] = []
@@ -33,9 +34,7 @@ public class CenterSetupNewPasswordCoordinator: Coordinator {
     // State
     private var passwordSetupSuccess: Bool = false
     
-    public init(router: Router) {
-        self.router = router
-    }
+    public init() { }
     
     public func start() {
         

@@ -16,13 +16,12 @@ public enum CenterLogInCoordinatorDestination {
 
 public class CenterLogInCoordinator: BaseCoordinator {
     
+    // Injected
+    @Injected var router: RouterProtocol
+    
     public var startFlow: ((CenterLogInCoordinatorDestination) -> ())!
     
-    let router: Router
-    
-    public init(router: Router) {
-        self.router = router
-    }
+    public init() { }
     
     public override func start() {
         
@@ -44,7 +43,7 @@ public class CenterLogInCoordinator: BaseCoordinator {
     }
     
     func startSetupNewPasswordFlow() {
-        let coordinator = CenterSetupNewPasswordCoordinator(router: router)
+        let coordinator = CenterSetupNewPasswordCoordinator()
         addChild(coordinator)
         coordinator.start()
     }

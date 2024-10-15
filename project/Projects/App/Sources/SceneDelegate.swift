@@ -18,10 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // RootCoordinator
     let router: Router = .init()
     
-    lazy var appCoordinator: AppCoordinator = {
-        let coodinator = AppCoordinator(router: router)
-        return coodinator
-    }()
+    lazy var appCoordinator: AppCoordinator = .init()
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -37,6 +34,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 LoggerAssembly(),
                 DataAssembly(),
                 DomainAssembly(),
+                PresentationAssembly(),
             ])
     
         // Start AppCoodinator
