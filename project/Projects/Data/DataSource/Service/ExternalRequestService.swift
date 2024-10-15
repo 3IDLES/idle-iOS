@@ -9,9 +9,5 @@ import Foundation
 
 public class ExternalRequestService: BaseNetworkService<ExtenalUrlAPI> {
     
-    public init() { }
-    
-    public override init(keyValueStore: KeyValueStore) {
-        super.init(keyValueStore: keyValueStore)
-    }
+    public override init() { }
 }

@@ -9,9 +9,5 @@ import Foundation
 
 public class NotificationTokenTransferService: BaseNetworkService<NotificationTokenAPI> {
     
-    public init() { }
-    
-    public override init(keyValueStore: KeyValueStore) {
-        super.init(keyValueStore: keyValueStore)
-    }
+    public override init() { }
 }

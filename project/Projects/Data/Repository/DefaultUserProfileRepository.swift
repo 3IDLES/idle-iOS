@@ -14,18 +14,10 @@ import RxSwift
 
 public class DefaultUserProfileRepository: UserProfileRepository {
 
-    let userInformationService: UserInformationService
-    let externalRequestService: ExternalRequestService
+    let userInformationService: UserInformationService = .init()
+    let externalRequestService: ExternalRequestService = .init()
     
-    public init(_ keyValueStore: KeyValueStore? = nil) {
-        if let keyValueStore {
-            self.userInformationService = .init(keyValueStore: keyValueStore)
-            self.externalRequestService = .init(keyValueStore: keyValueStore)
-        } else {
-            self.userInformationService = .init()
-            self.externalRequestService = .init()
-        }
-    }
+    public init() { }
     
     /// 센터프로필(최초 센터정보)를 등록합니다.
     public func registerCenterProfileForText(state: CenterProfileRegisterState) -> Single<Result<Void, DomainError>> {

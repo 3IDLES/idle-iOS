@@ -19,13 +19,7 @@ public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     private var crawlingPostService: CrawlingPostService = .init()
     private var applyService: ApplyService = .init()
     
-    public init(_ store: KeyValueStore? = nil) {
-        if let store {
-            self.recruitmentPostService = RecruitmentPostService(keyValueStore: store)
-            self.crawlingPostService = CrawlingPostService(keyValueStore: store)
-            self.applyService = ApplyService(keyValueStore: store)
-        }
-    }
+    public init() { }
     
     // MARK: Center
     public func registerPost(bundle: RegisterRecruitmentPostBundle) -> RxSwift.Single<Result<Void, DomainError>> {

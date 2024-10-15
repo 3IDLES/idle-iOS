@@ -266,6 +266,7 @@ private extension SplashCoordinator {
                 
                 return userInfoLocalRepository.getUserType()
             }
+            .share()
         
         let userFound = seekLocalUser.compactMap({ $0 })
         let userNotFound = seekLocalUser.filter({ $0 == nil })

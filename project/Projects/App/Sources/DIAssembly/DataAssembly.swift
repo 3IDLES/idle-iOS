@@ -20,6 +20,12 @@ public struct DataAssembly: Assembly {
     
     public func assemble(container: Container) {
         
+        // MARK: Key-value store for datasource
+        container.register(KeyValueStore.self) { _ in
+            return KeyChainList()
+        }
+        .inObjectScope(.container)
+        
         // MARK: Service
         container.register(LocalStorageService.self) { _ in
             return DefaultLocalStorageService()
