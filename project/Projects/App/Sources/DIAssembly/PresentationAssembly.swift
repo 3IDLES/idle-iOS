@@ -15,6 +15,11 @@ import Swinject
 public struct PresentationAssembly: Assembly {
     public func assemble(container: Container) {
         
+        container.register(RemoteConfigService.self) { _ in
+            DefaultRemoteConfigService()
+        }
+        .inObjectScope(.container)
+        
         container.register(RouterProtocol.self) { _ in
             Router()
         }
