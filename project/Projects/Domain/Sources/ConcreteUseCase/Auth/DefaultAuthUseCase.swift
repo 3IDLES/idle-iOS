@@ -27,7 +27,7 @@ public class DefaultAuthUseCase: AuthUseCase {
     public func registerCenterAccount(registerState: CenterRegisterState) -> Single<Result<Void, DomainError>> {
         
         // #1. 회원가입 실행
-        authRepository
+        let registerResult = authRepository
             .requestRegisterCenterAccount(
                 managerName: registerState.name,
                 phoneNumber: registerState.phoneNumber,
@@ -35,6 +35,13 @@ public class DefaultAuthUseCase: AuthUseCase {
                 id: registerState.id,
                 password: registerState.password
             )
+            .asObservable()
+            .share()
+        
+        let registerSuccess = registerResult.compactMap { $0.value }
+        let registerFailure = registerResult.compactMap { $0.error }
+        
+        let afterRegisterTaskResult = registerSuccess
             .map { [userInfoLocalRepository] _ in
                 // #2. 유저정보 로컬에 저장
                 userInfoLocalRepository.updateUserType(.center)
@@ -43,18 +50,40 @@ public class DefaultAuthUseCase: AuthUseCase {
                 // #3. 원격알림 토큰을 서버에 전송
                 notificationTokenUseCase.setNotificationToken()
             }
+        
+        return Observable.merge(
+            afterRegisterTaskResult,
+            registerFailure.asObservable()
+                .map { error -> Result<Void, DomainError> in .failure(error) }
+        ).asSingle()
     }
     
     // 센터 로그인 실행
     public func loginCenterAccount(id: String, password: String) -> Single<Result<Void, DomainError>> {
-        authRepository.requestCenterLogin(id: id, password: password)
+        let loginResult = authRepository
+            .requestCenterLogin(id: id, password: password)
+            .asObservable()
+            .share()
+        
+        let loginSuccess = loginResult.compactMap { $0.value }
+        let loginFailure = loginResult.compactMap { $0.error }
+        
+        let afterLoginTaskResult = loginSuccess
             .map { [userInfoLocalRepository] vo in
                 userInfoLocalRepository.updateUserType(.center)
             }
-            .flatMap { [notificationTokenUseCase] _ in
+            .unretained(self)
+            .flatMap { (obj, _) in
                 // 원격알림 토큰을 서버에 전송
-                notificationTokenUseCase.setNotificationToken()
+                obj.notificationTokenUseCase.setNotificationToken()
             }
+            .share()
+        
+        return Observable.merge(
+            afterLoginTaskResult,
+            loginFailure.asObservable()
+                .map { error -> Result<Void, DomainError> in .failure(error) }
+        ).asSingle()
     }
     
     // 요양 보호사 회원가입 실행, 성공한 경우 프로필 Fetch후 저장
