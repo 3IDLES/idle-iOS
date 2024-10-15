@@ -1,6 +1,6 @@
 //
-//  WorkerMainTopView.swift
-//  WorkerMainPageFeature
+//  CenterMainPageTopView.swift
+//  CenterMainPageFeature
 //
 //  Created by choijunios on 10/15/24.
 //
@@ -8,28 +8,12 @@
 import UIKit
 import DSKit
 
-
-import RxSwift
-
-// MARK: Top Container
-class WorkerMainTopView: UIView {
+class CenterMainPageTopView: UIView {
     
-    // Init parameters
-    
-    // View
-    
-    lazy var locationLabel: IdleLabel = {
-        
+    lazy var titleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Heading1)
         label.textAlignment = .left
         return label
-    }()
-    
-    let locationImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = DSIcon.location.image
-        imageView.tintColor = DSColor.gray700.color
-        return imageView
     }()
     
     let notificationImageView: UIImageView = {
@@ -40,27 +24,15 @@ class WorkerMainTopView: UIView {
         return imageView
     }()
     
-    private let disposeBag = DisposeBag()
     
-    init(
-        titleText: String = "",
-        innerViews: [UIView]
-    ) {
+    init() {
         super.init(frame: .zero)
         
-        self.locationLabel.textString = titleText
-        
-        setApearance()
-        setAutoLayout(innerViews: innerViews)
+        setAutoLayout()
     }
+    required init?(coder: NSCoder) { nil }
     
-    required init(coder: NSCoder) { fatalError() }
-    
-    func setApearance() {
-        
-    }
-    
-    private func setAutoLayout(innerViews: [UIView]) {
+    private func setAutoLayout() {
         
         self.layoutMargins = .init(
             top: 20,
@@ -71,15 +43,10 @@ class WorkerMainTopView: UIView {
         
         let mainStack = HStack(
             [
-                [
-                    locationImageView,
-                    Spacer(width: 4),
-                    locationLabel,
-                    Spacer(),
-                    notificationImageView
-                ],
-                innerViews
-            ].flatMap { $0 },
+                titleLabel,
+                Spacer(),
+                notificationImageView
+            ],
             alignment: .center,
             distribution: .fill
         )
@@ -92,9 +59,7 @@ class WorkerMainTopView: UIView {
         }
         
         NSLayoutConstraint.activate([
-            locationImageView.widthAnchor.constraint(equalToConstant: 32),
-            locationImageView.heightAnchor.constraint(equalTo: locationImageView.widthAnchor),
-            
+        
             notificationImageView.widthAnchor.constraint(equalToConstant: 32),
             notificationImageView.heightAnchor.constraint(equalTo: notificationImageView.widthAnchor),
             
