@@ -7,6 +7,9 @@
 
 import Foundation
 
+
+import RxSwift
+
 public extension Result {
     var value: Success? {
         guard case let .success(value) = self else {
@@ -22,3 +25,7 @@ public extension Result {
         return error
     }
 }
+
+
+/// Single + Result Short cut
+public typealias Sult<T, F: Error> = Single<Result<T, F>>
