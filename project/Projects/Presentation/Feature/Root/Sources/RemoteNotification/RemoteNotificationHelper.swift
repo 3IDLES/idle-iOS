@@ -37,22 +37,37 @@ public class DefaultRemoteNotificationHelper: NSObject, RemoteNotificationHelper
 
 extension DefaultRemoteNotificationHelper: UNUserNotificationCenterDelegate {
     
+    enum PreDefinedDeeplinkPath: String {
+        case checkApplicantPage = "PostApplicantPage"
+        
+        var links: [String] {
+            switch self {
+            case .checkApplicantPage:
+                ["CenterMainPage", "PostApplicantPage"]
+            }
+        }
+    }
+    
     /// 앱이 포그라운드에 있는 경우, 노티페이케이션이 도착하기만 하면 호출된다.
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        print("!!")
+
+        // 유저 인터렉션 불가 내부 이벤트로 처리야해야함
     }
     
     /// 앱이 백그라운드에 있는 경우, 유저가 노티피케이션을 통해 액션을 선택한 경우 호출
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
-        let userInfo = response.notification.request.content.userInfo
+        handleDeepLink(notification: response.notification)
+    }
+    
+    private func handleDeepLink(notification: UNNotification) {
         
-        if let linkInfo = userInfo["link"] as? String {
-            
-            let testLinks = linkInfo.split(separator: "/").map(String.init)
-            print(testLinks)
+        let userInfo = notification.request.content.userInfo
+        
+        if let linkInfo = userInfo["link"] as? String, let desination = PreDefinedDeeplinkPath(rawValue: linkInfo) {
+
             do {
-                let parsedLinks = try deeplinkParser.makeDeeplinkList(components: testLinks)
+                let parsedLinks = try deeplinkParser.makeDeeplinkList(components: desination.links)
                 deeplinks.onNext(.init(
                     deeplinks: parsedLinks,
                     userInfo: userInfo
