@@ -26,6 +26,8 @@ let project = Project(
             sources: ["Sources/**"],
             dependencies: [
                 D.Domain,
+                D.Data.DataSource,
+                D.Data.Repository,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"],

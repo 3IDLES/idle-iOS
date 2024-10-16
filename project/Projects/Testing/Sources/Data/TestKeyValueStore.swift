@@ -6,8 +6,7 @@
 //
 
 import Foundation
-@testable import DataSource
-
+import DataSource
 
 class TestKeyValueStore: KeyValueStore {
     
