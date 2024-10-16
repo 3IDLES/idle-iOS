@@ -7,16 +7,22 @@
 
 import Foundation
 import XCTest
+import Core
+
+
 @testable import Repository
 @testable import DataSource
+@testable import Testing
 
 class SaveUserInfoDataTests: XCTestCase {
     
-    let repository = DefaultUserInfoLocalRepository(
-        localStorageService: DefaultLocalStorageService()
-    )
+    static override func setUp() {
+        DependencyInjector.shared.assemble(MockAssemblies)
+    }
     
     func testUserTypeCRUD() {
+        
+        let repository = DefaultUserInfoLocalRepository()
         
         var userType = repository.getUserType()
         
@@ -44,6 +50,7 @@ class SaveUserInfoDataTests: XCTestCase {
     func testUserInfoCRUD() {
         
         // MARK: Center
+        let repository = DefaultUserInfoLocalRepository()
         
         var centerInfo = repository.getCurrentCenterData()
         

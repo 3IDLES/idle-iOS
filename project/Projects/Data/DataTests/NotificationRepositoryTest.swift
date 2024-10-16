@@ -1,5 +1,5 @@
 //
-//  NotificationRepositoryMockTest.swift
+//  NotificationRepositoryTest.swift
 //  DataTests
 //
 //  Created by choijunios on 10/15/24.
@@ -10,19 +10,17 @@ import Repository
 import DataSource
 import Core
 
+@testable import Testing
 
 import RxSwift
-import Swinject
 
-final class NotificationRepositoryMockTest: XCTestCase {
+final class NotificationRepositoryTest: XCTestCase {
     
     let disposeBag = DisposeBag()
 
     static override func setUp() {
         
-        DependencyInjector.shared.assemble([
-            TestAssembly()
-        ])
+        DependencyInjector.shared.assemble(MockAssemblies)
     }
     
     func testNotificationList() throws {

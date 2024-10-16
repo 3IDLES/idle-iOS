@@ -7,20 +7,20 @@
 
 import Foundation
 import XCTest
+import Core
+import Domain
+
 @testable import Repository
-@testable import Domain
+@testable import Testing
 
 import RxSwift
 
 class ImageCachingTest: XCTestCase {
     
-    var cacheRepository: DefaultCacheRepository!
-    var disposeBag: DisposeBag!
+    var disposeBag: DisposeBag = .init()
     
-    override func setUp() {
-        super.setUp()
-        self.cacheRepository = .init(maxFileCount: 5, removeFileCountForOveflow: 1)
-        self.disposeBag = .init()
+    static override func setUp() {
+        DependencyInjector.shared.assemble(MockAssemblies)
     }
     
     func test_diskcache_oveflows_50images() {
@@ -34,6 +34,8 @@ class ImageCachingTest: XCTestCase {
         }
         
         return;
+        
+        let cacheRepository = DefaultCacheRepository(maxFileCount: 5, removeFileCountForOveflow: 1)
         
         // 디스크 캐싱 내역 삭제
         cacheRepository.clearImageCacheDirectory()
