@@ -24,11 +24,11 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     var presentAlert: ((DefaultAlertObject) -> ())?
     var exitPage: (() -> ())?
     
-    
+    var isFirst: Bool = true
     var viewWillAppear: PublishSubject<Void> = .init()
     var exitButtonClicked: PublishSubject<Void> = .init()
     
-    var tableData: Driver<[SectionInfo : [NotificationVO]]>?
+    var tableData: Driver<(Bool, [SectionInfo : [NotificationVO]])>?
     
     override init() {
         super.init()
@@ -56,7 +56,8 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
         
         // MARK: 날짜를 바탕으로 섹션 필터링 후 반환
         tableData = fetchSuccess
-            .map { info in
+            .unretained(self)
+            .map { (obj, info) in
                 
                 // 날짜순 정렬
                 let sortedInfo = info.sorted { lhs, rhs in
@@ -88,7 +89,13 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
                     }
                 }
                 
-                return dict
+                defer {
+                    if obj.isFirst {
+                        obj.isFirst = false
+                    }
+                }
+                
+                return (obj.isFirst, dict)
             }
             .asDriver(onErrorDriveWith: .never())
         

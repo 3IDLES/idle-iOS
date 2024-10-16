@@ -15,6 +15,7 @@ import CenterCetificatePageFeature
 import AccountDeregisterFeature
 import PostDetailForWorkerFeature
 import UserProfileFeature
+import NotificationPageFeature
 import Domain
 import Core
 
@@ -147,6 +148,8 @@ extension AppCoordinator {
                 runAuthFlow()
             case .accountDeregisterPage:
                 accountDeregister(userType: .center)
+            case .notificationPage:
+                userNotifications()
             }
         }
         
@@ -319,6 +322,19 @@ extension AppCoordinator {
          executeChild(coordinator)
          return coordinator
      }
+}
+
+// MARK: Notification page
+extension AppCoordinator {
+    
+    func userNotifications() {
+        
+        let coordinator = NotificationPageCoordinator()
+        
+        // 딥링크 연결 추가적업 예정
+        
+        executeChild(coordinator)
+    }
 }
 
 
