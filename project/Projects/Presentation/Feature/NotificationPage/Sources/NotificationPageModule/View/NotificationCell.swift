@@ -23,6 +23,8 @@ class NotificationCell: UITableViewCell {
         let view = UIImageView()
         view.layer.cornerRadius = 24
         view.clipsToBounds = true
+        view.image = NotificationPageFeatureAsset.notificationNoImage.image
+        view.contentMode = .scaleAspectFit
         return view
     }()
     
@@ -145,8 +147,11 @@ class NotificationCell: UITableViewCell {
             viewModel
                 .profileImage?
                 .drive(onNext: { [weak self] image in
-                    UIView.animate(withDuration: 0.15) {
-                        self?.profileImageView.image = image
+                    
+                    guard let self else { return }
+                    
+                    UIView.transition(with: contentView, duration: 0.15) {
+                        self.profileImageView.image = image
                     }
                 })
         ]
