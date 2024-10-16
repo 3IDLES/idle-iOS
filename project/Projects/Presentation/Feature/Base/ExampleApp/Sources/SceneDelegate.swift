@@ -27,7 +27,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         navigationController.setNavigationBarHidden(true, animated: false)
         self.router = Router()
-        router.setRootModuleTo(module: .createRand())
+        router.setRootModuleTo(module: .createRand(), popCompletion: nil)
         
         DispatchQueue.main.asyncAfter(deadline: .now()+3) {
             

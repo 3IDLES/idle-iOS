@@ -14,7 +14,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
-    lazy var coordiantor = MakeCenterProfilePageCoordinator(router: router)
+    lazy var coordiantor = MakeCenterProfilePageCoordinator()
     
     let router = Router()
     
