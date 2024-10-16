@@ -8,6 +8,7 @@
 import Foundation
 import DataSource
 import Domain
+import Core
 
 
 import RxSwift
@@ -29,16 +30,12 @@ public class DefaultUserInfoLocalRepository: UserInfoLocalRepository {
     
     typealias K = UserInfoStorageKey
     
-    let localStorageService: LocalStorageService
+    @Injected var localStorageService: LocalStorageService
     
     let jsonDecoder = JSONDecoder()
     let encoder = JSONEncoder()
     
-    public init(
-        localStorageService: LocalStorageService
-    ) {
-        self.localStorageService = localStorageService
-    }
+    public init() { }
     
     public func getUserType() -> UserType? {
         let rawValue: String? = localStorageService.fetchData(key: K.userType.rawValue)

@@ -7,15 +7,20 @@
 
 import Foundation
 import XCTest
+import Core
 
 @testable import Domain
 @testable import Testing
 
-final class InputValidationTests: XCTestCase {
+final class RegisterValidationTests: XCTestCase {
     
-    let usecase = DefaultAuthInputValidationUseCase()
+    static override func setUp() {
+        DependencyInjector.shared.assemble(MockAssemblies)
+    }
     
     func testPhoneNumberRegex() {
+        
+        let usecase = DefaultAuthInputValidationUseCase()
         
         let result1 = usecase.checkPhoneNumberIsValid(
             phoneNumber: "01012341234"
@@ -39,6 +44,9 @@ final class InputValidationTests: XCTestCase {
     // MARK: Id & Password
     
     func testValidId() {
+        
+        let usecase = DefaultAuthInputValidationUseCase()
+        
         // 유효한 아이디 테스트
         XCTAssertTrue(usecase.checkIdIsValid(id: "User123"))
         XCTAssertTrue(usecase.checkIdIsValid(id: "user12"))
@@ -48,6 +56,9 @@ final class InputValidationTests: XCTestCase {
     }
     
     func testInvalidId() {
+        
+        let usecase = DefaultAuthInputValidationUseCase()
+        
         // 유효하지 않은 아이디 테스트
         XCTAssertFalse(usecase.checkIdIsValid(id: "Us3!")) // 너무 짧음
         XCTAssertFalse(usecase.checkIdIsValid(id: "user@123")) // 특수 문자 포함
@@ -56,6 +67,9 @@ final class InputValidationTests: XCTestCase {
     }
     
     func testValidPassword() {
+        
+        let usecase = DefaultAuthInputValidationUseCase()
+        
         // 유효한 비밀번호 테스트
         XCTAssertTrue(usecase.checkPasswordIsValid(password: "Password1"))
         XCTAssertTrue(usecase.checkPasswordIsValid(password: "pass1234"))
@@ -65,6 +79,9 @@ final class InputValidationTests: XCTestCase {
     }
     
     func testInvalidPassword() {
+        
+        let usecase = DefaultAuthInputValidationUseCase()
+        
         // 유효하지 않은 비밀번호 테스트
         XCTAssertFalse(usecase.checkPasswordIsValid(password: "short1")) // 너무 짧음
         XCTAssertFalse(usecase.checkPasswordIsValid(password: "alllowercase")) // 숫자 없음

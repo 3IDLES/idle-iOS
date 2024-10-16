@@ -249,43 +249,6 @@ public extension BaseNetworkService {
         request(api: api, with: with)
             .map(T.self)
     }
-
-//    // MARK: Request with Progress
-//    struct ProgressResponse<T: Decodable> {
-//        
-//        let progress: Double
-//        let data: T?
-//    }
-//    
-//    func requestDecodableWithProgress<T: Decodable>(api: TagetAPI) -> Single<ProgressResponse<T>> {
-//        
-//        Single<ProgressResponse<T>>.create { single in
-//            
-//            self.provider.rx
-//                .requestWithProgress(api)
-//                .subscribe(onNext: { response in
-//                    
-//                    if let result = response.response {
-//                        
-//                        do {
-//                            
-//                            let decoded = try result.map(T.self)
-//                            
-//                            let item = ProgressResponse<T>(
-//                                progress: response.progress,
-//                                data: decoded
-//                            )
-//                            
-//                            single(.success(item))
-//                            
-//                        } catch {
-//                            
-//                            single(.failure(error))
-//                        }
-//                    }
-//                })
-//        }
-//    }
 }
 
 // MARK: HTTPResponseException+Extension
