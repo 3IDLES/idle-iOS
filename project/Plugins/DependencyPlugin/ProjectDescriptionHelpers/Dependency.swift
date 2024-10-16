@@ -25,6 +25,8 @@ public enum ModuleDependency {
     }
     
     public static let Core: TargetDependency = .project(target: "Core", path: .relativeToRoot("Projects/Core"))
+    
+    public static let Testing: TargetDependency = .project(target: "Testing", path: .relativeToRoot("Projects/Testing"))
 }
 
 // External dependencies
