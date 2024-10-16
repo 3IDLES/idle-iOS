@@ -7,6 +7,7 @@
 
 import UIKit
 import Domain
+import BaseFeature
 import PresentationCore
 import Repository
 import Core
@@ -23,7 +24,7 @@ class NotificationCellViewModel {
     @Injected var notificationsRepository: NotificationsRepository
     
     // Navigation
-    var presentAlert: ((DefaultAlertContentVO) -> ())?
+    var presentAlert: ((DefaultAlertObject) -> ())?
     
     let notificationVO: NotificationVO
     
@@ -78,12 +79,12 @@ class NotificationCellViewModel {
         readRequestFailure
             .unretained(self)
             .subscribe(onNext: { (obj, error) in
-                let alertVO = DefaultAlertContentVO(
-                    title: "알림 확인 실패",
-                    message: error.message
-                )
                 
-                obj.presentAlert?(alertVO)
+                let alertObject = DefaultAlertObject()
+                    .setTitle("알림 확인 실패")
+                    .setDescription(error.message)
+                
+                obj.presentAlert?(alertObject)
             })
             .disposed(by: disposeBag)
     }
