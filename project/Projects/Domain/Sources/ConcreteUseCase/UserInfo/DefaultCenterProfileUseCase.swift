@@ -6,19 +6,17 @@
 //
 
 import Foundation
+import Core
 
 
 import RxSwift
 
 public class DefaultCenterProfileUseCase: CenterProfileUseCase {
     
-    let userProfileRepository: UserProfileRepository
-    let userInfoLocalRepository: UserInfoLocalRepository
+    @Injected var userProfileRepository: UserProfileRepository
+    @Injected var userInfoLocalRepository: UserInfoLocalRepository
     
-    public init(userProfileRepository: UserProfileRepository, userInfoLocalRepository: UserInfoLocalRepository) {
-        self.userProfileRepository = userProfileRepository
-        self.userInfoLocalRepository = userInfoLocalRepository
-    }
+    public init() { }
     
     public func getProfile(mode: ProfileMode) -> Single<Result<CenterProfileVO, DomainError>> {
         

@@ -6,17 +6,16 @@
 //
 
 import Foundation
+import Core
 
 
 import RxSwift
 
 public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
 
-    let repository: AuthInputValidationRepository
+    @Injected var repository: AuthInputValidationRepository
     
-    public init(repository: AuthInputValidationRepository) {
-        self.repository = repository
-    }
+    public init() { }
     
     // MARK: 이름 인증
     public func checkNameIsValid(name: String) -> Bool {
