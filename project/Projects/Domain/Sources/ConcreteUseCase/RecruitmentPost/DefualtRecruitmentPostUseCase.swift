@@ -6,17 +6,15 @@
 //
 
 import Foundation
-
+import Core
 
 import RxSwift
 
 public class DefaultRecruitmentPostUseCase: RecruitmentPostUseCase {
     
-    let repository: RecruitmentPostRepository
+    @Injected var repository: RecruitmentPostRepository
     
-    public init(repository: RecruitmentPostRepository) {
-        self.repository = repository
-    }
+    public init() { }
     
     public func registerRecruitmentPost(inputs: RegisterRecruitmentPostBundle) -> Single<Result<Void, DomainError>> {
         

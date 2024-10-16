@@ -18,58 +18,36 @@ public struct DomainAssembly: Assembly {
         
         // MARK: UseCase
         container.register(NotificationTokenUseCase.self) { _ in
-            return DefaultNotificationTokenUseCase()
+            DefaultNotificationTokenUseCase()
         }
         .inObjectScope(.container)
         
-        container.register(AuthInputValidationUseCase.self) { resolver in
-            let repository = resolver.resolve(AuthInputValidationRepository.self)!
-            
-            return DefaultAuthInputValidationUseCase(repository: repository)
+        container.register(AuthInputValidationUseCase.self) { _ in
+            DefaultAuthInputValidationUseCase()
         }
         
         container.register(AuthUseCase.self) { _ in
-            return DefaultAuthUseCase()
+            DefaultAuthUseCase()
         }
         
-        container.register(CenterProfileUseCase.self) { resolver in
-            let userProfileRepository = resolver.resolve(UserProfileRepository.self)!
-            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
-            return DefaultCenterProfileUseCase(
-                userProfileRepository: userProfileRepository,
-                userInfoLocalRepository: userInfoLocalRepository
-            )
+        container.register(CenterProfileUseCase.self) { _ in
+            DefaultCenterProfileUseCase()
         }
         
-        container.register(RecruitmentPostUseCase.self) { resolver in
-            let repository = resolver.resolve(RecruitmentPostRepository.self)!
-            
-            return DefaultRecruitmentPostUseCase(
-                repository: repository
-            )
+        container.register(RecruitmentPostUseCase.self) { _ in
+            DefaultRecruitmentPostUseCase()
         }
         
-        container.register(WorkerProfileUseCase.self) { resolver in
-            let userProfileRepository = resolver.resolve(UserProfileRepository.self)!
-            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
-            return DefaultWorkerProfileUseCase(
-                userProfileRepository: userProfileRepository,
-                userInfoLocalRepository: userInfoLocalRepository
-            )
+        container.register(WorkerProfileUseCase.self) { _ in
+            DefaultWorkerProfileUseCase()
         }
         
         container.register(SettingScreenUseCase.self) { _ in
-            return DefaultSettingUseCase()
+            DefaultSettingUseCase()
         }
         
-        container.register(CenterCertificateUseCase.self) { resolver in
-            let authRepository = resolver.resolve(AuthRepository.self)!
-            let userInfoLocalRepository = resolver.resolve(UserInfoLocalRepository.self)!
-            
-            return DefaultCenterCertificateUseCase(
-                authRepository: authRepository,
-                userInfoLocalRepository: userInfoLocalRepository
-            )
+        container.register(CenterCertificateUseCase.self) { _ in
+            DefaultCenterCertificateUseCase()
         }
     }
 }

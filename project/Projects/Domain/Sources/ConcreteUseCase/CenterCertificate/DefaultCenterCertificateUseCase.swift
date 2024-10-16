@@ -6,19 +6,17 @@
 //
 
 import Foundation
+import Core
 
 
 import RxSwift
 
 public class DefaultCenterCertificateUseCase: CenterCertificateUseCase {
     
-    let authRepository: AuthRepository
-    let userInfoLocalRepository: UserInfoLocalRepository
+    @Injected var authRepository: AuthRepository
+    @Injected var userInfoLocalRepository: UserInfoLocalRepository
     
-    public init(authRepository: AuthRepository, userInfoLocalRepository: UserInfoLocalRepository) {
-        self.authRepository = authRepository
-        self.userInfoLocalRepository = userInfoLocalRepository
-    }
+    public init() { }
     
     public func requestCenterCertificate() -> RxSwift.Single<Result<Void, DomainError>> {
         

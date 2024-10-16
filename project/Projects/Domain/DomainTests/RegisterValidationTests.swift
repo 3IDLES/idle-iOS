@@ -13,9 +13,7 @@ import XCTest
 
 final class InputValidationTests: XCTestCase {
     
-    let usecase = DefaultAuthInputValidationUseCase(
-        repository: MockAuthInputValidationRepository()
-    )
+    let usecase = DefaultAuthInputValidationUseCase()
     
     func testPhoneNumberRegex() {
         
