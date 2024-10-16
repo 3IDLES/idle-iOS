@@ -21,9 +21,13 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     @Injected var notificationsRepository: NotificationsRepository
     
     // Navigation
-    var presentAlert: ((DefaultAlertContentVO) -> ())?
+    var presentAlert: ((DefaultAlertObject) -> ())?
+    var exitPage: (() -> ())?
+    
     
     var viewWillAppear: PublishSubject<Void> = .init()
+    var exitButtonClicked: PublishSubject<Void> = .init()
+    
     var tableData: Driver<[SectionInfo : [NotificationVO]]>?
     
     override init() {
@@ -87,6 +91,14 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
                 return dict
             }
             .asDriver(onErrorDriveWith: .never())
+        
+        // MARK: Exit page
+        exitButtonClicked
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.exitPage?()
+            })
+            .disposed(by: disposeBag)
     }
     
     func createCellVM(vo: NotificationVO) -> NotificationCellViewModel {

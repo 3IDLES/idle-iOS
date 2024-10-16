@@ -20,6 +20,7 @@ protocol NotificationPageViewModelable: BaseViewModel {
     
     // Input
     var viewWillAppear: PublishSubject<Void> { get }
+    var exitButtonClicked: PublishSubject<Void> { get }
     
     // Output
     var tableData: Driver<[SectionInfo: [NotificationVO]]>? { get }
@@ -152,6 +153,11 @@ class NotificationPageVC: BaseViewController {
             .viewWillAppear
             .map { _ in }
             .bind(to: viewModel.viewWillAppear)
+            .disposed(by: disposeBag)
+        
+        navigationBar.backButton
+            .rx.tap
+            .bind(to: viewModel.exitButtonClicked)
             .disposed(by: disposeBag)
         
         // Output
