@@ -7,7 +7,6 @@
 
 import Foundation
 
-public class UserInformationService: BaseNetworkService<UserInformationAPI> {
-    
-    public override init() { }
-}
+public protocol UserInformationService: NetworkService where TagetAPI == UserInformationAPI { }
+
+public class DefaultUserInformationService: BaseNetworkService<UserInformationAPI>, UserInformationService { }

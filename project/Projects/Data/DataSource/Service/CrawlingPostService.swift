@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class CrawlingPostService: BaseNetworkService<CrawlingPostAPI> {
-    
-    public override init() { }
-}
+
+public protocol CrawlingPostService: NetworkService where TagetAPI == CrawlingPostAPI { }
+
+public class DefaultCrawlingPostService: BaseNetworkService<CrawlingPostAPI>, CrawlingPostService { }

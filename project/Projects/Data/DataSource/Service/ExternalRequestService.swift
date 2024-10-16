@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class ExternalRequestService: BaseNetworkService<ExtenalUrlAPI> {
-    
-    public override init() { }
-}
+
+public protocol ExternalRequestService: NetworkService where TagetAPI == ExtenalUrlAPI { }
+
+public class DefaultExternalRequestService: BaseNetworkService<ExtenalUrlAPI>, ExternalRequestService { }

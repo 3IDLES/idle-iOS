@@ -8,14 +8,15 @@
 import Foundation
 import Domain
 import DataSource
+import Core
 
 
 import RxSwift
 
 public class DefaultUserProfileRepository: UserProfileRepository {
 
-    let userInformationService: UserInformationService = .init()
-    let externalRequestService: ExternalRequestService = .init()
+    @Injected var userInformationService: any UserInformationService
+    @Injected var externalRequestService: any ExternalRequestService
     
     public init() { }
     

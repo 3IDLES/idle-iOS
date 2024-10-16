@@ -15,11 +15,24 @@ import Alamofire
 import Moya
 import RxMoya
 
-public class BaseNetworkService<TagetAPI: BaseAPI> {
+public protocol NetworkService {
     
+    associatedtype TagetAPI: BaseAPI
+    
+    func request(api: TagetAPI, with: RequestType) -> Single<Response>
+    
+    func requestDecodable<T: Decodable>(api: TagetAPI, with: RequestType) -> Single<T>
+}
+
+public enum RequestType {
+    case plain
+    case withToken
+}
+
+public class BaseNetworkService<TagetAPI: BaseAPI>: NetworkService {
     @Injected var keyValueStore: KeyValueStore
     
-    init() { }
+    public init() { }
         
     private lazy var providerWithToken: MoyaProvider<TagetAPI> = {
         
@@ -176,11 +189,6 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
 
 // MARK: DataRequest
 public extension BaseNetworkService {
-    
-    enum RequestType {
-        case plain
-        case withToken
-    }
     
     private func _request(api: TagetAPI, provider: MoyaProvider<TagetAPI>) -> Single<Response> {
         
