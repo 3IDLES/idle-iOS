@@ -178,7 +178,7 @@ class NotificationPageVC: BaseViewController {
                     snapShot.appendItems(itemIds, toSection: section.rawValue)
                 }
                 
-                tableViewDataSource.apply(snapShot, animatingDifferences: isFirst)
+                tableViewDataSource.apply(snapShot, animatingDifferences: !isFirst)
             })
             .disposed(by: disposeBag)
     }
