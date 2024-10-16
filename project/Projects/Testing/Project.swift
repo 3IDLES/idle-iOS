@@ -25,7 +25,7 @@ let project = Project(
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Sources/**"],
             dependencies: [
-                D.Core
+                D.Domain,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"],
