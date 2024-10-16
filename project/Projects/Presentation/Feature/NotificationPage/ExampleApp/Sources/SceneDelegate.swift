@@ -26,14 +26,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         
         window = UIWindow(windowScene: windowScene)
-        
-        DependencyInjector.shared.assemble([
-            TestAssembly()
-        ])
-        
-        let viewModel = NotificationPageViewModel()
-        
-        window?.rootViewController = NotificationPageVC(viewModel: viewModel)
         window?.makeKeyAndVisible()
     }
 }
