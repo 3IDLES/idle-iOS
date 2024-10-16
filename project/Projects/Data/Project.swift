@@ -74,6 +74,7 @@ let project = Project(
             sources: ["DataTests/**"],
             dependencies: [
                 D.Data.Repository,
+                D.Testing,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.dataConfigurations

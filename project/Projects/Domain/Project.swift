@@ -47,6 +47,7 @@ let project = Project(
 
                 // for test
                 D.Domain,
+                D.Testing,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.domainConfigurations
