@@ -22,6 +22,7 @@ protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelable & Clo
     
     /// ‼️임시조치: 알림 확인창 오픈 여부를 설정합니다.
     var showNotificationButton: Bool { get }
+    var notificationButtonClicked: PublishSubject<Void> { get }
 }
 
 class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModelable {
@@ -34,16 +35,18 @@ class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModel
     var presentRegisterPostPage: (() -> ())?
     var presentSnackBar: ((IdleSnackBarRO, CGFloat) -> ())?
     var createPostCellViewModel: ((RecruitmentPostInfoForCenterVO, PostState) -> CenterEmployCardViewModelable)!
+    var presentNotificationPage: (() -> ())?
 
     // Input
     var requestOngoingPost: PublishRelay<Void> = .init()
     var requestClosedPost: PublishRelay<Void> = .init()
-    var registerPostButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    var registerPostButtonClicked: PublishRelay<Void> = .init()
+    var notificationButtonClicked: PublishSubject<Void> = .init()
     
     // Output
-    var ongoingPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
-    var closedPostInfo: RxCocoa.Driver<[RecruitmentPostInfoForCenterVO]>?
-    var showRemovePostAlert: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
+    var ongoingPostInfo: Driver<[RecruitmentPostInfoForCenterVO]>?
+    var closedPostInfo: Driver<[RecruitmentPostInfoForCenterVO]>?
+    var showRemovePostAlert: Driver<IdleAlertViewModelable>?
     
     var showNotificationButton: Bool = false
     
@@ -183,6 +186,14 @@ class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModel
             alert.onNext(alertVO)
         })
         .disposed(by: disposeBag)
+        
+        // MARK: Notification page
+        notificationButtonClicked
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentNotificationPage?()
+            })
+            .disposed(by: disposeBag)
     }
 }
 

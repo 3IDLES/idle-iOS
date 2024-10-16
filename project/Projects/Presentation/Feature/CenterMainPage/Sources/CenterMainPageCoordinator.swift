@@ -16,6 +16,7 @@ public enum CenterMainPageCoordinatorDestination {
     case authFlow
     case myCenterProfilePage
     case accountDeregisterPage
+    case notificationPage
 }
 
 public class CenterMainPageCoordinator: BaseCoordinator {
@@ -89,6 +90,10 @@ public extension CenterMainPageCoordinator {
         viewModel.presentRegisterPostPage = { [weak self] in
             self?.startFlow(.createPostPage)
         }
+        viewModel.presentNotificationPage = { [weak self] in
+            self?.startFlow(.notificationPage)
+        }
+        
         viewModel.createPostCellViewModel = { [weak self] info, state in
             
             let cellViewModel = CenterEmployCardVM(

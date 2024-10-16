@@ -164,6 +164,11 @@ class PostBoardPageViewController: BaseViewController {
         
         // 임시 설정
         topView.notificationPageButton.isHidden = !viewModel.showNotificationButton
+        
+        // 알림 페이지 버튼 클릭
+        topView.notificationPageButton.rx.tap
+            .bind(to: viewModel.notificationButtonClicked)
+            .disposed(by: disposeBag)
     
         (viewControllerDict[.onGoingPost] as? OnGoingPostVC)?.bind(viewModel: viewModel)
         (viewControllerDict[.closedPost] as? ClosedPostVC)?.bind(viewModel: viewModel)

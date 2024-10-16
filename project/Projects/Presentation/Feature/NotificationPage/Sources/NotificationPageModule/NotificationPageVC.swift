@@ -23,7 +23,7 @@ protocol NotificationPageViewModelable: BaseViewModel {
     var exitButtonClicked: PublishSubject<Void> { get }
     
     // Output
-    var tableData: Driver<[SectionInfo: [NotificationVO]]>? { get }
+    var tableData: Driver<(Bool, [SectionInfo : [NotificationVO]])>? { get }
     
     /// Cell ViewModel생성
     func createCellVM(vo: NotificationVO) -> NotificationCellViewModel
@@ -163,7 +163,7 @@ class NotificationPageVC: BaseViewController {
         // Output
         viewModel
             .tableData?
-            .drive(onNext: { [weak self] tableData in
+            .drive(onNext: { [weak self] (isFirst, tableData) in
                 
                 guard let self else { return }
                 
@@ -178,7 +178,7 @@ class NotificationPageVC: BaseViewController {
                     snapShot.appendItems(itemIds, toSection: section.rawValue)
                 }
                 
-                tableViewDataSource.apply(snapShot)
+                tableViewDataSource.apply(snapShot, animatingDifferences: isFirst)
             })
             .disposed(by: disposeBag)
     }

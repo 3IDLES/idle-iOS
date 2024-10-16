@@ -74,5 +74,10 @@ public struct DataAssembly: Assembly {
         container.register(NotificationTokenRepository.self) { _ in
             return RootFeature.FCMTokenRepository()
         }
+        
+        // MARK: 알림 데이터 레포지토리
+        container.register(NotificationsRepository.self) { _ in
+            DefaultNotificationsRepository()
+        }
     }
 }

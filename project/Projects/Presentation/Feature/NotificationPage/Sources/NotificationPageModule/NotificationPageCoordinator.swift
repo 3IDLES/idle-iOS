@@ -17,6 +17,8 @@ public class NotificationPageCoordinator: Coordinator {
     
     public var onFinish: (() -> ())?
     
+    public init() { }
+    
     public func start() {
         
         let viewModel = NotificationPageViewModel()
