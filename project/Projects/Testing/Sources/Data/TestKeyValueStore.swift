@@ -12,8 +12,8 @@ class TestKeyValueStore: KeyValueStore {
     
     init(testStore: [String : String] = [:]) {
         self.testStore = [
-            Key.Auth.kaccessToken: "access_token",
-            Key.Auth.krefreshToken: "refresh_token",
+            KeyValueStoreKey.kaccessToken: "access_token",
+            KeyValueStoreKey.krefreshToken: "refresh_token",
         ].merging(testStore, uniquingKeysWith: { $1 })
     }
     
