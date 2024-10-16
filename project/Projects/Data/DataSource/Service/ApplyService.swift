@@ -7,7 +7,6 @@
 
 import Foundation
 
-public class ApplyService: BaseNetworkService<ApplyAPI> {
-    
-    public override init() { }
-}
+public protocol ApplyService: NetworkService where TagetAPI == ApplyAPI { }
+
+public class DefaultApplyService: BaseNetworkService<ApplyAPI>, ApplyService { }

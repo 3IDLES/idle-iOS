@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class NotificationTokenTransferService: BaseNetworkService<NotificationTokenAPI> {
-    
-    public override init() { }
-}
+
+public protocol NotificationTokenTransferService: NetworkService where TagetAPI == NotificationTokenAPI { }
+
+public class DefaultNotificationTokenTransferService: BaseNetworkService<NotificationTokenAPI>, NotificationTokenTransferService { }

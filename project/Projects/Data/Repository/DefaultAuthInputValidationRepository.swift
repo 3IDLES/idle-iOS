@@ -15,7 +15,7 @@ import RxSwift
 
 public class DefaultAuthInputValidationRepository: AuthInputValidationRepository {
     
-    let networkService = AuthService()
+    @Injected var networkService: any AuthService
     
     public init() { }
     

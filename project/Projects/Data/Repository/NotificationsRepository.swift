@@ -13,19 +13,19 @@ import Core
 
 public class DefaultNotificationsRepository: NotificationsRepository {
     
-    let service: NotificationsService = .init()
+    @Injected var notificationsService: any NotificationsService
     
     public init() { }
     
     public func readNotification(id: String) -> Sult<Void, DomainError> {
-        let dataTask = service
+        let dataTask = notificationsService
             .request(api: .readNotification(id: id), with: .withToken)
             .mapToVoid()
         return convertToDomain(task: dataTask)
     }
     
     public func unreadNotificationCount() -> Sult<Int, DomainError> {
-        let dataTask = service.request(api: .notReadNotificationsCount, with: .withToken)
+        let dataTask = notificationsService.request(api: .notReadNotificationsCount, with: .withToken)
             .map { response -> Int in
                 let jsonObject = try JSONSerialization.jsonObject(with: response.data) as! [String: Any]
                 let count = jsonObject["unreadNotificationCount"] as! Int
@@ -35,7 +35,7 @@ public class DefaultNotificationsRepository: NotificationsRepository {
     }
     
     public func notifcationList() -> Sult<[NotificationVO], DomainError> {
-        let dataTask = service.request(api: .allNotifications, with: .withToken)
+        let dataTask = notificationsService.request(api: .allNotifications, with: .withToken)
             .map { response in
                 let data = response.data
                 let decoded = try JSONDecoder().decode([NotificationItemDTO].self, from: data)

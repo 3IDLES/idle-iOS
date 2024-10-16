@@ -7,7 +7,6 @@
 
 import Foundation
 
-public class NotificationsService: BaseNetworkService<NotificationsAPI> {
-    
-    public override init() { }
-}
+public protocol NotificationsService: NetworkService where TagetAPI == NotificationsAPI { }
+
+public class DefaultNotificationsService: BaseNetworkService<NotificationsAPI>, NotificationsService { }

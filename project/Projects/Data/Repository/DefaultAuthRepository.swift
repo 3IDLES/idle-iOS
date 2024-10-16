@@ -16,8 +16,7 @@ import RxSwift
 public class DefaultAuthRepository: AuthRepository {
     
     @Injected var keyValueStore: KeyValueStore
-    
-    let networkService = AuthService()
+    @Injected var authService: any AuthService
     
     public init() { }
 }
@@ -43,14 +42,14 @@ public extension DefaultAuthRepository {
         
         let data = (try? JSONEncoder().encode(dto)) ?? Data()
         
-        let dataTask = networkService.request(api: .registerCenterAccount(data: data), with: .plain)
+        let dataTask = authService.request(api: .registerCenterAccount(data: data), with: .plain)
             .mapToVoid()
         
         return convertToDomain(task: dataTask)
     }
     
     func requestCenterLogin(id: String, password: String) -> Single<Result<Void, DomainError>> {
-        let dataTask = networkService.requestDecodable(api: .centerLogin(id: id, password: password), with: .plain)
+        let dataTask = authService.requestDecodable(api: .centerLogin(id: id, password: password), with: .plain)
             .flatMap { [unowned self] in
                 saveTokenToStore(token: $0)
             }
@@ -59,7 +58,7 @@ public extension DefaultAuthRepository {
     }
     
     func signoutCenterAccount() -> Single<Result<Void, DomainError>> {
-        let dataTask = networkService
+        let dataTask = authService
             .request(api: .signoutCenterAccount, with: .withToken)
             .mapToVoid()
         
@@ -70,7 +69,7 @@ public extension DefaultAuthRepository {
         
         let reasonString = reasons.joined(separator: "|")
         
-        let dataTask = networkService
+        let dataTask = authService
             .request(
                 api: .deregisterCenterAccount(
                     reason: reasonString,
@@ -84,7 +83,7 @@ public extension DefaultAuthRepository {
     }
     
     func getCenterJoinStatus() -> Single<Result<CenterJoinStatusInfoVO, DomainError>> {
-        let dataTask = networkService
+        let dataTask = authService
             .request(api: .centerJoinStatus, with: .withToken)
             .map(CenterJoinStatusInfoVO.self)
         
@@ -92,7 +91,7 @@ public extension DefaultAuthRepository {
     }
     
     func requestCenterJoin() -> Single<Result<Void, DomainError>> {
-        let dataTask = networkService
+        let dataTask = authService
             .request(api: .requestCenterJoin, with: .withToken)
             .mapToVoid()
         
@@ -100,7 +99,7 @@ public extension DefaultAuthRepository {
     }
     
     func setNewPassword(phoneNumber: String, password: String) -> Single<Result<Void, DomainError>> {
-        let dataTask = networkService
+        let dataTask = authService
             .request(api: .makeNewPassword(phoneNumber: phoneNumber, newPassword: password), with: .plain)
             .mapToVoid()
         
@@ -124,21 +123,21 @@ public extension DefaultAuthRepository {
         
         let data = (try? JSONEncoder().encode(dto)) ?? Data()
         
-        let dataTask = networkService.requestDecodable(api: .registerWorkerAccount(data: data), with: .plain)
+        let dataTask = authService.requestDecodable(api: .registerWorkerAccount(data: data), with: .plain)
             .flatMap { [unowned self] in saveTokenToStore(token: $0) }
         
         return convertToDomain(task: dataTask)
     }
     
     func requestWorkerLogin(phoneNumber: String, authNumber: String) -> Single<Result<Void, DomainError>> {
-        let dataTask = networkService.requestDecodable(api: .workerLogin(phoneNumber: phoneNumber, verificationNumber: authNumber), with: .plain)
+        let dataTask = authService.requestDecodable(api: .workerLogin(phoneNumber: phoneNumber, verificationNumber: authNumber), with: .plain)
             .flatMap { [unowned self] in saveTokenToStore(token: $0) }
         
         return convertToDomain(task: dataTask)
     }
     
     func signoutWorkerAccount() -> Single<Result<Void, DomainError>> {
-        let dataTask = networkService
+        let dataTask = authService
             .request(api: .signoutWorkerAccount, with: .withToken)
             .mapToVoid()
         
@@ -147,7 +146,7 @@ public extension DefaultAuthRepository {
     
     func deregisterWorkerAccount(reasons: [String]) -> Single<Result<Void, DomainError>> {
         let reasonString = reasons.joined(separator: "|")
-        let dataTask = networkService
+        let dataTask = authService
             .request(
                 api: .deregisterWorkerAccount(reason: reasonString),
                 with: .withToken

@@ -8,13 +8,14 @@
 import Foundation
 import Domain
 import DataSource
+import Core
 
 
 import RxSwift
 
 public class DefaultNotificationTokenTransferRepository: NotificationTokenTransferRepository {
     
-    let transferService: NotificationTokenTransferService = .init()
+    @Injected var transferService: any NotificationTokenTransferService
     
     public init() { }
     

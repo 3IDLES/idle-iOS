@@ -8,6 +8,7 @@
 import Foundation
 import Domain
 import DataSource
+import Core
 
 
 import Moya
@@ -15,9 +16,9 @@ import RxSwift
 
 public class DefaultRecruitmentPostRepository: RecruitmentPostRepository {
     
-    private var recruitmentPostService: RecruitmentPostService = .init()
-    private var crawlingPostService: CrawlingPostService = .init()
-    private var applyService: ApplyService = .init()
+    @Injected var recruitmentPostService: any RecruitmentPostService
+    @Injected var crawlingPostService: any CrawlingPostService
+    @Injected var applyService: any ApplyService
     
     public init() { }
     

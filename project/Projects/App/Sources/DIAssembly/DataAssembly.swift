@@ -30,6 +30,31 @@ public struct DataAssembly: Assembly {
         container.register(LocalStorageService.self) { _ in
             return DefaultLocalStorageService()
         }
+        container.register((any ApplyService).self) { _ in
+            DefaultApplyService()
+        }
+        container.register((any AuthService).self) { _ in
+            DefaultAuthService()
+        }
+        container.register((any CrawlingPostService).self) { _ in
+            DefaultCrawlingPostService()
+        }
+        container.register((any ExternalRequestService).self) { _ in
+            DefaultExternalRequestService()
+        }
+        container.register((any NotificationsService).self) { _ in
+            DefaultNotificationsService()
+        }
+        container.register((any NotificationTokenTransferService).self) { _ in
+            DefaultNotificationTokenTransferService()
+        }
+        container.register((any RecruitmentPostService).self) { _ in
+            DefaultRecruitmentPostService()
+        }
+        container.register((any UserInformationService).self) { _ in
+            DefaultUserInformationService()
+        }
+        
         
         // MARK: 캐싱 레포지토리
         container.register(CacheRepository.self) { _ in

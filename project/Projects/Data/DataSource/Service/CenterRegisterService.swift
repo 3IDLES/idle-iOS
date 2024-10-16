@@ -7,7 +7,6 @@
 
 import Foundation
 
-public class AuthService: BaseNetworkService<AuthAPI> {
-    
-    public override init() { }
-}
+public protocol AuthService: NetworkService where TagetAPI == AuthAPI { }
+
+public class DefaultAuthService: BaseNetworkService<AuthAPI>, AuthService { }
