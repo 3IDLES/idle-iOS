@@ -25,7 +25,7 @@ class PostApplicantDeeplink: DeeplinkExecutable {
             return nil
         }
         
-        guard let postId = userInfo?["postId"] as? String else { return nil }
+        guard let postId = userInfo?["jobPostingId"] as? String else { return nil }
         
         centerMainPageCoordinator.presentPostApplicantPage(postId: postId)
         
