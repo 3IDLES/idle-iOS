@@ -31,7 +31,7 @@ public class DefaultRemoteNotificationHelper: NSObject, RemoteNotificationHelper
     public func handleNotificationInApp(detail: Domain.NotificationDetailVO) {
         switch detail {
         case .applicant(let id):
-            let desination: PreDefinedDeeplinkPath = .checkApplicantPage
+            let desination: PreDefinedDeeplinkPath = .checkApplicant
             do {
                 let parsedLinks = try deeplinkParser.makeDeeplinkList(components: desination.links)
                 deeplinks.onNext(.init(
@@ -48,11 +48,11 @@ public class DefaultRemoteNotificationHelper: NSObject, RemoteNotificationHelper
 extension DefaultRemoteNotificationHelper: UNUserNotificationCenterDelegate {
     
     enum PreDefinedDeeplinkPath: String {
-        case checkApplicantPage = "APPLICANT"
+        case checkApplicant = "APPLICANT"
         
         var links: [String] {
             switch self {
-            case .checkApplicantPage:
+            case .checkApplicant:
                 ["CenterMainPage", "PostApplicantPage"]
             }
         }
@@ -74,7 +74,7 @@ extension DefaultRemoteNotificationHelper: UNUserNotificationCenterDelegate {
         
         let userInfo = notification.request.content.userInfo
         
-        let notificationId = userInfo["notificationId"] as? String
+        let _ = userInfo["notificationId"] as? String
         let notificationType = userInfo["notificationType"] as? String
         
         guard let notificationType, let desination = PreDefinedDeeplinkPath(rawValue: notificationType) else { return }
