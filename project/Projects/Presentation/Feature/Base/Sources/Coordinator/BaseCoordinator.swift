@@ -20,6 +20,16 @@ open class BaseCoordinator: Coordinator {
     
     open func start() { }
     
+    public func findChild<T: Coordinator>(coordinatorType: T.Type) -> T? {
+        
+        for child in children {
+            if let target = child as? T {
+                return target
+            }
+        }
+        return nil
+    }
+    
     public func addChild(_ coordinator: Coordinator) {
         
         children.append(coordinator)

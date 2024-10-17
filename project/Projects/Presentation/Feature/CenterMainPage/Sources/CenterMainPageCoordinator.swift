@@ -149,9 +149,9 @@ public extension CenterMainPageCoordinator {
 }
 
 // MARK: SubPages
-extension CenterMainPageCoordinator {
+public extension CenterMainPageCoordinator {
     
-    public func presentPostApplicantPage(postId: String) {
+    func presentPostApplicantPage(postId: String) {
         
         let viewModel = PostApplicantViewModel(postId: postId)
         viewModel.createCellViewModel = { applicantVO in
@@ -175,7 +175,7 @@ extension CenterMainPageCoordinator {
         router.push(module: viewController, animated: true)
     }
     
-    public func presentPostEditPage(postId: String) {
+    func presentPostEditPage(postId: String) {
         let viewModel = EditPostVM(id: postId)
         viewModel.exitPage = { [weak self] in
             self?.router.popModule(animated: true)
@@ -190,7 +190,7 @@ extension CenterMainPageCoordinator {
         router.push(module: viewController, animated: true)
     }
     
-    public func presentPostDetailPage(postId: String, postState: PostState) {
+    func presentPostDetailPage(postId: String, postState: PostState) {
         let viewModel = PostDetailViewModel(postId: postId, postState: postState)
         
         viewModel.presentApplicantPage = { [weak self] postId in

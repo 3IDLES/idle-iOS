@@ -20,15 +20,31 @@ class PostApplicantDeeplink: DeeplinkExecutable {
     init() { }
     
     func execute(with coordinator: any BaseFeature.Coordinator, userInfo: [AnyHashable : Any]?) -> Coordinator? {
+    
         
-        guard let centerMainPageCoordinator = coordinator as? CenterMainPageCoordinator else {
+        var targetCoordinator: CenterMainPageCoordinator
+        
+        if let centerMainCoordinator = coordinator as? CenterMainPageCoordinator {
+            
+            // 상위 Coordinator가 CenterMainPageCoordinator일 경우
+            
+            targetCoordinator = centerMainCoordinator
+            
+        } else if let appCoordinator = coordinator as? AppCoordinator, let centerMainCoordinator = appCoordinator.findChild(coordinatorType: CenterMainPageCoordinator.self) {
+            
+            // 상위 Coordinator가 AppCoordinator일 경우
+            
+            targetCoordinator = centerMainCoordinator
+            
+        } else {
+            
             return nil
         }
         
         guard let postId = userInfo?["jobPostingId"] as? String else { return nil }
         
-        centerMainPageCoordinator.presentPostApplicantPage(postId: postId)
+        targetCoordinator.presentPostApplicantPage(postId: postId)
         
-        return centerMainPageCoordinator
+        return targetCoordinator
     }
 }
