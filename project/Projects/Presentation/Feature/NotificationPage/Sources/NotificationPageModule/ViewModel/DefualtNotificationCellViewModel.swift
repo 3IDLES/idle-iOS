@@ -56,6 +56,21 @@ class NotificationCellViewModel {
         }
         
         // MARK: 클릭 이벤트
+        
+        /// 딥링크 처리
+        cellClicked
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                
+                guard let notificationDetails = notificationVO.notificationDetails else { return }
+                
+                obj.remoteNotificationHelper
+                    .handleNotificationInApp(detail: notificationDetails)
+            })
+            .disposed(by: disposeBag)
+        
+        
+        /// 읽음 처리
         let readRequestResult = cellClicked
             .unretained(self)
             .flatMap { (obj, _) in
