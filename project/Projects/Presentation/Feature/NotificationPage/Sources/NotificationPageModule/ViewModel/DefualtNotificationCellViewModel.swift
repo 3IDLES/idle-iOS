@@ -22,6 +22,7 @@ class NotificationCellViewModel {
     // Injected
     @Injected var cacheRepository: CacheRepository
     @Injected var notificationsRepository: NotificationsRepository
+    @Injected var remoteNotificationHelper: RemoteNotificationHelper
     
     // Navigation
     var presentAlert: ((DefaultAlertObject) -> ())?

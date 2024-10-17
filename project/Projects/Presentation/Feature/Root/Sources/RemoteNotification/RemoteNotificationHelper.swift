@@ -8,17 +8,11 @@
 import Foundation
 import UserNotifications
 import BaseFeature
+import Domain
 import Core
 
 
 import RxSwift
-
-public protocol RemoteNotificationHelper {
-    
-    var deeplinks: BehaviorSubject<DeeplinkBundle> { get }
-}
-
-
 
 public class DefaultRemoteNotificationHelper: NSObject, RemoteNotificationHelper {
     
@@ -33,12 +27,28 @@ public class DefaultRemoteNotificationHelper: NSObject, RemoteNotificationHelper
         super.init()
         UNUserNotificationCenter.current().delegate = self
     }
+    
+    public func handleNotificationInApp(detail: Domain.NotificationDetailVO) {
+        switch detail {
+        case .applicant(let id):
+            let desination: PreDefinedDeeplinkPath = .checkApplicantPage
+            do {
+                let parsedLinks = try deeplinkParser.makeDeeplinkList(components: desination.links)
+                deeplinks.onNext(.init(
+                    deeplinks: parsedLinks,
+                    userInfo: ["jobPostingId": id]
+                ))
+            } catch {
+                printIfDebug("딥링크 파싱실패 \(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 extension DefaultRemoteNotificationHelper: UNUserNotificationCenterDelegate {
     
     enum PreDefinedDeeplinkPath: String {
-        case checkApplicantPage = "PostApplicantPage"
+        case checkApplicantPage = "APPLICANT"
         
         var links: [String] {
             switch self {
@@ -57,25 +67,26 @@ extension DefaultRemoteNotificationHelper: UNUserNotificationCenterDelegate {
     /// 앱이 백그라운드에 있는 경우, 유저가 노티피케이션을 통해 액션을 선택한 경우 호출
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
-        handleDeepLink(notification: response.notification)
+        handleNotification(notification: response.notification)
     }
     
-    private func handleDeepLink(notification: UNNotification) {
+    private func handleNotification(notification: UNNotification) {
         
         let userInfo = notification.request.content.userInfo
         
-        if let linkInfo = userInfo["link"] as? String, let desination = PreDefinedDeeplinkPath(rawValue: linkInfo) {
-
-            do {
-                let parsedLinks = try deeplinkParser.makeDeeplinkList(components: desination.links)
-                deeplinks.onNext(.init(
-                    deeplinks: parsedLinks,
-                    userInfo: userInfo
-                ))
-                
-            } catch {
-                printIfDebug("딥링크 파싱실패 \(error.localizedDescription)")
-            }
+        let notificationId = userInfo["notificationId"] as? String
+        let notificationType = userInfo["notificationType"] as? String
+        
+        guard let notificationType, let desination = PreDefinedDeeplinkPath(rawValue: notificationType) else { return }
+        
+        do {
+            let parsedLinks = try deeplinkParser.makeDeeplinkList(components: desination.links)
+            deeplinks.onNext(.init(
+                deeplinks: parsedLinks,
+                userInfo: userInfo
+            ))
+        } catch {
+            printIfDebug("딥링크 파싱실패 \(error.localizedDescription)")
         }
     }
 }
