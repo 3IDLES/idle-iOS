@@ -31,9 +31,9 @@ public class DefaultRemoteNotificationHelper: NSObject, RemoteNotificationHelper
     public func handleNotificationInApp(detail: Domain.NotificationDetailVO) {
         switch detail {
         case .applicant(let id):
-            let desination: PreDefinedDeeplinkPath = .checkApplicant
+            let desination: PreDefinedDeeplinkPath = .postApplicant
             do {
-                let parsedLinks = try deeplinkParser.makeDeeplinkList(components: desination.links)
+                let parsedLinks = try deeplinkParser.makeDeeplinkList(components: desination.insideLinks, startFromRoot: false)
                 deeplinks.onNext(.init(
                     deeplinks: parsedLinks,
                     userInfo: ["jobPostingId": id]
@@ -46,17 +46,6 @@ public class DefaultRemoteNotificationHelper: NSObject, RemoteNotificationHelper
 }
 
 extension DefaultRemoteNotificationHelper: UNUserNotificationCenterDelegate {
-    
-    enum PreDefinedDeeplinkPath: String {
-        case checkApplicant = "APPLICANT"
-        
-        var links: [String] {
-            switch self {
-            case .checkApplicant:
-                ["CenterMainPage", "PostApplicantPage"]
-            }
-        }
-    }
     
     /// 앱이 포그라운드에 있는 경우, 노티페이케이션이 도착하기만 하면 호출된다.
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
@@ -80,7 +69,7 @@ extension DefaultRemoteNotificationHelper: UNUserNotificationCenterDelegate {
         guard let notificationType, let desination = PreDefinedDeeplinkPath(rawValue: notificationType) else { return }
         
         do {
-            let parsedLinks = try deeplinkParser.makeDeeplinkList(components: desination.links)
+            let parsedLinks = try deeplinkParser.makeDeeplinkList(components: desination.outsideLinks)
             deeplinks.onNext(.init(
                 deeplinks: parsedLinks,
                 userInfo: userInfo

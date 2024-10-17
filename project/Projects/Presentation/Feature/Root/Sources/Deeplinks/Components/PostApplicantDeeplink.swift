@@ -11,7 +11,7 @@ import BaseFeature
 
 class PostApplicantDeeplink: DeeplinkExecutable {
     
-    var name: String = "PostApplicantPage"
+    var component: DeepLinkPathComponent = .postApplicantPage
     
     var children: [DeeplinkExecutable] = []
     

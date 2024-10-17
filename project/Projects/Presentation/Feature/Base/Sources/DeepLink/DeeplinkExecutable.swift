@@ -9,11 +9,11 @@ import Foundation
 
 public protocol DeeplinkTreeNode {
     
-    var name: String { get }
+    var component: DeepLinkPathComponent { get }
     var children: [DeeplinkExecutable] { get }
     var isDestination: Bool { get set }
     
-    func findChild(name: String) -> DeeplinkExecutable?
+    func findChild(component: DeepLinkPathComponent) -> DeeplinkExecutable?
 }
 
 public protocol DeeplinkExecutable: DeeplinkTreeNode {
@@ -23,8 +23,8 @@ public protocol DeeplinkExecutable: DeeplinkTreeNode {
 
 public extension DeeplinkExecutable {
     
-    func findChild(name: String) -> DeeplinkExecutable? {
-        children.first(where: { $0.name == name })
+    func findChild(component: DeepLinkPathComponent) -> DeeplinkExecutable? {
+        children.first(where: { $0.component == component })
     }
 }
 

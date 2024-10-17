@@ -18,3 +18,27 @@ public protocol RemoteNotificationHelper {
     /// 인앱에서 발생한 Notification을 처리합니다.
     func handleNotificationInApp(detail: NotificationDetailVO)
 }
+
+public enum DeepLinkPathComponent {
+    case centerMainPage
+    case postApplicantPage
+    case splashPage
+}
+
+public enum PreDefinedDeeplinkPath: String {
+    case postApplicant = "APPLICANT"
+    
+    public var outsideLinks: [DeepLinkPathComponent] {
+        switch self {
+        case .postApplicant:
+            [.centerMainPage, .postApplicantPage]
+        }
+    }
+    
+    public var insideLinks: [DeepLinkPathComponent] {
+        switch self {
+        case .postApplicant:
+            [.postApplicantPage]
+        }
+    }
+}
