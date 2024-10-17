@@ -10,7 +10,7 @@ import BaseFeature
 
 class CenterMainPageDeeplink: DeeplinkExecutable {
     
-    var name: String = "CenterMainPage"
+    var component: DeepLinkPathComponent = .centerMainPage
     
     var children: [DeeplinkExecutable] = [
         PostApplicantDeeplink()

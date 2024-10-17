@@ -11,7 +11,7 @@ import BaseFeature
 
 class SplashDeeplink: DeeplinkExecutable {
     
-    var name: String = "SplashPage"
+    var component: DeepLinkPathComponent = .splashPage
     
     var children: [DeeplinkExecutable] = []
     
