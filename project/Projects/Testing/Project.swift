@@ -25,8 +25,7 @@ let project = Project(
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["Sources/**"],
             dependencies: [
-                D.Domain,
-                D.Data.DataSource,
+                
                 D.Data.Repository,
                 
                 D.Presentation.BaseFeature,

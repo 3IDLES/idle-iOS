@@ -46,7 +46,6 @@ let project = Project(
             dependencies: [
 
                 // for test
-                D.Domain,
                 D.Testing,
             ],
             settings: .settings(
