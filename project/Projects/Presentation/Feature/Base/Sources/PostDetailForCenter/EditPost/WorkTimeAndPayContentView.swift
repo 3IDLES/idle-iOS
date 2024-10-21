@@ -32,10 +32,16 @@ public class WorkTimeAndPayContentView: UIView {
     // 근무 요일
     let workDayButtons: [StateButtonTyp1] = {
         WorkDay.allCases.map { day in
-            StateButtonTyp1(
+            var normalSetting = StateButtonTyp1.StateSetting.normalDefault
+            normalSetting.typography = .Body2
+            
+            let button = StateButtonTyp1(
                 text: day.korOneLetterText,
-                initial: .normal
+                initial: .normal,
+                normalAppearance: normalSetting
             )
+            
+            return button
         }
     }()
     
@@ -107,7 +113,7 @@ public class WorkTimeAndPayContentView: UIView {
                     IdleContentTitleLabel(titleText: "근무 요일"),
                     HStack([
                         workDayButtons as [UIView],
-                        [UIView()]
+                        [Spacer()]
                     ].flatMap({ $0 }), spacing: 4),
                 ],
                 spacing: 6,

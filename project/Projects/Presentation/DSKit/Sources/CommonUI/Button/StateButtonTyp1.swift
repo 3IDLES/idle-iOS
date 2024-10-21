@@ -13,21 +13,26 @@ public class StateButtonTyp1: UIView {
     // Init values
     public private(set) var state: State
     
-    public var normalAppearance = StateSetting.normalDefault
-    public var accentAppearance = StateSetting.accentDefault
+    public var normalAppearance: StateSetting
+    public var accentAppearance: StateSetting
     
     public let eventPublisher: PublishRelay<State> = .init()
     
     // View
     public let label: IdleLabel = {
-       
         let view = IdleLabel(typography: .Body3)
-        
         return view
     }()
     
-    public init(text: String, initial: State) {
+    public init(
+        text: String,
+        initial: State,
+        normalAppearance: StateSetting = .normalDefault,
+        accentAppearance: StateSetting = .accentDefault
+    ) {
         self.state = initial
+        self.normalAppearance = normalAppearance
+        self.accentAppearance = accentAppearance
         
         super.init(frame: .zero)
         
@@ -46,7 +51,7 @@ public class StateButtonTyp1: UIView {
         self.layer.cornerRadius = 6.0
         self.clipsToBounds = true
         
-        applySetting(setting: self.state == .accent ? .accentDefault : .normalDefault)
+        applySetting(setting: self.state == .accent ? accentAppearance : normalAppearance)
     }
     
     private func setAutoLayout() {
@@ -114,13 +119,13 @@ public extension StateButtonTyp1 {
     
     struct StateSetting {
         
-        let textColor: UIColor
-        let typography: Typography
+        public var textColor: UIColor
+        public var typography: Typography
         
-        let borderColor: UIColor
-        let backgroundColor: UIColor
+        public var borderColor: UIColor
+        public var backgroundColor: UIColor
         
-        static var normalDefault: StateSetting {
+        public static var normalDefault: StateSetting {
             StateSetting(
                 textColor: DSKitAsset.Colors.gray500.color,
                 typography: .Body3,
@@ -129,7 +134,7 @@ public extension StateButtonTyp1 {
             )
         }
         
-        static var accentDefault: StateSetting {
+        public static var accentDefault: StateSetting {
             StateSetting(
                 textColor: DSKitAsset.Colors.orange500.color,
                 typography: .Subtitle4,
