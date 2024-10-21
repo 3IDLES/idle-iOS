@@ -85,7 +85,7 @@ public class StateButtonTyp1: UIView {
         }
     }
     
-    public func setState(_ state: State, withAnimation: Bool = true) {
+    public func setState(_ state: State, withAnimation: Bool = false) {
         
         if self.state == state { return }
         

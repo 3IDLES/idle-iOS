@@ -26,6 +26,13 @@ public class IdleLabel: UILabel {
         updateText()
     }
     
+    public override var intrinsicContentSize: CGSize {
+        return .init(
+            width: super.intrinsicContentSize.width,
+            height: typography.lineHeight!
+        )
+    }
+    
     public required init?(coder: NSCoder) { fatalError() }
     
     public var typography: Typography {
@@ -93,6 +100,6 @@ public class IdleLabel: UILabel {
         let attributedStr = NSMutableAttributedString(string: currentText, attributes: currentAttributes)
         
         self.attributedText = attributedStr
-        self.sizeToFit()
+        self.invalidateIntrinsicContentSize()
     }
 }
