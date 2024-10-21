@@ -73,7 +73,6 @@ let project = Project(
             deploymentTargets: DeploymentSettings.deployment_version,
             sources: ["DataTests/**"],
             dependencies: [
-                D.Data.Repository,
                 D.Testing,
             ],
             settings: .settings(
