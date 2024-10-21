@@ -21,6 +21,7 @@ public enum Typography {
     case Heading2
     case Heading3
     case Heading4
+    case Heading5
     
     case Subtitle1
     case Subtitle2
@@ -37,23 +38,25 @@ public enum Typography {
     var lineHeight: CGFloat? {
         switch self {
         case .Heading1:
-            36
+            38
         case .Heading2:
-            32
+            36
         case .Heading3:
-            30
+            32
         case .Heading4:
+            30
+        case .Heading5:
             26
             
             
         case .Subtitle1:
-            32
+            36
         case .Subtitle2:
-            30
+            32
         case .Subtitle3:
-            26
+            30
         case .Subtitle4:
-            22
+            26
             
             
         case .Body1:
@@ -61,6 +64,9 @@ public enum Typography {
         case .Body2:
             26
         case .Body3:
+            22
+            
+        case .caption:
             22
             
         default:
@@ -89,77 +95,93 @@ public enum Typography {
         case .Heading2:
             createAttribute(
                 weight: .Bold,
-                size: 20,
+                size: 22,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
         case .Heading3:
             createAttribute(
                 weight: .Bold,
-                size: 18,
+                size: 20,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
         case .Heading4:
             createAttribute(
                 weight: .Bold,
+                size: 18,
+                letterSpacing: -0.2,
+                color: DSKitAsset.Colors.gray900.color
+            )
+        case .Heading5:
+            createAttribute(
+                weight: .Bold,
                 size: 16,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
+            
+            
         case .Subtitle1:
             createAttribute(
                 weight: .Semibold,
-                size: 20,
+                size: 22,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
         case .Subtitle2:
             createAttribute(
                 weight: .Semibold,
-                size: 18,
+                size: 20,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
         case .Subtitle3:
             createAttribute(
                 weight: .Semibold,
-                size: 16,
+                size: 18,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
         case .Subtitle4:
             createAttribute(
                 weight: .Semibold,
-                size: 14,
+                size: 16,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
+            
+            
+            
         case .Body1:
             createAttribute(
                 weight: .medium,
-                size: 18,
+                size: 20,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
         case .Body2:
             createAttribute(
                 weight: .medium,
-                size: 16,
+                size: 18,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
         case .Body3:
             createAttribute(
                 weight: .medium,
-                size: 14,
+                size: 16,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
+            
+            
+            
+        
         case .caption:
             createAttribute(
                 weight: .medium,
-                size: 12,
+                size: 14,
                 letterSpacing: -0.2,
                 color: DSKitAsset.Colors.gray900.color
             )
