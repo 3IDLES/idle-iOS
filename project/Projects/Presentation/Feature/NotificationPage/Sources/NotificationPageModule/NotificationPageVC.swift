@@ -62,6 +62,15 @@ class NotificationPageVC: BaseViewController {
         let bar: IdleNavigationBar = .init(titleText: "알림")
         return bar
     }()
+    
+    let emptyView: EmptyNotificationPageView = {
+        let view: EmptyNotificationPageView = .init(
+            titleText: "아직 받은 알림이 없어요.",
+            descriptionText: "최근 30 이내의 알림만 확인할 수 있어요."
+        )
+        view.isHidden = true
+        return view
+    }()
 
     var tableViewDataSource: UITableViewDiffableDataSource<Int, String>!
     let tableView: UITableView = {
@@ -124,8 +133,10 @@ class NotificationPageVC: BaseViewController {
     
     private func setLayout() {
         [
+            // zindex순서
+            tableView,
+            emptyView,
             navigationBar,
-            tableView
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
@@ -133,13 +144,18 @@ class NotificationPageVC: BaseViewController {
         
         NSLayoutConstraint.activate([
             navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            navigationBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            navigationBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            navigationBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             
             tableView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            emptyView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            emptyView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            emptyView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            emptyView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
     }
     
@@ -166,6 +182,9 @@ class NotificationPageVC: BaseViewController {
             .drive(onNext: { [weak self] (isFirst, tableData) in
                 
                 guard let self else { return }
+                
+                // 전달된 알림이 없는 경우
+                emptyView.isHidden = tableData.count != 0
                 
                 self.tableData = tableData
             

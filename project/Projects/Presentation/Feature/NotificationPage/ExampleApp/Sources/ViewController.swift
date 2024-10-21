@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import BaseFeature
 
 class ViewController: UIViewController {
     

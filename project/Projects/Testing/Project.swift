@@ -28,6 +28,8 @@ let project = Project(
                 D.Domain,
                 D.Data.DataSource,
                 D.Data.Repository,
+                
+                D.Presentation.BaseFeature,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"],

@@ -7,6 +7,9 @@
 
 import UIKit
 
+import Testing
+import Core
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
