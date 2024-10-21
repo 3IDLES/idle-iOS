@@ -220,7 +220,9 @@ public enum Typography {
             paragraphStyle.minimumLineHeight = lineHeight
             paragraphStyle.maximumLineHeight = lineHeight
             
-            baseLineOffset = (lineHeight-font.lineHeight)/2
+            let wordMinHeight = font.ascender + abs(font.descender)
+            
+            baseLineOffset = (lineHeight-wordMinHeight)/2
         }
         
         return [
