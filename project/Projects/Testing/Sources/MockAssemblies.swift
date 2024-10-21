@@ -6,15 +6,18 @@
 //
 
 import Foundation
-import Domain
+
+import BaseFeature
 import DataSource
+import Domain
 
 
 import Swinject
 
-let MockAssemblies: [Assembly] = [
+public let MockAssemblies: [Assembly] = [
     MockDataAssembly(),
     MockDomainAssembly(),
+    ServiceAssembly()
 ]
 
 // MARK: Domain Assembly
@@ -40,5 +43,21 @@ struct MockDataAssembly: Assembly {
         container.register(LocalStorageService.self) { _ in
             MockLocalStorageService()
         }
+        
+        container.register(NotificationsRepository.self) { _ in
+            MockNotificationsRepository()
+        }
+    }
+}
+
+// MARK: Service Assembly
+
+struct ServiceAssembly: Assembly {
+    
+    func assemble(container: Container) {
+        container.register(RouterProtocol.self) { _ in
+            Router()
+        }
+        .inObjectScope(.container)
     }
 }

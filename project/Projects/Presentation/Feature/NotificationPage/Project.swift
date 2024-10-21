@@ -47,6 +47,7 @@ let project = Project(
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
                 .target(name: "NotificationPageFeature"),
+                D.Testing,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
