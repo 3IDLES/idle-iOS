@@ -22,6 +22,9 @@ protocol NotificationPageViewModelable: BaseViewModel {
     var viewWillAppear: PublishSubject<Void> { get }
     var exitButtonClicked: PublishSubject<Void> { get }
     
+    var requestInitialPageRequest: PublishSubject<Void> { get }
+    var requestNextPage: PublishSubject<Void> { get }
+    
     // Output
     var tableData: Driver<(Bool, [SectionInfo : [NotificationVO]])>? { get }
     
@@ -54,9 +57,6 @@ class NotificationPageVC: BaseViewController {
     // Init
     
     
-    // Table Data
-    private var tableData: [SectionInfo: [NotificationVO]] = [:]
-    
     // View
     let navigationBar: IdleNavigationBar = {
         let bar: IdleNavigationBar = .init(titleText: "알림")
@@ -77,6 +77,11 @@ class NotificationPageVC: BaseViewController {
         let tableView = UITableView()
         return tableView
     }()
+    
+    // Paging
+    var tableData: [SectionInfo: [NotificationVO]] = [:]
+    let requestNextPage: PublishSubject<Void> = .init()
+    var isPaging = true
     
     init(viewModel: NotificationPageViewModelable) {
         super.init(nibName: nil, bundle: nil)
@@ -176,6 +181,10 @@ class NotificationPageVC: BaseViewController {
             .bind(to: viewModel.exitButtonClicked)
             .disposed(by: disposeBag)
         
+        self.rx.viewDidLoad
+            .bind(to: viewModel.requestInitialPageRequest)
+            .disposed(by: disposeBag)
+        
         // Output
         viewModel
             .tableData?
@@ -227,6 +236,23 @@ extension NotificationPageVC: UITableViewDelegate {
             return 0
         default:
             return 8
+        }
+    }
+}
+
+// MARK: ScrollView관련
+extension NotificationPageVC {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.height
+        
+        // 스크롤이 테이블 뷰 Offset의 끝에 가게 되면 다음 페이지를 호출
+        if offsetY > (contentHeight - height) {
+            if !isPaging {
+                isPaging = true
+                requestNextPage.onNext(())
+            }
         }
     }
 }
