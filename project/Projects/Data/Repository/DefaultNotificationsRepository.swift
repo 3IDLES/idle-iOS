@@ -1,5 +1,5 @@
 //
-//  NotificationsRepository.swift
+//  DefaultNotificationsRepository.swift
 //  Repository
 //
 //  Created by choijunios on 10/15/24.
@@ -34,14 +34,17 @@ public class DefaultNotificationsRepository: NotificationsRepository {
         return convertToDomain(task: dataTask)
     }
     
-    public func notifcationList() -> Sult<[NotificationVO], DomainError> {
-        let dataTask = notificationsService.request(api: .allNotifications, with: .withToken)
+    public func notifcationList(next: String? = nil) -> Sult<([NotificationVO], String?), DomainError> {
+        let dataTask = notificationsService.request(api: .allNotifications(next: next), with: .withToken)
             .map { response in
                 let data = response.data
-                let decoded = try JSONDecoder().decode([NotificationItemDTO].self, from: data)
-                return decoded.map { dto in
+                let decoded = try JSONDecoder().decode(PagableListDTO<NotificationItemDTO>.self, from: data)
+                
+                let vo = decoded.items.map { dto in
                     dto.toEntity()
                 }
+                
+                return (vo, decoded.next)
             }
         return convertToDomain(task: dataTask)
     }

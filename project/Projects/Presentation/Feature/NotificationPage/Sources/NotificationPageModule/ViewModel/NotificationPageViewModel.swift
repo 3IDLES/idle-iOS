@@ -28,6 +28,17 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     var viewWillAppear: PublishSubject<Void> = .init()
     var exitButtonClicked: PublishSubject<Void> = .init()
     
+    
+    // pagenation
+    var requestInitialPageRequest: PublishSubject<Void> = .init()
+    var requestNextPage: PublishSubject<Void> = .init()
+    
+    // Paging
+    /// 값이 nil이라면 요청을 보내지 않습니다.
+    var nextPagingRequest: PostPagingRequestForWorker? = .initial
+    /// 가장최신의 데이터를 가집니다, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
+    private let currentNotificationList: BehaviorRelay<[NotificationVO]> = .init(value: [])
+    
     var tableData: Driver<(Bool, [SectionInfo : [NotificationVO]])>?
     
     override init() {
@@ -102,10 +113,27 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
         // MARK: Exit page
         exitButtonClicked
             .unretained(self)
-            .subscribe(onNext: { (obj, _) in
-                obj.exitPage?()
+            .subscribe(onNext: { (vm, _) in
+                vm.exitPage?()
             })
             .disposed(by: disposeBag)
+        
+        
+        // MARK: 알림 리스트 처음부터 요청하기
+        let initialRequest = mapEndLoading(mapStartLoading(requestInitialPageRequest.asObservable())
+            .unretained(self)
+            .flatMap { (vm: NotificationPageViewModel, request) in
+                
+                vm.currentNotificationList.accept([])
+                vm.nextPagingRequest = .initial
+                
+                return recruitmentPostUseCase
+                    .getPostListForWorker(
+                        request: .initial,
+                        postCount: 10
+                    )
+            })
+            .share()
     }
     
     func createCellVM(vo: NotificationVO) -> NotificationCellViewModel {

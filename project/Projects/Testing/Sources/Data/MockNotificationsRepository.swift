@@ -20,7 +20,7 @@ class MockNotificationsRepository: NotificationsRepository {
         .just(.success(1))
     }
     
-    func notifcationList() -> Sult<[Domain.NotificationVO], Domain.DomainError> {
+    func notifcationList(next: String? = nil) -> Sult<[Domain.NotificationVO], Domain.DomainError> {
         .just(.success([]))
     }
 }

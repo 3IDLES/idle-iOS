@@ -14,7 +14,7 @@ public enum NotificationsAPI {
     
     case readNotification(id: String)
     case notReadNotificationsCount
-    case allNotifications
+    case allNotifications(next: String?)
 }
 
 extension NotificationsAPI: BaseAPI {
@@ -34,6 +34,8 @@ extension NotificationsAPI: BaseAPI {
         }
     }
     
+    
+    
     public var method: Moya.Method {
         switch self {
         case .readNotification(let id):
@@ -47,8 +49,16 @@ extension NotificationsAPI: BaseAPI {
     
     public var task: Moya.Task {
         switch self {
+        case .allNotifications(let next):
+            if let next {
+                return .requestParameters(
+                    parameters: ["next": next],
+                    encoding: URLEncoding.queryString
+                )
+            }
+            return .requestPlain
         default:
-            .requestPlain
+            return  .requestPlain
         }
     }
 }
