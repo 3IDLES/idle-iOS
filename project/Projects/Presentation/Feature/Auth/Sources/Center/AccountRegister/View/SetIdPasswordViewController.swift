@@ -337,6 +337,7 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
                 guard let self else { return }
                 
                 // 검증 라벨 색상변경
+                idValidationIndicator.setState(isValid ? .valid : .invalid)
                 
                 // 중복확인버튼 활성화
                 idField.button.setEnabled(isValid)
@@ -365,16 +366,27 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
             .share()
         
         passwordValidationResult
-            .subscribe(onNext: { [weak self] state in
+            .subscribe(onNext: {
+                [weak self] state in
                 
                 guard let self else { return }
                 
                 // 비밀번호 체킹 상태 업데이트
-                
+                passwordValidationIndicator[.characterCount]?.setState(
+                    state.characterCount == .valid ? .valid : .invalid
+                )
+                passwordValidationIndicator[.alphabetAndNumberIncluded]?.setState(
+                    state.alphabetAndNumberIncluded == .valid ? .valid : .invalid
+                )
+                passwordValidationIndicator[.noEmptySpace]?.setState(
+                    state.noEmptySpace == .valid ? .valid : .invalid
+                )
+                passwordValidationIndicator[.unsuccessiveSame3words]?.setState(
+                    state.unsuccessiveSame3words == .valid ? .valid : .invalid
+                )
             })
             .disposed(by: disposeBag)
         
-    
         
         // id, password 유효성 검사
         Observable

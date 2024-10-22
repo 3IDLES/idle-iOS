@@ -82,7 +82,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         let noWhitespaceIsValid = evaluateStringWith(regex: noWhitespaceRegex, targetString: password)
         
         // 4. 연속된 문자 3개 이상 사용 금지
-        let noTripleRepeatedCharsRegex = "(.)\\1\\1"
+        let noTripleRepeatedCharsRegex = "(.)\\1{2,}"
         let noTripleRepeatedCharsIsValid = !evaluateStringWith(regex: noTripleRepeatedCharsRegex, targetString: password)
         
         return PasswordValidationState(

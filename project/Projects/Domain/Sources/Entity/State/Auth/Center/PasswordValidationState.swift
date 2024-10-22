@@ -42,6 +42,8 @@ public class PasswordValidationState {
             noEmptySpace == .valid
             &&
             unsuccessiveSame3words == .valid
+            &&
+            isEditingAndCheckingPasswordsEqual
         )
     }
     
