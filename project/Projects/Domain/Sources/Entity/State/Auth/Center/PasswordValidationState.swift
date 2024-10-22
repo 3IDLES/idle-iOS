@@ -35,16 +35,20 @@ public class PasswordValidationState {
     public var isValid: Bool {
         
         return (
-            characterCount == .valid
-            &&
-            alphabetAndNumberIncluded == .valid
-            &&
-            noEmptySpace == .valid
-            &&
-            unsuccessiveSame3words == .valid
+            isPasswordValid
             &&
             isEditingAndCheckingPasswordsEqual
         )
+    }
+    
+    public var isPasswordValid: Bool {
+        characterCount == .valid
+        &&
+        alphabetAndNumberIncluded == .valid
+        &&
+        noEmptySpace == .valid
+        &&
+        unsuccessiveSame3words == .valid
     }
     
     public func setEqualState(state: Bool) {

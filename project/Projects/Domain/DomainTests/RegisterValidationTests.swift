@@ -71,11 +71,11 @@ final class RegisterValidationTests: XCTestCase {
         let usecase = DefaultAuthInputValidationUseCase()
         
         // 유효한 비밀번호 테스트
-        XCTAssertTrue(usecase.checkPasswordIsValid(password: "Password1"))
-        XCTAssertTrue(usecase.checkPasswordIsValid(password: "pass1234"))
-        XCTAssertTrue(usecase.checkPasswordIsValid(password: "1234Abcd!"))
-        XCTAssertTrue(usecase.checkPasswordIsValid(password: "Valid123"))
-        XCTAssertTrue(usecase.checkPasswordIsValid(password: "StrongPass1!"))
+        XCTAssertTrue(usecase.checkPasswordIsValid(password: "Password1").isPasswordValid)
+        XCTAssertTrue(usecase.checkPasswordIsValid(password: "pass1234").isPasswordValid)
+        XCTAssertTrue(usecase.checkPasswordIsValid(password: "1234Abcd!").isPasswordValid)
+        XCTAssertTrue(usecase.checkPasswordIsValid(password: "Valid123").isPasswordValid)
+        XCTAssertTrue(usecase.checkPasswordIsValid(password: "StrongPass1!").isPasswordValid)
     }
     
     func testInvalidPassword() {
@@ -83,10 +83,10 @@ final class RegisterValidationTests: XCTestCase {
         let usecase = DefaultAuthInputValidationUseCase()
         
         // 유효하지 않은 비밀번호 테스트
-        XCTAssertFalse(usecase.checkPasswordIsValid(password: "short1")) // 너무 짧음
-        XCTAssertFalse(usecase.checkPasswordIsValid(password: "alllowercase")) // 숫자 없음
-        XCTAssertFalse(usecase.checkPasswordIsValid(password: "ALLUPPERCASE")) // 숫자 없음
-        XCTAssertFalse(usecase.checkPasswordIsValid(password: "12345678")) // 영문자 없음
-        XCTAssertFalse(usecase.checkPasswordIsValid(password: "123456789012345678901")) // 너무 길음
+        XCTAssertFalse(usecase.checkPasswordIsValid(password: "short1").isPasswordValid) // 너무 짧음
+        XCTAssertFalse(usecase.checkPasswordIsValid(password: "alllowercase").isPasswordValid) // 숫자 없음
+        XCTAssertFalse(usecase.checkPasswordIsValid(password: "ALLUPPERCASE").isPasswordValid) // 숫자 없음
+        XCTAssertFalse(usecase.checkPasswordIsValid(password: "12345678").isPasswordValid) // 영문자 없음
+        XCTAssertFalse(usecase.checkPasswordIsValid(password: "123456789012345678901").isValid) // 너무 길음
     }
 }
