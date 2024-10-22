@@ -17,10 +17,6 @@ class ValidationIndicator: UIView {
         case invalid
     }
     
-    // Init
-    let validText: String
-    let invalidText: String
-    
     // View
     let iconView: UIImageView = {
         let view: UIImageView = .init()
@@ -32,9 +28,10 @@ class ValidationIndicator: UIView {
         return label
     }()
     
-    init(validText: String, invalidText: String) {
-        self.validText = validText
-        self.invalidText = invalidText
+    init(labelText: String) {
+        
+        self.label.textString = labelText
+        
         super.init(frame: .zero)
         
         setLayout()
@@ -46,13 +43,18 @@ class ValidationIndicator: UIView {
         let mainStack: HStack = HStack(
             [iconView, label, Spacer()],
             spacing: 4,
-            alignment: .center
+            alignment: .center,
+            distribution: .fill
         )
         
         self.addSubview(mainStack)
         mainStack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
+            
+            iconView.heightAnchor.constraint(equalToConstant: 24),
+            iconView.widthAnchor.constraint(equalTo: iconView.heightAnchor),
+            
             mainStack.topAnchor.constraint(equalTo: self.topAnchor),
             mainStack.leftAnchor.constraint(equalTo: self.leftAnchor),
             mainStack.rightAnchor.constraint(equalTo: self.rightAnchor),
@@ -70,8 +72,6 @@ class ValidationIndicator: UIView {
         
         UIView.animate(withDuration: animateDuration) {
             self.label.attrTextColor = state == .valid ? DSColor.green.color : DSColor.red200.color
-        
-            self.label.textString = state == .valid ? self.validText : self.invalidText
         }
     }
 }
