@@ -26,7 +26,7 @@ protocol NotificationPageViewModelable: BaseViewModel {
     var requestNextPage: PublishSubject<Void> { get }
     
     // Output
-    var tableData: Driver<(Bool, [SectionInfo : [NotificationVO]])>? { get }
+    var tableData: Driver<NotificationTableDataInfo> { get }
     
     /// Cell ViewModel생성
     func createCellVM(vo: NotificationVO) -> NotificationCellViewModel
@@ -185,17 +185,18 @@ class NotificationPageVC: BaseViewController {
             .bind(to: viewModel.requestInitialPageRequest)
             .disposed(by: disposeBag)
         
+        requestNextPage
+            .bind(to: viewModel.requestNextPage)
+            .disposed(by: disposeBag)
+        
         // Output
         viewModel
-            .tableData?
-            .drive(onNext: { [weak self] (isFirst, tableData) in
+            .tableData
+            .drive(onNext: { [weak self] tableDataInfo in
                 
                 guard let self else { return }
                 
-                // 전달된 알림이 없는 경우
-                emptyView.isHidden = tableData.count != 0
-                
-                self.tableData = tableData
+                tableData = tableDataInfo.data
             
                 var snapShot: NSDiffableDataSourceSnapshot<Int, String> = .init()
                 
@@ -206,7 +207,20 @@ class NotificationPageVC: BaseViewController {
                     snapShot.appendItems(itemIds, toSection: section.rawValue)
                 }
                 
-                tableViewDataSource.apply(snapShot, animatingDifferences: !isFirst)
+                tableViewDataSource.apply(snapShot, animatingDifferences: false)
+                
+                // MARK: 테이블이 리프래쉬 된 경우, 스크롤을 최상단으로 이동
+                if tableDataInfo.isRefreshed {
+                    DispatchQueue.main.async { [weak self] in
+                        self?.tableView.setContentOffset(.zero, animated: false)
+                    }
+                }
+                
+                // MARK: 알림이 없는 경우 빈화면 UI표시
+                emptyView.isHidden = tableData.count != 0
+                
+                // 페이징 작업 종료
+                isPaging = false
             })
             .disposed(by: disposeBag)
     }
