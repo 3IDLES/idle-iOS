@@ -20,9 +20,10 @@ class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
     @Injected var inputValidationUseCase: AuthInputValidationUseCase
     @Injected var authUseCase: AuthUseCase
     
-    var presentNextPage: (() -> ())!
-    var presentPrevPage: (() -> ())!
-    var presentCompleteScreen: (() -> ())!
+    var presentNextPage: (() -> ())?
+    var presentPrevPage: (() -> ())?
+    var presentCompleteScreen: (() -> ())?
+    var presentAlert: ((DefaultAlertObject) -> ())?
     
     // Input은 모든 ViewController에서 공유한다. (다만, 각가의 ViewController의 Input프로토콜에 의해 제한된다.)
     let input = Input()
@@ -56,6 +57,10 @@ class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
         registerInOut()
         validateBusinessNumberInOut()
         
+        
+        
+       
+        
 //        AuthInOutStreamManager.idInOut(
 //            input: input,
 //            output: output,
@@ -83,7 +88,7 @@ class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
             .nextButtonClicked
             .unretained(self)
             .subscribe(onNext: { (obj, _) in
-                obj.presentNextPage()
+                obj.presentNextPage?()
             })
             .disposed(by: disposeBag)
         
@@ -91,13 +96,89 @@ class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
             .prevButtonClicked
             .unretained(self)
             .subscribe(onNext: { (obj, _) in
-                obj.presentPrevPage()
+                obj.presentPrevPage?()
             })
             .disposed(by: disposeBag)
     }
     
     deinit {
         printIfDebug("deinit \(Self.self)")
+    }
+}
+
+
+// MARK: Id & Password validation
+extension CenterAccountRegisterViewModel {
+    
+    func idAndPasswordValidationBinding() {
+        
+        // ID
+        output.idValidationResult = input
+            .editingId
+            .unretained(self)
+            .map { (vm, id) in
+                vm.inputValidationUseCase.checkIdIsValid(id: id)
+            }
+            .asDriver(onErrorDriveWith: .never())
+        
+        let idDuplicationCheckResult = input
+            .isIdDuplicatedButtonPressed
+            .withLatestFrom(input.editingId)
+            .unretained(self)
+            .flatMap { (vm, id) in
+                
+                printIfDebug("[CenterRegisterViewModel] 중복성 검사 대상 id: \(id)")
+                
+                #if DEBUG
+                // 디버그시 아이디 중복체크 미실시
+                print("✅ 디버그모드에서 아이디 중복검사 미실시")
+                // ☑️ 상태추적 ☑️
+                stateTracker(id)
+                return Single.just(Result<Void, DomainError>.success(()))
+                #endif
+                
+                return vm.inputValidationUseCase.requestCheckingIdDuplication(id: id)
+            }
+            .share()
+        
+        output.idDuplicationCheckResult = idDuplicationCheckResult
+            .map({ result in
+                switch result {
+                case .success:
+                    return true
+                case .failure:
+                    return false
+                }
+            })
+            .asDriver(onErrorDriveWith: .never())
+        
+        let idDuplicationFailure = idDuplicationCheckResult.compactMap { $0.error }
+        
+        idDuplicationFailure
+            .unretained(self)
+            .subscribe(onNext: { (vm, error) in
+                
+                let alertObject: DefaultAlertObject = .init()
+                alertObject.setTitle("아이디 중복검사 실패")
+                alertObject.setDescription(error.message)
+                
+                vm.presentAlert?(alertObject)
+            })
+            .disposed(by: disposeBag)
+        
+        
+        // Password
+        Observable
+            .combineLatest(
+                input.editingPassword,
+                input.checkingPassword
+            ).map { (editingPw, checkPW) in
+                
+                
+            }
+        
+            
+            
     }
 }
 
@@ -130,7 +211,7 @@ extension CenterAccountRegisterViewModel {
         
         // Password
         var editingPassword: PublishSubject<String> = .init()
-        var checkingPassword: PublishSubject<String> = .init()
+        var checkingPassword: BehaviorSubject<String> = .init(value: "")
         
         // Alert
         var alert: PublishSubject<DefaultAlertContentVO> = .init()
@@ -196,7 +277,7 @@ extension CenterAccountRegisterViewModel {
         loginSuccess
             .unretained(self)
             .subscribe(onNext: { (obj, _) in
-                obj.presentCompleteScreen()
+                obj.presentCompleteScreen?()
             })
             .disposed(by: disposeBag)
         

@@ -86,8 +86,8 @@ public protocol AuthInputValidationUseCase: BaseUseCase {
     /// - parameters:
     ///     - password : "password1234"
     /// - returns:
-    ///     - Bool, true: 가능, flase: 불가능
-    func checkPasswordIsValid(password: String) -> Bool
+    ///     - PasswordValidationState
+    func checkPasswordIsValid(password: String) -> PasswordValidationState
     
     // #9.
     /// 이름 유효성 확인 로직

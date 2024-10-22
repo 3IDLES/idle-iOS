@@ -67,10 +67,36 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
             .requestCheckingIdDuplication(id: id)
     }
     
-    public func checkPasswordIsValid(password: String) -> Bool {
-        let passwordLengthAndCharRegex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+=-]{8,20}$"
-        let predicate = NSPredicate(format: "SELF MATCHES %@", passwordLengthAndCharRegex)
+    public func checkPasswordIsValid(password: String) -> PasswordValidationState {
         
-        return predicate.evaluate(with: password)
+        // 1. 8자 ~ 20자 사이
+        let lengthRegex = "^.{8,20}$"
+        let lengthIsValid = evaluateStringWith(regex: lengthRegex, targetString: password)
+        
+        // 2. 영문자와 숫자 반드시 하나씩 포함
+        let letterAndNumberRegex = "(?=.*[A-Za-z])(?=.*[0-9])"
+        let letterAndNumberIsValid = evaluateStringWith(regex: letterAndNumberRegex, targetString: password)
+        
+        // 3. 공백 문자 사용 금지
+        let noWhitespaceRegex = "^\\S*$"
+        let noWhitespaceIsValid = evaluateStringWith(regex: noWhitespaceRegex, targetString: password)
+        
+        // 4. 연속된 문자 3개 이상 사용 금지
+        let noTripleRepeatedCharsRegex = "(.)\\1\\1"
+        let noTripleRepeatedCharsIsValid = evaluateStringWith(regex: noTripleRepeatedCharsRegex, targetString: password)
+        
+        return PasswordValidationState(
+            characterCount: lengthIsValid ? .valid : .invalid,
+            alphabetAndNumberIncluded: letterAndNumberIsValid ? .valid : .invalid,
+            noEmptySpace: noWhitespaceIsValid ? .valid : .invalid,
+            unsuccessiveSame3words: noTripleRepeatedCharsIsValid ? .valid : .invalid
+        )
+    }
+                                       
+    private func evaluateStringWith(regex: String, targetString: String) -> Bool {
+        
+        let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
+        
+        return !predicate.evaluate(with: targetString)
     }
 }

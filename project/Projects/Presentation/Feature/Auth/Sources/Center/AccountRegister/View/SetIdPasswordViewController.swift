@@ -23,7 +23,7 @@ protocol SetIdAndPasswordInputable {
     
     // Password
     var editingPassword: PublishSubject<String> { get set }
-    var checkingPassword: PublishSubject<String> { get set }
+    var checkingPassword: BehaviorSubject<String> { get set }
 }
 
 protocol SetIdAndPasswordOutputable {
@@ -35,33 +35,6 @@ protocol SetIdAndPasswordOutputable {
     // Password
     var passwordValidationState: Driver<PasswordValidationState> { get }
 }
-
-struct PasswordValidationState {
-    
-    enum State {
-        case valid
-        case invalid
-    }
-    
-    let characterCount: State
-    let alphabetAndNumberIncluded: State
-    let noEmptySpace: State
-    let unsuccessiveSame3words: State
-    
-    var isValid: Bool {
-        
-        return (
-            characterCount == .valid 
-            &&
-            alphabetAndNumberIncluded == .valid 
-            &&
-            noEmptySpace == .valid 
-            &&
-            unsuccessiveSame3words == .valid
-        )
-    }
-}
-
 
 class SetIdPasswordViewController<T: ViewModelType>: BaseViewController
 where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
