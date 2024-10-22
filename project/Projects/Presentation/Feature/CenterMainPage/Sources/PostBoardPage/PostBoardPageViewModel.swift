@@ -20,6 +20,11 @@ import RxSwift
 
 protocol CenterRecruitmentPostBoardViewModelable: OnGoingPostViewModelable & ClosedPostViewModelable {
     
+    var viewWillAppear: PublishSubject<Void> { get }
+    
+    /// 읽지않은 알림이 있는 경우
+    var unreadNotificationExist: Driver<Bool> { get }
+    
     /// ‼️임시조치: 알림 확인창 오픈 여부를 설정합니다.
     var showNotificationButton: Bool { get }
     var notificationButtonClicked: PublishSubject<Void> { get }
@@ -30,6 +35,7 @@ class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModel
     // Injected
     @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
     @Injected var remoteConfigService: RemoteConfigService
+    @Injected var norificationsRepository: NotificationsRepository
     
     // Navigation
     var presentRegisterPostPage: (() -> ())?
@@ -38,6 +44,7 @@ class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModel
     var presentNotificationPage: (() -> ())?
 
     // Input
+    var viewWillAppear: PublishSubject<Void> = .init()
     var requestOngoingPost: PublishRelay<Void> = .init()
     var requestClosedPost: PublishRelay<Void> = .init()
     var registerPostButtonClicked: PublishRelay<Void> = .init()
@@ -47,6 +54,7 @@ class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModel
     var ongoingPostInfo: Driver<[RecruitmentPostInfoForCenterVO]>?
     var closedPostInfo: Driver<[RecruitmentPostInfoForCenterVO]>?
     var showRemovePostAlert: Driver<IdleAlertViewModelable>?
+    var unreadNotificationExist: Driver<Bool> = .empty()
     
     var showNotificationButton: Bool = false
     
@@ -62,6 +70,22 @@ class PostBoardPageViewModel: BaseViewModel, CenterRecruitmentPostBoardViewModel
             fatalError(error.localizedDescription)
         }
         // -----------------------------------------------
+        
+        
+        
+        // 읽지 않은 알람 분기
+        self.unreadNotificationExist = viewWillAppear
+            .unretained(self)
+            .flatMap { (vm, _) in
+                vm.norificationsRepository
+                    .unreadNotificationCount()
+            }
+            .compactMap { $0.value }
+            .map { count in
+                count > 0
+            }
+            .asDriver(onErrorDriveWith: .never())
+        
         
         
         let requestOngoingPostResult = requestOngoingPost

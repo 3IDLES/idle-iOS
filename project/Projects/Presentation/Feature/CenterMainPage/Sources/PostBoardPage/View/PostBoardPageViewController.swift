@@ -162,13 +162,34 @@ class PostBoardPageViewController: BaseViewController {
         
         super.bind(viewModel: viewModel)
         
-        // 임시 설정
-        topView.notificationPageButton.isHidden = !viewModel.showNotificationButton
+        
+        // ------------ 임시 설정 (RemoteConfig)
+        topView.notificationBellView.isHidden = !viewModel.showNotificationButton
+        // ------------------------
+
+        
+        // MARK: Input
+        self.rx.viewWillAppear
+            .mapToVoid()
+            .bind(to: viewModel.viewWillAppear)
+            .disposed(by: disposeBag)
+        
         
         // 알림 페이지 버튼 클릭
-        topView.notificationPageButton.rx.tap
+        topView.notificationBellView.button.rx.tap
             .bind(to: viewModel.notificationButtonClicked)
             .disposed(by: disposeBag)
+        
+        
+        // MARK: Output
+        viewModel
+            .unreadNotificationExist
+            .drive(onNext: { [weak self] isExist in
+                self?.topView.notificationBellView
+                    .setUnreadState(isExist)
+            })
+            .disposed(by: disposeBag)
+        
     
         (viewControllerDict[.onGoingPost] as? OnGoingPostVC)?.bind(viewModel: viewModel)
         (viewControllerDict[.closedPost] as? ClosedPostVC)?.bind(viewModel: viewModel)
