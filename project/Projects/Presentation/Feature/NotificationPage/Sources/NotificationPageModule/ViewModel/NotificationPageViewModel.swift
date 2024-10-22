@@ -23,7 +23,6 @@ enum PagingRequest: Equatable {
 struct NotificationTableDataInfo {
     
     let isRefreshed: Bool
-    let isFirst: Bool
     let data: [SectionInfo : [NotificationVO]]
 }
 
@@ -36,7 +35,6 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     var presentAlert: ((DefaultAlertObject) -> ())?
     var exitPage: (() -> ())?
     
-    var isFirst: Bool = true
     var viewWillAppear: PublishSubject<Void> = .init()
     var exitButtonClicked: PublishSubject<Void> = .init()
     
@@ -51,6 +49,8 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     /// 가장최신의 데이터를 가집니다, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
     private var currentNotificationList: [NotificationVO] = []
     
+    // Output
+    var unreadNotificationExist: Driver<Bool> = .empty()
     var tableData: Driver<NotificationTableDataInfo> = .empty()
     
     override init() {
@@ -116,7 +116,7 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
         
         tableData = fetchSuccess
             .unretained(self)
-            .map { (vm, currentInfo) in
+            .map { (vm: NotificationPageViewModel, currentInfo) in
                 
                 let (currentList, nextId) = currentInfo
                 
@@ -168,15 +168,8 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
                     }
                 }
                 
-                defer {
-                    if vm.isFirst {
-                        vm.isFirst = false
-                    }
-                }
-                
                 return .init(
                     isRefreshed: isRefreshed,
-                    isFirst: vm.isFirst,
                     data: result
                 )
             }

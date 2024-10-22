@@ -16,13 +16,7 @@ class CenterMainPageTopView: UIView {
         return label
     }()
     
-    let notificationPageButton: UIButton = {
-        let button = UIButton()
-        button.setImage(DSIcon.notiBell.image, for: .normal)
-        button.imageView?.tintColor = DSColor.gray200.color
-        return button
-    }()
-    
+    let notificationBellView: NotificationBellView = .init()
     
     init() {
         super.init(frame: .zero)
@@ -44,7 +38,7 @@ class CenterMainPageTopView: UIView {
             [
                 titleLabel,
                 Spacer(),
-                notificationPageButton
+                notificationBellView
             ],
             alignment: .center,
             distribution: .fill
@@ -58,9 +52,6 @@ class CenterMainPageTopView: UIView {
         }
         
         NSLayoutConstraint.activate([
-        
-            notificationPageButton.widthAnchor.constraint(equalToConstant: 32),
-            notificationPageButton.heightAnchor.constraint(equalTo: notificationPageButton.widthAnchor),
             
             mainStack.leftAnchor.constraint(equalTo: self.layoutMarginsGuide.leftAnchor),
             mainStack.rightAnchor.constraint(equalTo: self.layoutMarginsGuide.rightAnchor),
