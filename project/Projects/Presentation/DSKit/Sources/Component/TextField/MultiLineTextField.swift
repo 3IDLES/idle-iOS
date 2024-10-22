@@ -96,6 +96,7 @@ public class MultiLineTextField: UITextView {
             placeHolderLabel.topAnchor.constraint(equalTo: frameGuide.topAnchor, constant: textContainerInset.top),
             placeHolderLabel.leftAnchor.constraint(equalTo: frameGuide.leftAnchor, constant: textContainerInset.left),
             placeHolderLabel.rightAnchor.constraint(equalTo: frameGuide.rightAnchor, constant: -textContainerInset.right),
+            placeHolderLabel.bottomAnchor.constraint(equalTo: frameGuide.bottomAnchor, constant: -textContainerInset.bottom),
         ])
     }
     
