@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PasswordValidationState {
+public class PasswordValidationState {
     
     public enum State {
         case valid
@@ -18,6 +18,19 @@ public struct PasswordValidationState {
     public let alphabetAndNumberIncluded: State
     public let noEmptySpace: State
     public let unsuccessiveSame3words: State
+    public private(set) var isEditingAndCheckingPasswordsEqual: Bool = false
+    
+    public init(
+        characterCount: State,
+        alphabetAndNumberIncluded: State,
+        noEmptySpace: State,
+        unsuccessiveSame3words: State
+    ) {
+        self.characterCount = characterCount
+        self.alphabetAndNumberIncluded = alphabetAndNumberIncluded
+        self.noEmptySpace = noEmptySpace
+        self.unsuccessiveSame3words = unsuccessiveSame3words
+    }
     
     public var isValid: Bool {
         
@@ -30,5 +43,9 @@ public struct PasswordValidationState {
             &&
             unsuccessiveSame3words == .valid
         )
+    }
+    
+    public func setEqualState(state: Bool) {
+        isEditingAndCheckingPasswordsEqual = state
     }
 }
