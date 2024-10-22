@@ -15,6 +15,18 @@ import Core
 import RxSwift
 import RxCocoa
 
+enum PagingRequest: Equatable {
+    case initial
+    case paging(nextPageId: String?)
+}
+
+struct NotificationTableDataInfo {
+    
+    let isRefreshed: Bool
+    let isFirst: Bool
+    let data: [SectionInfo : [NotificationVO]]
+}
+
 class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     
     // Injected
@@ -35,24 +47,60 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
-    var nextPagingRequest: PostPagingRequestForWorker? = .initial
+    var nextPagingRequest: PagingRequest? = .initial
     /// 가장최신의 데이터를 가집니다, 다음 요청시 해당데이터에 새로운 데이터를 더해서 방출
-    private let currentNotificationList: BehaviorRelay<[NotificationVO]> = .init(value: [])
+    private var currentNotificationList: [NotificationVO] = []
     
-    var tableData: Driver<(Bool, [SectionInfo : [NotificationVO]])>?
+    var tableData: Driver<NotificationTableDataInfo> = .empty()
     
     override init() {
         super.init()
         
-        let fetchResult = viewWillAppear
+        // MARK: Exit page
+        exitButtonClicked
             .unretained(self)
-            .flatMap { (obj, _) in
-                obj.notificationsRepository.notifcationList()
-            }
+            .subscribe(onNext: { (vm, _) in
+                vm.exitPage?()
+            })
+            .disposed(by: disposeBag)
+        
+        
+        // MARK: 알림 리스트 처음부터 요청하기
+        let initialRequest = mapEndLoading(mapStartLoading(requestInitialPageRequest.asObservable())
+            .unretained(self)
+            .flatMap { (vm: NotificationPageViewModel, request) in
+                
+                vm.currentNotificationList = []
+                vm.nextPagingRequest = .initial
+                
+                return vm.notificationsRepository.notifcationList(next: nil)
+            })
             .share()
         
-        let fetchSuccess = fetchResult.compactMap { $0.value }
-        let fetchFailure = fetchResult.compactMap { $0.error }
+        // MARK: 공고리스트 페이징 요청
+        let pagingRequest = requestNextPage
+            .compactMap { [weak self] _ in
+                // 요청이 없는 경우 요청을 보내지 않는다.
+                if let nextRequest = self?.nextPagingRequest, case .paging(let next) = nextRequest {
+                    
+                    return next
+                }
+                return nil
+            }
+            .unretained(self)
+            .flatMap { (vm, nextRequestId) in
+                
+                vm.notificationsRepository
+                    .notifcationList(next: nextRequestId)
+            }
+        
+        let notificationRequestResult = Observable
+            .merge(initialRequest, pagingRequest)
+            .share()
+        
+        
+        let fetchSuccess = notificationRequestResult.compactMap { $0.value }
+        let fetchFailure = notificationRequestResult.compactMap { $0.error }
         
         fetchFailure.subscribe (onNext: { [weak self] error in
             
@@ -65,17 +113,37 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
             })
             .disposed(by: disposeBag)
         
-        // MARK: 날짜를 바탕으로 섹션 필터링 후 반환
+        
         tableData = fetchSuccess
             .unretained(self)
-            .map { (obj, info) in
+            .map { (vm, currentInfo) in
+                
+                let (currentList, nextId) = currentInfo
+                
+                let isRefreshed: Bool = vm.nextPagingRequest == .initial
+                
+                // 다음 요청 설정
+                var nextRequest: PagingRequest?
+                if let nextId {
+                    nextRequest = .paging(nextPageId: nextId)
+                } else {
+                    // 페이징 종료
+                    nextRequest = nil
+                }
+                vm.nextPagingRequest = nextRequest
+                
+                var accum = vm.currentNotificationList
+                accum.append(contentsOf: currentList)
+                
+                // 최근값 업데이트
+                vm.currentNotificationList = accum
                 
                 // 날짜순 정렬
-                let sortedInfo = info.sorted { lhs, rhs in
+                let sortedInfo = accum.sorted { lhs, rhs in
                     lhs.createdDate < rhs.createdDate
                 }
                 
-                var dict: [SectionInfo: [NotificationVO]] = [:]
+                var result: [SectionInfo: [NotificationVO]] = [:]
                 
                 for item in sortedInfo {
                     let diffSeconds = Date.now.timeIntervalSince(item.createdDate)
@@ -93,47 +161,26 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
                             continue
                     }
                     
-                    if dict[section] != nil {
-                        dict[section]!.append(item)
+                    if result[section] != nil {
+                        result[section]!.append(item)
                     } else {
-                        dict[section] = [item]
+                        result[section] = [item]
                     }
                 }
                 
                 defer {
-                    if obj.isFirst {
-                        obj.isFirst = false
+                    if vm.isFirst {
+                        vm.isFirst = false
                     }
                 }
                 
-                return (obj.isFirst, dict)
+                return .init(
+                    isRefreshed: isRefreshed,
+                    isFirst: vm.isFirst,
+                    data: result
+                )
             }
             .asDriver(onErrorDriveWith: .never())
-        
-        // MARK: Exit page
-        exitButtonClicked
-            .unretained(self)
-            .subscribe(onNext: { (vm, _) in
-                vm.exitPage?()
-            })
-            .disposed(by: disposeBag)
-        
-        
-        // MARK: 알림 리스트 처음부터 요청하기
-        let initialRequest = mapEndLoading(mapStartLoading(requestInitialPageRequest.asObservable())
-            .unretained(self)
-            .flatMap { (vm: NotificationPageViewModel, request) in
-                
-                vm.currentNotificationList.accept([])
-                vm.nextPagingRequest = .initial
-                
-                return recruitmentPostUseCase
-                    .getPostListForWorker(
-                        request: .initial,
-                        postCount: 10
-                    )
-            })
-            .share()
     }
     
     func createCellVM(vo: NotificationVO) -> NotificationCellViewModel {
