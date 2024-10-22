@@ -12,6 +12,10 @@ import Core
 
 class MockNotificationsRepository: NotificationsRepository {
     
+    func notifcationList(next: String?) -> Core.Sult<([Domain.NotificationVO], String?), Domain.DomainError> {
+        .just(.success(([], nil)))
+    }
+    
     func readNotification(id: String) -> Sult<Void, Domain.DomainError> {
         .just(.success(()))
     }
