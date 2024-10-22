@@ -18,6 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var authCoordinator: AuthCoordinator?
     var centerAccountRegisterCoordinator: CenterAccountRegisterCoordinator?
+    var centerLogInCoordinator: CenterLogInCoordinator?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -37,6 +38,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 self?.centerAccountRegisterCoordinator = coordinator
                 coordinator.start()
                 
+            case .loginPage:
+                let coordinator = CenterLogInCoordinator()
+                
+                coordinator.startFlow = { desination in
+                    switch desination {
+                    default:
+                        // 센터 메인페이지로 이동
+                        return
+                    }
+                }
+                
+                self?.centerLogInCoordinator = coordinator
+                coordinator.start()
             default:
                 // 테스트시 추가가능
                 return

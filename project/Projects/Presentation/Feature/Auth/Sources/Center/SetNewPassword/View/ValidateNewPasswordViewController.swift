@@ -6,18 +6,27 @@
 //
 
 import UIKit
+
+import BaseFeature
 import DSKit
+import PresentationCore
+import Domain
+
 import RxCocoa
 import RxSwift
-import PresentationCore
-import BaseFeature
 
-public protocol ChangePasswordSuccessInputable {
+protocol ChangePasswordSuccessInputable {
+    var editingPassword: PublishSubject<String> { get set }
+    var checkingPassword: BehaviorSubject<String> { get set }
     var changePasswordButtonClicked: PublishRelay<Void> { get }
 }
 
+protocol ChangePasswordSuccessOutputable {
+    var passwordValidationState: Driver<PasswordValidationState> { get }
+}
+
 class ValidateNewPasswordViewController<T: ViewModelType>: UIViewController
-where T.Input: ChangePasswordSuccessInputable {
+where T.Input: ChangePasswordSuccessInputable, T.Output: ChangePasswordSuccessOutputable {
     
     let viewModel: T
     
@@ -43,17 +52,25 @@ where T.Input: ChangePasswordSuccessInputable {
         )
         return textField
     }()
-    private let thisIsValidPasswordLabel: IdleLabel = {
-        let label = IdleLabel(typography: .caption)
-        label.textString = "* 사용 가능한 비밀번호입니다."
-        label.attrTextColor = DSKitAsset.Colors.gray300.color
+    let passwordGuideLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Body3)
+        label.textString = "* 비밀번호는 아래의 조건에 맞추어주세요."
+        label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
-        label.alpha = 0
         return label
     }()
     
+    // MARK: 비밀번호 검증 라벨
+    let passwordValidationIndicator: [PasswordValidationCase: ValidationIndicator] = {
+        var dict: [PasswordValidationCase: ValidationIndicator] = [:]
+        for item in PasswordValidationCase.items {
+            dict[item] = ValidationIndicator(labelText: item.indicatorText)
+        }
+        return dict
+    }()
+    
     // MARK: 비밀번호 확인 입력
-    private let checlPasswordLabel: IdleLabel = {
+    private let checkPasswordLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
         label.textString = "비밀번호 확인"
         label.attrTextColor = DSKitAsset.Colors.gray500.color
@@ -61,11 +78,7 @@ where T.Input: ChangePasswordSuccessInputable {
         return label
     }()
     private let checkPasswordField: IdleOneLineInputField = {
-       
-        let textField = IdleOneLineInputField(
-            placeHolderText: "비밀번호를 한번 더 입력해주세요."
-        )
-        
+        let textField = IdleOneLineInputField(placeHolderText: "비밀번호를 한번 더 입력해주세요.")
         return textField
     }()
     private let passwordDoesntMathLabel: IdleLabel = {
@@ -110,12 +123,21 @@ where T.Input: ChangePasswordSuccessInputable {
     
     private func setAutoLayout() {
         
+        // pw validation indicators
+        
+        let pwValidationIndicators: VStack = VStack(
+            PasswordValidationCase.items.compactMap { item in passwordValidationIndicator[item] },
+            spacing: 4,
+            alignment: .fill
+        )
+        
         [
             processTitle,
             passwordLabel,
             passwordField,
-            thisIsValidPasswordLabel,
-            checlPasswordLabel,
+            passwordGuideLabel,
+            pwValidationIndicators,
+            checkPasswordLabel,
             checkPasswordField,
             passwordDoesntMathLabel,
             ctaButton,
@@ -138,15 +160,19 @@ where T.Input: ChangePasswordSuccessInputable {
             passwordField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             passwordField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            thisIsValidPasswordLabel.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 2),
-            thisIsValidPasswordLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            thisIsValidPasswordLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            passwordGuideLabel.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 12),
+            passwordGuideLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            passwordGuideLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            checlPasswordLabel.topAnchor.constraint(equalTo: thisIsValidPasswordLabel.bottomAnchor, constant: 12),
-            checlPasswordLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            checlPasswordLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            pwValidationIndicators.topAnchor.constraint(equalTo: passwordGuideLabel.bottomAnchor, constant: 6),
+            pwValidationIndicators.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            pwValidationIndicators.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            checkPasswordField.topAnchor.constraint(equalTo: checlPasswordLabel.bottomAnchor, constant: 6),
+            checkPasswordLabel.topAnchor.constraint(equalTo: pwValidationIndicators.bottomAnchor, constant: 12),
+            checkPasswordLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            checkPasswordLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            checkPasswordField.topAnchor.constraint(equalTo: checkPasswordLabel.bottomAnchor, constant: 6),
             checkPasswordField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             checkPasswordField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
@@ -161,6 +187,11 @@ where T.Input: ChangePasswordSuccessInputable {
     }
     
     private func initialUISettuing() {
+        
+        passwordValidationIndicator.values.forEach { indicator in
+            indicator.setState(.invalid)
+        }
+        
         // - CTA버튼 비활성화
         ctaButton.setEnabled(false)
     }
@@ -170,14 +201,18 @@ where T.Input: ChangePasswordSuccessInputable {
         // MARK: Input
         let input = viewModel.input
         
-//        Observable
-//            .combineLatest(
-//                passwordField.eventPublisher,
-//                checkPasswordField.eventPublisher
-//            )
-//            .map({ ($0, $1) })
-//            .bind(to: input.editingPasswords)
-//            .disposed(by: disposeBag)
+        // Password
+        passwordField
+            .textField.rx.text
+            .compactMap{ $0 }
+            .bind(to: input.editingPassword)
+            .disposed(by: disposeBag)
+        
+        checkPasswordField
+            .textField.rx.text
+            .compactMap{ $0 }
+            .bind(to: input.checkingPassword)
+            .disposed(by: disposeBag)
         
         ctaButton
             .eventPublisher
@@ -191,40 +226,29 @@ where T.Input: ChangePasswordSuccessInputable {
         // MARK: Output
         let output = viewModel.output
         
-        // 비밀번호 검증
-//        output
-//            .passwordValidation?
-//            .drive(onNext: { [weak self] validationState in
-//                
-//                guard let self else { return }
-//                
-//                switch validationState {
-//                case .invalidPassword:
-//                    thisIsValidPasswordLabel.alpha = 0
-//                    onPasswordUnMatched()
-//                case .unMatch:
-//                    thisIsValidPasswordLabel.alpha = 1
-//                    passwordDoesntMathLabel.alpha = 1
-//                    onPasswordUnMatched()
-//                case .match:
-//                    thisIsValidPasswordLabel.alpha = 1
-//                    passwordDoesntMathLabel.alpha = 0
-//                    onPasswordMatched()
-//                    ctaButton.setEnabled(true)
-//                }
-//            })
-//            .disposed(by: disposeBag)
-    }
-    
-    private func onPasswordMatched() {
-        
-        passwordField.setState(state: .complete)
-        checkPasswordField.setState(state: .complete)
-    }
-    
-    private func onPasswordUnMatched() {
-        
-        passwordField.setState(state: .editing)
-        checkPasswordField.setState(state: .editing)
+        output
+            .passwordValidationState
+            .drive(onNext: { [weak self] state in
+                
+                guard let self else { return }
+                
+                // 비밀번호 체킹 상태 업데이트
+                passwordValidationIndicator[.characterCount]?.setState(
+                    state.characterCount == .valid ? .valid : .invalid
+                )
+                passwordValidationIndicator[.alphabetAndNumberIncluded]?.setState(
+                    state.alphabetAndNumberIncluded == .valid ? .valid : .invalid
+                )
+                passwordValidationIndicator[.noEmptySpace]?.setState(
+                    state.noEmptySpace == .valid ? .valid : .invalid
+                )
+                passwordValidationIndicator[.unsuccessiveSame3words]?.setState(
+                    state.unsuccessiveSame3words == .valid ? .valid : .invalid
+                )
+                
+                // 확인버튼 활성화
+                ctaButton.setEnabled(state.isValid)
+            })
+            .disposed(by: disposeBag)
     }
 }
