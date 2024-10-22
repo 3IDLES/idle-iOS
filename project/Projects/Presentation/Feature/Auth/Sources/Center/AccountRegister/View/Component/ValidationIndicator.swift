@@ -62,7 +62,7 @@ class ValidationIndicator: UIView {
         ])
     }
     
-    func setState(_ state: State, animated: Bool = true) {
+    func setState(_ state: State, animated: Bool = false) {
         
         let animateDuration: TimeInterval = animated ? 0.2 : 0
         
