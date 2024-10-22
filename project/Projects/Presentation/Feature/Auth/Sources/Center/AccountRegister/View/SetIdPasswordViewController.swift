@@ -152,9 +152,7 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
     private func setAppearance() { }
     
     private func setAutoLayout() {
-        
-        view.layoutMargins = .init(top: 28, left: 20, bottom: 0, right: 20)
-
+    
         // pw validation indicators
         
         let pwValidationIndicators: VStack = VStack(
@@ -184,6 +182,7 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
         contentView.layoutMargins = .init(top: 28,left: 20, bottom: 48, right: 20)
         
         [
+            processTitleLabel,
             idLabel,
             idField,
             idGuideLabel,
@@ -200,8 +199,12 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
         }
         
         NSLayoutConstraint.activate([
+            
+            processTitleLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            processTitleLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            processTitleLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
         
-            idLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            idLabel.topAnchor.constraint(equalTo: processTitleLabel.layoutMarginsGuide.topAnchor, constant: 28),
             idLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             idLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             
@@ -245,8 +248,6 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
         
         
         [
-            processTitleLabel,
-            
             scrollView,
             
             buttonContainer,
@@ -256,19 +257,15 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
         }
         
         NSLayoutConstraint.activate([
-                
-            processTitleLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
-            processTitleLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            processTitleLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            scrollView.topAnchor.constraint(equalTo: processTitleLabel.bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: buttonContainer.topAnchor, constant: -12),
             
             buttonContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -14),
-            buttonContainer.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor),
-            buttonContainer.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor),
+            buttonContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            buttonContainer.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
         ])
     }
     
