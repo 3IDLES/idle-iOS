@@ -42,7 +42,7 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
 
     
     // View
-    private let processTitleLabel: IdleLabel = {
+    let processTitleLabel: IdleLabel = {
         let label = IdleLabel(typography: .Heading2)
         label.textString = "아이디와 비밀번호를 설정해주세요."
         label.textAlignment = .left
@@ -50,19 +50,19 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
     }()
     
     // MARK: Id 입력
-    private let idLabel: IdleLabel = {
+    let idLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
         label.textString = "아이디 설정"
         label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
         return label
     }()
-    private let idField: IFType1 = {
+    let idField: IFType1 = {
         let textField = IFType1(placeHolderText: "아이디를 입력해주세요", submitButtonText: "중복 확인")
         textField.idleTextField.isCompleteImageAvailable = false
         return textField
     }()
-    private let idGuideLabel: IdleLabel = {
+    let idGuideLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.textString = "* 아이디는 아래의 조건에 맞추어주세요."
         label.attrTextColor = DSColor.gray500.color
@@ -70,16 +70,19 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
         return label
     }()
     
+    // MARK: 아이디 검증 라벨
+    let idValidationIndicator: ValidationIndicator = .init(labelText: "6자~20자 사이")
+    
     
     // MARK: 비밀번호 입력
-    private let passwordLabel: IdleLabel = {
+    let passwordLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
         label.textString = "비밀번호 설정"
         label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
         return label
     }()
-    private let passwordField: IdleOneLineInputField = {
+    let passwordField: IdleOneLineInputField = {
        
         let textField = IdleOneLineInputField(
             placeHolderText: "비밀번호를 입력해주세요."
@@ -87,23 +90,32 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
         
         return textField
     }()
-    private let passwordGuideLabel: IdleLabel = {
+    let passwordGuideLabel: IdleLabel = {
         let label = IdleLabel(typography: .Body3)
         label.textString = "* 비밀번호는 아래의 조건에 맞추어주세요."
         label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
         return label
     }()
+    
+    // MARK: 비밀번호 검증 라벨
+    let passwordValidationIndicator: [PasswordValidationCase: ValidationIndicator] = {
+        var dict: [PasswordValidationCase: ValidationIndicator] = [:]
+        for item in PasswordValidationCase.items {
+            dict[item] = ValidationIndicator(labelText: item.indicatorText)
+        }
+        return dict
+    }()
 
     // MARK: 비밀번호 확인 입력
-    private let checlPasswordLabel: IdleLabel = {
+    let checlPasswordLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
         label.textString = "비밀번호 확인"
         label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
         return label
     }()
-    private let checkPasswordField: IdleOneLineInputField = {
+    let checkPasswordField: IdleOneLineInputField = {
        
         let textField = IdleOneLineInputField(
             placeHolderText: "비밀번호를 한번 더 입력해주세요."
@@ -112,13 +124,13 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
         return textField
     }()
     
-    private let buttonContainer: PrevOrNextContainer = {
+    let buttonContainer: PrevOrNextContainer = {
         let button = PrevOrNextContainer()
         button.nextButton.label.textString = "완료"
         return button
     }()
     
-    public init(viewModel: T) {
+    init(viewModel: T) {
         
         super.init(nibName: nil, bundle: nil)
         
@@ -132,7 +144,7 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
     
     required init?(coder: NSCoder) { fatalError() }
     
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         
         view.backgroundColor = .clear
     }
@@ -142,15 +154,25 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
     private func setAutoLayout() {
         
         view.layoutMargins = .init(top: 28, left: 20, bottom: 0, right: 20)
+
+        // pw validation indicators
+        
+        let pwValidationIndicators: VStack = VStack(
+            PasswordValidationCase.items.compactMap { item in passwordValidationIndicator[item] },
+            spacing: 4,
+            alignment: .fill
+        )
         
         [
             processTitleLabel,
             idLabel,
             idField,
             idGuideLabel,
+            idValidationIndicator,
             passwordLabel,
             passwordField,
             passwordGuideLabel,
+            pwValidationIndicators,
             checlPasswordLabel,
             checkPasswordField,
             buttonContainer,
@@ -177,9 +199,11 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
             idGuideLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             idGuideLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            //
+            idValidationIndicator.topAnchor.constraint(equalTo: idGuideLabel.bottomAnchor, constant: 6),
+            idValidationIndicator.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            idValidationIndicator.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            passwordLabel.topAnchor.constraint(equalTo: idField.bottomAnchor, constant: 32),
+            passwordLabel.topAnchor.constraint(equalTo: idValidationIndicator.bottomAnchor, constant: 24),
             passwordLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             passwordLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
@@ -191,9 +215,11 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
             passwordGuideLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             passwordGuideLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            //
+            pwValidationIndicators.topAnchor.constraint(equalTo: passwordGuideLabel.bottomAnchor, constant: 6),
+            pwValidationIndicators.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            pwValidationIndicators.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            checlPasswordLabel.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 32),
+            checlPasswordLabel.topAnchor.constraint(equalTo: pwValidationIndicators.bottomAnchor, constant: 24),
             checlPasswordLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             checlPasswordLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
@@ -210,6 +236,11 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
     private func initialUISettuing() {
         
         idField.button.setEnabled(false)
+        
+        idValidationIndicator.setState(.invalid)
+        passwordValidationIndicator.values.forEach { indicator in
+            indicator.setState(.invalid)
+        }
         
         // - CTA버튼 비활성화
         buttonContainer.nextButton.setEnabled(false)
