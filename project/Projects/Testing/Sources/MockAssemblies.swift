@@ -24,7 +24,13 @@ public let MockAssemblies: [Assembly] = [
 struct MockDomainAssembly: Assembly {
     
     func assemble(container: Container) {
+        container.register(AuthInputValidationUseCase.self) { _ in
+            DefaultAuthInputValidationUseCase()
+        }
         
+        container.register(AuthUseCase.self) { _ in
+            MockAuthUseCase()
+        }
     }
 }
 

@@ -74,7 +74,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         let lengthIsValid = evaluateStringWith(regex: lengthRegex, targetString: password)
         
         // 2. 영문자와 숫자 반드시 하나씩 포함
-        let letterAndNumberRegex = "(?=.*[A-Za-z])(?=.*[0-9])"
+        let letterAndNumberRegex = "^(?=.*[A-Za-z])(?=.*[0-9]).*$"
         let letterAndNumberIsValid = evaluateStringWith(regex: letterAndNumberRegex, targetString: password)
         
         // 3. 공백 문자 사용 금지
@@ -83,7 +83,7 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         
         // 4. 연속된 문자 3개 이상 사용 금지
         let noTripleRepeatedCharsRegex = "(.)\\1\\1"
-        let noTripleRepeatedCharsIsValid = evaluateStringWith(regex: noTripleRepeatedCharsRegex, targetString: password)
+        let noTripleRepeatedCharsIsValid = !evaluateStringWith(regex: noTripleRepeatedCharsRegex, targetString: password)
         
         return PasswordValidationState(
             characterCount: lengthIsValid ? .valid : .invalid,
@@ -97,6 +97,6 @@ public class DefaultAuthInputValidationUseCase: AuthInputValidationUseCase {
         
         let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
         
-        return !predicate.evaluate(with: targetString)
+        return predicate.evaluate(with: targetString)
     }
 }
