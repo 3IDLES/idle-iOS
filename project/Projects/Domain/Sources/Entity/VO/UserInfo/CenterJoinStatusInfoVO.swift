@@ -12,6 +12,18 @@ public struct CenterJoinStatusInfoVO: Codable {
     public let managerName: String
     public let phoneNumber: String
     public let centerManagerAccountStatus: CenterAccountStatus
+    
+    public init(
+        id: String,
+        managerName: String,
+        phoneNumber: String,
+        centerManagerAccountStatus: CenterAccountStatus
+    ) {
+        self.id = id
+        self.managerName = managerName
+        self.phoneNumber = phoneNumber
+        self.centerManagerAccountStatus = centerManagerAccountStatus
+    }
 }
 
 public enum CenterAccountStatus: String, Codable {

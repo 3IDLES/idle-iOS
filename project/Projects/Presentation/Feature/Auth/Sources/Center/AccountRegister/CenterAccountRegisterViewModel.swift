@@ -114,11 +114,12 @@ extension CenterAccountRegisterViewModel {
                 
                 printIfDebug("[CenterRegisterViewModel] 중복성 검사 대상 id: \(id)")
                 
+                // 가장 최근 id저장
+                vm.stateObject.id = id
+                
                 #if DEBUG
                 // 디버그시 아이디 중복체크 미실시
                 print("✅ 디버그모드에서 아이디 중복검사 미실시")
-                // ☑️ 상태추적 ☑️
-                stateTracker(id)
                 return Single.just(Result<Void, DomainError>.success(()))
                 #endif
                 
@@ -127,14 +128,14 @@ extension CenterAccountRegisterViewModel {
             .share()
         
         output.idDuplicationCheckResult = idDuplicationCheckResult
-            .map({ result in
+            .map { result in
                 switch result {
                 case .success:
                     return true
                 case .failure:
                     return false
                 }
-            })
+            }
             .asDriver(onErrorDriveWith: .never())
         
         let idDuplicationFailure = idDuplicationCheckResult.compactMap { $0.error }
@@ -167,6 +168,11 @@ extension CenterAccountRegisterViewModel {
                     .checkPasswordIsValid(password: editing)
                 
                 stateObject.setEqualState(state: editing == checking)
+                
+                // 가장 최근 비밀번호 저장
+                vm.stateObject.password = editing
+                
+                printIfDebug(stateObject.description)
                 
                 return stateObject
             }

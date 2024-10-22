@@ -46,6 +46,7 @@ let project = Project(
             resources: ["ExampleApp/Resources/**"],
             dependencies: [
                 .target(name: "AuthFeature"),
+                D.Testing,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
