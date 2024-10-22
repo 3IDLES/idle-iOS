@@ -58,24 +58,9 @@ class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
         validateBusinessNumberInOut()
         
         
+        // MARK: Id & Password
+        idAndPasswordValidationBinding()
         
-       
-        
-//        AuthInOutStreamManager.idInOut(
-//            input: input,
-//            output: output,
-//            useCase: inputValidationUseCase) { [weak self] validId in
-//                // 🚀 상태추적 🚀
-//                self?.stateObject.id = validId
-//            }
-//        
-//        AuthInOutStreamManager.passwordInOut(
-//            input: input,
-//            output: output,
-//            useCase: inputValidationUseCase) { [weak self] validPassword in
-//                // 🚀 상태추적 🚀
-//                self?.stateObject.password = validPassword
-//            }
         
         input.alert
             .subscribe(onNext: { [weak self] alertVO in

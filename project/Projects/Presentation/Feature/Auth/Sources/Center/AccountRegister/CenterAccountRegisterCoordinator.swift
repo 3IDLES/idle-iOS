@@ -89,6 +89,11 @@ public class CenterAccountRegisterCoordinator: Coordinator {
             // 완료화면으로 이동
             self?.router.presentAnonymousCompletePage(object)
         }
+        
+        vm.presentAlert = { [weak self] object in
+            
+            self?.router.presentDefaultAlertController(object: object)
+        }
     
         self.stageViewControllers = [
             EnterNameViewController(viewModel: vm),
