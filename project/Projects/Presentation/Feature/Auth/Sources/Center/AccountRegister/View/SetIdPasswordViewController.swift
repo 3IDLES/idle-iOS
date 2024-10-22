@@ -108,7 +108,7 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
     }()
 
     // MARK: 비밀번호 확인 입력
-    let checlPasswordLabel: IdleLabel = {
+    let checkPasswordLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
         label.textString = "비밀번호 확인"
         label.attrTextColor = DSColor.gray500.color
@@ -191,7 +191,7 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
             passwordField,
             passwordGuideLabel,
             pwValidationIndicators,
-            checlPasswordLabel,
+            checkPasswordLabel,
             checkPasswordField,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -236,11 +236,11 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
             pwValidationIndicators.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             pwValidationIndicators.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             
-            checlPasswordLabel.topAnchor.constraint(equalTo: pwValidationIndicators.bottomAnchor, constant: 24),
-            checlPasswordLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            checlPasswordLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            checkPasswordLabel.topAnchor.constraint(equalTo: pwValidationIndicators.bottomAnchor, constant: 24),
+            checkPasswordLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            checkPasswordLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             
-            checkPasswordField.topAnchor.constraint(equalTo: checlPasswordLabel.bottomAnchor, constant: 6),
+            checkPasswordField.topAnchor.constraint(equalTo: checkPasswordLabel.bottomAnchor, constant: 6),
             checkPasswordField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             checkPasswordField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             checkPasswordField.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor)

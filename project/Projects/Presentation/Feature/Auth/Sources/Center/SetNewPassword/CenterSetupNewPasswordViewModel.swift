@@ -36,7 +36,7 @@ class CenterSetupNewPasswordViewModel: BaseViewModel, ViewModelType {
         super.init()
         
         // 비밀번호
-
+        passwordValidationBinding()
         
         // 휴대전화 인증
         AuthInOutStreamManager.validatePhoneNumberInOut(
@@ -104,6 +104,37 @@ class CenterSetupNewPasswordViewModel: BaseViewModel, ViewModelType {
 
 extension CenterSetupNewPasswordViewModel {
     
+    func passwordValidationBinding() {
+    
+        // Passwords
+        output.passwordValidationState = Observable
+            .combineLatest(
+                input.editingPassword,
+                input.checkingPassword
+            )
+            .unretained(self)
+            .map { (vm, passwords) in
+                
+                let (editing, checking) = passwords
+                
+                let stateObject: PasswordValidationState = vm.inputValidationUseCase
+                    .checkPasswordIsValid(password: editing)
+                
+                stateObject.setEqualState(state: editing == checking)
+                
+                // 가장 최근 비밀번호 저장
+                vm.validPassword = editing
+                
+                printIfDebug(stateObject.description)
+                
+                return stateObject
+            }
+            .asDriver(onErrorDriveWith: .never())
+    }
+}
+
+extension CenterSetupNewPasswordViewModel {
+    
     class Input {
         
         // 화면 전환
@@ -118,7 +149,8 @@ extension CenterSetupNewPasswordViewModel {
         public var requestValidationForAuthNumber: PublishRelay<Void> = .init()
         
         // Password
-        public var editingPasswords: PublishRelay<(pwd: String, cpwd: String)> = .init()
+        var editingPassword: PublishSubject<String> = .init()
+        var checkingPassword: BehaviorSubject<String> = .init(value: "")
         
         // Change password
         public var changePasswordButtonClicked: PublishRelay<Void> = .init()
@@ -136,7 +168,7 @@ extension CenterSetupNewPasswordViewModel {
         public var authNumberValidation: Driver<Bool>?
         
         // Password
-        public var passwordValidation: Driver<PasswordValidationState>?
+        var passwordValidationState: Driver<PasswordValidationState> = .empty()
         
         public var loginSuccess: Driver<Void>?
     }
@@ -147,4 +179,6 @@ extension CenterSetupNewPasswordViewModel.Input: AuthPhoneNumberInputable { }
 extension CenterSetupNewPasswordViewModel.Output: AuthPhoneNumberOutputable { }
 
 extension CenterSetupNewPasswordViewModel.Input: ChangePasswordSuccessInputable { }
+extension CenterSetupNewPasswordViewModel.Output: ChangePasswordSuccessOutputable { }
+
 extension CenterSetupNewPasswordViewModel.Input: PageProcessInputable { }

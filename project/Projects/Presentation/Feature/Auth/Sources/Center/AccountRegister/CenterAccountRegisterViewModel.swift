@@ -114,7 +114,7 @@ extension CenterAccountRegisterViewModel {
                 
                 printIfDebug("[CenterRegisterViewModel] 중복성 검사 대상 id: \(id)")
                 
-                // 가장 최근 id저장
+                // 검증시 가장 최근 id저장
                 vm.stateObject.id = id
                 
                 #if DEBUG
@@ -249,9 +249,10 @@ extension CenterAccountRegisterViewModel {
         // MARK: 최종 회원가입 버튼
         let registerResult = input
             .completeButtonClicked
-            .flatMap { [unowned self] _ in
-                self.authUseCase
-                    .registerCenterAccount(registerState: self.stateObject)
+            .unretained(self)
+            .flatMap { (vm, _) in
+                vm.authUseCase
+                    .registerCenterAccount(registerState: vm.stateObject)
             }
             .share()
         
