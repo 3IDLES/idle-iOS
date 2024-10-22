@@ -15,28 +15,57 @@ import BaseFeature
 import RxSwift
 import RxCocoa
 
-
-public protocol SetIdInputable {
-    var editingId: BehaviorRelay<String> { get set }
-    var requestIdDuplicationValidation: PublishRelay<String> { get set }
+protocol SetIdAndPasswordInputable {
+    
+    // Id
+    var editingId: PublishSubject<String> { get set }
+    var isIdDuplicatedButtonPressed: PublishSubject<Void> { get set }
+    
+    // Password
+    var editingPassword: PublishSubject<String> { get set }
+    var checkingPassword: PublishSubject<String> { get set }
 }
 
-public protocol SetIdOutputable {
-    var canCheckIdDuplication: Driver<Bool>? { get set }
-    var idDuplicationValidation: Driver<Bool>? { get set }
+protocol SetIdAndPasswordOutputable {
+    
+    // Id
+    var idValidationResult: Driver<Bool> { get }
+    var idDuplicationCheckResult: Driver<Bool> { get }
+    
+    // Password
+    var passwordValidationState: Driver<PasswordValidationState> { get }
 }
 
-public protocol SetPasswordInputable {
-    var editingPasswords: PublishRelay<(pwd: String, cpwd: String)> { get set }
+struct PasswordValidationState {
+    
+    enum State {
+        case valid
+        case invalid
+    }
+    
+    let characterCount: State
+    let alphabetAndNumberIncluded: State
+    let noEmptySpace: State
+    let unsuccessiveSame3words: State
+    
+    var isValid: Bool {
+        
+        return (
+            characterCount == .valid 
+            &&
+            alphabetAndNumberIncluded == .valid 
+            &&
+            noEmptySpace == .valid 
+            &&
+            unsuccessiveSame3words == .valid
+        )
+    }
 }
 
-public protocol SetPasswordOutputable {
-    var passwordValidation: Driver<PasswordValidationState>? { get set }
-}
 
 class SetIdPasswordViewController<T: ViewModelType>: BaseViewController
-where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
-      T.Output: SetIdOutputable & SetPasswordOutputable, T: BaseViewModel {
+where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
+      T.Output: SetIdAndPasswordOutputable, T: BaseViewModel {
 
     
     // View
@@ -58,8 +87,8 @@ where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
     private let idField: IFType1 = {
         
        let textField = IFType1(
-        placeHolderText: "아이디를 입력해주세요",
-        submitButtonText: "중복 확인"
+            placeHolderText: "아이디를 입력해주세요",
+            submitButtonText: "중복 확인"
        )
         
         textField.idleTextField.isCompleteImageAvailable = false
@@ -230,21 +259,32 @@ where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
         // MARK: Input
         let input = viewModel.input
         
-        // 현재 입력중인 정보 전송
+        
+        // Id
         idField.idleTextField.textField.rx.text
             .compactMap{ $0 }
             .bind(to: input.editingId)
             .disposed(by: disposeBag)
         
-        Observable
-            .combineLatest(
-                passwordField.eventPublisher,
-                checkPasswordField.eventPublisher
-            )
-            .map({ ($0, $1) })
-            .bind(to: input.editingPasswords)
+        idField.button.eventPublisher
+            .mapToVoid()
+            .bind(to: input.isIdDuplicatedButtonPressed)
             .disposed(by: disposeBag)
         
+        // Password
+        passwordField
+            .textField.rx.text
+            .compactMap{ $0 }
+            .bind(to: input.editingPassword)
+            .disposed(by: disposeBag)
+        
+        checkPasswordField
+            .textField.rx.text
+            .compactMap{ $0 }
+            .bind(to: input.checkingPassword)
+            .disposed(by: disposeBag)
+        
+        // Navigation
         buttonContainer.nextBtnClicked
             .asObservable()
             .bind(to: input.completeButtonClicked)
@@ -255,63 +295,72 @@ where T.Input: SetIdInputable & SetPasswordInputable & PageProcessInputable,
             .bind(to: input.prevButtonClicked)
             .disposed(by: disposeBag)
         
-        // id 중복확인 요청 버튼
-        idField.eventPublisher
-            .map { [weak self] in
-                // 증복검사 실행시 아이디 입력 필드 비활성화
-                self?.idField.idleTextField.setEnabled(false)
-                self?.idField.button.setEnabled(false)
-                return $0
-            }
-            .bind(to: input.requestIdDuplicationValidation)
-            .disposed(by: disposeBag)
         
         // MARK: Output
         let output = viewModel.output
         
         // 중복확인이 가능한 아이디인가?
         output
-            .canCheckIdDuplication?
-            .drive(onNext: { [weak self] in
-                self?.idField.button.setEnabled($0)
+            .idValidationResult
+            .drive(onNext: { [weak self] isValid in
+                
+                guard let self else { return }
+                
+                // 검증 라벨 색상변경
+                
+                // 중복확인버튼 활성화
+                idField.button.setEnabled(isValid)
             })
             .disposed(by: disposeBag)
         
-        // 아이디 중복확인 결과
-        let idDuplicationValidation = output
-            .idDuplicationValidation?
-            .map { [weak self] isSuccess in
-                
-                self?.idField.idleTextField.setEnabled(true)
-                
-                if !isSuccess {
-                    self?.idField.idleTextField.textField.textString = ""
-                    self?.showAlert(vo: .init(
-                        title: "사용불가한 아이디",
-                        message: "다른 아이디를 사용해주세요.")
-                    )
-                }
-                
-                return isSuccess
-            }
-            .asObservable() ?? .empty()
+        let idDuplicationResult = output
+            .idDuplicationCheckResult
+            .asObservable()
+            .share()
         
-        // 비밀번호 검증 결과
+        idDuplicationResult
+            .subscribe(onNext: { [weak self] isValid in
+                
+                guard let self else { return }
+                
+                // 비밀번호 필드 활성화
+                passwordField.setEnabled(isValid)
+                checkPasswordField.setEnabled(isValid)
+            })
+            .disposed(by: disposeBag)
+        
         let passwordValidationResult = output
-            .passwordValidation?
-            .map { state in
-                state == .match
-            }
-            .asObservable() ?? .empty()
+            .passwordValidationState
+            .asObservable()
+            .share()
+        
+        passwordValidationResult
+            .subscribe(onNext: { [weak self] state in
+                
+                guard let self else { return }
+                
+                // 비밀번호 체킹 상태 업데이트
+                
+            })
+            .disposed(by: disposeBag)
+        
+    
         
         // id, password 유효성 검사
         Observable
             .combineLatest(
-                idDuplicationValidation,
+                idDuplicationResult,
                 passwordValidationResult
             )
-            .map { $0 && $1 }
-            .subscribe(onNext: { [weak self] in self?.buttonContainer.nextButton.setEnabled($0) })
+            .map { idIsValid, passwordCheckingState in
+                idIsValid && passwordCheckingState.isValid
+            }
+            .subscribe(onNext: { [weak self] isValid in
+                
+                guard let self else { return }
+                
+                buttonContainer.nextButton.setEnabled(isValid)
+            })
             .disposed(by: disposeBag)
     }
     

@@ -16,10 +16,8 @@ public protocol ChangePasswordSuccessInputable {
     var changePasswordButtonClicked: PublishRelay<Void> { get }
 }
 
-
 class ValidateNewPasswordViewController<T: ViewModelType>: UIViewController
-where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
-      T.Output: SetPasswordOutputable {
+where T.Input: ChangePasswordSuccessInputable {
     
     let viewModel: T
     
@@ -172,14 +170,14 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
         // MARK: Input
         let input = viewModel.input
         
-        Observable
-            .combineLatest(
-                passwordField.eventPublisher,
-                checkPasswordField.eventPublisher
-            )
-            .map({ ($0, $1) })
-            .bind(to: input.editingPasswords)
-            .disposed(by: disposeBag)
+//        Observable
+//            .combineLatest(
+//                passwordField.eventPublisher,
+//                checkPasswordField.eventPublisher
+//            )
+//            .map({ ($0, $1) })
+//            .bind(to: input.editingPasswords)
+//            .disposed(by: disposeBag)
         
         ctaButton
             .eventPublisher
@@ -194,28 +192,28 @@ where T.Input: SetPasswordInputable & ChangePasswordSuccessInputable,
         let output = viewModel.output
         
         // 비밀번호 검증
-        output
-            .passwordValidation?
-            .drive(onNext: { [weak self] validationState in
-                
-                guard let self else { return }
-                
-                switch validationState {
-                case .invalidPassword:
-                    thisIsValidPasswordLabel.alpha = 0
-                    onPasswordUnMatched()
-                case .unMatch:
-                    thisIsValidPasswordLabel.alpha = 1
-                    passwordDoesntMathLabel.alpha = 1
-                    onPasswordUnMatched()
-                case .match:
-                    thisIsValidPasswordLabel.alpha = 1
-                    passwordDoesntMathLabel.alpha = 0
-                    onPasswordMatched()
-                    ctaButton.setEnabled(true)
-                }
-            })
-            .disposed(by: disposeBag)
+//        output
+//            .passwordValidation?
+//            .drive(onNext: { [weak self] validationState in
+//                
+//                guard let self else { return }
+//                
+//                switch validationState {
+//                case .invalidPassword:
+//                    thisIsValidPasswordLabel.alpha = 0
+//                    onPasswordUnMatched()
+//                case .unMatch:
+//                    thisIsValidPasswordLabel.alpha = 1
+//                    passwordDoesntMathLabel.alpha = 1
+//                    onPasswordUnMatched()
+//                case .match:
+//                    thisIsValidPasswordLabel.alpha = 1
+//                    passwordDoesntMathLabel.alpha = 0
+//                    onPasswordMatched()
+//                    ctaButton.setEnabled(true)
+//                }
+//            })
+//            .disposed(by: disposeBag)
     }
     
     private func onPasswordMatched() {

@@ -36,13 +36,7 @@ class CenterSetupNewPasswordViewModel: BaseViewModel, ViewModelType {
         super.init()
         
         // 비밀번호
-        AuthInOutStreamManager.passwordInOut(
-            input: input,
-            output: output,
-            useCase: inputValidationUseCase) { [weak self] validPassword in
-                // 🚀 상태추적 🚀
-                self?.validPassword = validPassword
-            }
+
         
         // 휴대전화 인증
         AuthInOutStreamManager.validatePhoneNumberInOut(
@@ -151,9 +145,6 @@ extension CenterSetupNewPasswordViewModel {
 // Auth phoneNumber
 extension CenterSetupNewPasswordViewModel.Input: AuthPhoneNumberInputable { }
 extension CenterSetupNewPasswordViewModel.Output: AuthPhoneNumberOutputable { }
-
-extension CenterSetupNewPasswordViewModel.Input: SetPasswordInputable { }
-extension CenterSetupNewPasswordViewModel.Output: SetPasswordOutputable { }
 
 extension CenterSetupNewPasswordViewModel.Input: ChangePasswordSuccessInputable { }
 extension CenterSetupNewPasswordViewModel.Input: PageProcessInputable { }

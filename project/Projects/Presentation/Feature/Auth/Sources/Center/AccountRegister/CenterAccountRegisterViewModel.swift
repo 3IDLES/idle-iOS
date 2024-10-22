@@ -14,7 +14,7 @@ import Core
 import RxSwift
 import RxCocoa
 
-public class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
+class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
     
     // Injected
     @Injected var inputValidationUseCase: AuthInputValidationUseCase
@@ -25,8 +25,8 @@ public class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
     var presentCompleteScreen: (() -> ())!
     
     // Input은 모든 ViewController에서 공유한다. (다만, 각가의 ViewController의 Input프로토콜에 의해 제한된다.)
-    public let input = Input()
-    public let output = Output()
+    let input = Input()
+    let output = Output()
     
     internal let stateObject = CenterRegisterState()
     
@@ -56,21 +56,21 @@ public class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
         registerInOut()
         validateBusinessNumberInOut()
         
-        AuthInOutStreamManager.idInOut(
-            input: input,
-            output: output,
-            useCase: inputValidationUseCase) { [weak self] validId in
-                // 🚀 상태추적 🚀
-                self?.stateObject.id = validId
-            }
-        
-        AuthInOutStreamManager.passwordInOut(
-            input: input,
-            output: output,
-            useCase: inputValidationUseCase) { [weak self] validPassword in
-                // 🚀 상태추적 🚀
-                self?.stateObject.password = validPassword
-            }
+//        AuthInOutStreamManager.idInOut(
+//            input: input,
+//            output: output,
+//            useCase: inputValidationUseCase) { [weak self] validId in
+//                // 🚀 상태추적 🚀
+//                self?.stateObject.id = validId
+//            }
+//        
+//        AuthInOutStreamManager.passwordInOut(
+//            input: input,
+//            output: output,
+//            useCase: inputValidationUseCase) { [weak self] validPassword in
+//                // 🚀 상태추적 🚀
+//                self?.stateObject.password = validPassword
+//            }
         
         input.alert
             .subscribe(onNext: { [weak self] alertVO in
@@ -104,62 +104,63 @@ public class CenterAccountRegisterViewModel: BaseViewModel, ViewModelType {
 // MARK: ViewModel input output
 extension CenterAccountRegisterViewModel {
     
-    public class Input {
+    class Input {
         
         // CTA 버튼 클릭시
-        public var nextButtonClicked: PublishSubject<Void> = .init()
-        public var prevButtonClicked: PublishSubject<Void> = .init()
-        public var completeButtonClicked: PublishSubject<Void> = .init()
+        var nextButtonClicked: PublishSubject<Void> = .init()
+        var prevButtonClicked: PublishSubject<Void> = .init()
+        var completeButtonClicked: PublishSubject<Void> = .init()
         
         // 이름입력
         public var editingName: PublishRelay<String> = .init()
         
         // 전화번호 입력
-        public var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
-        public var editingAuthNumber: BehaviorRelay<String> = .init(value: "")
-        public var requestAuthForPhoneNumber: PublishRelay<Void> = .init()
-        public var requestValidationForAuthNumber: PublishRelay<Void> = .init()
+        var editingPhoneNumber: BehaviorRelay<String> = .init(value: "")
+        var editingAuthNumber: BehaviorRelay<String> = .init(value: "")
+        var requestAuthForPhoneNumber: PublishRelay<Void> = .init()
+        var requestValidationForAuthNumber: PublishRelay<Void> = .init()
         
         // 사업자 번호 입력
-        public var editingBusinessNumber: BehaviorRelay<String> = .init(value: "")
-        public var requestBusinessNumberValidation: PublishRelay<Void> = .init()
+        var editingBusinessNumber: BehaviorRelay<String> = .init(value: "")
+        var requestBusinessNumberValidation: PublishRelay<Void> = .init()
         
         // Id
-        public var editingId: BehaviorRelay<String> = .init(value: "")
-        public var requestIdDuplicationValidation: PublishRelay<String> = .init()
+        var editingId: PublishSubject<String> = .init()
+        var isIdDuplicatedButtonPressed: PublishSubject<Void> = .init()
         
         // Password
-        public var editingPasswords: PublishRelay<(pwd: String, cpwd: String)> = .init()
+        var editingPassword: PublishSubject<String> = .init()
+        var checkingPassword: PublishSubject<String> = .init()
         
         // Alert
-        public var alert: PublishSubject<DefaultAlertContentVO> = .init()
+        var alert: PublishSubject<DefaultAlertContentVO> = .init()
     }
     
-    public class Output {
+    class Output {
         
         // 이름 입력
         public var nameValidation: Driver<Bool>?
         
         // 전화번호 입력
-        public var canSubmitPhoneNumber: Driver<Bool>?
-        public var canSubmitAuthNumber: Driver<Bool>?
-        public var phoneNumberValidation: Driver<Bool>?
-        public var authNumberValidation: Driver<Bool>?
+        var canSubmitPhoneNumber: Driver<Bool>?
+        var canSubmitAuthNumber: Driver<Bool>?
+        var phoneNumberValidation: Driver<Bool>?
+        var authNumberValidation: Driver<Bool>?
         
         // 사업자 번호 입력
-        public var canSubmitBusinessNumber: Driver<Bool>?
-        public var businessNumberVO: Driver<BusinessInfoVO>?
-        public var businessNumberValidationFailure: Driver<Void>?
+        var canSubmitBusinessNumber: Driver<Bool>?
+        var businessNumberVO: Driver<BusinessInfoVO>?
+        var businessNumberValidationFailure: Driver<Void>?
         
         // Id
-        public var canCheckIdDuplication: Driver<Bool>?
-        public var idDuplicationValidation: Driver<Bool>?
+        var idValidationResult: Driver<Bool> = .empty()
+        var idDuplicationCheckResult: Driver<Bool> = .empty()
         
         // Password
-        public var passwordValidation: Driver<PasswordValidationState>?
+        var passwordValidationState: Driver<PasswordValidationState> = .empty()
         
         // Register success
-        public var loginSuccess: Driver<Void>?
+        var loginSuccess: Driver<Void>?
     }
 }
 
@@ -311,8 +312,6 @@ extension CenterAccountRegisterViewModel.Input: AuthBusinessOwnerInputable { }
 extension CenterAccountRegisterViewModel.Output: AuthBusinessOwnerOutputable { }
 
 // Id & Password
-extension CenterAccountRegisterViewModel.Input: SetIdInputable { }
-extension CenterAccountRegisterViewModel.Input: SetPasswordInputable { }
-extension CenterAccountRegisterViewModel.Output: SetIdOutputable { }
-extension CenterAccountRegisterViewModel.Output: SetPasswordOutputable { }
+extension CenterAccountRegisterViewModel.Input: SetIdAndPasswordInputable { }
+extension CenterAccountRegisterViewModel.Output: SetIdAndPasswordOutputable { }
 
