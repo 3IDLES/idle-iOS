@@ -167,18 +167,25 @@ extension CenterAccountRegisterViewModel {
             .disposed(by: disposeBag)
         
         
-        // Password
-        Observable
+        // Passwords
+        output.passwordValidationState = Observable
             .combineLatest(
                 input.editingPassword,
                 input.checkingPassword
-            ).map { (editingPw, checkPW) in
+            )
+            .unretained(self)
+            .map { (vm, passwords) in
                 
+                let (editing, checking) = passwords
                 
+                let stateObject: PasswordValidationState = vm.inputValidationUseCase
+                    .checkPasswordIsValid(password: editing)
+                
+                stateObject.setEqualState(state: editing == checking)
+                
+                return stateObject
             }
-        
-            
-            
+            .asDriver(onErrorDriveWith: .never())
     }
 }
 
