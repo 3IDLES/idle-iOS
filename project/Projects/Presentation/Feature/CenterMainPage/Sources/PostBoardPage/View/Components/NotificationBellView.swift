@@ -11,7 +11,7 @@ import DSKit
 
 class NotificationBellView: UIView {
     
-    let bellView: UIButton = {
+    let button: UIButton = {
         let button = UIButton()
         button.setImage(DSIcon.notiBell.image, for: .normal)
         button.imageView?.tintColor = DSColor.gray200.color
@@ -23,6 +23,7 @@ class NotificationBellView: UIView {
         view.backgroundColor = DSColor.red200.color
         view.layer.cornerRadius = 3
         view.alpha = 0
+        view.isUserInteractionEnabled = false
         return view
     }()
     
@@ -36,7 +37,7 @@ class NotificationBellView: UIView {
     private func setAutoLayout() {
         
         [
-            bellView,
+            button,
             unreadPoint,
         ].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -45,19 +46,19 @@ class NotificationBellView: UIView {
         
         NSLayoutConstraint.activate([
         
-            bellView.widthAnchor.constraint(equalToConstant: 32),
-            bellView.heightAnchor.constraint(equalTo: bellView.widthAnchor),
+            button.widthAnchor.constraint(equalToConstant: 32),
+            button.heightAnchor.constraint(equalTo: button.widthAnchor),
             
-            bellView.leftAnchor.constraint(equalTo: self.leftAnchor),
-            bellView.rightAnchor.constraint(equalTo: self.rightAnchor),
-            bellView.topAnchor.constraint(equalTo: self.topAnchor),
-            bellView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            button.leftAnchor.constraint(equalTo: self.leftAnchor),
+            button.rightAnchor.constraint(equalTo: self.rightAnchor),
+            button.topAnchor.constraint(equalTo: self.topAnchor),
+            button.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
             unreadPoint.widthAnchor.constraint(equalToConstant: 6),
             unreadPoint.heightAnchor.constraint(equalTo: unreadPoint.widthAnchor),
             
-            unreadPoint.topAnchor.constraint(equalTo: bellView.topAnchor, constant: 1),
-            unreadPoint.rightAnchor.constraint(equalTo: bellView.rightAnchor),
+            unreadPoint.topAnchor.constraint(equalTo: button.topAnchor, constant: 1),
+            unreadPoint.rightAnchor.constraint(equalTo: button.rightAnchor),
         ])
     }
     

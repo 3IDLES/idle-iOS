@@ -27,7 +27,6 @@ protocol NotificationPageViewModelable: BaseViewModel {
     
     // Output
     var tableData: Driver<NotificationTableDataInfo> { get }
-    var unreadNotificationExist: Driver<Bool> { get }
     
     /// Cell ViewModel생성
     func createCellVM(vo: NotificationVO) -> NotificationCellViewModel

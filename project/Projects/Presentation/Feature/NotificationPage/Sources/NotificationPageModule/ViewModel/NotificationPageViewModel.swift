@@ -50,7 +50,6 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
     private var currentNotificationList: [NotificationVO] = []
     
     // Output
-    var unreadNotificationExist: Driver<Bool> = .empty()
     var tableData: Driver<NotificationTableDataInfo> = .empty()
     
     override init() {
