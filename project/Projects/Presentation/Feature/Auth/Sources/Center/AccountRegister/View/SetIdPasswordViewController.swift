@@ -58,26 +58,18 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
         return label
     }()
     private let idField: IFType1 = {
-        
-       let textField = IFType1(
-            placeHolderText: "아이디를 입력해주세요",
-            submitButtonText: "중복 확인"
-       )
-        
+        let textField = IFType1(placeHolderText: "아이디를 입력해주세요", submitButtonText: "중복 확인")
         textField.idleTextField.isCompleteImageAvailable = false
-        
         return textField
     }()
-    private let thisIsValidIdLabel: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 12)
-        label.text = "사용 가능한 아이디입니다."
-        label.textColor = DSKitAsset.Colors.gray300.color
+    private let idGuideLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Body3)
+        label.textString = "* 아이디는 아래의 조건에 맞추어주세요."
+        label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
-        
         return label
     }()
+    
     
     // MARK: 비밀번호 입력
     private let passwordLabel: IdleLabel = {
@@ -95,17 +87,14 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
         
         return textField
     }()
-    private let thisIsValidPasswordLabel: ResizableUILabel = {
-        
-        let label = ResizableUILabel()
-        label.font = DSKitFontFamily.Pretendard.semiBold.font(size: 12)
-        label.text = "사용 가능한 비밀번호입니다."
-        label.textColor = DSKitAsset.Colors.gray300.color
+    private let passwordGuideLabel: IdleLabel = {
+        let label = IdleLabel(typography: .Body3)
+        label.textString = "* 비밀번호는 아래의 조건에 맞추어주세요."
+        label.attrTextColor = DSColor.gray500.color
         label.textAlignment = .left
-        
         return label
     }()
-    
+
     // MARK: 비밀번호 확인 입력
     private let checlPasswordLabel: IdleLabel = {
         let label = IdleLabel(typography: .Subtitle4)
@@ -158,10 +147,10 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
             processTitleLabel,
             idLabel,
             idField,
-            thisIsValidIdLabel,
+            idGuideLabel,
             passwordLabel,
             passwordField,
-            thisIsValidPasswordLabel,
+            passwordGuideLabel,
             checlPasswordLabel,
             checkPasswordField,
             buttonContainer,
@@ -184,9 +173,11 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
             idField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             idField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            thisIsValidIdLabel.topAnchor.constraint(equalTo: idField.bottomAnchor, constant: 6),
-            thisIsValidIdLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            thisIsValidIdLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            idGuideLabel.topAnchor.constraint(equalTo: idField.bottomAnchor, constant: 12),
+            idGuideLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            idGuideLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            //
             
             passwordLabel.topAnchor.constraint(equalTo: idField.bottomAnchor, constant: 32),
             passwordLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
@@ -196,9 +187,11 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
             passwordField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             passwordField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
             
-            thisIsValidPasswordLabel.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 6),
-            thisIsValidPasswordLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            thisIsValidPasswordLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            passwordGuideLabel.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 12),
+            passwordGuideLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            passwordGuideLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            
+            //
             
             checlPasswordLabel.topAnchor.constraint(equalTo: passwordField.bottomAnchor, constant: 32),
             checlPasswordLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
@@ -217,9 +210,6 @@ where T.Input: SetIdAndPasswordInputable & PageProcessInputable,
     private func initialUISettuing() {
         
         idField.button.setEnabled(false)
-        
-        thisIsValidIdLabel.isHidden = true
-        thisIsValidPasswordLabel.isHidden = true
         
         // - CTA버튼 비활성화
         buttonContainer.nextButton.setEnabled(false)
