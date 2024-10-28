@@ -50,7 +50,7 @@ enum SectionInfo: Int, CaseIterable {
 }
 
 
-class NotificationPageVC: BaseViewController {
+class NotificationPageVC: BaseViewController, UIGestureRecognizerDelegate {
     
     typealias Cell = NotificationCell
     

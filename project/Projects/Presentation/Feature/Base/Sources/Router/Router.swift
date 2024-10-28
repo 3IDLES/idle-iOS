@@ -215,7 +215,7 @@ public final class Router: NSObject, RouterProtocol {
         
         guard let keyWindow = UIWindow.keyWindow else { return }
         
-        let navigationController = UINavigationController(rootViewController: module)
+        let navigationController = PopToDismissNavigationController(rootViewController: module)
         navigationController.setNavigationBarHidden(true, animated: false)
         
         self.rootController = navigationController
@@ -245,7 +245,7 @@ public final class Router: NSObject, RouterProtocol {
     
     public func setRootModuleTo(module: Module, popCompletion: RoutingCompletion?) {
         guard let keyWindow = UIWindow.keyWindow else { return }
-        let navigationController = UINavigationController(rootViewController: module)
+        let navigationController = PopToDismissNavigationController(rootViewController: module)
         navigationController.setNavigationBarHidden(true, animated: false)
         
         if let popCompletion {
