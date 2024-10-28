@@ -47,7 +47,7 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .unitTests,
             bundleId: "com.idleApplication.test",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: ["Tests/**"],
             dependencies: [.target(name: "Idle-iOS")]
         )
