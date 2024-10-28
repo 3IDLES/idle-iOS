@@ -71,7 +71,7 @@ class NotificationCell: UITableViewCell {
         let mainStack = HStack([
             profileImageView,
             labelStack,
-        ], spacing: 16, alignment: .top)
+        ], spacing: 20, alignment: .center)
         
         [
             mainStack
