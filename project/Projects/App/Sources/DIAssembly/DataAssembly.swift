@@ -22,13 +22,13 @@ public struct DataAssembly: Assembly {
         
         // MARK: Key-value store for datasource
         container.register(KeyValueStore.self) { _ in
-            return KeyChainList()
+            KeyChainList()
         }
         .inObjectScope(.container)
         
         // MARK: Service
         container.register(LocalStorageService.self) { _ in
-            return DefaultLocalStorageService()
+            DefaultLocalStorageService()
         }
         container.register((any ApplyService).self) { _ in
             DefaultApplyService()
