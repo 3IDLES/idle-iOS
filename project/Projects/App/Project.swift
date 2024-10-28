@@ -23,7 +23,7 @@ let project = Project(
             product: .app,
             productName: DeploymentSettings.productName,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             infoPlist: IdleInfoPlist.mainApp,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
