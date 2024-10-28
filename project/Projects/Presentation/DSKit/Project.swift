@@ -21,7 +21,7 @@ let proejct = Project(
             destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: ["Sources/**"],
             resources: ["Resources/**",],
             dependencies: [
@@ -42,7 +42,7 @@ let proejct = Project(
             destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             infoPlist: IdleInfoPlist.exampleAppDefault,
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],

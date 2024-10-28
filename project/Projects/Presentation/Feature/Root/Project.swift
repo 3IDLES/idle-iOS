@@ -23,7 +23,7 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: [
                 "Sources/**",
                 SecretSource.amplitudeConfig,
@@ -59,7 +59,7 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             infoPlist: IdleInfoPlist.exampleAppDefault,
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],

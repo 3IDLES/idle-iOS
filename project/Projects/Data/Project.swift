@@ -23,7 +23,7 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: ["Repository/**"],
             dependencies: [
                 D.Domain,
@@ -43,7 +43,7 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: [
                 "DataSource/**",
                 SecretSource.networkDataSource,
@@ -70,7 +70,7 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .unitTests,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: ["DataTests/**"],
             dependencies: [
                 D.Testing,
