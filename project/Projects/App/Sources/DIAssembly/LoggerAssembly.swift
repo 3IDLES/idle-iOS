@@ -23,11 +23,11 @@ public struct LoggerAssembly: Assembly {
             #endif
             return AmplitudeLogger()
         }
+        .inObjectScope(.container)
         
         // MARK: Overall logger
-        container.register(OverallLogger.self) { resolver in
-            let messagePublisher = resolver.resolve(LoggerMessagePublisher.self)!
-            return DefaultOverallLogger(publisher: messagePublisher)
+        container.register(OverallLogger.self) { _ in
+            DefaultOverallLogger()
         }
         .inObjectScope(.container)
         

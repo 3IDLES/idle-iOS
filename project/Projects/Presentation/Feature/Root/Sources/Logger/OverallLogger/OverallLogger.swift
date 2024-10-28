@@ -6,10 +6,12 @@
 //
 
 import Foundation
+
 import PresentationCore
 import AuthFeature
 import CenterMainPageFeature
 import Domain
+import Core
 
 public protocol OverallLogger:
     CenterRegisterLogger, 
@@ -20,11 +22,9 @@ public protocol OverallLogger:
 
 public class DefaultOverallLogger {
     
-    let publisher: LoggerMessagePublisher
+    @Injected var publisher: LoggerMessagePublisher
     
-    public init(publisher: LoggerMessagePublisher) {
-        self.publisher = publisher
-    }
+    public init() { }
 }
 
 extension DefaultOverallLogger: OverallLogger {
