@@ -56,7 +56,8 @@ extension NotificationItemDTO: EntityRepresentable {
     
     public func toEntity() -> Entity {
         
-        let dateFormatter = ISO8601DateFormatter()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         var createdDate: Date = .now
         
         if let formatted = dateFormatter.date(from: createdAt) {
