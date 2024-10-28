@@ -201,6 +201,7 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
         
         let editingRequestResult = mapEndLoading(imageProcessingFinishWithSuccess
             .unretained(self)
+            .observe(on: ConcurrentDispatchQueueScheduler(qos: .default))
             .flatMap { (obj, imageInfo) in
                 let (phoneNumber, introduction) = obj.checkTextInputModification()
                 
