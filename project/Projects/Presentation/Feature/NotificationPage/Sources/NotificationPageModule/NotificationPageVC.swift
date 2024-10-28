@@ -118,7 +118,7 @@ class NotificationPageVC: BaseViewController {
         tableView.dataSource = tableViewDataSource
         tableView.delegate = self
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 93
+        tableView.estimatedRowHeight = 102
         tableView.sectionHeaderTopPadding = 10
         // MARK: Cell
         tableView.separatorStyle = .none

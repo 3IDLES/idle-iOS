@@ -139,7 +139,7 @@ class NotificationPageViewModel: BaseViewModel, NotificationPageViewModelable {
                 
                 // 날짜순 정렬
                 let sortedInfo = accum.sorted { lhs, rhs in
-                    lhs.createdDate < rhs.createdDate
+                    lhs.createdDate > rhs.createdDate
                 }
                 
                 var result: [SectionInfo: [NotificationVO]] = [:]
