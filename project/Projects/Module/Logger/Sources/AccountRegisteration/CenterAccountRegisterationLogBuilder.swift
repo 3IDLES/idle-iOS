@@ -1,5 +1,5 @@
 //
-//  CenterAccountRegisterationLogBuilder.swift
+//  AccountRegisterationLogBuilder.swift
 //  Logger
 //
 //  Created by choijunios on 10/30/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct CenterAccountRegisterationLogObject: LoggingObject {
+public struct AccountRegisterationLogObject: LoggingObject {
     
     public var properties: [String : Any] {
         [
@@ -25,7 +25,7 @@ public struct CenterAccountRegisterationLogObject: LoggingObject {
     }
 }
 
-public class CenterAccountRegisterationLogBuilder {
+public class AccountRegisterationLogBuilder {
     
     let step: Int
     let stepName: String
@@ -35,7 +35,7 @@ public class CenterAccountRegisterationLogBuilder {
         self.stepName = stepName
     }
     
-    public func build() -> CenterAccountRegisterationLogObject {
+    public func build() -> AccountRegisterationLogObject {
         .init(step: step, stepName: stepName)
     }
 }
