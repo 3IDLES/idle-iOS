@@ -9,6 +9,8 @@ import Foundation
 
 public struct CreatePostLogObject: LoggingObject {
     
+    public var eventType: String = "CreatePost"
+    
     public var properties: [String : Any] {
         [
             "step": step,

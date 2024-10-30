@@ -9,7 +9,7 @@ import Foundation
 
 
 public protocol LoggingObject {
-    
+    var eventType: String { get }
     var properties: [String: Any] { get }
 }
 
