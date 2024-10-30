@@ -20,7 +20,11 @@ public struct LoggerAssembly: Assembly {
     public func assemble(container: Container) {
         
         container.register(Logger.self) { _ in
-            AmplitudeLogger()
+            #if DEBUG
+                return MockLogger()
+            #endif
+            
+            return AmplitudeLogger()
         }
     }
 }

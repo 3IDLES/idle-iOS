@@ -6,7 +6,9 @@
 //
 
 import UIKit
+
 import BaseFeature
+import Logger
 import PresentationCore
 import Core
 
@@ -19,20 +21,37 @@ enum CenterAccountRegisterStage: Int {
     case idPassword
     case finish
     
-    var screenName: String {
+    var screenKorName: String {
         switch self {
         case .registerFinished:
-            ""
+            "회원가입 페이지 이탈"
         case .name:
-            "name"
+            "이름 입력"
         case .phoneNumber:
-            "phoneNumber"
+            "전화번호 입력"
         case .businessOwner:
-            "businessOwner"
+            "사업자 인증번호 입력"
         case .idPassword:
-            "idPassword"
+            "아이디 패스워드 입력"
         case .finish:
-            ""
+            "가입완료"
+        }
+    }
+    
+    var step: Int {
+        switch self {
+        case .registerFinished:
+            0
+        case .name:
+            1
+        case .phoneNumber:
+            2
+        case .businessOwner:
+            3
+        case .idPassword:
+            4
+        case .finish:
+            5
         }
     }
 }
@@ -45,7 +64,7 @@ public class CenterAccountRegisterCoordinator: Coordinator {
     
     // Injected
     @Injected var router: RouterProtocol
-    @Injected var logger: CenterRegisterLogger
+    @Injected var logger: Logger
     
     public var onFinish: (() -> ())?
     
@@ -74,9 +93,20 @@ public class CenterAccountRegisterCoordinator: Coordinator {
         
         vm.presentCompleteScreen = { [weak self] in
             
-            // MARK: 센터 계정 회원가입 완료 로깅
-            self?.logger.logCenterRegisterDuration()
+            guard let self else { return }
             
+            // MARK: 센터 계정 회원가입 완료 로깅
+            let stage: CenterAccountRegisterStage = .finish
+            let logObject = CenterAccountRegisterationLogBuilder(
+                step: currentStage.step,
+                stepName: currentStage.screenKorName
+            )
+            .build()
+            
+            logger.send(logObject)
+            
+            
+            // MARK: 완료화면으로 이동
             let object: AnonymousCompleteVCRenderObject = .init(
                 titleText: "센터관리자 로그인을\n완료했어요!",
                 descriptionText: "로그인 정보는 마지막 접속일부터\n180일간 유지될 예정이에요.",
@@ -87,7 +117,7 @@ public class CenterAccountRegisterCoordinator: Coordinator {
             }
             
             // 완료화면으로 이동
-            self?.router.presentAnonymousCompletePage(object)
+            router.presentAnonymousCompletePage(object)
         }
         
         vm.presentAlert = { [weak self] object in
@@ -125,9 +155,6 @@ public class CenterAccountRegisterCoordinator: Coordinator {
         }
         
         excuteStage(.name, moveTo: .next)
-        
-        // MARK: 센터 계정등록 시작 로깅
-        logger.startCenterRegister()
     }
 }
 
@@ -166,14 +193,9 @@ extension CenterAccountRegisterCoordinator {
             return
         default:
             
-            // MARK: 등록 스테이지 이동 로깅
-            if moveTo == .next {
-                logger.logCenterRegisterStep(
-                    stepName: stage.screenName,
-                    stepIndex: stage.rawValue-1
-                )
-            }
-            
+            // 로깅
+            logCurrentStage()
+
             let vc = stageViewControllers[stage.rawValue-1]
             showPageViewControllerStage(viewController: vc, moveTo: moveTo)
         }
@@ -185,6 +207,16 @@ extension CenterAccountRegisterCoordinator {
             direction: moveTo == .next ? .forward : .reverse,
             animated: true
         )
+    }
+    
+    func logCurrentStage() {
+        let logObject = CenterAccountRegisterationLogBuilder(
+            step: currentStage.step,
+            stepName: currentStage.screenKorName
+        )
+        .build()
+        
+        logger.send(logObject)
     }
 }
 
