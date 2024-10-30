@@ -26,5 +26,6 @@ public struct LoggerAssembly: Assembly {
             
             return AmplitudeLogger()
         }
+        .inObjectScope(.container)
     }
 }
