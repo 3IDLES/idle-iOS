@@ -22,7 +22,10 @@ let project = Project(
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_iOS_version,
-            sources: ["Sources/**"],
+            sources: [
+                "Sources/**",
+                SecretSource.amplitudeConfig,
+            ],
             resources: ["Resources/**",],
             dependencies: [
                 // External

@@ -10,7 +10,7 @@ import Foundation
 
 public protocol LoggingObject {
     
-    
+    var properties: [String: Any] { get }
 }
 
 public protocol Logger {

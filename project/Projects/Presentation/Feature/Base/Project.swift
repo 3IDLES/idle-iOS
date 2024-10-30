@@ -28,11 +28,10 @@ let project = Project(
             resources: ["Resources/**"],
             dependencies: [
                 
-                // Data
+                // Internal
                 D.Data.Repository,
-                
-                // Presentation
                 D.Presentation.DSKit,
+                D.Module.Logger,
 
                 // ThirdParty
                 D.ThirdParty.NaverMapSDKForSPM,

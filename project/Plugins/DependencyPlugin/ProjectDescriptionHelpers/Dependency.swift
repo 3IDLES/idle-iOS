@@ -24,6 +24,10 @@ public enum ModuleDependency {
         public static let PresentationCore: TargetDependency = .project(target: "PresentationCore", path: .relativeToRoot("Projects/Presentation/PresentationCore"))
     }
     
+    public enum Module {
+        public static let Logger: TargetDependency = .project(target: "Logger", path: .relativeToRoot("Projects/Module/Logger"))
+    }
+    
     public static let Core: TargetDependency = .project(target: "Core", path: .relativeToRoot("Projects/Core"))
     
     public static let Testing: TargetDependency = .project(target: "Testing", path: .relativeToRoot("Projects/Testing"))

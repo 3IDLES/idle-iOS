@@ -23,7 +23,7 @@ public class AmplitudeLogger: Logger {
         
         self.amplitude = Amplitude(
             configuration: Configuration(
-                apiKey: "AmplitudeConfig.apiKey"
+                apiKey: AmplitudeConfig.apiKey
             )
         )
         
