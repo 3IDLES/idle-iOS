@@ -7,6 +7,7 @@
 
 import UIKit
 import BaseFeature
+import Logger
 import PresentationCore
 import Domain
 import DSKit
@@ -15,29 +16,6 @@ import Core
 
 import RxCocoa
 import RxSwift
-
-enum RegisterRecruitmentPage: Int, CaseIterable {
-    case workTimeAndPayment = 0
-    case workPlaceAddress = 1
-    case customerInformation = 2
-    case customerRequirement = 3
-    case additionalInfo = 4
-    
-    var screenName: String {
-        switch self {
-        case .workTimeAndPayment:
-            "workTimeAndPayment"
-        case .workPlaceAddress:
-            "workPlaceAddress"
-        case .customerInformation:
-            "customerInformation"
-        case .customerRequirement:
-            "customerRequirement"
-        case .additionalInfo:
-            "applyInformation"
-        }
-    }
-}
 
 public protocol RegisterRecruitmentPostVMBindable {
     func bind(viewModel: RegisterRecruitmentPostViewModelable)
@@ -57,7 +35,7 @@ public protocol RegisterRecruitmentPostViewModelable:
 
 public class CreatePostViewController: BaseViewController {
     
-    @Injected var logger: PostRegisterLogger
+    @Injected var logger: Logger
     
     /// 현재 스크린의 넓이를 의미합니다.
     private var screenWidth: CGFloat {
@@ -70,7 +48,7 @@ public class CreatePostViewController: BaseViewController {
     private var pageViews: [RegisterRecruitmentPostViews] = []
     private var pagesAreSetted = false
     
-    var currentIndex: Int = 0
+    var currentStage: RegisterRecruitmentPage = .workTimeAndPayment
     
     let exitEvent: PublishSubject<Void> = .init()
 
@@ -150,7 +128,7 @@ public class CreatePostViewController: BaseViewController {
     }
     
     private func createPages() {
-        self.pageViews = RegisterRecruitmentPage.allCases.map { page in
+        self.pageViews = RegisterRecruitmentPage.stages.map { page in
             switch page {
                 case .workTimeAndPayment:
                     WorkTimeAndPayView()
@@ -162,6 +140,8 @@ public class CreatePostViewController: BaseViewController {
                     CustomerRequirementView()
                 case .additionalInfo:
                     ApplicationDetailView(viewController: self)
+                default:
+                    fatalError("센터공고등록 지정되지 않은 화면")
             }
         }
     }
@@ -184,12 +164,6 @@ public class CreatePostViewController: BaseViewController {
         
         // 첫번째 뷰를 최상단으로
         view.bringSubviewToFront(pageViews.first!)
-        
-        // MARK: 로깅
-        logger.logPostRegisterStep(
-            stepName: RegisterRecruitmentPage(rawValue: currentIndex)!.screenName,
-            stepIndex: currentIndex
-        )
         
         // 옵저버블 설정
         let nextButtonClickedObservables = pageViews
@@ -220,52 +194,59 @@ public class CreatePostViewController: BaseViewController {
         }
         // 첫번째 뷰를 표시
         pageViews.first?.transform = .identity
+        
+        // 로깅
+        logCurrentStage()
     }
     
     private func next(animated: Bool = true) {
         
-        if let nextStage = RegisterRecruitmentPage(rawValue: currentIndex+1) {
+        if let nextStage = RegisterRecruitmentPage(rawValue: currentStage.rawValue+1) {
             
-            let nextIndex = nextStage.rawValue
-            
-            // MARK: 로깅
-            logger.logPostRegisterStep(
-                stepName: nextStage.screenName,
-                stepIndex: nextIndex
-            )
+            if nextStage == .overview {
+                
+                guard let vm = viewModel as? RegisterRecruitmentPostViewModelable else { return }
+                
+                // 오버뷰화면으로 이동
+                vm.showOverView()
+                
+                return
+            }
             
             // Status바 이동
             statusBar.moveToSignal.onNext(.next)
             
-            let prevView: UIView? = currentIndex != -1 ? pageViews[currentIndex] : nil
-            let willShowView = pageViews[nextIndex]
+            let currentStageIndex: Int = currentStage.stageIndex
+            let prevView: UIView? = currentStageIndex != -1 ? pageViews[currentStageIndex] : nil
+            let willShowView = pageViews[nextStage.stageIndex]
             
-            currentIndex = nextIndex
+            currentStage = nextStage
+
+            // MARK: Logging stage
+            logCurrentStage()
             
             UIView.animate(withDuration: animated ? 0.35 : 0.0) { [screenWidth, prevView, willShowView] in
                 
                 prevView?.transform = .init(translationX: -screenWidth, y: 0)
                 willShowView.transform = .identity
             }
-        } else {
-            
-            guard let vm = viewModel as? RegisterRecruitmentPostViewModelable else { return }
-            
-            // 오버뷰화면으로 이동
-            vm.showOverView()
         }
     }
     
     private func prev(animated: Bool = true) {
-        if let nextIndex = RegisterRecruitmentPage(rawValue: currentIndex-1)?.rawValue {
+        
+        if let nextStage = RegisterRecruitmentPage(rawValue: currentStage.rawValue-1) {
             
             // Status바 이동
             statusBar.moveToSignal.onNext(.prev)
             
-            let prevView = pageViews[currentIndex]
-            let willShowView = pageViews[nextIndex]
+            let prevView = pageViews[currentStage.stageIndex]
+            let willShowView = pageViews[nextStage.stageIndex]
             
-            currentIndex = nextIndex
+            currentStage = nextStage
+            
+            // MARK: Logging stage
+            logCurrentStage()
             
             UIView.animate(withDuration: animated ? 0.35 : 0.0) { [screenWidth, prevView, willShowView] in
                 
@@ -294,6 +275,16 @@ public class CreatePostViewController: BaseViewController {
             .forEach { view in
                 view.bind(viewModel: viewModel)
             }
+    }
+    
+    func logCurrentStage(stage: RegisterRecruitmentPage? = nil) {
+        let logObject = CreatePostLogBuilder(
+            step: (stage ?? currentStage).step,
+            stepName: (stage ?? currentStage).screenKorName
+        )
+        .build()
+        
+        logger.send(logObject)
     }
 }
 

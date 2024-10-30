@@ -9,6 +9,7 @@ import UIKit
 import PresentationCore
 import Domain
 import BaseFeature
+import Logger
 import Core
 
 public class CreatePostCoordinator: Coordinator {
@@ -19,7 +20,7 @@ public class CreatePostCoordinator: Coordinator {
     
     // Injected
     @Injected var router: RouterProtocol
-    @Injected var logger: PostRegisterLogger
+    @Injected var logger: Logger
     
     weak var presentingModule: Module?
     
@@ -38,12 +39,15 @@ public class CreatePostCoordinator: Coordinator {
             self?.router.popModule(animated: true)
         }
         viewModel.presentPostOverviewPage = { [weak self] viewModel in
+            self?.logStage(stage: .overview)
             self?.presentOverviewPage(viewModel: viewModel)
         }
         viewModel.presentEditPostPage = { [weak self] viewModel in
+            self?.logStage(stage: .editPage)
             self?.presentEditPostPage(viewModel: viewModel)
         }
         viewModel.presentCompletePage = { [weak self] in
+            self?.logStage(stage: .finish)
             self?.presentCompletePage()
         }
         
@@ -55,7 +59,17 @@ public class CreatePostCoordinator: Coordinator {
         }
         
         // MARK: 공고등록 시작 로깅
-        logger.startPostRegister()
+        logStage(stage: .start)
+    }
+    
+    func logStage(stage: RegisterRecruitmentPage) {
+        let logObject = CreatePostLogBuilder(
+            step: stage.step,
+            stepName: stage.screenKorName
+        )
+        .build()
+        
+        logger.send(logObject)
     }
 }
 
