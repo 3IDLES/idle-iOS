@@ -12,50 +12,6 @@ import Logger
 import PresentationCore
 import Core
 
-enum CenterAccountRegisterStage: Int {
-    
-    case registerFinished
-    case name
-    case phoneNumber
-    case businessOwner
-    case idPassword
-    case finish
-    
-    var screenKorName: String {
-        switch self {
-        case .registerFinished:
-            "회원가입 페이지 이탈"
-        case .name:
-            "이름 입력"
-        case .phoneNumber:
-            "전화번호 입력"
-        case .businessOwner:
-            "사업자 인증번호 입력"
-        case .idPassword:
-            "아이디 패스워드 입력"
-        case .finish:
-            "가입완료"
-        }
-    }
-    
-    var step: Int {
-        switch self {
-        case .registerFinished:
-            0
-        case .name:
-            1
-        case .phoneNumber:
-            2
-        case .businessOwner:
-            3
-        case .idPassword:
-            4
-        case .finish:
-            5
-        }
-    }
-}
-
 public enum CenterAccountRegisterCoordinatorDestination {
     case centerMainPage
 }
@@ -96,15 +52,7 @@ public class CenterAccountRegisterCoordinator: Coordinator {
             guard let self else { return }
             
             // MARK: 센터 계정 회원가입 완료 로깅
-            let stage: CenterAccountRegisterStage = .finish
-            let logObject = CenterAccountRegisterationLogBuilder(
-                step: currentStage.step,
-                stepName: currentStage.screenKorName
-            )
-            .build()
-            
-            logger.send(logObject)
-            
+            logCurrentStage(stage: .finish)
             
             // MARK: 완료화면으로 이동
             let object: AnonymousCompleteVCRenderObject = .init(
@@ -154,6 +102,10 @@ public class CenterAccountRegisterCoordinator: Coordinator {
             self?.onFinish?()
         }
         
+        // MARK: 센터 계정 회원가입 시작 로깅
+        logCurrentStage(stage: .start)
+        
+        // 첫시작 페이지로 이동
         excuteStage(.name, moveTo: .next)
     }
 }
@@ -187,7 +139,7 @@ extension CenterAccountRegisterCoordinator {
     private func excuteStage(_ stage: CenterAccountRegisterStage, moveTo: MovingDirection) {
         currentStage = stage
         switch stage {
-        case .registerFinished:
+        case .start:
             router.popModule(animated: true)
         case .finish:
             return
@@ -209,10 +161,10 @@ extension CenterAccountRegisterCoordinator {
         )
     }
     
-    func logCurrentStage() {
-        let logObject = CenterAccountRegisterationLogBuilder(
-            step: currentStage.step,
-            stepName: currentStage.screenKorName
+    func logCurrentStage(stage: CenterAccountRegisterStage? = nil) {
+        let logObject = AccountRegisterationLogBuilder(
+            step: (stage ?? currentStage).step,
+            stepName: (stage ?? currentStage).screenKorName
         )
         .build()
         

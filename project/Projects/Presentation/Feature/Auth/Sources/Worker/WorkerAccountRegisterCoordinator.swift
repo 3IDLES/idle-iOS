@@ -6,33 +6,11 @@
 //
 
 import UIKit
+
 import BaseFeature
+import Logger
 import PresentationCore
 import Core
-
-enum WorkerAccountRegisterStage: Int {
-    
-    case registerFinished
-    case phoneNumber
-    case info
-    case address
-    case finish
-    
-    var screenName: String {
-        switch self {
-        case .registerFinished:
-            ""
-        case .phoneNumber:
-            "phoneNumber"
-        case .info:
-            "personalInfo"
-        case .address:
-            "address"
-        case .finish:
-            ""
-        }
-    }
-}
 
 public enum WorkerAccountRegisterCoordinatorDestination {
     case workerMainPage
@@ -44,7 +22,7 @@ public class WorkerAccountRegisterCoordinator: Coordinator {
     
     // Injected
     @Injected var router: RouterProtocol
-    @Injected var logger: WorkerRegisterLogger
+    @Injected var logger: Logger
     
     // startFlow
     public var startFlow: ((WorkerAccountRegisterCoordinatorDestination) -> ())!
@@ -61,6 +39,12 @@ public class WorkerAccountRegisterCoordinator: Coordinator {
         let viewModel = WorkerRegisterViewModel()
         
         viewModel.presentCompletePage = { [weak self] in
+            
+            guard let self else { return }
+            
+            // 회원가입 완료
+            logCurrentStage(stage: .finish)
+            
             let object: AnonymousCompleteVCRenderObject = .init(
                 titleText: "요양보호사 로그인을\n완료했어요!",
                 descriptionText: "로그인 정보는 마지막 접속일부터\n180일간 유지될 예정이에요.",
@@ -71,7 +55,7 @@ public class WorkerAccountRegisterCoordinator: Coordinator {
                 }
             
             // 완료화면 표시
-            self?.router.presentAnonymousCompletePage(object)
+            router.presentAnonymousCompletePage(object)
         }
         
         viewModel.presentNextPage = { [weak self] in
@@ -110,10 +94,10 @@ public class WorkerAccountRegisterCoordinator: Coordinator {
             self?.onFinish?()
         }
         
-        excuteStage(.phoneNumber, moveTo: .next)
+        // 회원가입 시작
+        logCurrentStage(stage: .start)
         
-        // MARK: 요양보호사 회원가입 시작 ㄹ깅
-        logger.startWorkerRegister()
+        excuteStage(.phoneNumber, moveTo: .next)
     }
 }
 
@@ -146,19 +130,14 @@ extension WorkerAccountRegisterCoordinator {
     private func excuteStage(_ stage: WorkerAccountRegisterStage, moveTo: MovingDirection) {
         currentStage = stage
         switch stage {
-        case .registerFinished:
+        case .start:
             router.popModule(animated: true)
         case .finish:
             return
         default:
             
             // MARK: 화면 전환 로깅
-            if moveTo == .next {
-                logger.logWorkerRegisterStep(
-                    stepName: stage.screenName,
-                    stepIndex: stage.rawValue-1
-                )
-            }
+            logCurrentStage()
             
             let vc = stageViewControllers[stage.rawValue-1]
             showStage(viewController: vc, moveTo: moveTo)
@@ -172,6 +151,16 @@ extension WorkerAccountRegisterCoordinator {
             direction: moveTo == .next ? .forward : .reverse,
             animated: true
         )
+    }
+    
+    func logCurrentStage(stage: WorkerAccountRegisterStage? = nil) {
+        let logObject = AccountRegisterationLogBuilder(
+            step: (stage ?? currentStage).step,
+            stepName: (stage ?? currentStage).screenKorName
+        )
+        .build()
+        
+        logger.send(logObject)
     }
 }
 

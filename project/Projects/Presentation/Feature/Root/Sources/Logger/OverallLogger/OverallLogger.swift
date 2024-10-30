@@ -13,11 +13,7 @@ import CenterMainPageFeature
 import Domain
 import Core
 
-public protocol OverallLogger:
-    WorkerRegisterLogger,
-    PostRegisterLogger {
-    
-}
+public protocol OverallLogger: PostRegisterLogger { }
 
 public class DefaultOverallLogger {
     
