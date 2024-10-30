@@ -9,6 +9,8 @@ import Foundation
 
 public struct AccountRegisterationLogObject: LoggingObject {
     
+    public var eventType: String = "AccountRegister"
+    
     public var properties: [String : Any] {
         [
             "step": step,

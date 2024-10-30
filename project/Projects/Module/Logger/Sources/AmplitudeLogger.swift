@@ -29,8 +29,12 @@ public class AmplitudeLogger: Logger {
         
         objectPublisher
             .throttle(for: 0.3, scheduler: DispatchQueue.main, latest: true)
-            .sink { object in
+            .sink { [weak self] object in
                 
+                let eventType = object.eventType
+                let eventProperties = object.properties
+                
+                self?.amplitude.track(eventType: eventType, eventProperties: eventProperties)
             }
             .store(in: &bag)
     }
