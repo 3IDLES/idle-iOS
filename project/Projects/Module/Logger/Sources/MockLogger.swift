@@ -12,6 +12,6 @@ public class MockLogger: Logger {
     public init() { }
     
     public func send(_ object: any LoggingObject) {
-        print(object.properties)
+        print("[\(object.eventType)] \(object.properties)")
     }
 }
