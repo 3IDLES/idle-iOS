@@ -14,7 +14,6 @@ import Domain
 import Core
 
 public protocol OverallLogger:
-    CenterRegisterLogger, 
     WorkerRegisterLogger,
     PostRegisterLogger {
     
