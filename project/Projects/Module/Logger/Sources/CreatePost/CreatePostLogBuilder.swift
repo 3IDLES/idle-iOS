@@ -37,7 +37,7 @@ public class CreatePostLogBuilder {
         self.stepName = stepName
     }
     
-    public func build() -> AccountRegisterationLogObject {
+    public func build() -> CreatePostLogObject {
         .init(step: step, stepName: stepName)
     }
 }
