@@ -27,7 +27,7 @@ public struct AccountRegisterationLogObject: LoggingObject {
     }
 }
 
-public class AccountRegisterationLogBuilder {
+public class AccountRegisterationLogBuilder: LogObjectBuilder {
     
     let step: Int
     let stepName: String
@@ -37,7 +37,7 @@ public class AccountRegisterationLogBuilder {
         self.stepName = stepName
     }
     
-    public func build() -> AccountRegisterationLogObject {
-        .init(step: step, stepName: stepName)
+    public func build() -> LoggingObject {
+        AccountRegisterationLogObject(step: step, stepName: stepName)
     }
 }

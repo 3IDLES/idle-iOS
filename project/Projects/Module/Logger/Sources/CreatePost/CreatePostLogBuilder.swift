@@ -27,7 +27,7 @@ public struct CreatePostLogObject: LoggingObject {
     }
 }
 
-public class CreatePostLogBuilder {
+public class CreatePostLogBuilder: LogObjectBuilder {
     
     let step: Int
     let stepName: String
@@ -37,7 +37,7 @@ public class CreatePostLogBuilder {
         self.stepName = stepName
     }
     
-    public func build() -> CreatePostLogObject {
-        .init(step: step, stepName: stepName)
+    public func build() -> LoggingObject {
+        CreatePostLogObject(step: step, stepName: stepName)
     }
 }
