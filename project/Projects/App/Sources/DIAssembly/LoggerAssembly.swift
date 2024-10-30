@@ -6,44 +6,21 @@
 //
 
 import Foundation
+
 import RootFeature
 import AuthFeature
 import PresentationCore
 import CenterMainPageFeature
+import Logger
+
 
 import Swinject
 
 public struct LoggerAssembly: Assembly {
     public func assemble(container: Container) {
         
-        // MARK: Message pusher
-        container.register(LoggerMessagePublisher.self) { _ in
-            #if DEBUG || QA
-            return DebugLogger()
-            #endif
-            return AmplitudeLogger()
-        }
-        .inObjectScope(.container)
-        
-        // MARK: Overall logger
-        container.register(OverallLogger.self) { _ in
-            DefaultOverallLogger()
-        }
-        .inObjectScope(.container)
-        
-        container.register(CenterRegisterLogger.self) { resolver in
-            let overallLogger = resolver.resolve(OverallLogger.self)!
-            return overallLogger
-        }
-        
-        container.register(WorkerRegisterLogger.self) { resolver in
-            let overallLogger = resolver.resolve(OverallLogger.self)!
-            return overallLogger
-        }
-        
-        container.register(PostRegisterLogger.self) { resolver in
-            let overallLogger = resolver.resolve(OverallLogger.self)!
-            return overallLogger
+        container.register(Logger.self) { _ in
+            AmplitudeLogger()
         }
     }
 }

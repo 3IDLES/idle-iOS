@@ -26,7 +26,6 @@ let project = Project(
             deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: [
                 "Sources/**",
-                SecretSource.amplitudeConfig,
             ],
             resources: ["Resources/**"],
             dependencies: [
@@ -43,7 +42,6 @@ let project = Project(
                 D.Presentation.NotificationPageFeature,
                 
                 // ThirParty
-                D.ThirdParty.Amplitude,
                 D.ThirdParty.FirebaseMessaging,
                 D.ThirdParty.FirebaseRemoteConfig,
                 D.ThirdParty.FirebaseCrashlytics
