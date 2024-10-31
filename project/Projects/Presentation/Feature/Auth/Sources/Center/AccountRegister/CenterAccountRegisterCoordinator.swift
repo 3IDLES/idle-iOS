@@ -13,7 +13,7 @@ import PresentationCore
 import Core
 
 public enum CenterAccountRegisterCoordinatorDestination {
-    case centerMainPage
+    case centerAuthPage
 }
 
 public class CenterAccountRegisterCoordinator: Coordinator {
@@ -61,7 +61,7 @@ public class CenterAccountRegisterCoordinator: Coordinator {
                 completeButtonText: "시작하기") { [weak self] in
                     
                     // 메인페이지로 이동
-                    self?.startFlow(.centerMainPage)
+                    self?.startFlow(.centerAuthPage)
             }
             
             // 완료화면으로 이동

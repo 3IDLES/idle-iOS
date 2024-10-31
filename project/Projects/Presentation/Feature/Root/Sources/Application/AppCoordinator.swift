@@ -212,8 +212,8 @@ extension AppCoordinator {
             guard let self else { return }
             
             switch destination {
-            case .centerMainPage:
-                runCenterMainPageFlow()
+            case .centerAuthPage:
+                runCenterCertificateFlow()
             }
         }
         

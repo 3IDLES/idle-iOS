@@ -378,7 +378,7 @@ private extension SplashCoordinator {
                 case .pending, .new:
                     
                     // 센터인증화면으로 이동
-                    object.startFlow(.authPage)
+                    object.startFlow(.centerCertificatePage)
                     
                     return nil
                 }
