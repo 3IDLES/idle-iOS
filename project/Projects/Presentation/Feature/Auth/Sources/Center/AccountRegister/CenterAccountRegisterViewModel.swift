@@ -127,7 +127,7 @@ extension CenterAccountRegisterViewModel {
             }
             .share()
         
-        output.idDuplicationCheckResult = idDuplicationCheckResult
+        let isIdDuplicated = idDuplicationCheckResult
             .map { result in
                 switch result {
                 case .success:
@@ -136,7 +136,26 @@ extension CenterAccountRegisterViewModel {
                     return false
                 }
             }
+            .share()
+        
+        output.idDuplicationCheckResult = isIdDuplicated
             .asDriver(onErrorDriveWith: .never())
+        
+        isIdDuplicated
+            .unretained(self)
+            .subscribe(onNext: { (vm, result) in
+                
+                let alertObject: DefaultAlertObject = .init()
+                alertObject.setTitle(
+                    result ? "사용가능한 id입니다." : "사용불가한 id입니다."
+                )
+                alertObject.addAction(
+                    .init(titleName: "닫기", action: nil)
+                )
+                
+                vm.presentAlert?(alertObject)
+            })
+            .disposed(by: disposeBag)
         
         let idDuplicationFailure = idDuplicationCheckResult.compactMap { $0.error }
         
