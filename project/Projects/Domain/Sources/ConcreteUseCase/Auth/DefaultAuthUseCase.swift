@@ -26,7 +26,7 @@ public class DefaultAuthUseCase: AuthUseCase {
     // 센터 회원가입 실행
     public func registerCenterAccount(registerState: CenterRegisterState) -> Single<Result<Void, DomainError>> {
         
-        // #1. 회원가입 실행
+        // 회원가입 실행
         let registerResult = authRepository
             .requestRegisterCenterAccount(
                 managerName: registerState.name,
@@ -35,27 +35,8 @@ public class DefaultAuthUseCase: AuthUseCase {
                 id: registerState.id,
                 password: registerState.password
             )
-            .asObservable()
-            .share()
         
-        let registerSuccess = registerResult.compactMap { $0.value }
-        let registerFailure = registerResult.compactMap { $0.error }
-        
-        let afterRegisterTaskResult = registerSuccess
-            .map { [userInfoLocalRepository] _ in
-                // #2. 유저정보 로컬에 저장
-                userInfoLocalRepository.updateUserType(.center)
-            }
-            .flatMap { [notificationTokenUseCase] _ in
-                // #3. 원격알림 토큰을 서버에 전송
-                notificationTokenUseCase.setNotificationToken()
-            }
-        
-        return Observable.merge(
-            afterRegisterTaskResult,
-            registerFailure.asObservable()
-                .map { error -> Result<Void, DomainError> in .failure(error) }
-        ).asSingle()
+        return registerResult
     }
     
     // 센터 로그인 실행
