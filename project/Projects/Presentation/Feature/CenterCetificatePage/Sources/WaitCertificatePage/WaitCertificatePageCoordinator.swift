@@ -43,6 +43,8 @@ public class WaitCertificatePageCoordinator: Coordinator {
         
         let viewController = WaitCertificatePageViewController()
         
+        viewController.bind(viewModel: viewModel)
+        
         router.replaceRootModuleTo(module: viewController, animated: true) { [weak self] in
             self?.onFinish?()
         }

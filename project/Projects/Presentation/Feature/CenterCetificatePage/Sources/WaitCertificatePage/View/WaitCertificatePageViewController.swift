@@ -193,6 +193,7 @@ public class WaitCertificatePageViewController: BaseViewController {
     
     func canRequestJoinState() {
         requestAuthButton.setEnabled(true)
+        requestAuthButton.isUserInteractionEnabled = true
         requestAuthButton.label.textString = "인증 요청하기"
     }
     

@@ -269,6 +269,7 @@ extension CenterAccountRegisterViewModel {
                 return authUseCase
                     .loginCenterAccount(id: id, password: pw)
             }
+            .share()
         
         let loginSuccess = loginResult.compactMap { $0.value }
         let loginFailure = loginResult.compactMap { $0.error }
