@@ -12,6 +12,8 @@ import Core
 
 public enum CenterLogInCoordinatorDestination {
     case centerMainPage
+    case centerCertificatePage
+    case makeCenterProfilePage
 }
 
 public class CenterLogInCoordinator: BaseCoordinator {
@@ -26,15 +28,25 @@ public class CenterLogInCoordinator: BaseCoordinator {
     public override func start() {
         
         let viewModel = CenterLoginViewModel()
-        viewModel.presentCenterMainPage = { [weak self] in
-            self?.startFlow(.centerMainPage)
+        viewModel.exitPage = { [weak self] in
+            self?.router.popModule(animated: true)
+        }
+        viewModel.presentAlert = { [weak self] object in
+            self?.router.presentDefaultAlertController(object: object)
         }
         viewModel.presentSetupNewPasswordPage = { [weak self] in
             self?.startSetupNewPasswordFlow()
         }
-        viewModel.exitPage = { [weak self] in
-            self?.router.popModule(animated: true)
+        viewModel.presentCenterMainPage = { [weak self] in
+            self?.startFlow(.centerMainPage)
         }
+        viewModel.presentCertificatePage = { [weak self] in
+            self?.startFlow(.centerCertificatePage)
+        }
+        viewModel.presentMakeCenterProfilePage = { [weak self] in
+            self?.startFlow(.makeCenterProfilePage)
+        }
+        
         let viewController = CenterLoginViewController(viewModel: viewModel)
         
         router.push(module: viewController, animated: true) { [weak self] in

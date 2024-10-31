@@ -88,24 +88,6 @@ public class BaseNetworkService<TagetAPI: BaseAPI>: NetworkService {
         completion(.success(adaptedRequest))
     }
     
-    private let tokenSession: Session = {
-       
-        let configuration = URLSessionConfiguration.default
-        
-        // 단일 요청이 완료되는데 걸리는 최대 시간, 초과시 타임아웃
-        configuration.timeoutIntervalForRequest = 10
-        
-        // 하나의 리소스를 로드하는데 걸리는 시간, 재시도를 포함한다 초과시 타임아웃
-        configuration.timeoutIntervalForResource = 10
-        
-        // Cache policy: 로컬캐시를 무시하고 항상 새로운 데이터를 가져온다.
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        
-        let session = Session(configuration: configuration)
-        
-        return session
-    }()
-    
     lazy var tokenRetrier = Retrier { [weak self] request, session, error, completion in
         
         if let httpResponse = request.response {
@@ -196,7 +178,9 @@ public extension BaseNetworkService {
             .request(api)
             .catch { error in
                 
-                let moyaError = error as! MoyaError
+                guard let moyaError = error as? MoyaError else {
+                    return .error(error)
+                }
                 
                 // 재시도 실패 or 근본적인 에러(Ex 타임아웃, 네트워크 끊어짐)
                 if case let .underlying(error, response) = moyaError {
@@ -209,6 +193,17 @@ public extension BaseNetworkService {
                             return .error(
                                 HTTPResponseException(response: response)
                             )
+                        }
+                        
+                        // 401코드의 경우 별도처리, Moya 인증상태 오류의 경우 underlyng으로 랩핑
+                        if case .responseValidationFailed(let reason) = afError {
+                            
+                            if case . unacceptableStatusCode = reason, let response {
+                                
+                                return .error(
+                                    HTTPResponseException(response: response)
+                                )
+                            }
                         }
                     }
                     

@@ -246,9 +246,16 @@ extension AppCoordinator {
         
         let coordinator = CenterLogInCoordinator()
         coordinator.startFlow = { [weak self] destination in
+            
+            guard let self else { return }
+            
             switch destination {
             case .centerMainPage:
-                self?.runCenterMainPageFlow()
+                runCenterMainPageFlow()
+            case .centerCertificatePage:
+                runCenterCertificateFlow()
+            case .makeCenterProfilePage:
+                runMakeCenterProfileFlow()
             }
         }
         

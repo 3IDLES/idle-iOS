@@ -18,11 +18,15 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
     
     // Injection
     @Injected var authUseCase: AuthUseCase
+    @Injected var centerProfileUseCase: CenterProfileUseCase
     
     // Navigation
-    var exitPage: (() -> ())!
-    var presentSetupNewPasswordPage: (() -> ())!
-    var presentCenterMainPage: (() -> ())!
+    var exitPage: (() -> ())?
+    var presentAlert: ((DefaultAlertObject) -> ())?
+    var presentSetupNewPasswordPage: (() -> ())?
+    var presentCenterMainPage: (() -> ())?
+    var presentCertificatePage: (() -> ())?
+    var presentMakeCenterProfilePage: (() -> ())?
     
     public var input: Input = .init()
     public var output: Output = .init()
@@ -35,14 +39,14 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
         input.backButtonClicked
             .unretained(self)
             .subscribe(onNext: { (obj, _) in
-                obj.exitPage()
+                obj.exitPage?()
             })
             .disposed(by: disposeBag)
         
         input.setNewPasswordButtonClicked
             .unretained(self)
             .subscribe(onNext: { (obj, _) in
-                obj.presentSetupNewPasswordPage()
+                obj.presentSetupNewPasswordPage?()
             })
             .disposed(by: disposeBag)
         
@@ -59,13 +63,64 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
         let loginFailure = loginResult.compactMap { $0.error }
         
         
-        loginSuccess
+        let checkCenterJoinStatusResult = loginSuccess
             .unretained(self)
-            .subscribe(onNext: { (obj, _) in
-                // 센터 메인화면으로 이동
-                obj.presentCenterMainPage()
+            .flatMap { (vm, _) in
+                vm.authUseCase.checkCenterJoinStatus()
+            }
+            .share()
+        
+        let checkStatusSuccess = checkCenterJoinStatusResult.compactMap { $0.value }
+        let checkStatusFailure = checkCenterJoinStatusResult.compactMap { $0.error }
+        
+        let checkProfileRegisterResult = checkStatusSuccess
+            .unretained(self)
+            .compactMap { (vm, vo) -> Void? in
+                
+                let status = vo.centerManagerAccountStatus
+                
+                switch status {
+                case .new, .pending:
+                    vm.presentCertificatePage?()
+                    return nil
+                case .approved:
+                    return ()
+                }
+            }
+            .unretained(self)
+            .flatMap { (vm, _) in
+                vm.centerProfileUseCase
+                    .getProfile(mode: .myProfile)
+            }
+            .share()
+        
+        let profileExists = checkProfileRegisterResult.compactMap { $0.value }
+        let profileDoentExistOrError = checkProfileRegisterResult.compactMap { $0.error }
+        
+        profileExists
+            .unretained(self)
+            .subscribe(onNext: { (vm, _) in
+                vm.presentCenterMainPage?()
             })
             .disposed(by: disposeBag)
+        
+        
+        let checkProfileExistenceFailure = profileDoentExistOrError
+            .unretained(self)
+            .compactMap { (vm, error) -> DomainError? in
+                
+                switch error {
+                case .centerNotFoundException:
+                    
+                    // 센터가 없는 경우 -> 프로필이 등록되지 않음
+                    // 프로필 등록화면으로 이동
+                    vm.presentMakeCenterProfilePage?()
+                    return nil
+                default:
+                    // 토큰과 무관한 에러상황
+                    return error
+                }
+            }
         
         // MARK: output
         output.canRequestLoginAction = Observable
@@ -80,7 +135,12 @@ public class CenterLoginViewModel: BaseViewModel, ViewModelType {
         
         
         // MARK: BaseViewModel
-        loginFailure
+        Observable
+            .merge(
+                loginFailure,
+                checkStatusFailure,
+                checkProfileExistenceFailure
+            )
             .map { error in
                 DefaultAlertContentVO(
                     title: "로그인 실패",

@@ -135,7 +135,7 @@ public enum DomainError: Error, Equatable {
             return "접근 권한이 없습니다. 로그인이 필요한 API에 접근하려면 로그인을 먼저 해주세요."
             
         case .invalidLoginRequest:
-            return "로그인 실패: 입력하신 ID 또는 비밀번호가 잘못되었습니다. 존재하지 않는 ID로 로그인 시도 시에도 발생할 수 있습니다."
+            return "입력하신 ID 또는 비밀번호가 잘못되었습니다. 존재하지 않는 ID로 로그인 시도 시에도 발생할 수 있습니다."
             
         case .invalidPassword:
             return "비밀번호가 일치하지 않습니다. 정확한 비밀번호를 입력해주세요. (예: 회원 탈퇴 시 비밀번호 입력 단계에서 발생)"
