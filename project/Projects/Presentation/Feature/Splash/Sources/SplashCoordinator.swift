@@ -404,7 +404,6 @@ private extension SplashCoordinator {
                     object.startFlow(.centerMakeProfilePage)
                     
                 default:
-                    // 토큰과 무관한 에러상황
                     let alertVO = DefaultAlertObject()
                     alertVO
                         .setTitle("초기화면 오류")
@@ -413,6 +412,7 @@ private extension SplashCoordinator {
                             titleName: "앱 종료",
                             action: { exit(1) }
                         ))
+                    object.router.presentDefaultAlertController(object: alertVO)
                 }
             })
             .disposed(by: disposeBag)
