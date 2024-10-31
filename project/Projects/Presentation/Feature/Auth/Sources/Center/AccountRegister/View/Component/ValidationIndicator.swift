@@ -67,7 +67,7 @@ class ValidationIndicator: UIView {
         let animateDuration: TimeInterval = animated ? 0.2 : 0
         
         UIView.transition(with: self, duration: animateDuration, options: .transitionCrossDissolve) {
-            self.iconView.image = state == .valid ? AuthFeatureAsset.vsMark.image : AuthFeatureAsset.vfMark.image
+            self.iconView.image = state == .valid ? DSKitAsset.Icons.vsMark.image : DSKitAsset.Icons.vfMark.image
         }
         
         UIView.animate(withDuration: animateDuration) {

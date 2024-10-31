@@ -23,7 +23,7 @@ class NotificationCell: UITableViewCell {
         let view = UIImageView()
         view.layer.cornerRadius = 24
         view.clipsToBounds = true
-        view.image = NotificationPageFeatureAsset.notificationNoImage.image
+        view.image = DSKitAsset.Icons.notificationNoImage.image
         view.contentMode = .scaleAspectFill
         return view
     }()

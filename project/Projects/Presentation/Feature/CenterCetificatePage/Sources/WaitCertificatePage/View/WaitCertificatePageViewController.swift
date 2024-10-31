@@ -73,9 +73,9 @@ public class WaitCertificatePageViewController: BaseViewController {
         pageViewController.delegate = self
         
         self.pages = [
-            ("센터 관리자 인증 시", "요양보호사 정보를\n한눈에 확인할 수 있어요", CenterCetificatePageFeatureAsset.workerProfileOnboarding.image),
-            ("센터 관리자 인증 시", "요양보호사 구인 공고를\n간편하게 등록할 수 있어요", CenterCetificatePageFeatureAsset.postRegisterOnboarding.image),
-            ("센터 관리자 인증 시", "요양보호사를 즐겨찾기하고\n직접 연락해 능동적으로 구인해요", CenterCetificatePageFeatureAsset.favoriteWorkerOnboarding.image),
+            ("센터 관리자 인증 시", "요양보호사 정보를\n한눈에 확인할 수 있어요", DSKitAsset.Icons.workerProfileOnboarding.image),
+            ("센터 관리자 인증 시", "요양보호사 구인 공고를\n간편하게 등록할 수 있어요", DSKitAsset.Icons.postRegisterOnboarding.image),
+            ("센터 관리자 인증 시", "요양보호사를 즐겨찾기하고\n직접 연락해 능동적으로 구인해요", DSKitAsset.Icons.favoriteWorkerOnboarding.image),
         ].map { (text1, text2, image) in
             let vc = CenterCertificateIntroductionSubVC(
                 title1Text: text1,
