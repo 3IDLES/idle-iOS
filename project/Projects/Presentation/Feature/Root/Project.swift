@@ -40,6 +40,7 @@ let project = Project(
                 D.Presentation.PostDetailForWorkerFeature,
                 D.Presentation.UserProfileFeature,
                 D.Presentation.NotificationPageFeature,
+                D.Presentation.ChattingFeature,
                 
                 // ThirParty
                 D.ThirdParty.FirebaseMessaging,

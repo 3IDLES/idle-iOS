@@ -29,6 +29,7 @@ let project = Project(
             dependencies: [
                 // Presentation
                 D.Presentation.BaseFeature,
+                D.Presentation.ChattingFeatureInterface,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

@@ -17,6 +17,21 @@ let project = Project(
     ),
     targets: [
         
+        .target(
+            name: "ChattingFeatureInterface",
+            destinations: DeploymentSettings.platforms,
+            product: .framework,
+            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
+            sources: ["Interface/**"],
+            dependencies: [
+                D.Presentation.BaseFeature,
+            ],
+            settings: .settings(
+                configurations: IdleConfiguration.presentationConfigurations
+            )
+        ),
+        
         /// FeatureConcrete
         .target(
             name: "ChattingFeature",
@@ -28,7 +43,7 @@ let project = Project(
             resources: ["Resources/**"],
             dependencies: [
                 // Presentation
-                D.Presentation.BaseFeature,
+                D.Presentation.ChattingFeatureInterface,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
