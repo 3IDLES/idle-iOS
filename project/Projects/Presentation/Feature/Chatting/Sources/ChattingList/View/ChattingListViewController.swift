@@ -10,6 +10,7 @@ import UIKit
 import BaseFeature
 import PresentationCore
 import DSKit
+import Domain
 
 
 import RxCocoa
@@ -31,6 +32,9 @@ class ChattingListViewController: BaseViewController {
         barView.backButton.isHidden = true
         return barView
     }()
+    
+    // TableView Data
+    private var chattingListItems: [ChattingListItemVO] = []
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -83,6 +87,25 @@ class ChattingListViewController: BaseViewController {
             chatListView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
+    
+    func bind(viewModel: ChattingListViewModel) {
+        super.bind(viewModel: viewModel)
+        
+        // input
+        self.rx
+            .viewDidLoad
+            .bind(to: viewModel.viewDidLoad)
+            .disposed(by: disposeBag)
+        
+        // output
+        viewModel
+            .chatListItems
+            .drive(onNext: { [weak self] list in
+                self?.chattingListItems = list
+                self?.chatListView.reloadData()
+            })
+            .disposed(by: disposeBag)
+    }
 }
 
 extension ChattingListViewController: UITableViewDelegate {
@@ -96,7 +119,7 @@ extension ChattingListViewController: UITableViewDelegate {
 extension ChattingListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        10
+        chattingListItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -104,11 +127,18 @@ extension ChattingListViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Cell.identifier) as? Cell else { fatalError() }
 
         // set initial cell state
-        cell.hostImage.backgroundColor = .black
-        cell.titleLabel.textString = "세얼간이요양센터"
-        cell.latestChattingLabel.textString = "안녕하세요 문의드리고 싶어서 연락드렸어요"
-        cell.latestChatDateLabel.textString = "10월 29일"
-        cell.unreadChattingCountLabel.textString = "100"
+        let item = chattingListItems[indexPath.item]
+        
+        cell.hostImage.backgroundColor = .red
+        cell.titleLabel.textString = item.counterPartName
+        cell.latestChattingLabel.textString = item.latestChat
+        
+        let dateFormatter: DateFormatter = .init()
+        dateFormatter.dateFormat = "MM월 dd일"
+        cell.latestChatDateLabel.textString = dateFormatter.string(from: item.latestChatTime)
+        
+        
+        cell.unreadChattingCountLabel.textString = "1"
         
         return cell
     }

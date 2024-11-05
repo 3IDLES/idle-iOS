@@ -39,6 +39,7 @@ final class ChattingInfoRowCell: UITableViewCell {
     }()
     let unreadChattingCountLabel: IdleLabel = {
         let label: IdleLabel = .init(typography: .caption)
+        label.textAlignment = .center
         label.attrTextColor = DSColor.gray0.color
         label.layer.backgroundColor = DSColor.orange500.color.cgColor
         label.layer.cornerRadius = 11
