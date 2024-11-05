@@ -20,7 +20,7 @@ let project = Project(
         .target(
             name: "Testing",
             destinations: DeploymentSettings.platforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
             deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: ["Sources/**"],

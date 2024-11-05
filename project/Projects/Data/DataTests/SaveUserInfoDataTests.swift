@@ -8,11 +8,10 @@
 import Foundation
 import XCTest
 import Core
-
+import Testing
 
 @testable import Repository
 @testable import DataSource
-@testable import Testing
 
 class SaveUserInfoDataTests: XCTestCase {
     

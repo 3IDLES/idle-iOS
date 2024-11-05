@@ -9,9 +9,9 @@ import Foundation
 import XCTest
 import Core
 import Domain
+import Testing
 
 @testable import Repository
-@testable import Testing
 
 import RxSwift
 

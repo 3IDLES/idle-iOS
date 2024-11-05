@@ -8,9 +8,9 @@
 import Foundation
 import XCTest
 import Core
+import Testing
 
 @testable import Domain
-@testable import Testing
 
 final class RegisterValidationTests: XCTestCase {
     
