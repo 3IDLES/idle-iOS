@@ -12,7 +12,9 @@ import DSKit
 
 import RxSwift
 
-public final class ChattingInfoRowCell: UITableViewCell {
+final class ChattingInfoRowCell: UITableViewCell {
+    
+    static let identifier: String = .init(describing: ChattingInfoRowCell.self)
     
     // View
     let hostImage: UIImageView = {
@@ -44,12 +46,12 @@ public final class ChattingInfoRowCell: UITableViewCell {
     }()
     
     
-    public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         setLayout()
     }
-    public required init?(coder: NSCoder) { nil }
+    required init?(coder: NSCoder) { nil }
     
     private func setLayout() {
         
