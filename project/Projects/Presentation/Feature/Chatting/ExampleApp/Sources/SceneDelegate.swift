@@ -7,6 +7,9 @@
 
 import UIKit
 
+import ChattingFeature
+import Core
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
@@ -15,12 +18,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         guard let windowScene = scene as? UIWindowScene else { return }
         
-//        let vc = ChattingListViewController()
-//        let vm = ChattingListViewModel()
-//        vc.bind(viewModel: vm)
+        let vc = DefaultChattingListFeatureFactory().createModule()
         
         window = UIWindow(windowScene: windowScene)
-//        window?.rootViewController = vc
+        window?.rootViewController = vc
         window?.makeKeyAndVisible()
     }
 }
