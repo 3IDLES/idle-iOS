@@ -26,9 +26,12 @@ let project = Project(
             sources: ["Sources/**"],
             dependencies: [
                 
-                D.Data.Repository,
-                
                 D.Presentation.BaseFeature,
+                
+                D.Data.Repository,
+                D.Data.DataSource,
+                
+                D.Domain,
             ],
             settings: .settings(
                 base: ["ENABLE_TESTABILITY": "YES"],

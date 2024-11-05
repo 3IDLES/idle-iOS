@@ -47,6 +47,8 @@ let project = Project(
 
                 // for test
                 D.Testing,
+                
+                D.Domain,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.domainConfigurations
@@ -56,7 +58,7 @@ let project = Project(
     schemes: [
         Scheme.makeTestableSchemes(
             .target("Domain"),
-            testableTarget: .target("DomainTests"),
+            testableTarget: .target("Domain"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName,

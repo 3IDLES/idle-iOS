@@ -74,6 +74,8 @@ let project = Project(
             sources: ["DataTests/**"],
             dependencies: [
                 D.Testing,
+                D.Data.Repository,
+                D.Data.DataSource,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.dataConfigurations
@@ -83,7 +85,7 @@ let project = Project(
     schemes: [
         Scheme.makeTestableSchemes(
             .target("Repository"),
-            testableTarget: .target("DataTests"),
+            testableTarget: .target("Data"),
             configNames: [
                 IdleConfiguration.debugConfigName,
                 IdleConfiguration.releaseConfigName,
