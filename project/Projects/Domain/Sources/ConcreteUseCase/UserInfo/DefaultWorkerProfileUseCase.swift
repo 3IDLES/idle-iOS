@@ -29,7 +29,18 @@ public class DefaultWorkerProfileUseCase: WorkerProfileUseCase {
     }
     
     public func getFreshProfile(mode: ProfileMode) -> RxSwift.Single<Result<WorkerProfileVO, DomainError>> {
-        userProfileRepository.getWorkerProfile(mode: mode)
+        userProfileRepository
+            .getWorkerProfile(mode: mode)
+            .map { [weak self] result in
+                
+                if case .myProfile = mode, case .success(let profileVO) = result {
+                    
+                    // 내프로필이면서 프로필 획득에 성공한 경우 캐싱정보를 업데이트
+                    self?.userInfoLocalRepository.updateCurrentWorkerData(vo: profileVO)
+                }
+                
+                return result
+            }
     }
     
     public func updateProfile(stateObject: WorkerProfileStateObject, imageInfo: ImageUploadInfo?) -> Single<Result<Void, DomainError>> {
