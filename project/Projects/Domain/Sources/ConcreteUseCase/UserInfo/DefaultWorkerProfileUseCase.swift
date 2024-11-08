@@ -20,7 +20,7 @@ public class DefaultWorkerProfileUseCase: WorkerProfileUseCase {
     
     public func getProfile(mode: ProfileMode) -> Single<Result<WorkerProfileVO, DomainError>> {
         
-        if let cachedProfile = userInfoLocalRepository.getCurrentWorkerData() {
+        if case .myProfile = mode, let cachedProfile = userInfoLocalRepository.getCurrentWorkerData() {
             // Cache된 정보가 있는 경우 해당 값을 전달
             return .just(.success(cachedProfile))
         }
