@@ -41,7 +41,6 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
                     self?.userInfoLocalRepository.updateCurrentCenterData(vo: profileVO)
                 }
                 
-                
                 return result
             }
     }
