@@ -20,8 +20,10 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
     
     public func getProfile(mode: ProfileMode) -> Single<Result<CenterProfileVO, DomainError>> {
         
-        if let cachedProfile = userInfoLocalRepository.getCurrentCenterData() {
-            // 캐쉬된 데이터 전송
+        if case .myProfile = mode, let cachedProfile = userInfoLocalRepository.getCurrentCenterData() {
+            
+            // 자신의 프로필인 경우에만 캐싱여부 확인
+            
             return .just(.success(cachedProfile))
         }
         
