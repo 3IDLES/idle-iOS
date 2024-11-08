@@ -151,8 +151,12 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             }
             .asDriver(onErrorJustReturn: "")
         
-        let fetchCenterImageInfo = mapEndLoading(mapStartLoading(profileRequestSuccess)
-            .compactMap { $0.profileImageInfo }
+        
+        let waitImageLoading = profileRequestSuccess
+            .compactMap { profileVO in profileVO.profileImageInfo }
+        
+        
+        let fetchCenterImageInfo = mapEndLoading(mapStartLoading(waitImageLoading)
             .observe(on: imageDownLoadScheduler)
             .flatMap { [cacheRepository] downloadInfo in
                 cacheRepository
