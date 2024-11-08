@@ -31,7 +31,19 @@ public class DefaultCenterProfileUseCase: CenterProfileUseCase {
     }
     
     public func getFreshProfile(mode: ProfileMode) -> RxSwift.Single<Result<CenterProfileVO, DomainError>> {
-        userProfileRepository.getCenterProfile(mode: mode)
+        userProfileRepository
+            .getCenterProfile(mode: mode)
+            .map { [weak self] result in
+                
+                if case .myProfile = mode, case .success(let profileVO) = result {
+                    
+                    // 내프로필이면서 프로필 획득에 성공한 경우 캐싱정보를 업데이트
+                    self?.userInfoLocalRepository.updateCurrentCenterData(vo: profileVO)
+                }
+                
+                
+                return result
+            }
     }
     
     public func updateProfile(phoneNumber: String?, introduction: String?, imageInfo: ImageUploadInfo?) -> Single<Result<Void, DomainError>> {
