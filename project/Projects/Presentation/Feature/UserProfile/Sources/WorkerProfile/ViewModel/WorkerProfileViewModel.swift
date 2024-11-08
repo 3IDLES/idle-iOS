@@ -85,8 +85,10 @@ class WorkerProfileViewModel: BaseViewModel, OtherWorkerProfileViewModelable {
                 return vo
             }
         
-        displayingImage = fetchedProfileVOSuccess
+        let waitProfileImage = fetchedProfileVOSuccess
             .compactMap { $0.profileImageInfo }
+        
+        displayingImage = waitProfileImage
             .observe(on: imageDownLoadScheduler)
             .flatMap { [cacheRepository] downloadInfo in
                 cacheRepository

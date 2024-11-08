@@ -156,12 +156,12 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             .compactMap { profileVO in profileVO.profileImageInfo }
         
         
-        let fetchCenterImageInfo = mapEndLoading(mapStartLoading(waitImageLoading)
+        let fetchCenterImageInfo = waitImageLoading
             .observe(on: imageDownLoadScheduler)
             .flatMap { [cacheRepository] downloadInfo in
                 cacheRepository
                     .getImage(imageInfo: downloadInfo)
-            }.map { image -> UIImage? in image })
+            }.map { image -> UIImage? in image }
         
         // MARK: image validation
         let displayingImageDriver = Observable
