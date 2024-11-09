@@ -211,27 +211,47 @@ class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
                 if let prevRequest = self.nextPagingRequest {
                     
                     if let nextPageId = fetchedData.nextPageId {
-                        // 다음값이 있는 경우
+                        
+                        
+                        // 이전 속성의 다음 페이징 아이디가 있는 경우
+                        
+                        
                         switch prevRequest {
                         case .initial:
+                            
+                            // 최초요청이후 다음 아이디(네이티브)가 있음
                             nextRequest = .paging(source: .native, nextPageId: nextPageId)
-                        case .paging(let source, let nextPageId):
+                            
+                        case .paging(let source, _):
+                            
+                            // 이전페이징의 호출속성(native or worknet)을 그대로 따라감, 다만 아이디를 새로운 값으로 업데이트
                             nextRequest = .paging(source: source, nextPageId: nextPageId)
+                            
                         }
                     } else {
-                        // 다음값이 없는 경우
+                        
+                        
+                        // 이전 속성의 다음 페이징 아이디가 없는 경우, 즉 해당속성 페이징 종료
+                        
+                        
                         switch prevRequest {
                         case .initial:
-                            // 써드파티 데이터 호출
+                            
+                            // 첫번째 호출후 다음 공고가 없음 -> 워크넷 포스트 최초 호출
                             nextRequest = .paging(source: .thirdParty, nextPageId: nil)
+                            
                         case .paging(let source, _):
                             switch source {
                             case .native:
-                                // 써드파티 데이터 호출
+                                
+                                // 네이티브 페이징 종료 -> 워크넷 최초호출
                                 nextRequest = .paging(source: .thirdParty, nextPageId: nil)
+                                
                             case .thirdParty:
-                                // 페이징 종료
+                                
+                                // 워크넷 페이징 종료
                                 nextRequest = nil
+                                
                             }
                         }
                     }
