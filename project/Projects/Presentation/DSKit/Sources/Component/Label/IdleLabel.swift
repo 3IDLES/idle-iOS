@@ -93,6 +93,6 @@ public class IdleLabel: UILabel {
         let attributedStr = NSMutableAttributedString(string: currentText, attributes: currentAttributes)
         
         self.attributedText = attributedStr
-        self.sizeToFit()
+        self.invalidateIntrinsicContentSize()
     }
 }

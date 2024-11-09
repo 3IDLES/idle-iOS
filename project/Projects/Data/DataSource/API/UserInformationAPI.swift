@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import Domain
+
+
 import Moya
-import Entity
 import Alamofire
 
 extension UserType {

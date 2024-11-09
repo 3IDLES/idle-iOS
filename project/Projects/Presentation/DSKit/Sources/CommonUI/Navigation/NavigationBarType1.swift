@@ -47,11 +47,14 @@ public class NavigationBarType1: UIStackView {
     private let disposeBag = DisposeBag()
     
     public init(
-        navigationTitle: String = ""
+        navigationTitle: String = "",
+        hideBackButton: Bool = false
     ) {
         super.init(frame: .zero)
         
         self.navigationTitle = navigationTitle
+        
+        backButton.isHidden = hideBackButton
         
         setApearance()
         setAutoLayout()

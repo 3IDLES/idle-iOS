@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import Domain
+
+
 import RxSwift
 import RxCocoa
-import Entity
 
 public class WorkerWorknetEmployCardCell: UITableViewCell {
     

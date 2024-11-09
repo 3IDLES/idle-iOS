@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Entity
+import Domain
 
 public struct RecruitmentPostRegisterDTO: Codable {
     public let isMealAssistance, isBowelAssistance, isWalkingAssistance, isExperiencePreferred: Bool

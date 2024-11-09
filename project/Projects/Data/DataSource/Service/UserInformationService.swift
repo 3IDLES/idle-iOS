@@ -7,11 +7,6 @@
 
 import Foundation
 
-public class UserInformationService: BaseNetworkService<UserInformationAPI> {
-    
-    public init() { }
-    
-    public override init(keyValueStore: KeyValueStore) {
-        super.init(keyValueStore: keyValueStore)
-    }
-}
+public protocol UserInformationService: NetworkService where TagetAPI == UserInformationAPI { }
+
+public class DefaultUserInformationService: BaseNetworkService<UserInformationAPI>, UserInformationService { }

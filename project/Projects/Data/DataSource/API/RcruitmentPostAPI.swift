@@ -5,10 +5,12 @@
 //  Created by choijunios on 8/8/24.
 //
 
-import Moya
 import Foundation
+import Domain
+
+
+import Moya
 import Alamofire
-import Entity
 
 public enum RcruitmentPostAPI {
     
@@ -35,7 +37,7 @@ public enum RcruitmentPostAPI {
     
     // Favorite posts
     case getNativeFavoritePost
-    case addFavoritePost(id: String, jobPostingType: RecruitmentPostType)
+    case addFavoritePost(id: String, jobPostingType: PostOriginType)
     case removeFavoritePost(id: String)
 }
 

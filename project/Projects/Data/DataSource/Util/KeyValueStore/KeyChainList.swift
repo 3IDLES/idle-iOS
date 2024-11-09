@@ -1,6 +1,6 @@
 //
 //  KeyChainList.swift
-//  ConcreteRepository
+//  DataSource
 //
 //  Created by choijunios on 6/28/24.
 //
@@ -8,18 +8,13 @@
 import Foundation
 import KeychainAccess
 
-class KeyChainList {
+public class KeyChainList: KeyValueStore {
     
-    private init() { }
-    
-    static let shared = KeyChainList()
+    public init() { }
     
     private let keyChain = Keychain(service: "com.service.idle")
-}
-
-extension KeyChainList: KeyValueStore {
     
-    func save(key: String, value: String) throws {
+    public func save(key: String, value: String) throws {
         do {
             try keyChain.set(value, key: key)
             #if DEBUG
@@ -33,29 +28,23 @@ extension KeyChainList: KeyValueStore {
         }
     }
     
-    func delete(key: String) throws {
+    public func delete(key: String) throws {
         try keyChain.remove(key)
         UserDefaults.standard.removeObject(forKey: key)
     }
     
-    func removeAll() throws {
+    public func removeAll() throws {
         try keyChain.removeAll()
         
         // UserDefaults의 경우 수동으로 정보를 삭제합니다.
-        UserDefaults.standard.removeObject(forKey: Key.Auth.kaccessToken)
-        UserDefaults.standard.removeObject(forKey: Key.Auth.krefreshToken)
+        UserDefaults.standard.removeObject(forKey: KeyValueStoreKey.kaccessToken)
+        UserDefaults.standard.removeObject(forKey: KeyValueStoreKey.krefreshToken)
     }
     
-    func get(key: String) -> String? {
+    public func get(key: String) -> String? {
         if let value = try? keyChain.get(key) {
-            #if DEBUG
-            print("get value from KeyChain: \(key)")
-            #endif
             return value
         } else if let value = UserDefaults.standard.string(forKey: key) {
-            #if DEBUG
-            print("get value from UserDefaults: \(key)")
-            #endif
             return value
         }
         return nil

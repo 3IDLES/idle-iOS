@@ -7,20 +7,26 @@
 
 import UIKit
 import PresentationCore
+import Core
+import RootFeature
+import BaseFeature
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
-    var rootCoordinator: RootCoordinator?
+    // RootCoordinator
+    let router: Router = .init()
+    
+    lazy var appCoordinator: AppCoordinator = .init()
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
         guard let windowScene = scene as? UIWindowScene else { return }
         
         window = UIWindow(windowScene: windowScene)
+        window?.makeKeyAndVisible()
         
-        let rootNavigationController = UINavigationController()
         let injector = DependencyInjector.shared
         
         injector
@@ -28,18 +34,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 LoggerAssembly(),
                 DataAssembly(),
                 DomainAssembly(),
-            ])    
-        
-        rootCoordinator = RootCoordinator(
-            dependency: .init(
-                navigationController: rootNavigationController,
-                injector: injector
-            )
-        )
-        
-        rootCoordinator?.start()
-        
-        window?.rootViewController = rootNavigationController
-        window?.makeKeyAndVisible()
+                PresentationAssembly(),
+            ])
+    
+        // Start AppCoodinator
+        appCoordinator.start()
     }
 }

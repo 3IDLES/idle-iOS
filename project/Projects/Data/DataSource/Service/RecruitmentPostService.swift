@@ -7,11 +7,7 @@
 
 import Foundation
 
-public class RecruitmentPostService: BaseNetworkService<RcruitmentPostAPI> {
-    
-    public init() { }
-    
-    public override init(keyValueStore: KeyValueStore) {
-        super.init(keyValueStore: keyValueStore)
-    }
-}
+
+public protocol RecruitmentPostService: NetworkService where TagetAPI == RcruitmentPostAPI { }
+
+public class DefaultRecruitmentPostService: BaseNetworkService<RcruitmentPostAPI>, RecruitmentPostService { }

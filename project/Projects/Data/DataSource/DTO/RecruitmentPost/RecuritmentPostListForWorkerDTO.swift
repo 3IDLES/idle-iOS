@@ -6,9 +6,9 @@
 //
 
 import Foundation
-import Entity
+import Domain
 
-public protocol EntityRepresentable: Codable {
+public protocol EntityRepresentable: Decodable {
     associatedtype Entity
     func toEntity() -> Entity
 }
@@ -64,7 +64,7 @@ public struct WorkNetRecruitmentPostForWorkerDTO: EntityRepresentable {
     public let payInfo: String
     public let applyDeadline: String
     public let isFavorite: Bool
-    public let jobPostingType: RecruitmentPostType
+    public let jobPostingType: PostOriginType
     public let createdAt: String?
     
     public func toEntity() -> WorknetRecruitmentPostVO {
@@ -113,7 +113,7 @@ public struct NativeRecruitmentPostForWorkerDTO: EntityRepresentable {
     public let distance: Int
     public let applyTime: String?
     public let isFavorite: Bool
-    public let jobPostingType: RecruitmentPostType
+    public let jobPostingType: PostOriginType
     public let createdAt: String?
     
     public func toEntity() -> NativeRecruitmentPostForWorkerVO {

@@ -6,8 +6,10 @@
 //
 
 import UIKit
+import Domain
+
+
 import RxSwift
-import Entity
 
 public class InfoBox: UIView {
     

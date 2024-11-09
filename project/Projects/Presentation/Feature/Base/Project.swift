@@ -21,30 +21,20 @@ let project = Project(
         .target(
             name: "BaseFeature",
             destinations: DeploymentSettings.platforms,
-            product: .staticFramework,
+            product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                // Presentation
-                D.Presentation.PresentationCore,
-                D.Presentation.DSKit,
-
-                // Domain
-                D.Domain.UseCaseInterface,
-                D.Domain.RepositoryInterface,
                 
-                // Data
-                D.Data.ConcreteRepository,
+                // Internal
+                D.Data.Repository,
+                D.Presentation.DSKit,
+                D.Module.Logger,
 
                 // ThirdParty
-                D.ThirdParty.RxSwift,
-                D.ThirdParty.RxCocoa,
                 D.ThirdParty.NaverMapSDKForSPM,
-                D.ThirdParty.FirebaseCrashlytics,
-                D.ThirdParty.FirebaseAnalytics,
-                D.ThirdParty.SDWebImageWebPCoder,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -57,7 +47,7 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             infoPlist: IdleInfoPlist.exampleAppDefault,
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],

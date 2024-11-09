@@ -7,11 +7,7 @@
 
 import Foundation
 
-public class CrawlingPostService: BaseNetworkService<CrawlingPostAPI> {
-    
-    public init() { }
-    
-    public override init(keyValueStore: KeyValueStore) {
-        super.init(keyValueStore: keyValueStore)
-    }
-}
+
+public protocol CrawlingPostService: NetworkService where TagetAPI == CrawlingPostAPI { }
+
+public class DefaultCrawlingPostService: BaseNetworkService<CrawlingPostAPI>, CrawlingPostService { }

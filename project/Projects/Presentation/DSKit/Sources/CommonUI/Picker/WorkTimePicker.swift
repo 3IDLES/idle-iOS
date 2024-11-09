@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import PresentationCore
+import Domain
+import Core
+
 import RxSwift
 import RxCocoa
-import Entity
-import PresentationCore
 
 public class WorkTimePicker: TextImageButtonType2 {
     

@@ -6,19 +6,33 @@
 //
 
 import Foundation
-import Entity
+import Domain
+import Core
+
+
 import RxSwift
 import Alamofire
 import Moya
 import RxMoya
 
-public class BaseNetworkService<TagetAPI: BaseAPI> {
+public protocol NetworkService {
     
-    public let keyValueStore: KeyValueStore
+    associatedtype TagetAPI: BaseAPI
     
-    init(keyValueStore: KeyValueStore = KeyChainList.shared) {
-        self.keyValueStore = keyValueStore
-    }
+    func request(api: TagetAPI, with: RequestType) -> Single<Response>
+    
+    func requestDecodable<T: Decodable>(api: TagetAPI, with: RequestType) -> Single<T>
+}
+
+public enum RequestType {
+    case plain
+    case withToken
+}
+
+public class BaseNetworkService<TagetAPI: BaseAPI>: NetworkService {
+    @Injected var keyValueStore: KeyValueStore
+    
+    public init() { }
         
     private lazy var providerWithToken: MoyaProvider<TagetAPI> = {
         
@@ -73,24 +87,6 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
           
         completion(.success(adaptedRequest))
     }
-    
-    private let tokenSession: Session = {
-       
-        let configuration = URLSessionConfiguration.default
-        
-        // 단일 요청이 완료되는데 걸리는 최대 시간, 초과시 타임아웃
-        configuration.timeoutIntervalForRequest = 10
-        
-        // 하나의 리소스를 로드하는데 걸리는 시간, 재시도를 포함한다 초과시 타임아웃
-        configuration.timeoutIntervalForResource = 10
-        
-        // Cache policy: 로컬캐시를 무시하고 항상 새로운 데이터를 가져온다.
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        
-        let session = Session(configuration: configuration)
-        
-        return session
-    }()
     
     lazy var tokenRetrier = Retrier { [weak self] request, session, error, completion in
         
@@ -176,18 +172,15 @@ public class BaseNetworkService<TagetAPI: BaseAPI> {
 // MARK: DataRequest
 public extension BaseNetworkService {
     
-    enum RequestType {
-        case plain
-        case withToken
-    }
-    
     private func _request(api: TagetAPI, provider: MoyaProvider<TagetAPI>) -> Single<Response> {
         
         provider.rx
             .request(api)
             .catch { error in
                 
-                let moyaError = error as! MoyaError
+                guard let moyaError = error as? MoyaError else {
+                    return .error(error)
+                }
                 
                 // 재시도 실패 or 근본적인 에러(Ex 타임아웃, 네트워크 끊어짐)
                 if case let .underlying(error, response) = moyaError {
@@ -200,6 +193,17 @@ public extension BaseNetworkService {
                             return .error(
                                 HTTPResponseException(response: response)
                             )
+                        }
+                        
+                        // 401코드의 경우 별도처리, Moya 인증상태 오류의 경우 underlyng으로 랩핑
+                        if case .responseValidationFailed(let reason) = afError {
+                            
+                            if case . unacceptableStatusCode = reason, let response {
+                                
+                                return .error(
+                                    HTTPResponseException(response: response)
+                                )
+                            }
                         }
                     }
                     
@@ -248,43 +252,6 @@ public extension BaseNetworkService {
         request(api: api, with: with)
             .map(T.self)
     }
-
-//    // MARK: Request with Progress
-//    struct ProgressResponse<T: Decodable> {
-//        
-//        let progress: Double
-//        let data: T?
-//    }
-//    
-//    func requestDecodableWithProgress<T: Decodable>(api: TagetAPI) -> Single<ProgressResponse<T>> {
-//        
-//        Single<ProgressResponse<T>>.create { single in
-//            
-//            self.provider.rx
-//                .requestWithProgress(api)
-//                .subscribe(onNext: { response in
-//                    
-//                    if let result = response.response {
-//                        
-//                        do {
-//                            
-//                            let decoded = try result.map(T.self)
-//                            
-//                            let item = ProgressResponse<T>(
-//                                progress: response.progress,
-//                                data: decoded
-//                            )
-//                            
-//                            single(.success(item))
-//                            
-//                        } catch {
-//                            
-//                            single(.failure(error))
-//                        }
-//                    }
-//                })
-//        }
-//    }
 }
 
 // MARK: HTTPResponseException+Extension

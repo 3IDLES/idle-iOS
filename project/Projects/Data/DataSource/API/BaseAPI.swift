@@ -16,6 +16,8 @@ public enum APIType {
     case crawling_job_postings
     case external(url: String)
     case applys
+    case notificationToken
+    case notifications
 }
 
 // MARK: BaseAPI
@@ -43,6 +45,10 @@ public extension BaseAPI {
             baseStr += "/applys"
         case .external(let url):
             baseStr = url
+        case .notificationToken:
+            baseStr += "/fcm"
+        case .notifications:
+            baseStr += "/notifications"
         }
         
         return URL(string: baseStr)!

@@ -7,9 +7,12 @@
 
 import UIKit
 import PresentationCore
+import Domain
+
+
 import RxCocoa
 import RxSwift
-import Entity
+
 
 public class CenterInfoCardView: TappableUIView {
     

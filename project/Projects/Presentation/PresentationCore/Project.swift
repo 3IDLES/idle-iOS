@@ -21,13 +21,14 @@ let proejct = Project(
             destinations: DeploymentSettings.platforms,
             product: .framework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: ["Sources/**"],
             dependencies: [
+                
+                D.Domain,
+                
                 // ThirdParty
-                D.ThirdParty.RxSwift,
                 D.ThirdParty.RxCocoa,
-                D.ThirdParty.Swinject,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Entity
+import Domain
 
 public struct WorknetRecruitmentPostDetailDTO: EntityRepresentable {
     
@@ -28,7 +28,7 @@ public struct WorknetRecruitmentPostDetailDTO: EntityRepresentable {
     let centerName: String
     let centerAddress: String
     let jobPostingUrl: String
-    let jobPostingType: RecruitmentPostType
+    let jobPostingType: PostOriginType
     let isFavorite: Bool
     
     public func toEntity() -> WorknetRecruitmentPostDetailVO {

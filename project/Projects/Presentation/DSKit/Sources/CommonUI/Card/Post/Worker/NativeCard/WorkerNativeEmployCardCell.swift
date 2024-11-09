@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import Domain
+
+
 import RxSwift
 import RxCocoa
-import Entity
 
 public enum PostAppliedState {
     case applied
@@ -18,10 +20,10 @@ public enum PostAppliedState {
 public protocol WorkerEmployCardViewModelable: AnyObject {
     
     /// 공고상세보기
-    func showPostDetail(postType: RecruitmentPostType, id: String)
+    func showPostDetail(postType: PostOriginType, id: String)
     
     /// 즐겨찾기 버튼 클릭
-    func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: RecruitmentPostType) -> Single<Bool>
+    func setPostFavoriteState(isFavoriteRequest: Bool, postId: String, postType: PostOriginType) -> Single<Bool>
 }
 
 public protocol AppliableWorkerEmployCardVMable: WorkerEmployCardViewModelable {

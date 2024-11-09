@@ -23,15 +23,29 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .staticFramework,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
-            sources: ["Sources/**"],
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
+            sources: [
+                "Sources/**",
+            ],
             resources: ["Resources/**"],
             dependencies: [
 
                 // Presentation
+                D.Presentation.SplashFeature,
                 D.Presentation.AuthFeature,
-                D.Presentation.WorkerFeature,
-                D.Presentation.CenterFeature,
+                D.Presentation.CenterMainPageFeature,
+                D.Presentation.WorkerMainPageFeature,
+                D.Presentation.CenterCetificatePageFeature,
+                D.Presentation.AccountDeregisterFeature,
+                D.Presentation.PostDetailForWorkerFeature,
+                D.Presentation.UserProfileFeature,
+                D.Presentation.NotificationPageFeature,
+                D.Presentation.ChattingFeature,
+                
+                // ThirParty
+                D.ThirdParty.FirebaseMessaging,
+                D.ThirdParty.FirebaseRemoteConfig,
+                D.ThirdParty.FirebaseCrashlytics
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
@@ -44,7 +58,7 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .app,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             infoPlist: IdleInfoPlist.exampleAppDefault,
             sources: ["ExampleApp/Sources/**"],
             resources: ["ExampleApp/Resources/**"],

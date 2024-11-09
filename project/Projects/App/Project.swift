@@ -23,10 +23,11 @@ let project = Project(
             product: .app,
             productName: DeploymentSettings.productName,
             bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             infoPlist: IdleInfoPlist.mainApp,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
+            entitlements: .file(path: .relativeToRoot("Entitlements/App/Idle-iOS.entitlements")),
             scripts: [
                 .crashlyticsScript
             ],
@@ -34,43 +35,8 @@ let project = Project(
                 
                 // Presentation
                 D.Presentation.RootFeature,
-                
-                // Domain
-                D.Domain.ConcreteUseCase,
-                
-                // Data
-                D.Data.ConcreteRepository,
-                
-                // Logger
-                D.App.ConcreteLogger,
             ],
             settings: .settings(
-                configurations: IdleConfiguration.appConfigurations
-            )
-        ),
-        
-        .target(
-            name: "ConcreteLogger",
-            destinations: DeploymentSettings.platforms,
-            product: .staticLibrary,
-            bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER).concretelogger",
-            deploymentTargets: DeploymentSettings.deployment_version,
-            sources: [
-                "ConcreteLogger/**",
-                SecretSource.amplitudeConfig,
-            ],
-            dependencies: [
-                
-                D.Presentation.RootFeature,
-                D.Domain.LoggerInterface,
-                
-                // ThirdParty
-                D.ThirdParty.Amplitude,
-            ],
-            settings: .settings(
-                base: [
-                    "ENABLE_TESTABILITY": "YES",
-                ],
                 configurations: IdleConfiguration.appConfigurations
             )
         ),
@@ -81,7 +47,7 @@ let project = Project(
             destinations: DeploymentSettings.platforms,
             product: .unitTests,
             bundleId: "com.idleApplication.test",
-            deploymentTargets: DeploymentSettings.deployment_version,
+            deploymentTargets: DeploymentSettings.deployment_iOS_version,
             sources: ["Tests/**"],
             dependencies: [.target(name: "Idle-iOS")]
         )

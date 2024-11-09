@@ -4,17 +4,17 @@ import PackageDescription
 #if TUIST
     import ProjectDescription
 
-    let packageSettings = PackageSettings(
-        // Customize the product types for specific package product
-        // Default is .staticFramework
-        productTypes: [
-            "RxSwift": .framework,
-            "RxCocoa": .framework,
-        ],
-        baseSettings: .settings(
-            configurations: [
-                .debug(name: "debug"),
-                .release(name: "release"),
+let packageSettings = PackageSettings(
+    // Customize the product types for specific package product
+    // Default is .staticFramework
+    productTypes: [
+        "RxSwift": .framework,
+        "RxCocoa": .framework,
+    ],
+    baseSettings: .settings(
+        configurations: [
+            .debug(name: "debug"),
+            .release(name: "release"),
                 .release(name: "qa")
             ]
         )

@@ -194,4 +194,8 @@ extension AuthAPI: BaseAPI {
             return .requestPlain
         }
     }
+    
+    public var validationType: ValidationType {
+        .successCodes
+    }
 }

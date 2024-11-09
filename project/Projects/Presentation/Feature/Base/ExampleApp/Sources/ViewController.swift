@@ -30,10 +30,6 @@ class ViewController: BaseViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        self.viewModel?
-            .snackBar
-            .onNext(.init(titleText: "테스트테스트테스트"))
     }
 }
 
