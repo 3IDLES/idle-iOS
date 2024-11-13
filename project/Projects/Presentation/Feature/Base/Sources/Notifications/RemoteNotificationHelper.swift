@@ -16,7 +16,7 @@ public protocol RemoteNotificationHelper {
     var deeplinks: BehaviorSubject<DeeplinkBundle> { get }
     
     /// 인앱에서 발생한 Notification을 처리합니다.
-    func handleNotificationInApp(detail: NotificationDetailVO)
+    func handleNotificationInApp(detail: NotificationDestinationForInApp)
 }
 
 public enum DeepLinkPathComponent {

@@ -66,7 +66,7 @@ extension NotificationItemDTO: EntityRepresentable {
             printIfDebug("\(NotificationItemDTO.self): 생성날짜 디코딩 실패")
         }
         
-        var notificationDetail: NotificationDetailVO?
+        var notificationDetail: NotificationDestinationForInApp?
         switch notificationType {
             case .APPLICANT:
                 if let postId = (notificationDetails as? ApplicantInfluxDTO)?.toEntity() {
