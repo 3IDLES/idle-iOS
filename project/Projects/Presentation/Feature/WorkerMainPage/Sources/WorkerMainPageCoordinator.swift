@@ -15,6 +15,7 @@ public enum WorkerMainPageCoordinatorDestination {
     case authFlow
     case myProfilePage
     case accountDeregisterPage
+    case notificationPage
 }
 
 public class WorkerMainPageCoordinator: BaseCoordinator {
@@ -86,6 +87,9 @@ public extension WorkerMainPageCoordinator {
     func presentPostBoardPage(controller: UINavigationController) {
         
         let viewModel = MainPostBoardViewModel()
+        viewModel.presentNotificationPage = { [weak self] in
+            self?.startFlow(.notificationPage)
+        }
         viewModel.presentMyProfile = { [weak self] in
             self?.startFlow(.myProfilePage)
         }
