@@ -1,24 +1,22 @@
 //
 //  NotificationBellView.swift
-//  CenterMainPageFeature
+//  DSKit
 //
-//  Created by choijunios on 10/22/24.
+//  Created by choijunios on 11/13/24.
 //
 
 import UIKit
 
-import DSKit
-
-class NotificationBellView: UIView {
+public class NotificationBellView: UIView {
     
-    let button: UIButton = {
+    public let button: UIButton = {
         let button = UIButton()
         button.setImage(DSIcon.notiBell.image, for: .normal)
         button.imageView?.tintColor = DSColor.gray200.color
         return button
     }()
     
-    let unreadPoint: UIView = {
+    public let unreadPoint: UIView = {
         let view: UIView = .init()
         view.backgroundColor = DSColor.red200.color
         view.layer.cornerRadius = 3
@@ -27,7 +25,7 @@ class NotificationBellView: UIView {
         return view
     }()
     
-    init() {
+    public init() {
         super.init(frame: .zero)
         
         setAutoLayout()
@@ -62,7 +60,7 @@ class NotificationBellView: UIView {
         ])
     }
     
-    func setUnreadState(_ showUnreadPoint: Bool) {
+    public func setUnreadState(_ showUnreadPoint: Bool) {
         UIView.animate(withDuration: 0.35) {
             self.unreadPoint.alpha = showUnreadPoint ? 1 : 0
         }

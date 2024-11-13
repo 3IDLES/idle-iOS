@@ -32,13 +32,7 @@ class WorkerMainTopView: UIView {
         return imageView
     }()
     
-    let notificationImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = DSIcon.bell.image
-        imageView.tintColor = DSColor.gray200.color
-        imageView.isHidden = true
-        return imageView
-    }()
+    let notificationBellView: NotificationBellView = .init()
     
     private let disposeBag = DisposeBag()
     
