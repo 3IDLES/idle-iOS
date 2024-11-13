@@ -166,6 +166,8 @@ extension AppCoordinator {
         coordinator.startFlow = { [weak self] destination in
             guard let self else { return }
             switch destination {
+            case .notificationPage:
+                userNotifications()
             case .accountDeregisterPage:
                 accountDeregister(userType: .worker)
             case .authFlow:
