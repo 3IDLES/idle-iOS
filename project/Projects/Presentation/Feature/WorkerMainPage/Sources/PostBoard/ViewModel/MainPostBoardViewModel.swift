@@ -50,6 +50,15 @@ protocol WorkerRecruitmentPostBoardVMable: WorkerAppliablePostBoardVMable {
     
     /// 요양보호사 위치 정보를 전달합니다.
     var workerLocationTitleText: Driver<String>? { get }
+    
+    var viewWillAppear: PublishSubject<Void> { get }
+    
+    /// 읽지않은 알림이 있는 경우
+    var unreadNotificationExist: Driver<Bool> { get }
+    
+    /// ‼️임시조치: 알림 확인창 오픈 여부를 설정합니다.
+    var showNotificationButton: Bool { get }
+    var notificationButtonClicked: PublishSubject<Void> { get }
 }
 
 class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
@@ -57,23 +66,30 @@ class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
     @Injected var recruitmentPostUseCase: RecruitmentPostUseCase
     @Injected var workerProfileUseCase: WorkerProfileUseCase
     
+    @Injected var remoteConfigService: RemoteConfigService
+    @Injected var norificationsRepository: NotificationsRepository
+    
     // Navigation
     var presentMyProfile: (() -> ())?
     var presentSnackBar: ((IdleSnackBarRO, CGFloat) -> ())?
     var presentPostDetailPage: ((String, PostOriginType) -> ())?
+    var presentNotificationPage: (() -> ())?
     
     // Output
     var postBoardData: Driver<(isRefreshed: Bool, postData: [RecruitmentPostForWorkerRepresentable])>?
     var workerLocationTitleText: Driver<String>?
     var idleAlertVM: RxCocoa.Driver<any DSKit.IdleAlertViewModelable>?
+    var unreadNotificationExist: Driver<Bool> = .empty()
     
     
     // Input
+    var viewWillAppear: PublishSubject<Void> = .init()
     var editProfileButtonClicked: PublishRelay<Void> = .init()
     var requestInitialPageRequest: PublishRelay<Void> = .init()
     var requestWorkerLocation: PublishRelay<Void> = .init()
     var requestNextPage: PublishRelay<Void> = .init()
     var applyButtonClicked: PublishRelay<(postId: String, postTitle: String)> = .init()
+    var notificationButtonClicked: PublishSubject<Void> = .init()
     
     // Paging
     /// 값이 nil이라면 요청을 보내지 않습니다.
@@ -84,9 +100,35 @@ class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
     // Observable
     let dispostBag = DisposeBag()
     
+    var showNotificationButton: Bool = false
+    
     override init() {
         
         super.init()
+        
+        // Notification버튼 활성화 여부
+        do {
+            let value = try remoteConfigService.getBoolProperty(key: "show_notification_button")
+            self.showNotificationButton = value
+        } catch {
+            fatalError(error.localizedDescription)
+        }
+        // -----------------------------------------------
+        
+        
+        // 읽지 않은 알람 분기
+        self.unreadNotificationExist = viewWillAppear
+            .unretained(self)
+            .flatMap { (vm, _) in
+                vm.norificationsRepository
+                    .unreadNotificationCount()
+            }
+            .compactMap { $0.value }
+            .map { count in
+                count > 0
+            }
+            .asDriver(onErrorDriveWith: .never())
+        
         
         // MARK: 상단 위치정보 불러오기
         workerLocationTitleText = requestWorkerLocation
@@ -286,6 +328,15 @@ class MainPostBoardViewModel: BaseViewModel, WorkerRecruitmentPostBoardVMable {
                 obj.presentMyProfile?()
             })
             .disposed(by: dispostBag)
+        
+        
+        // MARK: Notification page
+        notificationButtonClicked
+            .unretained(self)
+            .subscribe(onNext: { (obj, _) in
+                obj.presentNotificationPage?()
+            })
+            .disposed(by: disposeBag)
         
         Observable
             .merge(

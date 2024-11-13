@@ -21,7 +21,7 @@ class MainPostBoardViewController: BaseViewController {
     typealias WorknetCell = WorkerWorknetEmployCardCell
     
     // View
-    fileprivate let topContainer: WorkerMainTopView = {
+    fileprivate let titleView: WorkerMainTopView = {
         let container = WorkerMainTopView(innerViews: [])
         return container
     }()
@@ -56,11 +56,17 @@ class MainPostBoardViewController: BaseViewController {
         
         super.bind(viewModel: viewModel)
         
+        
+        // ------------ 임시 설정 (RemoteConfig)
+        titleView.notificationBellView.isHidden = !viewModel.showNotificationButton
+        // ------------------------
+        
+        
         // Output
         viewModel
             .workerLocationTitleText?
             .drive(onNext: { [weak self] titleText in
-                self?.topContainer.locationLabel.textString = titleText
+                self?.titleView.locationLabel.textString = titleText
             })
             .disposed(by: disposeBag)
         
@@ -99,7 +105,27 @@ class MainPostBoardViewController: BaseViewController {
             })
             .disposed(by: disposeBag)
         
+        viewModel
+            .unreadNotificationExist
+            .drive(onNext: { [weak self] isExist in
+                self?.titleView.notificationBellView
+                    .setUnreadState(isExist)
+            })
+            .disposed(by: disposeBag)
+        
+        
         // Input
+        self.rx.viewWillAppear
+            .mapToVoid()
+            .bind(to: viewModel.viewWillAppear)
+            .disposed(by: disposeBag)
+        
+        // 알림 페이지 버튼 클릭
+        titleView.notificationBellView.button.rx.tap
+            .bind(to: viewModel.notificationButtonClicked)
+            .disposed(by: disposeBag)
+        
+        
         self.emptyScreen
             .editProfile.rx.tap
             .bind(to: viewModel.editProfileButtonClicked)
@@ -143,7 +169,7 @@ class MainPostBoardViewController: BaseViewController {
     private func setLayout() {
         
         [
-            topContainer,
+            titleView,
             postTableView,
             emptyScreen,
         ].forEach {
@@ -152,16 +178,16 @@ class MainPostBoardViewController: BaseViewController {
         }
         
         NSLayoutConstraint.activate([
-            topContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            topContainer.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            topContainer.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            titleView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            titleView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            titleView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             
-            postTableView.topAnchor.constraint(equalTo: topContainer.bottomAnchor),
+            postTableView.topAnchor.constraint(equalTo: titleView.bottomAnchor),
             postTableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             postTableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             postTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            emptyScreen.topAnchor.constraint(equalTo: topContainer.bottomAnchor),
+            emptyScreen.topAnchor.constraint(equalTo: titleView.bottomAnchor),
             emptyScreen.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             emptyScreen.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             emptyScreen.bottomAnchor.constraint(equalTo: view.bottomAnchor),
