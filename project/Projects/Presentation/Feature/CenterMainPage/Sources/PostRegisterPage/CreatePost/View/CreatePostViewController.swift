@@ -59,7 +59,7 @@ public class CreatePostViewController: BaseViewController {
     }()
     lazy var statusBar: ProcessStatusBar = {
         let view = ProcessStatusBar(
-            processCount: RegisterRecruitmentPage.allCases.count,
+            processCount: RegisterRecruitmentPage.stages.count,
             startIndex: 0
         )
         return view
