@@ -15,7 +15,7 @@ public struct NotificationVO {
     public let body: String
     public let createdDate: Date
     public let imageDownloadInfo: ImageDownLoadInfo?
-    public let notificationDetails: NotificationDetailVO?
+    public let notificationDetails: NotificationDestinationForInApp?
     
     public init(
         id: String,
@@ -24,7 +24,7 @@ public struct NotificationVO {
         body: String,
         createdDate: Date,
         imageDownloadInfo: ImageDownLoadInfo?,
-        notificationDetails: NotificationDetailVO?
+        notificationDetails: NotificationDestinationForInApp?
     ) {
         self.id = id
         self.isRead = isRead
@@ -36,6 +36,7 @@ public struct NotificationVO {
     }
 }
 
-public enum NotificationDetailVO {
+public enum NotificationDestinationForInApp {
     case applicant(id: String)
+    case postDetailForWorker(info: RecruitmentPostInfo)
 }
