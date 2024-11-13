@@ -40,7 +40,7 @@ class DeeplinkParser {
                 if startFromRoot {
                     start = try findRoot(component: component)
                 } else {
-                    start = try findStartPoint(component: component)
+                    start = try findBranchPoint(component: component)
                 }
                 
                 deeplinks.append(start)
@@ -61,17 +61,21 @@ class DeeplinkParser {
         switch component {
         case .centerMainPage:
             return CenterMainPageDeeplink()
+        case .workerMainPage:
+            return WorkerMainPageDeepLink()
         default:
             throw DeeplinkParserError.rootNotFound
         }
     }
     
-    private func findStartPoint(component: DeepLinkPathComponent) throws -> DeeplinkExecutable {
+    private func findBranchPoint(component: DeepLinkPathComponent) throws -> DeeplinkExecutable {
         switch component {
         case .centerMainPage:
             return CenterMainPageDeeplink()
         case .postApplicantPage:
             return PostApplicantDeeplink()
+        case .workerMainPage:
+            return CenterMainPageDeeplink()
         default:
             throw DeeplinkParserError.startPointNotFound
         }
