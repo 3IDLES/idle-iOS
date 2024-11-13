@@ -70,7 +70,7 @@ class WorkerMainTopView: UIView {
                     Spacer(width: 4),
                     locationLabel,
                     Spacer(),
-                    notificationImageView
+                    notificationBellView
                 ],
                 innerViews
             ].flatMap { $0 },
@@ -89,8 +89,8 @@ class WorkerMainTopView: UIView {
             locationImageView.widthAnchor.constraint(equalToConstant: 32),
             locationImageView.heightAnchor.constraint(equalTo: locationImageView.widthAnchor),
             
-            notificationImageView.widthAnchor.constraint(equalToConstant: 32),
-            notificationImageView.heightAnchor.constraint(equalTo: notificationImageView.widthAnchor),
+            notificationBellView.widthAnchor.constraint(equalToConstant: 32),
+            notificationBellView.heightAnchor.constraint(equalTo: notificationBellView.widthAnchor),
             
             mainStack.leftAnchor.constraint(equalTo: self.layoutMarginsGuide.leftAnchor),
             mainStack.rightAnchor.constraint(equalTo: self.layoutMarginsGuide.rightAnchor),
