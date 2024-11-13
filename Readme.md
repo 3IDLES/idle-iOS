@@ -80,6 +80,21 @@
 </td>
 
 </tr>
+
+<tr>
+<td><b>요양보호사 거주지 주변 공고 알림</b></td>
+<td><b>-</b></td>
+<td><b>-</b></td>
+</tr>
+
+<tr>
+<td>
+    <img src="https://github.com/user-attachments/assets/3e029c19-3ecd-4d5b-9ebf-e5ee104e27a7" width=300 />    
+</td>
+<td><b>to be continued</b></td>
+<td><b>to be continued</b></td>
+</tr>
+
 </table>
 
 
