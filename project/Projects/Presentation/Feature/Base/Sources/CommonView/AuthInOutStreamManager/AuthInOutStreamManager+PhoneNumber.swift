@@ -51,10 +51,7 @@ public extension AuthInOutStreamManager {
             .flatMap { [useCase, input] _ in
 
                 let formatted = Self.formatPhoneNumber(phoneNumber: input.editingPhoneNumber.value)
-#if DEBUG
-                print("✅ 디버그모드에서 번호인증 요청 무조건 통과")
-                return Single.just(Result<String, DomainError>.success(formatted))
-#endif
+
                 return useCase.requestPhoneNumberAuthentication(phoneNumber: formatted)
             }
             .share()

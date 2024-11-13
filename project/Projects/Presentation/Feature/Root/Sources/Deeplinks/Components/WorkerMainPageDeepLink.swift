@@ -13,7 +13,7 @@ class WorkerMainPageDeepLink: DeeplinkExecutable {
     var component: DeepLinkPathComponent = .centerMainPage
     
     var children: [DeeplinkExecutable] = [
-        PostApplicantDeeplink()
+        PostDetailForWorkerDeepLink()
     ]
     
     var isDestination: Bool = false
@@ -26,8 +26,8 @@ class WorkerMainPageDeepLink: DeeplinkExecutable {
             return nil
         }
         
-        let mainPageCoordinator = appCoordinator.runWorkerMainPageFlow()
+        let _ = appCoordinator.runWorkerMainPageFlow()
         
-        return mainPageCoordinator
+        return appCoordinator
     }
 }
