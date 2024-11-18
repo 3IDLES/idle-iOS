@@ -101,7 +101,7 @@ jobs:
           cd project
           make generate
           xcrun simctl list devices
-          xcodebuild test -workspace SWM-Idle.xcworkspace -scheme TestScheme -destination "platform=iOS Simulator,name=iPhone 16 Pro,OS=18.0"
+          xcodebuild test -workspace SWM-Idle.xcworkspace -scheme TestScheme -destination "platform=iOS Simulator,name=iPhone 14 Pro,OS=18.0"
 
     
 
