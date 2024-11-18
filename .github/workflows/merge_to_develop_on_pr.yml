@@ -17,10 +17,10 @@ jobs:
       TUIST_VERSION: 4.12.1
     steps:
 
-      #1. load mise
+      #1. mise툴을 로드
       - uses: jdx/mise-action@v2
 
-      #2. cache tuist
+      #2. Tuist 캐싱정보 확인
       - name: cache tuist
         id: cache-tuist
         uses: actions/cache@v4
@@ -28,26 +28,22 @@ jobs:
           path: /Users/runner/.local/share/mise/shims/tuist
           key: ${{ runner.os }}-tuist@${{ env.TUIST_VERSION }}
     
-      #3. install tuist
+      #3. Tuist 설치, 캐싱 정보확인 실패시 실행
       - name: install tuist
         if: steps.cache-tuist.outputs.cache-hit != 'true'
         run: |
           mise install tuist@${{ env.TUIST_VERSION }}
           mise use -g tuist@${{ env.TUIST_VERSION }}
-          
-      - name: install tree
-        run: brew install tree
 
       - name: check paths
         run: |
           echo "tuist in installed in $(which tuist)"
-          echo "tree in installed in $(which tree)"
       
-      #4. checkout tuist project repository
+      #4. 프로젝트 다운로드
       - name: checkout project
         uses: actions/checkout@v4
       
-      #5. fetch XCConfig from repository
+      #5. XCConfig파일 및 유출금지파일 다운로드
       - name: fetch Secrets
         uses: actions/checkout@v4
         with:
@@ -58,7 +54,6 @@ jobs:
       - name: check secret files
         run: |
           echo "Checking configurations are loaded..."
-          tree ${{ github.workspace }}/project/Secrets
       
       #6. test tuist project
       - name: Test project
