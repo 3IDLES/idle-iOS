@@ -90,8 +90,8 @@ jobs:
           cd project
           tuist install
           mkdir -p /Users/runner/spm_builds
-          cp -r project/Tuist/.build /Users/runner/spm_builds
-          cp project/Tuist/Package.swift /Users/runner/spm_builds
+          cp -r '${{ github.workspace }}/project/Tuist/.build' /Users/runner/spm_builds
+          cp '${{ github.workspace }}/project/Tuist/Package.swift' /Users/runner/spm_builds
 
       #9. update cache .build & Package.swift
       - name: cache build
