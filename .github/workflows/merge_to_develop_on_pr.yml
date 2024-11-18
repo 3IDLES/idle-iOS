@@ -1,4 +1,4 @@
-name: PR to [develop]
+name: TestFlow
 on: 
   workflow_dispatch:
 
