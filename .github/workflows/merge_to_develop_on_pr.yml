@@ -79,27 +79,13 @@ jobs:
           echo "::set-output name=is_same::false"
           diff /Users/runner/spm_builds/Package.swift Package.swift > /dev/null && \
           echo "::set-output name=is_same::true"
-
-      # debuging ---
-      - name: Debug Cache Build
-        run: |
-          echo "cache-spm-build.cache-hit: ${{ steps.cache-spm-build.outputs.cache-hit }}"
-
-      - name: Debug Cached Package.swift
-        run: |
-          echo "cache-package-swift.cache-hit: ${{ steps.cache-package-swift.outputs.cache-hit }}"  
-          
-      - name: Debug Diff Package.swift
-        run: |
-          echo "check-diff-package-swift.is_same: ${{ steps.check-diff-package-swift.outputs.is_same }}"
-      # debuging ---
       
       #8. tuist install
       - name: Tuist install
         if: >
-          (steps.check-diff-package-swift.outputs.is_same == 'false') || 
-          (steps.cache-spm-build.outputs.cache-hit == 'false') || 
-          (steps.cache-package-swift.outputs.cache-hit == 'false')
+          (steps.check-diff-package-swift.outputs.is_same != 'true') || 
+          (steps.cache-spm-build.outputs.cache-hit != 'true') || 
+          (steps.cache-package-swift.outputs.cache-hit != 'true')
         run: |
           cd project
           tuist install
