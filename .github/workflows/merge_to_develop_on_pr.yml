@@ -24,6 +24,7 @@ jobs:
       - name: install tuist
         if: steps.cache-tuist.outputs.cache-hit != 'true'
         run: |
+          mise config set local-path /Users/runner/.local/share/mise/shims
           mise install tuist@${{ env.TUIST_VERSION }}
           mise use -g tuist@${{ env.TUIST_VERSION }}
 
@@ -92,19 +93,7 @@ jobs:
           mkdir -p /Users/runner/spm_builds
           cp -r '${{ github.workspace }}/project/Tuist/.build' /Users/runner/spm_builds
           cp '${{ github.workspace }}/project/Tuist/Package.swift' /Users/runner/spm_builds
-
-      #9. update cache .build & Package.swift
-      - name: cache build
-        uses: actions/cache@v4
-        with:
-          path: /Users/runner/spm_builds/.build
-          key: spm-build
-      - name: cache package
-        uses: actions/cache@v4
-        with:
-          path: /Users/runner/spm_builds/Package.swift
-          key: spm-package
-
+          ls -l /Users/runner/spm_builds
 
       #10. 프로젝트 테스트 시작
       - name: Test project
