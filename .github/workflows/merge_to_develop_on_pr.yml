@@ -24,9 +24,9 @@ jobs:
       - name: install tuist
         if: steps.cache-tuist.outputs.cache-hit != 'true'
         run: |
-          mise config set local-path /Users/runner/.local/share/mise/shims
           mise install tuist@${{ env.TUIST_VERSION }}
           mise use -g tuist@${{ env.TUIST_VERSION }}
+          mise where tuist
 
       - name: check paths
         run: |
