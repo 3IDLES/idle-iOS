@@ -1,4 +1,4 @@
-name: PR to [develop]
+name: Test
 on: 
   pull_request:
     branches: [ develop ]
