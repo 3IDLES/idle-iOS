@@ -17,7 +17,7 @@ jobs:
         id: cache-tuist
         uses: actions/cache@v4
         with:
-          path: /Users/runner/.local/share/mise/shims/tuist
+          path: /Users/runner/.local/share/mise/installs/tuist/${{ env.TUIST_VERSION }}
           key: ${{ runner.os }}-tuist@${{ env.TUIST_VERSION }}
     
       #3. Tuist 설치, 캐싱 정보확인 실패시 실행
