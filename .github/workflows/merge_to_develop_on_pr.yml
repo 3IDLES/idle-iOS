@@ -83,7 +83,7 @@ jobs:
       #8. tuist install
       - name: Tuist install
         if: >
-          (steps.check-diff-package-swift.outputs.is_same != 'true') || 
+          (steps.check-diff-package-swift.outputs.is_same != 'true') || 
           (steps.cache-spm-build.outputs.cache-hit != 'true') || 
           (steps.cache-package-swift.outputs.cache-hit != 'true')
         run: |
