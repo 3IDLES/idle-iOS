@@ -1,14 +1,6 @@
-name: Test
+name: TestFlow
 on: 
-  pull_request:
-    branches: [ develop ]
-
-#1. load mise
-#2. cache tuist
-#3. install tuist
-#4. checkout tuist project repository
-#5. fetch XCConfig from repository
-#6. test tuist project
+  workflow_dispatch:
 
 jobs:
   test:
@@ -17,10 +9,10 @@ jobs:
       TUIST_VERSION: 4.12.1
     steps:
 
-      #1. load mise
+      #1. mise툴을 로드
       - uses: jdx/mise-action@v2
 
-      #2. cache tuist
+      #2. Tuist 캐싱정보 확인
       - name: cache tuist
         id: cache-tuist
         uses: actions/cache@v4
@@ -28,26 +20,22 @@ jobs:
           path: /Users/runner/.local/share/mise/shims/tuist
           key: ${{ runner.os }}-tuist@${{ env.TUIST_VERSION }}
     
-      #3. install tuist
+      #3. Tuist 설치, 캐싱 정보확인 실패시 실행
       - name: install tuist
         if: steps.cache-tuist.outputs.cache-hit != 'true'
         run: |
           mise install tuist@${{ env.TUIST_VERSION }}
           mise use -g tuist@${{ env.TUIST_VERSION }}
-          
-      - name: install tree
-        run: brew install tree
 
       - name: check paths
         run: |
           echo "tuist in installed in $(which tuist)"
-          echo "tree in installed in $(which tree)"
       
-      #4. checkout tuist project repository
+      #4. 프로젝트 다운로드
       - name: checkout project
         uses: actions/checkout@v4
       
-      #5. fetch XCConfig from repository
+      #5. XCConfig파일 및 유출금지파일 다운로드
       - name: fetch Secrets
         uses: actions/checkout@v4
         with:
@@ -58,14 +46,74 @@ jobs:
       - name: check secret files
         run: |
           echo "Checking configurations are loaded..."
-          tree ${{ github.workspace }}/project/Secrets
+
+      #6-1. 캐싱된 .build파일이 있는 지 확인하기
+      - name: checkout package builds
+        id: cache-spm-build
+        uses: actions/cache@v4
+        with:
+          path: /Users/runner/spm_builds/.build
+          key: spm-build
       
-      #6. test tuist project
-      - name: Test project
+      #6-2. 캐싱된 .build파일이 있는 경우 해당 파일을 .build디렉토리로 링킹
+      - name: Link Cached Build to Project
+        if: steps.cache-spm-build.outputs.cache-hit == 'true'
+        run: |
+          cd project/Tuist
+          rsync -a /Users/runner/spm_builds/.build/ .build/
+      
+      #7-1. 캐싱된 Package.swift가 있는지 확인
+      - name: checkout Package.swift
+        id: cache-package-swift
+        uses: actions/cache@v4
+        with:
+          path: /Users/runner/spm_builds/Package.swift
+          key: spm-package
+
+      #7-2. 캐싱된 Package.swift와 현재 레포지토리의 파일을 비교
+      - name: Link Cached Packages.swift
+        id: check-diff-package-swift
+        if: steps.cache-package-swift.outputs.cache-hit == 'true'
+        run: |
+          cd project/Tuist
+          echo "::set-output name=is_same::false"
+          diff /Users/runner/spm_builds/Package.swift Package.swift > /dev/null && \
+          echo "::set-output name=is_same::true"
+      
+      #8. tuist install
+      - name: Tuist install
+        if: >
+          (steps.check-diff-package-swift.outputs.is_same == 'false') || 
+          (steps.cache-spm-build.outputs.cache-hit == 'false') || 
+          (steps.cache-package-swift.outputs.cache-hit == 'false')
         run: |
           cd project
           tuist install
-          make test
+          mkdir -p /Users/runner/spm_builds
+          cp -r project/Tuist/.build /Users/runner/spm_builds
+          cp project/Tuist/Package.swift /Users/runner/spm_builds
+
+      #9. update cache .build & Package.swift
+      - name: cache build
+        uses: actions/cache@v4
+        with:
+          path: /Users/runner/spm_builds/.build
+          key: spm-build
+      - name: cache package
+        uses: actions/cache@v4
+        with:
+          path: /Users/runner/spm_builds/Package.swift
+          key: spm-package
+
+
+      #10. 프로젝트 테스트 시작
+      - name: Test project
+        run: |
+          cd project
+          make generate
+          xcodebuild test -workspace SWM-Idle.xcworkspace -scheme TestScheme -destination "platform=iOS Simulator,name=iPhone 16 Pro,OS=18.0"
+
+    
 
   
 
