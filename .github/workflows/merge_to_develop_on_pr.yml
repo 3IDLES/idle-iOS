@@ -99,9 +99,10 @@ jobs:
       - name: Test project
         run: |
           cd project
-          make generate
-          xcrun simctl list devices
-          xcodebuild test -workspace SWM-Idle.xcworkspace -scheme TestScheme -destination "platform=iOS Simulator,name=iPhone 14 Pro,OS=18.0"
+          tuist cache
+          make test
+          
+          
 
     
 
