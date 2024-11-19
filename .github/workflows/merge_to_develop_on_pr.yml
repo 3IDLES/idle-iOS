@@ -61,7 +61,7 @@ jobs:
         if: steps.cache-spm-build.outputs.cache-hit == 'true'
         run: |
           cd project/Tuist
-          rsync -a /Users/runner/spm_builds/.build/ .build/
+          rsync -a /Users/runner/spm_builds/.build/ .
       
       #7-1. 캐싱된 Package.swift가 있는지 확인
       - name: checkout Package.swift
@@ -95,11 +95,16 @@ jobs:
           cp '${{ github.workspace }}/project/Tuist/Package.swift' /Users/runner/spm_builds
           ls -l /Users/runner/spm_builds
 
-      #10. 프로젝트 테스트 시작
+      #10. Cache project
       - name: Test project
         run: |
           cd project
           tuist cache
+    
+      #11. 프로젝트 테스트 시작
+      - name: Test project
+        run: |
+          cd project
           make test
           
           
