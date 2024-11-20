@@ -1,6 +1,7 @@
-name: TestFlow
+name: ExecuteAllTestables
 on: 
-  workflow_dispatch:
+  pull_request:
+    branches: [ develop ]
 
 jobs:
   test:
