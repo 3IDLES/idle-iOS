@@ -270,50 +270,6 @@ class CenterProfileViewController: BaseViewController {
         
         super.bind(viewModel: viewModel)
         
-        // input
-        
-        let bindFinished = PublishRelay<Void>()
-        
-        bindFinished
-            .bind(to: viewModel.readyToFetch)
-            .disposed(by: disposeBag)
-        
-        // 내 센터보기 상태인 경우(수정가능한 프로필 상태)
-        if case .myProfile = viewModel.mode {
-            
-            profileEditButton
-                .eventPublisher
-                .bind(to: viewModel.editingButtonPressed)
-                .disposed(by: disposeBag)
-            
-            editingCompleteButton
-                .eventPublisher
-                .bind(to: viewModel.editingFinishButtonPressed)
-                .disposed(by: disposeBag)
-            
-            centerPhoneNumeberField.rx.text
-                .compactMap { $0 }
-                .bind(to: viewModel.editingPhoneNumber)
-                .disposed(by: disposeBag)
-            
-            centerIntroductionField.rx.text
-                .compactMap { $0 }
-                .bind(to: viewModel.editingInstruction)
-                .disposed(by: disposeBag)
-            
-            centerImageView
-                .selectedImage
-                .compactMap { $0 }
-                .bind(to: viewModel.selectedImage)
-                .disposed(by: disposeBag)
-        }
-        
-        navigationBar
-            .backButton
-            .rx.tap
-            .bind(to: viewModel.exitButtonClicked)
-            .disposed(by: disposeBag)
-        
         // output
         
         navigationBar.titleLabel.textString = viewModel.navigationBarTitle
@@ -400,6 +356,53 @@ class CenterProfileViewController: BaseViewController {
             profileEditButton.isHidden = true
             centerImageView.state.accept(.normal)
         }
+        
+        // input
+        
+        let bindFinished = PublishRelay<Void>()
+        
+        bindFinished
+            .bind(to: viewModel.readyToFetch)
+            .disposed(by: disposeBag)
+        
+        viewModel.profileImageSize.onNext(.init(width: UIScreen.main.bounds.width-40, height: 250))
+        
+        
+        // 내 센터보기 상태인 경우(수정가능한 프로필 상태)
+        if case .myProfile = viewModel.mode {
+            
+            profileEditButton
+                .eventPublisher
+                .bind(to: viewModel.editingButtonPressed)
+                .disposed(by: disposeBag)
+            
+            editingCompleteButton
+                .eventPublisher
+                .bind(to: viewModel.editingFinishButtonPressed)
+                .disposed(by: disposeBag)
+            
+            centerPhoneNumeberField.rx.text
+                .compactMap { $0 }
+                .bind(to: viewModel.editingPhoneNumber)
+                .disposed(by: disposeBag)
+            
+            centerIntroductionField.rx.text
+                .compactMap { $0 }
+                .bind(to: viewModel.editingInstruction)
+                .disposed(by: disposeBag)
+            
+            centerImageView
+                .selectedImage
+                .compactMap { $0 }
+                .bind(to: viewModel.selectedImage)
+                .disposed(by: disposeBag)
+        }
+        
+        navigationBar
+            .backButton
+            .rx.tap
+            .bind(to: viewModel.exitButtonClicked)
+            .disposed(by: disposeBag)
         
         // 바인딩 종료
         bindFinished.accept(())
