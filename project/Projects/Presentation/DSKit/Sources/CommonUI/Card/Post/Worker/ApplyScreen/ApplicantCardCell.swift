@@ -12,6 +12,7 @@ import Domain
 
 import RxSwift
 import RxCocoa
+import SimpleImageProvider
 
 public class ApplicantCardCell: UITableViewCell {
     
@@ -58,23 +59,19 @@ public class ApplicantCardCell: UITableViewCell {
         
         self.viewModel = viewModel
         
+        if let imageURL = viewModel.getProfileImageURL() {
+            
+            self.cardView.workerProfileImage
+                .simple
+                .setImage(url: imageURL, size: .init(width: 72, height: 72))
+        }
+        
         let disposables: [Disposable?] = [
             // Output
             viewModel
                 .renderObject?
                 .drive(onNext: { [cardView] ro in
                     cardView.bind(ro: ro)
-                }),
-            
-            viewModel
-                .displayingImage?
-                .drive(onNext: { [weak self] image in
-                    
-                    guard let self else { return }
-                   
-                    UIView.transition(with: contentView, duration: 0.1, options: .transitionCrossDissolve) {
-                        self.cardView.workerProfileImage.image = image
-                    }
                 }),
    
             // Input

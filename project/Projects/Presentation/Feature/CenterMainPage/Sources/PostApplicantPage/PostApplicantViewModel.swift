@@ -96,12 +96,12 @@ class PostApplicantViewModel: BaseViewModel, PostApplicantViewModelable {
 
 // MARK: ApplicantCardVM
 class ApplicantCardVM: ApplicantCardViewModelable {
-    @Injected var cacheRepository: CacheRepository
     
     // Navigation
     var presentApplicantDetail: ((String) -> ())?
     
     // Init
+    let applicantVO: PostApplicantVO
     let id: String
     
     var showProfileButtonClicked: PublishRelay<Void> = .init()
@@ -109,26 +109,18 @@ class ApplicantCardVM: ApplicantCardViewModelable {
     var staredThisWorker: PublishRelay<Bool> = .init()
     
     var renderObject: Driver<ApplicantCardRO>?
-    var displayingImage: RxCocoa.Driver<UIImage>?
     
     private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     let disposeBag = DisposeBag()
     
     init(vo: PostApplicantVO) {
+        self.applicantVO = vo
         self.id = vo.workerId
         
         // MARK: RenderObject
         let publishRelay: BehaviorRelay<ApplicantCardRO> = .init(value: .mock)
         renderObject = publishRelay.asDriver(onErrorJustReturn: .mock)
-        
-        if let imageInfo = vo.imageInfo {
-            
-            displayingImage = cacheRepository
-                .getImage(imageInfo: imageInfo)
-                .subscribe(on: imageDownLoadScheduler)
-                .asDriver(onErrorDriveWith: .never())
-        }
         
         publishRelay
             .accept(ApplicantCardRO.create(vo: vo))
@@ -140,5 +132,9 @@ class ApplicantCardVM: ApplicantCardViewModelable {
                 obj.presentApplicantDetail?(obj.id)
             })
             .disposed(by: disposeBag)
+    }
+    
+    func getProfileImageURL() -> String? {
+        self.applicantVO.imageInfo?.imageURL.absoluteString
     }
 }

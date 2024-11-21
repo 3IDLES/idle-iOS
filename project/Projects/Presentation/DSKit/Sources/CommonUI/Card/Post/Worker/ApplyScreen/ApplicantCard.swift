@@ -68,7 +68,8 @@ public protocol ApplicantCardViewModelable {
     
     // Output
     var renderObject: Driver<ApplicantCardRO>? { get }
-    var displayingImage: Driver<UIImage>? { get }
+    
+    func getProfileImageURL() -> String?
 }
 
 public class ApplicantCard: UIView {
