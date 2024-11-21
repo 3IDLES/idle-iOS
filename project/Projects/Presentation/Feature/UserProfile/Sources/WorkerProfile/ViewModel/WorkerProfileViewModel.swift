@@ -38,6 +38,7 @@ class WorkerProfileViewModel: BaseViewModel, OtherWorkerProfileViewModelable {
     var viewWillAppear: PublishRelay<Void> = .init()
     var exitButtonClicked: PublishRelay<Void> = .init()
     var phoneCallButtonClicked: PublishRelay<Void> = .init()
+    let displayingUserProfileImageSize: PublishSubject<CGSize> = .init()
     
     // Output
     var uploadSuccess: Driver<Void>?
@@ -45,9 +46,6 @@ class WorkerProfileViewModel: BaseViewModel, OtherWorkerProfileViewModelable {
     var profileRenderObject: Driver<WorkerProfileRenderObject>?
     private let rederingState: BehaviorRelay<WorkerProfileRenderObject> = .init(value: .createRO(isMyProfile: true, vo: .mock))
     var displayingImage: RxCocoa.Driver<UIImage?>?
-    
-    // Image
-    private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     // Editing & State
     var willSubmitImage: UIImage?
@@ -87,10 +85,11 @@ class WorkerProfileViewModel: BaseViewModel, OtherWorkerProfileViewModelable {
         
         let waitProfileImage = fetchedProfileVOSuccess
             .compactMap { $0.profileImageInfo }
+            
         
-        displayingImage = waitProfileImage
-            .observe(on: imageDownLoadScheduler)
-            .flatMap { [cacheRepository] downloadInfo in
+        displayingImage = Observable
+            .combineLatest(waitProfileImage, displayingUserProfileImageSize)
+            .flatMap { [cacheRepository] (downloadInfo, size) in
                 cacheRepository
                     .getImage(imageInfo: downloadInfo)
             }

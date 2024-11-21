@@ -40,5 +40,11 @@ public struct PresentationAssembly: Assembly {
         container.register(ChattingListFeatureFactory.self) { _ in
             DefaultChattingListFeatureFactory()
         }
+        
+        // MARK: ImageProvider
+        container.register(ImageProvider.self) { _ in
+            DefaultImageProvider()
+        }
+        .inObjectScope(.container)
     }
 }
