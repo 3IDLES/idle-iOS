@@ -57,7 +57,7 @@ let package = Package(
         // WebpCoder
         .package(url: "https://github.com/SDWebImage/SDWebImageWebPCoder.git", from: "0.14.6"),
         // SimpleImageProvider
-        .package(url: "https://github.com/J0onYEong/SimpleImageProvider.git", from: "1.0.1"),
+        .package(url: "https://github.com/J0onYEong/SimpleImageProvider.git", from: "1.0.2"),
         
         
         // MARK: Product logging
