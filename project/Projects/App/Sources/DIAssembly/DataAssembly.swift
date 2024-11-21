@@ -56,12 +56,6 @@ public struct DataAssembly: Assembly {
         }
         
         
-        // MARK: 캐싱 레포지토리
-        container.register(CacheRepository.self) { _ in
-            return DefaultCacheRepository()
-        }
-        .inObjectScope(.container)
-        
         // MARK: 로컬에 저장된 유저정보 레포지토리
         container.register(UserInfoLocalRepository.self) { _ in
             DefaultUserInfoLocalRepository()
