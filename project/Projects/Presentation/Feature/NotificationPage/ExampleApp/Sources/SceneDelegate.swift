@@ -44,13 +44,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         coordinator?.start()
     }
 }
-
-public class TestAssembly: Assembly {
-    
-    public func assemble(container: Swinject.Container) {
-        
-        container.register(CacheRepository.self) { _ in
-            DefaultCacheRepository()
-        }
-    }
-}
