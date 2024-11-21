@@ -33,6 +33,8 @@ protocol CenterProfileInputable {
     var editingFinishButtonPressed: PublishRelay<Void> { get }
     var editingPhoneNumber: BehaviorRelay<String> { get }
     var editingInstruction: BehaviorRelay<String> { get }
+    
+    var profileImageSize: PublishSubject<CGSize> { get }
     var selectedImage: BehaviorRelay<UIImage?> { get }
     
     var exitButtonClicked: PublishRelay<Void> { get }
@@ -56,7 +58,7 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     let mode: ProfileMode
     
     // Injected
-    @Injected var cacheRepository: CacheRepository
+    @Injected var imageProvider: ImageProvider
     @Injected var profileUseCase: CenterProfileUseCase
     
     // Navigation
@@ -75,6 +77,7 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     var editingInstruction: BehaviorRelay<String> = .init(value: "")
     var selectedImage: BehaviorRelay<UIImage?> = .init(value: nil)
     var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
+    var profileImageSize: PublishSubject<CGSize> = .init()
     
     // 기본 데이터
     let navigationBarTitle: String
@@ -91,9 +94,6 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
     
     // 요구사항 X
     var editingValidation: Driver<Void>?
-    
-    // Image
-    private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     init(mode: ProfileMode) {
         
@@ -152,15 +152,16 @@ class CenterProfileViewModel: BaseViewModel, CenterProfileViewModelable {
             .asDriver(onErrorJustReturn: "")
         
         
-        let waitImageLoading = profileRequestSuccess
+        let profileImageInfo = profileRequestSuccess
             .compactMap { profileVO in profileVO.profileImageInfo }
         
-        
-        let fetchCenterImageInfo = waitImageLoading
-            .observe(on: imageDownLoadScheduler)
-            .flatMap { [cacheRepository] downloadInfo in
-                cacheRepository
-                    .getImage(imageInfo: downloadInfo)
+        let fetchCenterImageInfo = Observable.zip(profileImageInfo, profileImageSize)
+            .flatMap { [imageProvider] (downloadInfo, size) in
+                
+                let url = downloadInfo.imageURL.absoluteString
+                
+                return imageProvider
+                    .getImage(url: url, size: size)
             }.map { image -> UIImage? in image }
         
         // MARK: image validation
