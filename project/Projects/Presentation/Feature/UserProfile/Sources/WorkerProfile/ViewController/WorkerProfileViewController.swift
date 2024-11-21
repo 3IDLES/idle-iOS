@@ -14,6 +14,7 @@ import BaseFeature
 
 import RxSwift
 import RxCocoa
+import SimpleImageProvider
 
 class WorkerProfileViewController: BaseViewController {
     
@@ -43,7 +44,7 @@ class WorkerProfileViewController: BaseViewController {
         view.layer.cornerRadius = 48
         view.clipsToBounds = true
         view.image = DSKitAsset.Icons.workerProfilePlaceholder.image
-        view.contentMode = .scaleAspectFit
+        view.contentMode = .scaleAspectFill
 
         return view
     }()
@@ -452,7 +453,6 @@ class WorkerProfileViewController: BaseViewController {
             .map { _ in () }
             .bind(to: viewModel.viewWillAppear)
             .disposed(by: disposeBag)
-
         
         // Output
         viewModel
@@ -475,22 +475,17 @@ class WorkerProfileViewController: BaseViewController {
                 addressLabel.textString = ro.address
                 introductionLabel.textString = ro.oneLineIntroduce
                 abilityLabel.textString = ro.specialty
-            })
-            .disposed(by: disposeBag)
-        
-        viewModel
-            .displayingImage?
-            .drive(onNext: { [weak self] image in
-                guard let self else { return }
-                UIView.transition(with: view, duration: 0.2) {
-                    self.workerProfileImage .image = image
+                
+                if let imageURL = ro.imageURL {
+                    
+                    profileImageContainer.simple.setImage(
+                        url: imageURL,
+                        size: .init(width: 96, height: 96),
+                        fadeOutDuration: 0.2
+                    )
                 }
             })
             .disposed(by: disposeBag)
-    }
-    
-    func cleanUp() {
-        
     }
 }
 

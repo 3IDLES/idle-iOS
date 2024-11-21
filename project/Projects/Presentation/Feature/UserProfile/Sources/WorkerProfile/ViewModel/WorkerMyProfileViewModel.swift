@@ -25,7 +25,6 @@ protocol WorkerProfileViewModelable: BaseViewModel {
     var exitButtonClicked: PublishRelay<Void> { get }
     
     // Output
-    var displayingImage: Driver<UIImage?>? { get }
     var profileRenderObject: Driver<WorkerProfileRenderObject>? { get }
 }
 
@@ -47,7 +46,6 @@ protocol WorkerProfileEditViewModelable: WorkerProfileViewModelable {
 class WorkerMyProfileViewModel: BaseViewModel, WorkerProfileEditViewModelable {
 
     // Injeced
-    @Injected var cacheRepository: CacheRepository
     @Injected var workerProfileUseCase: WorkerProfileUseCase
 
     // Navigation
@@ -67,18 +65,14 @@ class WorkerMyProfileViewModel: BaseViewModel, WorkerProfileEditViewModelable {
     
     // Input(Rendering)
     var viewWillAppear: PublishRelay<Void> = .init()
-    
     var exitButtonClicked: RxRelay.PublishRelay<Void> = .init()
     
     // Output
     var uploadSuccess: Driver<Void>?
     
     var profileRenderObject: Driver<WorkerProfileRenderObject>?
-    var displayingImage: Driver<UIImage?>?
     private let rederingState: BehaviorRelay<WorkerProfileRenderObject> = .init(value: .createRO(isMyProfile: true, vo: .mock))
     
-    // Image
-    private let imageDownLoadScheduler = ConcurrentDispatchQueueScheduler(qos: .userInitiated)
     
     // Editing & State
     var willSubmitImageInfo: ImageUploadInfo?
@@ -122,6 +116,7 @@ class WorkerMyProfileViewModel: BaseViewModel, WorkerProfileEditViewModelable {
                 
                 return vo
             }
+            .share()
             
         
         fetchedProfileVOSuccess
@@ -132,17 +127,6 @@ class WorkerMyProfileViewModel: BaseViewModel, WorkerProfileEditViewModelable {
             .bind(to: rederingState)
             .disposed(by: disposbag)
         
-        displayingImage = fetchedProfileVOSuccess
-            .compactMap { $0.profileImageInfo }
-            .observe(on: imageDownLoadScheduler)
-            .flatMap { [cacheRepository] downloadInfo in
-                cacheRepository
-                    .getImage(imageInfo: downloadInfo)
-            }
-            .map({ image -> UIImage? in
-                image
-            })
-            .asDriver(onErrorJustReturn: nil)
         
         exitButtonClicked
             .unretained(self)
