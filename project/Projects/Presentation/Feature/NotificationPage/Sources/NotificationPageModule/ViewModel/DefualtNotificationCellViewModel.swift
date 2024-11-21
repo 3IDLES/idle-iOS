@@ -20,7 +20,6 @@ import RxCocoa
 class NotificationCellViewModel {
     
     // Injected
-    @Injected var cacheRepository: CacheRepository
     @Injected var notificationsRepository: NotificationsRepository
     @Injected var remoteNotificationHelper: RemoteNotificationHelper
     
@@ -34,7 +33,6 @@ class NotificationCellViewModel {
     
     // Output
     var isRead: Driver<Bool>?
-    var profileImage: Driver<UIImage>?
     
     let disposeBag: DisposeBag = .init()
     
@@ -47,13 +45,6 @@ class NotificationCellViewModel {
         isRead = isReadSubject
             .asDriver(onErrorDriveWith: .never())
         
-        // MARK: 프로필 이미지
-        
-        if let imageDownloadInfo = notificationVO.imageDownloadInfo {
-            profileImage = cacheRepository
-                .getImage(imageInfo: imageDownloadInfo)
-                .asDriver(onErrorDriveWith: .never())
-        }
         
         // MARK: 클릭 이벤트
         
@@ -121,5 +112,10 @@ class NotificationCellViewModel {
         default:
             return "\(Int(diff/86400))일 전"
         }
+    }
+    
+    func getPrfileImageURL() -> String? {
+        
+        notificationVO.imageDownloadInfo?.imageURL.absoluteString
     }
 }

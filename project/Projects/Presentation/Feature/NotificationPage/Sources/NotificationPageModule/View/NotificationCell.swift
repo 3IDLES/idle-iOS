@@ -11,6 +11,7 @@ import DSKit
 
 import RxCocoa
 import RxSwift
+import SimpleImageProvider
 
 class NotificationCell: UITableViewCell {
     
@@ -132,6 +133,11 @@ class NotificationCell: UITableViewCell {
         titleLabel.textString = notificationVO.title
         subTitleLabel.textString = notificationVO.body
         
+        if let imageURL = viewModel.getPrfileImageURL() {
+            
+            profileImageView.simple.setImage(url: imageURL, size: .init(width: 48, height: 48))
+        }
+        
         // Reactive
         disposables = [
             // Input
@@ -143,17 +149,6 @@ class NotificationCell: UITableViewCell {
                 .drive(onNext: { [weak self] isRead in
                     self?.setState(isRead: isRead)
                 }),
-            
-            viewModel
-                .profileImage?
-                .drive(onNext: { [weak self] image in
-                    
-                    guard let self else { return }
-                    
-                    UIView.transition(with: contentView, duration: 0.15, options: .transitionCrossDissolve) {
-                        self.profileImageView.image = image
-                    }
-                })
         ]
     }
     
