@@ -56,6 +56,8 @@ let package = Package(
         .package(url: "https://github.com/J0onYEong/NaverMapSDKForSPM.git", from: "1.0.0"),
         // WebpCoder
         .package(url: "https://github.com/SDWebImage/SDWebImageWebPCoder.git", from: "0.14.6"),
+        // SimpleImageProvider
+        .package(url: "https://github.com/J0onYEong/SimpleImageProvider.git", from: "1.0.0"),
         
         
         // MARK: Product logging

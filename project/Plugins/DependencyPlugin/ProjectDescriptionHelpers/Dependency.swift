@@ -5,7 +5,7 @@
 //  Created by 최준영 on 6/20/24.
 //
 
-import ProjectDescription
+@preconcurrency import ProjectDescription
 import Foundation
 
 public typealias D = ModuleDependency
@@ -48,6 +48,7 @@ public extension ModuleDependency {
         public static let NaverMapSDKForSPM: TargetDependency = .external(name: "Junios.NMapSDKForSPM")
         public static let Amplitude: TargetDependency = .external(name: "AmplitudeSwift")
         public static let SDWebImageWebPCoder: TargetDependency = .external(name: "SDWebImageWebPCoder")
+        public static let SimpleImageProvider: TargetDependency = .external(name: "SimpleImageProvider")
         
         // FireBase
         public static let FirebaseRemoteConfig: TargetDependency = .external(name: "FirebaseRemoteConfig")
