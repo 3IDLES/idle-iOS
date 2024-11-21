@@ -38,7 +38,7 @@ public class EditWorkerProfileViewController: BaseViewController {
         view.layer.cornerRadius = 48
         view.clipsToBounds = true
         view.image = DSKitAsset.Icons.workerProfilePlaceholder.image
-        view.contentMode = .scaleAspectFit
+        view.contentMode = .scaleAspectFill
 
         return view
     }()
@@ -413,15 +413,14 @@ public class EditWorkerProfileViewController: BaseViewController {
                 addressSearchButton.label.textString = ro.address
                 introductionInputField.textString = ro.oneLineIntroduce
                 abilityInputField.textString = ro.specialty
-            })
-            .disposed(by: disposeBag)
-        
-        viewModel
-            .displayingImage?
-            .drive(onNext: { [weak self] image in
-                guard let self else { return }
-                UIView.transition(with: view, duration: 0.2) {
-                    self.workerProfileImage .image = image
+                
+                if let imageURL = ro.imageURL {
+                    
+                    profileImageContainer.simple.setImage(
+                        url: imageURL,
+                        size: .init(width: 96, height: 96),
+                        fadeOutDuration: 0.2
+                    )
                 }
             })
             .disposed(by: disposeBag)

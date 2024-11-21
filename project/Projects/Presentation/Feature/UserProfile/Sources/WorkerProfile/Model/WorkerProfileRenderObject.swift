@@ -25,6 +25,7 @@ public struct WorkerProfileRenderObject {
     let address: String
     let oneLineIntroduce: String
     let specialty: String
+    let imageURL: String?
     
     static func createRO(isMyProfile: Bool, vo: WorkerProfileVO) -> WorkerProfileRenderObject {
         
@@ -43,7 +44,8 @@ public struct WorkerProfileRenderObject {
             address: vo.address.roadAddress,
             oneLineIntroduce: vo.introductionText.emptyDefault("-"),
             specialty: vo.specialty
-                .emptyDefault("-")
+                .emptyDefault("-"),
+            imageURL: vo.profileImageInfo?.imageURL.absoluteString
         )
     }
 }
