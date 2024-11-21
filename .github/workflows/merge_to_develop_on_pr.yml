@@ -78,9 +78,11 @@ jobs:
         if: steps.cache-package-swift.outputs.cache-hit == 'true'
         run: |
           cd project/Tuist
-          echo "::set-output name=is_same::false"
-          diff /Users/runner/spm_builds/Package.swift Package.swift > /dev/null && \
-          echo "::set-output name=is_same::true"
+          if diff /Users/runner/spm_builds/Package.swift Package.swift > /dev/null; then
+            echo "is_same=true" >> $GITHUB_ENV
+          else
+            echo "is_same=false" >> $GITHUB_ENV
+          fi
       
       #8. tuist install & cache
       - name: Tuist install & cache
