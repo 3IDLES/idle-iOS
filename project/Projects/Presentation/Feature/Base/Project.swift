@@ -35,6 +35,7 @@ let project = Project(
 
                 // ThirdParty
                 D.ThirdParty.NaverMapSDKForSPM,
+                D.ThirdParty.SimpleImageProvider,
             ],
             settings: .settings(
                 configurations: IdleConfiguration.presentationConfigurations
